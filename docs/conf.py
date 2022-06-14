@@ -4,7 +4,7 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import builder2builder2ibek
+import builder2ibek
 
 # -- General configuration ------------------------------------------------
 
@@ -12,7 +12,7 @@ import builder2builder2ibek
 project = "builder2ibek"
 
 # The full version, including alpha/beta/rc tags.
-release = builder2builder2ibek.__version__
+release = builder2ibek.__version__
 
 # The short X.Y version.
 if "+" in release:

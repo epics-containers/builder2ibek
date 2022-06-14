@@ -1,5 +1,5 @@
 builder2ibek
-====
+============
 
 |code_ci| |docs_ci| |coverage| |pypi_version| |license|
 
@@ -22,25 +22,6 @@ Documentation  https://epics-containers.github.io/builder2ibek
 Releases       https://github.com/epics-containers/builder2ibek/releases
 ============== ==============================================================
 
-TODO
-----
-
-This project is approaching completion. The following items are still to do:
-
-    - Complete documentation in general
-
-    - Add a diagram and more details. Use draw.io for image, and save as SVG
-      with source embed in it, save as something.draw.io.svg
-
-    - DONE: Add ability to define embedded objects e.g. AsynIp and AsynSerial would
-      both be defined by embedding AsynPort (so similar to how original builder.py
-      works)
-
-    - Add support for enums where you define the possible values inline
-
-    - DONE: update helm-template/config/start.sh to call 'builder2ibek build-startup' when it
-      sees a ioc.boot.yaml file in the startup directory. This change requires
-      embedding builder2ibek into the epics-base container image.
 
 .. |code_ci| image:: https://github.com/epics-containers/builder2ibek/workflows/Code%20CI/badge.svg?branch=master
     :target: https://github.com/epics-containers/builder2ibek/actions?query=workflow%3A%22Code+CI%22
