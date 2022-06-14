@@ -118,10 +118,6 @@ jobs:
           name: ${{ matrix.python }}/${{ matrix.os }}/${{ matrix.lock }}
           files: cov.xml
 
-      - name: Generate builder2ibek.defs.schema.json
-        run: |
-          builder2ibek builder2ibek-schema builder2ibek.defs.schema.json
-
       - name: Upload build files
         if: matrix.lock
         uses: actions/upload-artifact@v2
@@ -130,7 +126,6 @@ jobs:
           path: |
             requirements.txt
             requirements_dev.txt
-            builder2ibek.defs.schema.json
 
   release:
     needs: [lint, wheel, test]
