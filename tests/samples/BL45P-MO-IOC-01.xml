@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_MAX_ARRAY_BYTES" value="6000000"/>
+	<devIocStats.devIocStatsHelper ioc="BL45P-MO-IOC-01" name="MO1_STATS"/>
+	<pmac.pmacAsynIPPort IP="172.23.59.21" name="BRICK1port"/>
+	<pmac.GeoBrick P="BL45P-MO-STEP-01" Port="BRICK1port" name="BRICK1"/>
+	<pmac.pmacDisableLimitsCheck Axis="2" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.2"/>
+	<pmac.pmacDisableLimitsCheck Axis="3" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.3"/>
+	<pmac.pmacDisableLimitsCheck Axis="4" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.4"/>
+	<pmac.pmacDisableLimitsCheck Axis="5" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.5"/>
+	<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="2" DESC="Theta top" DHLM="10000000" DLLM="-10000000" EGU="deg" HOMEVISSTR="Absolute Encoder" M=":THETA:TOP" MRES="0.087890625" P="BL45P-MO-STAGE-01" PORT="BRICK1" PREC="3" SPORT="BRICK1port" TWV="1" VELO="90" VMAX="1080" name="STAGE1.THETA_TOP"/>
+	<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="3" DESC="Theta bottom" DHLM="10000000" DLLM="-10000000" EGU="deg" HOMEVISSTR="Absolute Encoder" M=":THETA:BOT" MRES="0.087890625" P="BL45P-MO-STAGE-01" PORT="BRICK1" PREC="3" SPORT="BRICK1port" TWV="1" VELO="90" VMAX="1080" name="STAGE1.THETA_BOT"/>
+	<pmac.dls_pmac_asyn_motor ADDR="4" DESC="Hor EnDat chopper" DHLM="10000000" DLLM="-10000000" EGU="deg" HOMEVIS="0" HOMEVISSTR="Absolute Encoder" M=":ENDAT" MRES="0.000043" P="BL45P-MO-CHOP-01" PORT="BRICK1" PREC="5" SPORT="BRICK1port" TWV="1" VELO="43" name="CHOP1.HOR"/>
+	<pmac.dls_pmac_asyn_motor ACCL="0.01" ADDR="5" DESC="Ver Biss chopper" DHLM="10000000" DLLM="-10000000" EGU="deg" ERES="" HOMEVIS="0" HOMEVISSTR="Absolute Encoder" M=":BISS" MRES="0.000687" P="BL45P-MO-CHOP-01" PORT="BRICK1" PREC="5" SPORT="BRICK1port" TWV="1" VELO="720" name="CHOP1.VER"/>
+	<pmac.dls_pmac_asyn_motor ADDR="6" DESC="Sample X" DHLM="19" DLLM="0.0" EGU="mm" M=":X" MRES="0.0001" P="BL45P-MO-STAGE-01" PORT="BRICK1" PREC="3" SPORT="BRICK1port" TWV="1" VELO="5" name="STAGE1.X"/>
+	<pmac.dls_pmac_asyn_motor ADDR="7" DESC="Sample Y top" DHLM="4" DLLM="-1" EGU="mm" M=":Y:TOP" MRES="0.0005" P="BL45P-MO-STAGE-01" PORT="BRICK1" PREC="3" SPORT="BRICK1port" TWV="1" VELO="5" name="STAGE1.Y_TOP"/>
+	<pmac.dls_pmac_asyn_motor ADDR="8" DESC="Sample Y bottom" DHLM="4" DLLM="-1" EGU="mm" M=":Y:BOT" MRES="0.0005" P="BL45P-MO-STAGE-01" PORT="BRICK1" PREC="3" SPORT="BRICK1port" TWV="1" VELO="5" name="STAGE1.Y_BOT"/>
+	<pmac.autohome GRP2="Theta" GRP3="X" GRP4="Y top" GRP5="Y bottom" P="BL45P-MO-STAGE-01" PLC="10" PORT="BRICK1" name="STAGE1.HOME"/>
+	<pmac.CS CS="1" Controller="BRICK1" IdlePoll="1000" PARENTPORT="BRICK1port" name="BRICK1.CS1"/>
+	<pmac.CS CS="2" Controller="BRICK1" IdlePoll="1000" PARENTPORT="BRICK1port" name="BRICK1.CS2"/>
+	<pmac.CS CS="3" Controller="BRICK1" IdlePoll="1000" PARENTPORT="BRICK1port" name="BRICK1.CS3"/>
+	<pmac.dls_pmac_cs_asyn_motor ACCL="0.1" ADDR="7" DESC="Theta position" DHLM="10000" DLLM="-10000" EGU="deg" M=":THETA:POS" MRES="0.0001" P="BL45P-MO-STAGE-01" PORT="BRICK1.CS2" PREC="3" TWV="5" VELO="30" name="STAGE1.CS.THETA"/>
+	<pmac.dls_pmac_cs_asyn_motor ACCL="0.1" ADDR="8" DESC="Theta skew" DHLM="360" DLLM="-360" EGU="deg" M=":THETA:SKEW" MRES="0.0001" P="BL45P-MO-STAGE-01" PORT="BRICK1.CS2" PREC="3" TWV="5" VELO="10" name="STAGE1.CS.THETA_SKEW"/>
+	<pmac.dls_pmac_cs_asyn_motor ADDR="7" DESC="CS Y" DHLM="4" DLLM="-1" EGU="mm" M=":CS:Y" MRES="0.0001" P="BL45P-MO-STAGE-01" PORT="BRICK1.CS3" PREC="3" TWV="0.5" VELO="5" name="STAGE1.CS.Y"/>
+	<pmac.dls_pmac_cs_asyn_motor ADDR="8" DESC="CS Y stretch" DHLM="2" DLLM="-2" EGU="mm" M=":CS:Y:STRETCH" MRES="0.0001" P="BL45P-MO-STAGE-01" PORT="BRICK1.CS3" PREC="3" TWV="0.5" VELO="5" name="STAGE1.CS.Y_STRETCH"/>
+	<!--This can be removed if we get kinematics working with straight through axes in the same CS.-->
+	<!--<pmac.dls_pmac_cs_asyn_motor ADDR="9" DESC="CS X" EGU="mm" M=":CS:X" MRES="0.0001" P="BL45P-MO-STAGE-01" PORT="BRICK1.CS3" PREC="3" TWV="0.5" VELO="5" name="STAGE1.CS.X"/>-->
+	<!--Adding this template for Malcolm Demo-->
+	<pmac.GeoBrickTrajectoryControlT NPOINTS="500000" PORT="BRICK1" name="BRICK1.TRAJ"/>
+	<pmac.pmacCreateCsGroup AxisCount="9" Controller="BRICK1" GroupName="Default" GroupNumber="0" name="BRICK1.DEFAULT"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="2" Controller="BRICK1" CoordSysNumber="2" GroupNumber="0" name="BRICK1.CS.GROUP0.AXIS2"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="3" Controller="BRICK1" CoordSysNumber="2" GroupNumber="0" name="BRICK1.CS.GROUP0.AXIS3"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="Z" AxisNumber="6" Controller="BRICK1" CoordSysNumber="3" GroupNumber="0" name="BRICK1.CS.GROUP0.AXIS4"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="7" Controller="BRICK1" CoordSysNumber="3" GroupNumber="0" name="BRICK1.CS.GROUP0.AXIS5"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="8" Controller="BRICK1" CoordSysNumber="3" GroupNumber="0" name="BRICK1.CS.GROUP0.AXIS6"/>
+</components>

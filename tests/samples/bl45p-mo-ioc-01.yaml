@@ -1,0 +1,241 @@
+# yaml-language-server: $schema=file://ibek/pmac.ibek.entities.schema.json
+ioc_name: bl45p-mo-ioc-01
+description: motion IOC for the test beamline p45 in G13
+generic_ioc_image: ghcr.io/epics-containers/ioc-pmac-run:1.2.0
+
+# TODO need to make use of lists / strings consistent
+# ANSWERS - script \n separated string, include,define are lists
+# currently include_args is a list, define_args is a string, script is a list
+# script should be a string, not sure about include_args but it could be a , and CR
+# separate string?
+
+# TODO would be good to have 'databases: include_all' for auto-substitution modules.
+# ANSWERS - use wildcards in include args
+
+entities:
+  - type: epics.EPICS_CA_MAX_ARRAY_BYTES
+    max_bytes: 6000000
+
+  - type: pmac.PmacAsynIPPort
+    name: BRICK1port
+    IP: 172.23.59.21
+
+  - type: deviocstats.iocAdminSoft
+    IOC: BL45P-MO-IOC-01
+
+  - type: pmac.Geobrick
+    name: BRICK1
+    # NOTE: validation cannot check the object type (NEVER FIX)
+    PORT: BRICK1port
+    P: BL45P-MO-STEP-01
+    # NOTE: There is no honouring defaults in Database files
+    # in fact we repeat the defaults in the definitions YAML
+    # ANSWER OK!
+    numAxes: 8
+    idlePoll: 100
+    movingPoll: 500
+
+  - type: pmac.DlsPmacAsynMotor
+    name: STAGE1.THETA_TOP
+    Controller: BRICK1
+    axis: 2
+    P: BL45P-MO-STAGE-01
+    M: :THETA:TOP
+    ACCL: 0.1
+    MRES: 0.087890625
+    VELO: 90
+    # NOTE: VMAX is a string because we usually use $(VELO)
+    # ? Would a Union be better - what about other number args
+    VMAX: "1080"
+    HOMEVISSTR: Absolute Encoder
+    EGU: deg
+
+  - type: pmac.DlsPmacAsynMotor
+    name: STAGE1.THETA_BOT
+    Controller: BRICK1
+    ACCL: 0.1
+    axis: 3
+    P: BL45P-MO-STAGE-01
+    M: :THETA:BOT
+    DESC: Theta bottom
+    EGU: deg
+    HOMEVISSTR: Absolute Encoder
+    MRES: 0.087890625
+    PREC: 3
+    VELO: 90
+    VMAX: "1080"
+
+  - type: pmac.DlsPmacAsynMotor
+    name: CHOP1.HOR
+    Controller: BRICK1
+    axis: 4
+    P: BL45P-MO-CHOP-01
+    M: :ENDAT
+    DESC: Hor EnDat chopper
+    EGU: deg
+    HOMEVIS: 0
+    HOMEVISSTR: Absolute Encoder
+    MRES: 0.000043
+    PREC: 5
+    VELO: 43
+
+  - type: pmac.DlsPmacAsynMotor
+    name: CHOP1.VER
+    Controller: BRICK1
+    ACCL: 0.01
+    axis: 5
+    P: BL45P-MO-CHOP-01
+    M: :BISS
+    DESC: Ver Biss chopper
+    EGU: deg
+    HOMEVIS: 0
+    HOMEVISSTR: Absolute Encoder
+    MRES: 0.000687
+    PREC: 5
+    VELO: 720
+
+  - type: pmac.DlsPmacAsynMotor
+    name: STAGE1.X
+    Controller: BRICK1
+    axis: 6
+    P: BL45P-MO-STAGE-01
+    M: :X
+    DESC: Sample X
+    DHLM: 19
+    DLLM: 0.0
+    EGU: mm
+    MRES: 0.0001
+    PREC: 3
+    VELO: 5
+
+  - type: pmac.DlsPmacAsynMotor
+    name: STAGE1.Y_TOP
+    Controller: BRICK1
+    axis: 7
+    P: BL45P-MO-STAGE-01
+    M: :Y:TOP
+    DESC: Sample Y top
+    DHLM: 4
+    DLLM: -1
+    EGU: mm
+    MRES: 0.0005
+    PREC: 3
+    VELO: 5
+
+  - type: pmac.DlsPmacAsynMotor
+    name: STAGE1.Y_BOT
+    Controller: BRICK1
+    P: BL45P-MO-STAGE-01
+    M: :Y:BOT
+    axis: 8
+    DESC: Sample Y bottom
+    DHLM: 4
+    DLLM: -1
+    EGU: mm
+    MRES: 0.0005
+    PREC: 3
+    VELO: 5
+
+  - type: pmac.CS
+    name: BRICK1.CS1
+    CS: 1
+    Controller: BRICK1
+
+    # NOTE: objects must be defined before references to them.
+    # Vscode schema checks do NOT pick this up and the apischema error is v bad.
+  - type: pmac.CS
+    name: BRICK1.CS2
+    CS: 2
+    Controller: BRICK1
+
+  - type: pmac.CS
+    name: BRICK1.CS3
+    CS: 3
+    Controller: BRICK1
+
+  - type: pmac.DlsCsPmacAsynMotor
+    name: STAGE1.CS.THETA
+    CsController: BRICK1.CS2
+    axis: 7
+    P: BL45P-MO-STAGE-01
+    M: :THETA:POS
+    ACCL: 0.1
+    MRES: 0.0001
+    VELO: 30
+    DESC: Theta position
+    DHLM: 10000
+    DLLM: -10000
+    EGU: deg
+    PREC: 3
+    TWV: 5
+
+  - type: pmac.DlsCsPmacAsynMotor
+    name: STAGE1.CS.THETA_SKEW
+    CsController: BRICK1.CS2
+    axis: 8
+    P: BL45P-MO-STAGE-01
+    M: :THETA:SKEW
+    ACCL: 0.1
+    DESC: Theta skew
+    DHLM: 360
+    DLLM: -360
+    EGU: deg
+    MRES: 0.0001
+    PREC: 3
+    TWV: 5
+    VELO: 10
+
+  - type: pmac.DlsCsPmacAsynMotor
+    name: STAGE1.CS.Y
+    CsController: BRICK1.CS3
+    axis: 7
+    P: BL45P-MO-STAGE-01
+    M: :CS:Y
+    DESC: CS Y
+    DHLM: 4
+    DLLM: -1
+    EGU: mm
+    MRES: 0.0001
+    PREC: 3
+    TWV: 0.5
+    VELO: 5
+
+  - type: pmac.DlsCsPmacAsynMotor
+    name: STAGE1.CS.Y_STRETCH
+    CsController: BRICK1.CS3
+    axis: 8
+    P: BL45P-MO-STAGE-01
+    M: :CS:Y:STRETCH
+    DESC: CS Y stretch
+    DHLM: 2
+    DLLM: -2
+    EGU: mm
+    MRES: 0.0001
+    PREC: 3
+    TWV: 0.5
+    VELO: 5
+
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 2
+
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 3
+
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 4
+
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 5
+
+  - type: pmac.autohome
+    Controller: BRICK1
+    P: BL45P-MO-STAGE-01
+    PLC: 10
+    GRP2: Theta
+    GRP3: X
+    GRP4: Y top
+    GRP5: Y bottom

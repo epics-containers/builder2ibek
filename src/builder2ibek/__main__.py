@@ -5,6 +5,7 @@ import typer
 from ruamel.yaml import YAML
 
 from builder2ibek import __version__
+from builder2ibek.builder import Builder
 
 cli = typer.Typer()
 yaml = YAML()
@@ -31,10 +32,12 @@ def main(
 
 @cli.command()
 def file(
-    input: Path = typer.Argument(..., help="Filename of the builder XML file"),
-    output: Path = typer.Option(..., help="Output file"),
+    xml: Path = typer.Argument(..., help="Filename of the builder XML file"),
+    yaml: Optional[Path] = typer.Option(..., help="Output file"),
 ):
     """Convert a single builder XML file into a single ibek YAML"""
+    b = Builder()
+    b.load(xml)
 
 
 @cli.command()
