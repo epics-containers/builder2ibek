@@ -3,17 +3,7 @@ builder2ibek
 
 |code_ci| |docs_ci| |coverage| |pypi_version| |license|
 
-IOC Builder for EPICS and Kubernetes:
-
-- In an EPICS support module describe what entities an IOC using it can create,
-  what arguments they take, and what database and st.cmd snippets it should
-  generate in a ``builder.yaml`` file
-- Build support modules together in a container image and use ``builder2ibek`` in the
-  image to create a JSON schema of what an IOC using that image can contain
-- Write an ``ioc.yaml`` file against that schema listing instances of the
-  entities with arguments
-- Use ``builder2ibek`` to generate a startup script, database and Helm chart that runs
-  up the IOC contained in the image with them
+Tool for converting DLS builder IOCS to ibek containerized IOCS.
 
 ============== ==============================================================
 PyPI           ``pip install builder2ibek``
