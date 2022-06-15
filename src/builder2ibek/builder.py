@@ -2,32 +2,62 @@
 Defines classes for reading a builder XML IOC definition
 """
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List
 from xml.dom.minidom import parse
 
-from .dispatch import dispatch
+
+@dataclass
+class Element:
+    name: str
+    attributes: Dict[str, str]
+
+
+@dataclass
+class Module:
+    name: str
+    elements: List[Element]
 
 
 class Builder:
+    """
+    A class for interpreting builder XML and creating an object graph of its
+    contents like this:
+    Builder -> Dictionary of Module -> List of Element -> Element name, Attributes
+    """
+
+    def __init__(self) -> None:
+        file: str
+        name: str
+        arch: str
+        modules: Dict[str, Module]
+
     def load(self, input_file: Path):
         """
-        parse an XML file and build an ibek Support object model
+        parse an XML file and populate this Builder object
         """
-        entities: List[Dict[str, str]] = []
+        self.file = input_file
+        self.name = input_file.stem
+        self.modules: Dict[str, Module] = {}
         xml = parse(str(input_file))
 
         components = xml.firstChild
         assert components.tagName == "components"
-        arch = components.attributes["arch"].nodeValue
+        self.arch = components.attributes["arch"].nodeValue
 
         element = components.firstChild
 
         while element is not None:
             if element.attributes is not None:
-                builder_name = element.tagName
-                attributes = {key: val for key, val in element.attributes.items()}
+                module_name, element_name = element.tagName.split(".", 1)
+                attributes = element.attributes.items()
 
-                entities.append(dispatch(arch, builder_name, attributes))
+                if module_name not in self.modules:
+                    self.modules[module_name] = Module(module_name, [])
+
+                self.modules[module_name].elements.append(
+                    Element(element_name, attributes)
+                )
 
             element = element.nextSibling

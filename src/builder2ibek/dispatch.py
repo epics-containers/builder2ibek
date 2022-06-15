@@ -1,26 +1,21 @@
 """
 Dispatch Builder XML elements to the appropriate handlers
 """
+from ibek.ioc import IOC
 
-from typing import Dict
+from .builder import Builder
 
 
-def dispatch(
-    arch: str, builder_name: str, attributes: Dict[str, str]
-) -> Dict[str, str]:
+def dispatch(builder: Builder) -> IOC:
     """
-    Choose the correct handler for a given Builder XML element and return a
+    Choose the correct handler for each Builder XML element and return a
     Dictionary representing a ibek Entity
     """
-    entity: Dict[str, str] = {}
+    modules = builder.modules.keys()
+    ioc = IOC(builder.name, "auto-generated", [], "")
 
-    module, item = builder_name.split(".", 1)
-
-    if module == "pmac":
-        # use the pmac handler
-        pass
-    else:
-        # default handling (is this possible)
+    for module in modules:
+        # TODO dispatch to the appropriate handler
         pass
 
-    return entity
+    return ioc
