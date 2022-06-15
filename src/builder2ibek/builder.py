@@ -11,27 +11,20 @@ from xml.dom.minidom import parse
 @dataclass
 class Element:
     name: str
+    module: str
     attributes: Dict[str, str]
-
-
-@dataclass
-class Module:
-    name: str
-    elements: List[Element]
 
 
 class Builder:
     """
-    A class for interpreting builder XML and creating an object graph of its
-    contents like this:
-    Builder -> Dictionary of Module -> List of Element -> Element name, Attributes
+    A class for interpreting builder XML and creating a list of Element
     """
 
     def __init__(self) -> None:
-        file: str
-        name: str
-        arch: str
-        modules: Dict[str, Module]
+        self.file: Path = Path()
+        self.name: str = ""
+        self.arch: str = ""
+        self.elements: List[Element] = []
 
     def load(self, input_file: Path):
         """
@@ -39,7 +32,6 @@ class Builder:
         """
         self.file = input_file
         self.name = input_file.stem
-        self.modules: Dict[str, Module] = {}
         xml = parse(str(input_file))
 
         components = xml.firstChild
@@ -51,13 +43,9 @@ class Builder:
         while element is not None:
             if element.attributes is not None:
                 module_name, element_name = element.tagName.split(".", 1)
-                attributes = element.attributes.items()
+                attributes = {key: val for key, val in element.attributes.items()}
 
-                if module_name not in self.modules:
-                    self.modules[module_name] = Module(module_name, [])
-
-                self.modules[module_name].elements.append(
-                    Element(element_name, attributes)
-                )
+                new_element = Element(element_name, module_name, attributes)
+                self.elements.append(new_element)
 
             element = element.nextSibling

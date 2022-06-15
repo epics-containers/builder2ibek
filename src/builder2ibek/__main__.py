@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 import typer
+from apischema import serialize
 from ruamel.yaml import YAML
 
 from builder2ibek import __version__
@@ -37,11 +38,16 @@ def file(
     yaml: Optional[Path] = typer.Option(..., help="Output file"),
 ):
     """Convert a single builder XML file into a single ibek YAML"""
-    b = Builder()
-    b.load(xml)
-    i = dispatch(b)
+    builder = Builder()
+    builder.load(xml)
+    ioc = dispatch(builder)
 
-    print(i)
+    if not yaml:
+        yaml = xml.absolute().with_suffix("yaml")
+
+    data = serialize(ioc)
+    with yaml.open("w") as stream:
+        YAML().dump(data, stream)
 
 
 @cli.command()

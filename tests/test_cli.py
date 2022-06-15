@@ -26,5 +26,6 @@ def test_mo_01(tmp_path: Path, samples: Path):
     """read and convert p45s 1st motion IOC"""
 
     ioc_xml_file = samples / "BL45P-MO-IOC-01.xml"
-    yaml_file = tmp_path / "bl45p-mo-ioc-01.yaml"
+    yaml_file = tmp_path / "/tmp/bl45p-mo-ioc-01.yaml"
+    yaml_file = "/tmp/bl45p-mo-ioc-01.yaml"
     run_cli("file", ioc_xml_file, "--yaml", yaml_file)
