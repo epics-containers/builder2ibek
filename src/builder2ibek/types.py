@@ -2,7 +2,7 @@
 Dataclasses for representing XML and YAML in memory
 """
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 # Generic YAML classes #########################################################
 
@@ -14,7 +14,7 @@ class Generic_IOC:
     arch: str
     description: str
     generic_ioc_image: str
-    entities: list[Dict[str, Any]]
+    entities: List[Dict[str, Any]]
 
 
 class Entity(Dict[str, Any]):

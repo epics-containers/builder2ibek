@@ -17,10 +17,25 @@ defaults = {
 
 
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
-    if entity.type == "pmacDisableLimitsCheck":
+    if entity_type == "pmacDisableLimitsCheck":
         entity.remove("name")
-    elif entity.type == "pmac.DlsPmacAsynMotor":
-        # TODO unnecessary difference - could just call this DlsPmacAsynMotor?
-        entity.type = "pmac.dls_pmac_asyn_motor"
+
+    elif entity_type == "dls_pmac_asyn_motor":
+        # TODO unnecessary difference - could just call this dls_pmac_asyn_motor?
+        entity.type = "pmac.DlsPmacAsynMotor"
+
         entity.rename("PORT", "Controller")
         entity.remove("SPORT")
+
+    elif entity_type == "dls_pmac_cs_asyn_motor":
+        # TODO unnecessary difference - could just call this DlsPmacAsynMotor?
+        entity.type = "pmac.DlsPmacCsAsynMotor"
+
+        entity.rename("PORT", "Controller")
+
+    elif entity_type == "GeoBrick":
+        # TODO unnecessary difference?
+        entity.rename("Port", "PORT")
+
+    elif entity_type == "CS":
+        entity.remove("PARENTPORT")

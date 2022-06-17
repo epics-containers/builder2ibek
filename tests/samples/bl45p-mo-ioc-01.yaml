@@ -1,7 +1,8 @@
 # yaml-language-server: $schema=file://ibek/pmac.ibek.entities.schema.json
 ioc_name: bl45p-mo-ioc-01
-description: motion IOC for the test beamline p45 in G13
-generic_ioc_image: ghcr.io/epics-containers/ioc-pmac-run:1.2.0
+description: auto-generated
+generic_ioc_image: ''
+arch: linux-x86_64
 
 # TODO need to make use of lists / strings consistent
 # ANSWERS - script \n separated string, include,define are lists
@@ -23,7 +24,7 @@ entities:
   - type: deviocstats.iocAdminSoft
     IOC: BL45P-MO-IOC-01
 
-  - type: pmac.Geobrick
+  - type: pmac.GeoBrick
     name: BRICK1
     # NOTE: validation cannot check the object type (NEVER FIX)
     PORT: BRICK1port
@@ -35,6 +36,22 @@ entities:
     idlePoll: 100
     movingPoll: 500
 
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 2
+
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 3
+
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 4
+
+  - type: pmac.pmacDisableLimitsCheck
+    Controller: BRICK1
+    Axis: 5
+    
   - type: pmac.DlsPmacAsynMotor
     name: STAGE1.THETA_TOP
     Controller: BRICK1
@@ -214,22 +231,6 @@ entities:
     PREC: 3
     TWV: 0.5
     VELO: 5
-
-  - type: pmac.pmacDisableLimitsCheck
-    Controller: BRICK1
-    Axis: 2
-
-  - type: pmac.pmacDisableLimitsCheck
-    Controller: BRICK1
-    Axis: 3
-
-  - type: pmac.pmacDisableLimitsCheck
-    Controller: BRICK1
-    Axis: 4
-
-  - type: pmac.pmacDisableLimitsCheck
-    Controller: BRICK1
-    Axis: 5
 
   - type: pmac.autohome
     Controller: BRICK1

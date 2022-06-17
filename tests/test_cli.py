@@ -1,11 +1,16 @@
+import filecmp
 import subprocess
 import sys
 from pathlib import Path
+from shutil import copy
 
+import apischema
+from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
 from builder2ibek import __version__
 from builder2ibek.__main__ import cli
+from builder2ibek.types import Generic_IOC
 
 runner = CliRunner()
 
@@ -26,6 +31,23 @@ def test_mo_01(tmp_path: Path, samples: Path):
     """read and convert p45s 1st motion IOC"""
 
     ioc_xml_file = samples / "BL45P-MO-IOC-01.xml"
-    yaml_file = tmp_path / "/tmp/bl45p-mo-ioc-01.yaml"
-    yaml_file = Path("/tmp/bl45p-mo-ioc-01.yaml")
+    yaml_file = tmp_path / "bl45p-mo-ioc-01.yaml"
     run_cli("file", ioc_xml_file, "--yaml", yaml_file)
+
+    # deserialize, re-serialize the example to remove whitespace and comments
+    example_yaml_file = samples / "bl45p-mo-ioc-01.yaml"
+    example_yaml = YAML().load(example_yaml_file)
+    example = apischema.deserialize(
+        Generic_IOC,
+        example_yaml,
+    )
+
+    example_out = Path("/tmp/bl45p-mo-ioc-01-example.yaml")
+    with example_out.open("w") as stream:
+        YAML().dump(apischema.serialize(example), stream)
+
+    # TODO these do not yet fully match TODO remove 'not'!
+    assert not filecmp.cmp(yaml_file, example_yaml_file)
+
+    # TODO for the moment copy the result out of the ephemeral folder for debugging
+    copy(str(yaml_file.absolute()), str(Path("/tmp") / yaml_file.name))

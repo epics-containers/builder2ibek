@@ -13,7 +13,7 @@ def dispatch(builder: Builder) -> Generic_IOC:
     Dispatch every element in the XML to the correct convertor
     and build a generic IOC from the converted Entities
     """
-    ioc = Generic_IOC(builder.name, builder.arch, "auto-generated", "", [])
+    ioc = Generic_IOC(builder.name.lower(), builder.arch, "auto-generated", "", [])
 
     for element in builder.elements:
         # first do default conversion to entity
@@ -22,8 +22,8 @@ def dispatch(builder: Builder) -> Generic_IOC:
         # then dispatch to a specific handler if there is one
         if element.module in module_infos:
             info = module_infos[element.module]
-            add_defaults(entity, info.defaults)
             info.handler(entity, element.name, ioc)
+            add_defaults(entity, info.defaults)
 
     return ioc
 
