@@ -2,6 +2,11 @@ from typing import Any, Dict
 
 from builder2ibek.dataclasses import Generic_IOC
 
+schema = (
+    "https://github.com/epics-containers/ioc-pmac/releases/"
+    "download/1.2.1/ioc.ibek.schema.yaml"
+)
+
 pmac_defaults = {
     "pmac.GeoBrick": {
         "numAxes": 8,

@@ -23,7 +23,7 @@ def dispatch(builder: Builder) -> Generic_IOC:
         if element.module in module_infos:
             info = module_infos[element.module]
             add_defaults(entity, info.defaults)
-            info.handler(entity, entity["type"], ioc)
+            info.handler(entity, element.name, ioc)
 
     return ioc
 
@@ -48,6 +48,8 @@ def make_entity(element: Element) -> Dict[str, Any]:
     entity["type"] = f"{element.module}.{element.name}"
 
     for attribute_name, attribute_val in element.attributes.items():
+        # convert to numeric type if appropriate, otherwise Serialize will
+        # put quotes around numbers in the YAML
         try:
             f = float(attribute_val)
             if f.is_integer():
