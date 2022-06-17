@@ -7,7 +7,7 @@ schema = (
     "download/1.2.1/ioc.ibek.schema.yaml"
 )
 
-pmac_defaults = {
+defaults = {
     "pmac.GeoBrick": {
         "numAxes": 8,
         "idlePoll": 100,
@@ -16,6 +16,6 @@ pmac_defaults = {
 }
 
 
-def pmac_handler(entity: Dict[str, Any], entity_type: str, ioc: Generic_IOC):
+def handler(entity: Dict[str, Any], entity_type: str, ioc: Generic_IOC):
 
     pass

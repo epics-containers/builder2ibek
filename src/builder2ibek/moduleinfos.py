@@ -1,12 +1,9 @@
 from dataclasses import dataclass
+from importlib import import_module
+from pathlib import Path
 from typing import Any, Callable, Dict
 
-# MAINTENANCE: add imports for any new convertor functions here and then add a
-# corresponding ModuleInfo to module_infos below
-# todo this could be simplified using import lib and a function to make all the
-# module_infos
-from builder2ibek.convertors.epic_base import epics_base_defaults, epics_base_handler
-from builder2ibek.convertors.pmac import pmac_defaults, pmac_handler
+convertors_path = Path(__file__).parent / "convertors"
 
 
 @dataclass
@@ -15,14 +12,17 @@ class ModuleInfo:
     defaults: Dict[str, Dict[str, Any]]
 
 
-# MAINTENANCE: add any new convertor classes here
-module_infos: Dict[str, ModuleInfo] = {
-    "pmac": ModuleInfo(
-        pmac_handler,
-        pmac_defaults,
-    ),
-    "EPICS_BASE": ModuleInfo(
-        epics_base_handler,
-        epics_base_defaults,
-    ),
-}
+module_infos: Dict[str, ModuleInfo] = {}
+
+
+# automatically load all of the convert handlers in ./convertors into the
+# module_infos list using importlib
+# All modules in package convertors need to implement 'handler' and provide
+# 'schema' and 'defaults'
+convertors = convertors_path.glob("*.py")
+for convertor in convertors:
+    if not convertor.name.startswith("_"):
+        module = import_module(f"builder2ibek.convertors.{convertor.stem}")
+        if module is not None:
+            info = ModuleInfo(getattr(module, "handler"), getattr(module, "defaults"))
+            module_infos[convertor.stem] = info
