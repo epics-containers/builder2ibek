@@ -2,6 +2,8 @@ from typing import Any, Dict
 
 from builder2ibek.dataclasses import Generic_IOC
 
+xml_component = "pmac"
+
 schema = (
     "https://github.com/epics-containers/ioc-pmac/releases/"
     "download/1.2.1/ioc.ibek.schema.yaml"
