@@ -7,7 +7,7 @@ from ruamel.yaml import YAML
 
 from builder2ibek import __version__
 from builder2ibek.builder import Builder
-from builder2ibek.dispatch import dispatch
+from builder2ibek.convert import dispatch
 
 cli = typer.Typer()
 yaml = YAML()

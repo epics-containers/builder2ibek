@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from builder2ibek.ioc import Generic_IOC
+from builder2ibek.dataclasses import Generic_IOC
 
 pmac_defaults = {
     "pmac.GeoBrick": {

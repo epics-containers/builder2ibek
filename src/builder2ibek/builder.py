@@ -2,17 +2,11 @@
 Defines classes for reading a builder XML IOC definition
 """
 
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 from xml.dom.minidom import parse
 
-
-@dataclass
-class Element:
-    name: str
-    module: str
-    attributes: Dict[str, str]
+from builder2ibek.dataclasses import Element
 
 
 class Builder:
