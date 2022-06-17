@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import List
 from xml.dom.minidom import parse
 
-from builder2ibek.dataclasses import Element
+from builder2ibek.types import Element
 
 
 class Builder:

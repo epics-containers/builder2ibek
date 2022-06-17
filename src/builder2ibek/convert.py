@@ -4,8 +4,8 @@ Generic XML to YAML conversion functions
 from typing import Any, Dict
 
 from builder2ibek.builder import Builder, Element
-from builder2ibek.dataclasses import Generic_IOC
 from builder2ibek.moduleinfos import module_infos
+from builder2ibek.types import Entity, Generic_IOC
 
 
 def dispatch(builder: Builder) -> Generic_IOC:
@@ -13,7 +13,7 @@ def dispatch(builder: Builder) -> Generic_IOC:
     Dispatch every element in the XML to the correct convertor
     and build a generic IOC from the converted Entities
     """
-    ioc = Generic_IOC(builder.name, "auto-generated", "", [])
+    ioc = Generic_IOC(builder.name, builder.arch, "auto-generated", "", [])
 
     for element in builder.elements:
         # first do default conversion to entity
@@ -37,14 +37,14 @@ def add_defaults(entity: Dict[str, Any], defaults: Dict[str, Dict[str, Any]]):
         entity.update(needed_defaults)
 
 
-def make_entity(element: Element) -> Dict[str, Any]:
+def make_entity(element: Element) -> Entity:
     """
     default Entity creation is a direct mapping
     of element name and attribute names/values to
     Entity type and argument names/values
     """
 
-    entity: Dict[str, Any] = {}
+    entity = Entity()
     entity["type"] = f"{element.module}.{element.name}"
 
     for attribute_name, attribute_val in element.attributes.items():
@@ -62,7 +62,7 @@ def make_entity(element: Element) -> Dict[str, Any]:
     return entity
 
 
-def convert_generic(element: Element, ioc: Generic_IOC):
+def convert_generic(element: Element, ioc: Generic_IOC) -> Entity:
     entity = make_entity(element)
     ioc.entities.append(entity)
     return entity

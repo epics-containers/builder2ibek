@@ -1,6 +1,4 @@
-from typing import Any, Dict
-
-from builder2ibek.dataclasses import Generic_IOC
+from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "pmac"
 
@@ -18,6 +16,11 @@ defaults = {
 }
 
 
-def handler(entity: Dict[str, Any], entity_type: str, ioc: Generic_IOC):
-
-    pass
+def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
+    if entity.type == "pmacDisableLimitsCheck":
+        entity.remove("name")
+    elif entity.type == "pmac.DlsPmacAsynMotor":
+        # TODO unnecessary difference - could just call this DlsPmacAsynMotor?
+        entity.type = "pmac.dls_pmac_asyn_motor"
+        entity.rename("PORT", "Controller")
+        entity.remove("SPORT")
