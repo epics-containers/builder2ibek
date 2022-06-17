@@ -1,10 +1,16 @@
-from builder2ibek.builder import Element
-from builder2ibek.convert import Convert
+from typing import Any, Dict
+
 from builder2ibek.ioc import Generic_IOC
 
+pmac_defaults = {
+    "pmac.GeoBrick": {
+        "numAxes": 8,
+        "idlePoll": 100,
+        "movingPoll": 500,
+    }
+}
 
-class Pmac(Convert):
-    @classmethod
-    def convert(cls, element: Element, ioc: Generic_IOC):
 
-        ioc.entities.append(cls.make_entity(element))
+def pmac_handler(entity: Dict[str, Any], entity_type: str, ioc: Generic_IOC):
+
+    pass
