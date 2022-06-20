@@ -13,15 +13,15 @@ Releases       https://github.com/epics-containers/builder2ibek/releases
 ============== ==============================================================
 
 
-.. |code_ci| image:: https://github.com/epics-containers/builder2ibek/workflows/Code%20CI/badge.svg?branch=master
+.. |code_ci| image:: https://github.com/epics-containers/builder2ibek/workflows/Code%20CI/badge.svg?branch=main
     :target: https://github.com/epics-containers/builder2ibek/actions?query=workflow%3A%22Code+CI%22
     :alt: Code CI
 
-.. |docs_ci| image:: https://github.com/epics-containers/builder2ibek/workflows/Docs%20CI/badge.svg?branch=master
+.. |docs_ci| image:: https://github.com/epics-containers/builder2ibek/workflows/Docs%20CI/badge.svg?branch=main
     :target: https://github.com/epics-containers/builder2ibek/actions?query=workflow%3A%22Docs+CI%22
     :alt: Docs CI
 
-.. |coverage| image:: https://codecov.io/gh/epics-containers/builder2ibek/branch/master/graph/badge.svg
+.. |coverage| image:: https://codecov.io/gh/epics-containers/builder2ibek/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/epics-containers/builder2ibek
     :alt: Test Coverage
 
