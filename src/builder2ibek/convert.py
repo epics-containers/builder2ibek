@@ -13,7 +13,13 @@ def dispatch(builder: Builder) -> Generic_IOC:
     Dispatch every element in the XML to the correct convertor
     and build a generic IOC from the converted Entities
     """
-    ioc = Generic_IOC(builder.name.lower(), builder.arch, "auto-generated", "", [])
+    ioc = Generic_IOC(
+        ioc_name=builder.name.lower(),
+        arch=builder.arch,
+        description="auto-generated",
+        generic_ioc_image="",
+        entities=[],
+    )
 
     for element in builder.elements:
         # first do default conversion to entity

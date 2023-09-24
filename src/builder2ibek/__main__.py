@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Optional
 
 import typer
-from apischema import serialize
 from ruamel.yaml import YAML
 
 from builder2ibek import __version__
@@ -45,9 +44,8 @@ def file(
     if not yaml:
         yaml = xml.absolute().with_suffix("yaml")
 
-    data = serialize(ioc)
     with yaml.open("w") as stream:
-        YAML().dump(data, stream)
+        YAML().dump(ioc.model_dump(), stream)
 
 
 @cli.command()

@@ -4,11 +4,15 @@ Dataclasses for representing XML and YAML in memory
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
+from pydantic import BaseModel, ConfigDict
+
 # Generic YAML classes #########################################################
 
 
-@dataclass
-class Generic_IOC:
+class Generic_IOC(BaseModel):
+    model_config = ConfigDict(
+        extra="allow",
+    )
     ioc_name: str
     # TODO arch is not in ibek's IOC class but probably should be
     arch: str

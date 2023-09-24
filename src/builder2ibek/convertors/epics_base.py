@@ -13,7 +13,6 @@ defaults = {
 
 
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
-
     # TODO - we currently have a specific Entity type epics.EPICS_CA_MAX_ARRAY_BYTES
     # not sure this is wise and a general EPICS_BASE.EpicsEnvSet would be more
     # generally useful plus this would work with the generic conversion
