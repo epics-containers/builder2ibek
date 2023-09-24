@@ -8,7 +8,8 @@ from builder2ibek.types import Entity, Generic_IOC
 xml_component = "pmac"
 
 # The ibek schema for the Generic IOC that compiles this support module
-# (currently not used)
+# (currently not used) TODO it would be good to pull in the schema and
+# verify that the YAML we generate is valid against it.
 schema = (
     "https://github.com/epics-containers/ioc-pmac/releases/"
     "download/1.2.1/ioc.ibek.schema.yaml"
@@ -16,6 +17,8 @@ schema = (
 
 # A list of Tags and their default attributes
 # These should match defaults supplied in builder.py __init__()
+# NOTE: the build2ibek.support.py tool will now pick up the defaults
+# from the builder.py __init__() function, so these are no longer needed
 defaults = {
     "pmac.GeoBrick": {
         "numAxes": 8,
@@ -32,23 +35,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "pmacDisableLimitsCheck":
         entity.remove("name")
 
-    elif entity_type == "dls_pmac_asyn_motor":
-        # TODO unnecessary difference -
-        # could just call this dls_pmac_asyn_motor in ibek definition ?
-        entity.type = "pmac.DlsPmacAsynMotor"
 
-        entity.rename("PORT", "Controller")
-        entity.remove("SPORT")
 
-    elif entity_type == "dls_pmac_cs_asyn_motor":
-        # TODO unnecessary difference
-        entity.type = "pmac.DlsPmacCsAsynMotor"
-
-        entity.rename("PORT", "Controller")
-
-    elif entity_type == "GeoBrick":
-        # TODO unnecessary difference?
-        entity.rename("Port", "PORT")
-
-    elif entity_type == "CS":
-        entity.remove("PARENTPORT")
