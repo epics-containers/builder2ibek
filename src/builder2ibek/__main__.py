@@ -56,6 +56,8 @@ def beamline(
     """
     Convert a beamline's IOCs from builder to ibek
     """
+    typer.echo("Not implemented yet")
+    raise typer.Exit(code=1)
 
 
 # test with:
