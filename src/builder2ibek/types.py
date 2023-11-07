@@ -14,10 +14,7 @@ class Generic_IOC(BaseModel):
         extra="allow",
     )
     ioc_name: str
-    # TODO arch is not in ibek's IOC class but probably should be
-    arch: str
     description: str
-    generic_ioc_image: str
     entities: List[Dict[str, Any]]
 
 

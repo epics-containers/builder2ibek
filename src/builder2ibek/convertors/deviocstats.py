@@ -13,7 +13,17 @@ defaults = {
 
 
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
-    if entity_type == "devIocStatsHelper" and ioc.arch == "linux-x86_64":
+    if (
+        entity_type == "devIocStatsHelper"
+        or entity_type == "iocAdminSoft"
+        # TODO - to do the right thing here we need to know arch somehow
+        # TODO but at present this is a Generic IOC target thing - not in the yaml
+        # and ioc.arch == "linux-x86_64"
+    ):
         entity.type = f"{xml_component}.iocAdminSoft"
-        entity.rename("ioc", "IOC")
-        entity.remove("name")
+        if "ioc" in entity:
+            entity.rename("ioc", "IOC")
+        elif "name" in entity:
+            entity.rename("name", "IOC")
+        if "name" in entity:
+            entity.remove("name")

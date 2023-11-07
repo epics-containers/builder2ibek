@@ -31,7 +31,7 @@
                 "file",
                 "/dls_sw/work/R3.14.12.7/support/BL20J-BUILDER/etc/makeIocs/BL20J-DI-IOC-01.xml",
                 "--yaml",
-                "/scratch/hgv27681/work/bl20j/iocsbl20j-di-ioc-01.yaml"
+                "/scratch/hgv27681/work/bl20j/iocs/bl20j-di-ioc-01.yaml"
             ],
             "purpose": [
                 "debug-test"
