@@ -14,3 +14,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "aravisCamera":
         if entity["CLASS"] == "AVT_Mako_1_52":
             entity["CLASS"] = "AVT_Mako_G125B"
+        if entity["CLASS"] == "AVT_Mako_1_44":
+            entity["CLASS"] = "AVT_Mako_G125B"

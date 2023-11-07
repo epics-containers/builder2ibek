@@ -21,9 +21,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         ioc.entities.remove(entity)
         yaml_text = GDA_PLUGINS.read_text()
         for macro, value in entity.items():
-            if isinstance(value, int):
-                value = f'"{value}"'  # all ints this case are db substs == str
-            yaml_text = re.sub(f"(\$\({macro}[^\)]*\))", str(value), yaml_text)
+            yaml_text = re.sub(f"(\$\({macro}(?:=[^\)]*)?\))", str(value), yaml_text)
+
+        # substitute remaining macros with their in-place defaults
+        yaml_text = re.sub(r"\$\(.*?=([^\)]*)\)", r"\1", yaml_text)
 
         with io.StringIO(yaml_text) as f:
             entities = yaml.safe_load(f)
