@@ -34,6 +34,3 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     if entity_type == "pmacDisableLimitsCheck":
         entity.remove("name")
-
-
-
