@@ -1,8 +1,9 @@
+import re
 from pathlib import Path
 from typing import Optional
 
 import typer
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, CommentedMap
 
 from builder2ibek import __version__
 from builder2ibek.builder import Builder
@@ -35,7 +36,21 @@ def main(
 def file(
     xml: Path = typer.Argument(..., help="Filename of the builder XML file"),
     yaml: Optional[Path] = typer.Option(..., help="Output file"),
+    schema: Optional[str] = typer.Option(
+        None, help="Generic IOC schema (added to top of the yaml output)"
+    ),
 ):
+    def tidy_up(yaml):
+        # add blank lines between major fields
+        for field in [
+            "ioc_name",
+            "description",
+            "entities",
+            "  - type",
+        ]:
+            yaml = re.sub(r"(\n%s)" % field, "\n\\g<1>", yaml)
+        return yaml
+
     """Convert a single builder XML file into a single ibek YAML"""
     builder = Builder()
     builder.load(xml)
@@ -44,8 +59,21 @@ def file(
     if not yaml:
         yaml = xml.absolute().with_suffix("yaml")
 
+    ruamel = YAML()
+
+    ruamel.default_flow_style = False
+    yaml_map = CommentedMap(ioc.model_dump())
+
+    # add support yaml schema
+    if schema:
+        yaml_map.yaml_add_eol_comment(
+            f"yaml-language-server: $schema={schema}", column=0
+        )
+
+    ruamel.indent(mapping=2, sequence=4, offset=2)
+
     with yaml.open("w") as stream:
-        YAML().dump(ioc.model_dump(), stream)
+        ruamel.dump(yaml_map, stream, transform=tidy_up)
 
 
 @cli.command()
