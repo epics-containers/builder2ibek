@@ -25,17 +25,21 @@ class Entity(Dict[str, Any]):
     """
 
     def __getattr__(self, __name: str) -> Any:
-        return self[__name]
+        if __name in self:
+            return self[__name]
+        return None
 
     def __setattr__(self, __name: str, value) -> Any:
         self[__name] = value
 
     def remove(self, attr: str):
-        del self[attr]
+        if attr in self:
+            del self[attr]
 
     def rename(self, attr: str, new: str):
-        self[new] = self[attr]
-        del self[attr]
+        if attr in self:
+            self[new] = self[attr]
+            del self[attr]
 
 
 # Generic XML classes ##########################################################

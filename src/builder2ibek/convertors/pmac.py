@@ -11,21 +11,9 @@ xml_component = "pmac"
 # (currently not used) TODO it would be good to pull in the schema and
 # verify that the YAML we generate is valid against it.
 schema = (
-    "https://github.com/epics-containers/ioc-pmac/releases/"
-    "download/1.2.1/ioc.ibek.schema.yaml"
+    "https://github.com/epics-containers/ioc-pmac/releases/download/"
+    "2023.11.1/ibek.ioc.schema.json"
 )
-
-# A list of Tags and their default attributes
-# These should match defaults supplied in builder.py __init__()
-# NOTE: the build2ibek.support.py tool will now pick up the defaults
-# from the builder.py __init__() function, so these are no longer needed
-defaults = {
-    "pmac.GeoBrick": {
-        "numAxes": 8,
-        "idlePoll": 100,
-        "movingPoll": 500,
-    }
-}
 
 
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
@@ -34,3 +22,25 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     if entity_type == "pmacDisableLimitsCheck":
         entity.remove("name")
+
+    elif (
+        entity_type == "dls_pmac_asyn_motor" or entity_type == "dls_cs_pmac_asyn_motor"
+    ):
+        entity.rename("PORT", "Controller")
+        entity.remove("SPORT")
+        entity.remove("gda_desc")
+        entity.remove("gda_name")
+        if entity.DIR == 1:
+            entity.DIR = "Neg"
+        else:
+            entity.DIR = "Pos"
+        if entity.VMAX is not None:
+            entity.VMAX = str(entity.VMAX)
+
+    elif entity_type == "GeoBrickTrajectoryControlT":
+        entity.type = "pmac.GeoBrickTrajectoryControl"
+        entity.remove("name")
+        entity.rename("PORT", "PmacController")
+
+    elif entity_type == "autohome":
+        entity.rename("PORT", "PmacController")
