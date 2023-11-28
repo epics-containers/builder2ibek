@@ -3,7 +3,7 @@ from importlib import import_module
 from pathlib import Path
 from typing import Any, Callable, Dict
 
-convertors_path = Path(__file__).parent / "convertors"
+converters_path = Path(__file__).parent / "converters"
 
 
 @dataclass
@@ -17,12 +17,12 @@ class ModuleInfo:
 module_infos: Dict[str, ModuleInfo] = {}
 
 
-# automatically load all of the convert handlers in ./convertors into the
+# automatically load all of the convert handlers in ./converters into the
 # module_infos list using importlib
-convertors = convertors_path.glob("*.py")
-for convertor in convertors:
-    if not convertor.name.startswith("_"):
-        module = import_module(f"builder2ibek.convertors.{convertor.stem}")
+converters = converters_path.glob("*.py")
+for converter in converters:
+    if not converter.name.startswith("_"):
+        module = import_module(f"builder2ibek.converters.{converter.stem}")
         if module is not None:
             xml_component = getattr(module, "xml_component")
             info = ModuleInfo(

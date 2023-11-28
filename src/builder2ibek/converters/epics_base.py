@@ -5,10 +5,13 @@ yaml_component = "epics"
 
 
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
-    if entity_type == "EpicsEnvSet" and entity["key"] == "EPICS_CA_MAX_ARRAY_BYTES":
-        entity.rename("value", "max_bytes")
-        entity.remove("key")
-        entity.type = "epics.EpicsCaMaxArrayBytes"
+    if entity_type == "EpicsEnvSet":
+        if entity["key"] == "EPICS_CA_MAX_ARRAY_BYTES":
+            entity.rename("value", "max_bytes")
+            entity.remove("key")
+            entity.type = "epics.EpicsCaMaxArrayBytes"
+        else:
+            entity.rename("key", "name")
     elif entity_type == "StartupCommand":
         if entity.post_init:
             entity.type = "epics.PostStartupCommand"

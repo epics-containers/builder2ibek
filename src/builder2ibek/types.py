@@ -8,6 +8,8 @@ from pydantic import BaseModel, ConfigDict
 
 # Generic YAML classes #########################################################
 
+DELETE_ME = "__delete_me__"
+
 
 class Generic_IOC(BaseModel):
     model_config = ConfigDict(
@@ -40,6 +42,12 @@ class Entity(Dict[str, Any]):
         if attr in self:
             self[new] = self[attr]
             del self[attr]
+
+    def delete_me(self):
+        self[DELETE_ME] = True
+
+    def is_deleted(self):
+        return DELETE_ME in self
 
 
 # Generic XML classes ##########################################################

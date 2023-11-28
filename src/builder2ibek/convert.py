@@ -28,7 +28,10 @@ def dispatch(builder: Builder) -> Generic_IOC:
             info = module_infos[element.module]
             entity.type = f"{info.yaml_component}.{element.name}"
             info.handler(entity, element.name, ioc)
-            add_defaults(entity, info.defaults)
+            if entity.is_deleted():
+                ioc.entities.remove(entity)
+            else:
+                add_defaults(entity, info.defaults)
 
     return ioc
 
