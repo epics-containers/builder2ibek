@@ -27,3 +27,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.rename("name", "IOC")
         if "name" in entity:
             entity.remove("name")
+
+        # we will always use the uppercase version of the instance YAML stem
+        # for devIOCStats IOC name.
+        entity.IOC = "{{ ioc_name | upper }}"

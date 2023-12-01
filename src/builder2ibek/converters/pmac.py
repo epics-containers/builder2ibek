@@ -47,6 +47,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         if entity.VMAX is not None:
             entity.VMAX = str(entity.VMAX)
 
+    elif entity_type == "GeoBrick":
+        entity.rename("Port", "pmacAsynPort")
+
     elif entity_type == "GeoBrickTrajectoryControlT":
         # don't bore the user with the fact this is a template!
         entity.type = "pmac.GeoBrickTrajectoryControl"

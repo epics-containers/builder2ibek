@@ -12,6 +12,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.type = "epics.EpicsCaMaxArrayBytes"
         else:
             entity.rename("key", "name")
+            # remove IOCSH settings as epics-containers makes the iocsh prompt
+            if "IOCSH" in entity.name:
+                entity.delete_me()
     elif entity_type == "StartupCommand":
         if entity.post_init:
             entity.type = "epics.PostStartupCommand"
