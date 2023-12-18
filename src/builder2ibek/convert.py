@@ -34,6 +34,16 @@ def dispatch(builder: Builder) -> Generic_IOC:
             else:
                 add_defaults(entity, info.defaults)
 
+        sorted_entities = []
+        for entity in ioc.entities:
+            # sort the args by key
+            entity = dict(sorted(entity.items()))
+            # but move type to the start of each entity
+            entity = {"type": entity.pop("type"), **entity}
+            sorted_entities.append(entity)
+
+        ioc.entities = sorted_entities
+
     return ioc
 
 
