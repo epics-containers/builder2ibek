@@ -36,14 +36,14 @@ def dispatch(builder: Builder) -> Generic_IOC:
                 add_defaults(entity, info.defaults)
 
         sorted_entities: List[Entity] = []
-        for entity in ioc.entities:
+        for entity in ioc.entities:  # type: ignore
             # sort the args by key
-            entity = Entity(sorted(entity.items()))
+            entity = Entity(sorted(entity.items()))  # type: ignore
             # but move type to the start of each entity
             entity = Entity(type=entity.pop("type"), **entity)
             sorted_entities.append(entity)
 
-        ioc.entities = sorted_entities
+        ioc.entities = sorted_entities  # type: ignore
 
     return ioc
 
