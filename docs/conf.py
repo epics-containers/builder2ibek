@@ -32,8 +32,6 @@ extensions = [
     "sphinx.ext.viewcode",
     # Adds the inheritance-diagram generation directive
     "sphinx.ext.inheritance_diagram",
-    # Makes autodoc understand apischema annotated classes/functions
-    "sphinx_apischema",
 ]
 
 # If true, Sphinx will warn about all references where the target cannot
@@ -52,7 +50,6 @@ nitpick_ignore = [
     ("py:class", "'bool'"),
     ("py:class", "'object'"),
     ("py:class", "'id'"),
-    ("py:class", "apischema.utils.UndefinedType"),
     ("py:class", "typing_extensions.Literal"),
 ]
 

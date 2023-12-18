@@ -11,15 +11,6 @@ from pydantic import BaseModel, ConfigDict
 DELETE_ME = "__delete_me__"
 
 
-class Generic_IOC(BaseModel):
-    model_config = ConfigDict(
-        extra="allow",
-    )
-    ioc_name: str
-    description: str
-    entities: List[Dict[str, Any]]
-
-
 class Entity(Dict[str, Any]):
     """
     Generic Entity has functions for using . notation which makes the code
@@ -50,9 +41,16 @@ class Entity(Dict[str, Any]):
         return DELETE_ME in self
 
 
+class Generic_IOC(BaseModel):
+    model_config = ConfigDict(
+        extra="allow",
+    )
+    ioc_name: str
+    description: str
+    entities: List[Dict[str, Any]]
+
+
 # Generic XML classes ##########################################################
-
-
 @dataclass
 class Element:
     name: str

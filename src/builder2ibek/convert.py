@@ -1,7 +1,7 @@
 """
 Generic XML to YAML conversion functions
 """
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from builder2ibek.builder import Builder, Element
 from builder2ibek.moduleinfos import module_infos
@@ -25,6 +25,7 @@ def dispatch(builder: Builder) -> Generic_IOC:
         entity = convert_generic(element, ioc)
 
         # then dispatch to a specific handler if there is one
+        assert isinstance(element, Element)
         if element.module in module_infos:
             info = module_infos[element.module]
             entity.type = f"{info.yaml_component}.{element.name}"
@@ -33,6 +34,16 @@ def dispatch(builder: Builder) -> Generic_IOC:
                 ioc.entities.remove(entity)
             else:
                 add_defaults(entity, info.defaults)
+
+        sorted_entities: List[Entity] = []
+        for entity in ioc.entities:
+            # sort the args by key
+            entity = Entity(sorted(entity.items()))
+            # but move type to the start of each entity
+            entity = Entity(type=entity.pop("type"), **entity)
+            sorted_entities.append(entity)
+
+        ioc.entities = sorted_entities
 
     return ioc
 
