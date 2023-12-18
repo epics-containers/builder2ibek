@@ -36,6 +36,7 @@ dev = [
     "sphinx-design",
     "tox-direct",
     "types-mock",
+    "sphinx-rtd-theme-github-versions",
 ]
 
 [project.scripts]
