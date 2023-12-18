@@ -4,9 +4,10 @@ import sys
 from pathlib import Path
 from shutil import copy
 
+from typer.testing import CliRunner
+
 from builder2ibek import __version__
 from builder2ibek.__main__ import cli
-from typer.testing import CliRunner
 
 runner = CliRunner()
 

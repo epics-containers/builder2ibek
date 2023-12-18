@@ -4,6 +4,7 @@ Defines classes for reading a builder XML IOC definition
 
 from pathlib import Path
 from typing import List
+from xml.dom.minidom import Element as DomElement
 from xml.dom.minidom import parse
 
 from builder2ibek.types import Element
@@ -29,15 +30,16 @@ class Builder:
         xml = parse(str(input_file))
 
         components = xml.firstChild
+        assert isinstance(components, DomElement)
         assert components.tagName == "components"
         self.arch = components.attributes["arch"].nodeValue
 
         element = components.firstChild
 
         while element is not None:
-            if element.attributes is not None:
-                module_name, element_name = element.tagName.split(".", 1)
-                attributes = {key: val for key, val in element.attributes.items()}
+            if element.attributes is not None:  # type: ignore
+                module_name, element_name = element.tagName.split(".", 1)  # type: ignore
+                attributes = dict(element.attributes.items())  # type: ignore
 
                 new_element = Element(element_name, module_name, attributes)
                 self.elements.append(new_element)
