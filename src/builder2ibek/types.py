@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel, ConfigDict
 
-# Generic YAML classes #########################################################
+# Generic YAML classes #######################################################
 
 DELETE_ME = "__delete_me__"
 
