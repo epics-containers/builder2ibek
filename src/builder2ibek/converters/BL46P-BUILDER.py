@@ -1,6 +1,6 @@
 from builder2ibek.types import Entity, Generic_IOC
 
-xml_component = "BL46P-BUILDER__remove_me"
+xml_component = "BL46P-BUILDER"
 
 
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):

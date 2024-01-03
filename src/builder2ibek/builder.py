@@ -5,7 +5,7 @@ Defines classes for reading a builder XML IOC definition
 from pathlib import Path
 from typing import List
 from xml.dom.minidom import Element as DomElement
-from xml.dom.minidom import parse
+from xml.dom.minidom import parse, parseString
 
 from builder2ibek.types import Element
 
@@ -21,6 +21,15 @@ class Builder:
         self.arch: str = ""
         self.elements: List[Element] = []
 
+    def load_string(self, xml_str: str):
+        """
+        parse an XML string and populate this Builder object
+        """
+        self.file = "no_file"
+        self.name = "no_name"
+        xml = parseString(xml_str)
+        self._parse(xml)
+
     def load(self, input_file: Path):
         """
         parse an XML file and populate this Builder object
@@ -28,7 +37,9 @@ class Builder:
         self.file = input_file
         self.name = input_file.stem
         xml = parse(str(input_file))
+        self._parse(xml)
 
+    def _parse(self, xml: DomElement):
         components = xml.firstChild
         assert isinstance(components, DomElement)
         assert components.tagName == "components"

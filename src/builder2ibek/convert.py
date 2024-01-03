@@ -21,6 +21,10 @@ def dispatch(builder: Builder, filename) -> Generic_IOC:
         source_file=filename,
     )
 
+    return do_dispatch(builder, ioc)
+
+
+def do_dispatch(builder: Builder, ioc: Generic_IOC):
     for element in builder.elements:
         do_one_element(element, ioc)
 
@@ -47,7 +51,10 @@ def do_one_element(element: Element, ioc: Generic_IOC):
         entity.type = f"{info.yaml_component}.{element.name}"
         new_xml = info.handler(entity, element.name, ioc)
         if new_xml:
-            pass  # the idea is to handle xml templates but not implemented yet
+            new_builder = Builder()
+            new_builder.load_string(new_xml)
+            ioc.entities.remove(entity)
+            do_dispatch(new_builder, ioc)
         if entity.is_deleted():
             ioc.entities.remove(entity)
         else:
