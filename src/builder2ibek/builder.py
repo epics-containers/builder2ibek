@@ -4,8 +4,8 @@ Defines classes for reading a builder XML IOC definition
 
 from pathlib import Path
 from typing import List
-from xml.dom.minidom import Document, Element as DomElement
-from xml.dom.minidom import parse, parseString
+from xml.dom.minidom import Document, parse, parseString
+from xml.dom.minidom import Element as DomElement
 
 from builder2ibek.types import Element
 
