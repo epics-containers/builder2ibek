@@ -43,6 +43,31 @@
                 // https://github.com/microsoft/vscode-python/issues/693
                 "PYTEST_ADDOPTS": "--no-cov"
             },
+        },
+        {
+            "name": "Builder2ibek-P46",
+            "type": "python",
+            "request": "launch",
+            "justMyCode": false,
+            "program": "/scratch/hgv27681/work/builder2ibek/src/builder2ibek/__main__.py",
+            "args": [
+                "file",
+                "/scratch/wks59344/MXBridge/bl46p-builder/etc/makeIocs/BL46P-EA-IOC-01.xml",
+                "--yaml",
+                "/scratch/wks59344/MXBridge/bl46p/iocs/bl46p-ea-dcam-01/ioc.yaml",
+                "--schema",
+                "https://github.com/epics-containers/ioc-adaravis/releases/download/2023.11.4/ibek.ioc.schema.json"
+            ],
+            "purpose": [
+                "debug-test"
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                // The default config in setup.cfg's "[tool:pytest]" adds coverage.
+                // Cannot have coverage and debugging at the same time.
+                // https://github.com/microsoft/vscode-python/issues/693
+                "PYTEST_ADDOPTS": "--no-cov"
+            },
         }
     ]
 }

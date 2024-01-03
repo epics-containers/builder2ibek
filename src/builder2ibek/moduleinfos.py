@@ -31,4 +31,9 @@ for converter in converters:
                 getattr(module, "schema", ""),
                 getattr(module, "yaml_component", xml_component),
             )
-            module_infos[xml_component] = info
+            if isinstance(xml_component, str):
+                module_infos[xml_component] = info
+
+            elif isinstance(xml_component, list):
+                for component in xml_component:
+                    module_infos[component] = info
