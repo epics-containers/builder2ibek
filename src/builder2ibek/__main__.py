@@ -27,7 +27,7 @@ def main(
         callback=version_callback,
         is_eager=True,
         help="Print the version of builder2ibek and exit",
-    )
+    ),
 ):
     """Convert build XML to ibek YAML"""
 
@@ -54,7 +54,7 @@ def file(
     """Convert a single builder XML file into a single ibek YAML"""
     builder = Builder()
     builder.load(xml)
-    ioc = dispatch(builder)
+    ioc = dispatch(builder, xml)
 
     if not yaml:
         yaml = xml.absolute().with_suffix("yaml")
@@ -62,6 +62,8 @@ def file(
     ruamel = YAML()
 
     ruamel.default_flow_style = False
+    # this attribute is for internal use, remove before serialising
+    setattr(ioc, "source_file", None)
     yaml_map = CommentedMap(ioc.model_dump())
 
     # add support yaml schema

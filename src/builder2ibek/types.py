@@ -2,6 +2,7 @@
 Dataclasses for representing XML and YAML in memory
 """
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List
 
 from pydantic import BaseModel, ConfigDict
@@ -35,10 +36,10 @@ class Entity(Dict[str, Any]):
             del self[attr]
 
     def delete_me(self):
-        self[DELETE_ME] = True
+        self.__command__ = "delete"
 
     def is_deleted(self):
-        return DELETE_ME in self
+        return self.__command__ == "delete"
 
 
 class Generic_IOC(BaseModel):
@@ -48,6 +49,7 @@ class Generic_IOC(BaseModel):
     ioc_name: str
     description: str
     entities: List[Dict[str, Any]]
+    source_file: Path
 
 
 # Generic XML classes ##########################################################
