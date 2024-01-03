@@ -72,3 +72,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # remove GUI only parameters
         entity.remove("name")
         entity.remove("LABEL")
+
+    elif entity_type == "pmacAsynIPPort":
+        entity.remove("simulation")
