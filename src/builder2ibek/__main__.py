@@ -63,7 +63,7 @@ def file(
 
     ruamel.default_flow_style = False
     # this attribute is for internal use, remove before serialising
-    setattr(ioc, "source_file", None)
+    delattr(ioc, "source_file")
     yaml_map = CommentedMap(ioc.model_dump())
 
     # add support yaml schema

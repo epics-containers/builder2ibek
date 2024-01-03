@@ -9,6 +9,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         if entity["key"] == "EPICS_CA_MAX_ARRAY_BYTES":
             entity.rename("value", "max_bytes")
             entity.remove("key")
+            entity.remove("name")
             entity.type = "epics.EpicsCaMaxArrayBytes"
         else:
             entity.rename("key", "name")
@@ -21,3 +22,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         else:
             entity.type = "epics.StartupCommand"
         entity.remove("post_init")
+
+    elif entity_type == "dbpf":
+        entity.type = "epics.Dbpf"
+        entity.value = str({entity.value})
