@@ -24,7 +24,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         yaml_text = re.sub(r"\$\(.*?=([^\)]*)\)", r"\1", yaml_text)
 
         with io.StringIO(yaml_text) as f:
-            entities = yaml.safe_load(f)
+            yml = yaml.YAML(typ="safe", pure=True)
+            entities = yml.load(f)
 
         print(f"adding gdaPlugins items to entities for {entity.CAM}")
         ioc.entities.extend(entities)
