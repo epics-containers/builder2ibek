@@ -12,3 +12,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         id = int(entity.get("id"))
         id_enum = f"{id:02d}"
         entity.id = id_enum
+    elif entity_type == "NX102_readReal":
+        entity.remove("name")

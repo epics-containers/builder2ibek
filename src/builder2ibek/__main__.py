@@ -37,7 +37,8 @@ def file(
     xml: Path = typer.Argument(..., help="Filename of the builder XML file"),
     yaml: Optional[Path] = typer.Option(..., help="Output file"),
     schema: Optional[str] = typer.Option(
-        None, help="Generic IOC schema (added to top of the yaml output)"
+        "/epics/ibek-defs/ioc.schema.json",
+        help="Generic IOC schema (added to top of the yaml output)",
     ),
 ):
     def tidy_up(yaml):
@@ -67,10 +68,7 @@ def file(
     yaml_map = CommentedMap(ioc.model_dump())
 
     # add support yaml schema
-    if schema:
-        yaml_map.yaml_add_eol_comment(
-            f"yaml-language-server: $schema={schema}", column=0
-        )
+    yaml_map.yaml_add_eol_comment(f"yaml-language-server: $schema={schema}", column=0)
 
     ruamel.indent(mapping=2, sequence=4, offset=2)
 
