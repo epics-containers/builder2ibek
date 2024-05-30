@@ -3,7 +3,6 @@ Defines classes for reading a builder XML IOC definition
 """
 
 from pathlib import Path
-from typing import List
 from xml.dom.minidom import Document, parse, parseString
 from xml.dom.minidom import Element as DomElement
 
@@ -19,7 +18,7 @@ class Builder:
         self.file: Path = Path()
         self.name: str = ""
         self.arch: str = ""
-        self.elements: List[Element] = []
+        self.elements: list[Element] = []
 
     def load_string(self, xml_str: str):
         """

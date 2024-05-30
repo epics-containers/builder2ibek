@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: builder2ibek
+  title: builder2ibek
+  description: Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml
+spec:
+  type: documentation
+  lifecycle: experimental
+  owner: group:default/sscc

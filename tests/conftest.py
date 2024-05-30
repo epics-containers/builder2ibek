@@ -1,21 +1,15 @@
-from pathlib import Path
+import os
 
-from ibek.support import Support
-from pytest import fixture
-from ruamel.yaml import YAML
+import pytest
 
+# Prevent pytest from catching exceptions when debugging in vscode so that break on
+# exception works correctly (see: https://github.com/pytest-dev/pytest/issues/7409)
+if os.getenv("PYTEST_RAISE", "0") == "1":
 
-def get_support(samples: Path, yaml_file: str) -> Support:
-    """
-    Get a support object from the sample YAML directory
-    """
-    # load from file
-    d = YAML(typ="safe").load(samples / "yaml" / f"{yaml_file}")
-    # create a support object from that dict
-    support = Support.deserialize(d)
-    return support
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_exception_interact(call):
+        raise call.excinfo.value
 
-
-@fixture
-def samples():
-    return Path(__file__).parent / "samples"
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_internalerror(excinfo):
+        raise excinfo.value

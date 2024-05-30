@@ -1,9 +1,10 @@
 """
 Dataclasses for representing XML and YAML in memory
 """
+
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -12,7 +13,7 @@ from pydantic import BaseModel, ConfigDict
 DELETE_ME = "__delete_me__"
 
 
-class Entity(Dict[str, Any]):
+class Entity(dict[str, Any]):
     """
     Generic Entity has functions for using . notation which makes the code
     in the convertors package easier to type and read
@@ -48,7 +49,7 @@ class Generic_IOC(BaseModel):
     )
     ioc_name: str
     description: str
-    entities: List[Dict[str, Any]]
+    entities: list[dict[str, Any]]
     source_file: Path
 
 
@@ -57,4 +58,4 @@ class Generic_IOC(BaseModel):
 class Element:
     name: str
     module: str
-    attributes: Dict[str, str]
+    attributes: dict[str, str]

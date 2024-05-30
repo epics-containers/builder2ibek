@@ -49,7 +49,7 @@ def file(
             "entities",
             "  - type",
         ]:
-            yaml = re.sub(r"(\n%s)" % field, "\n\\g<1>", yaml)
+            yaml = re.sub(rf"(\n{field})", "\n\\g<1>", yaml)
         return yaml
 
     """Convert a single builder XML file into a single ibek YAML"""
@@ -88,7 +88,6 @@ def beamline(
     raise typer.Exit(code=1)
 
 
-# test with:
-#     pipenv run python -m builder2ibek
+# test with: python -m builder2ibek
 if __name__ == "__main__":
-    cli()
+    main()

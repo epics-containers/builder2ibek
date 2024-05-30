@@ -2,7 +2,7 @@
 Generic XML to YAML conversion functions
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 from builder2ibek.builder import Builder, Element
 from builder2ibek.moduleinfos import module_infos
@@ -32,7 +32,7 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
     for element in builder.elements:
         do_one_element(element, ioc)
 
-    sorted_entities: List[Entity] = []
+    sorted_entities: list[Entity] = []
     for entity in ioc.entities:  # type: ignore
         # sort the args by key
         entity = Entity(sorted(entity.items()))  # type: ignore
@@ -65,7 +65,7 @@ def do_one_element(element: Element, ioc: Generic_IOC):
             add_defaults(entity, info.defaults)
 
 
-def add_defaults(entity: Dict[str, Any], defaults: Dict[str, Dict[str, Any]]):
+def add_defaults(entity: dict[str, Any], defaults: dict[str, dict[str, Any]]):
     this_entity_defaults = defaults.get(entity["type"])
     if this_entity_defaults:
         needed_defaults = {

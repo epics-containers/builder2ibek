@@ -1,7 +1,8 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Any
 
 converters_path = Path(__file__).parent / "converters"
 
@@ -9,12 +10,12 @@ converters_path = Path(__file__).parent / "converters"
 @dataclass
 class ModuleInfo:
     handler: Callable
-    defaults: Dict[str, Dict[str, Any]]
+    defaults: dict[str, dict[str, Any]]
     schema: str
     yaml_component: str
 
 
-module_infos: Dict[str, ModuleInfo] = {}
+module_infos: dict[str, ModuleInfo] = {}
 
 
 # automatically load all of the convert handlers in ./converters into the
@@ -24,7 +25,7 @@ for converter in converters:
     if not converter.name.startswith("_"):
         module = import_module(f"builder2ibek.converters.{converter.stem}")
         if module is not None:
-            xml_component = getattr(module, "xml_component")
+            xml_component = module.xml_component
             info = ModuleInfo(
                 getattr(module, "handler", lambda *args: None),
                 getattr(module, "defaults", {}),

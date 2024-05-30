@@ -1,15 +1,11 @@
 {
+    "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "editor.formatOnSave": true,
-    "[python]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll.ruff": "never",
-            "source.organizeImports.ruff": "explicit",
-            "source.black": "explicit"
-        }
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
     },
-    "cSpell.words": [
-        "moduleinfos",
-        "PARENTPORT"
-    ]
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+    },
 }
