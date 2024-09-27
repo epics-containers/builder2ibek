@@ -90,4 +90,4 @@ def beamline(
 
 # test with: python -m builder2ibek
 if __name__ == "__main__":
-    main()
+    cli()

@@ -81,6 +81,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # standardise the name of the controller port
         entity.rename("PORT", "PmacController")
 
+    elif entity_type in ["pmacCreateCsGroup", "pmacCsGroupAddAxis"]:
+        # remove GUI only parameters
+        entity.remove("name")
+
     elif entity_type == "CS":
         # standardise the name of the controller port
         entity.rename("Controller", "PmacController")
