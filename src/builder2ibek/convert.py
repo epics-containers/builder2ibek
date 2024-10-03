@@ -53,7 +53,7 @@ def do_one_element(element: Element, ioc: Generic_IOC):
     if element.module in module_infos:
         info = module_infos[element.module]
         entity.type = f"{info.yaml_component}.{element.name}"
-        # new_xml = info.handler(entity, element.name, ioc)
+        
         new_xml = globalHandler(entity, element.name, ioc, info.handler)
         if new_xml:
           handle_new_xml(new_xml, entity, ioc, info)
