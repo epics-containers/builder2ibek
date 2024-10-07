@@ -1,15 +1,15 @@
 import subprocess
 import sys
-
+import os
 
 def test_cli_version():
-    cmd = [sys.executable, "-m", "builder2ibek", "file", "--yaml", "out.yaml", "tests/samples/BL45P-MO-IOC-01.xml"]
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    assert result.stderr == b""
-
-    cmd = [sys.executable, "-m", "builder2ibek", "file", "--yaml", "out.yaml", "tests/samples/BL99P-EA-IOC-05.xml"]
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    assert result.stderr == b""
+    conversion_samples = ["tests/samples/BL45P-MO-IOC-01.xml",
+                           "tests/samples/BL99P-EA-IOC-05.xml"]    
+    
+    for sample in conversion_samples:
+        cmd = [sys.executable, "-m", "builder2ibek", "file", "--yaml", "out.yaml", sample]
+        result = subprocess.run(cmd)
+        assert result.returncode == 0
 
     
 
