@@ -5,9 +5,9 @@ Generic XML to YAML conversion functions
 from typing import Any
 
 from builder2ibek.builder import Builder, Element
+from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.moduleinfos import module_infos
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.converters.globalHandler import globalHandler
 
 
 def dispatch(builder: Builder, filename) -> Generic_IOC:
@@ -71,8 +71,7 @@ def handle_new_xml(new_xml: str, entity: Entity, ioc: Generic_IOC, info=None):
     do_dispatch(new_builder, ioc)
     if entity.is_deleted():
         ioc.entities.remove(entity)
-    if not entity.is_deleted and info:
-        print("a")
+    if not entity.is_deleted() and info:
         add_defaults(entity, info.defaults)
 
 
