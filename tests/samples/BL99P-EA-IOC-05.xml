@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_MAX_ARRAY_BYTES" value="9000000"/>
+	<devIocStats.devIocStatsHelper ioc="BL99P-EA-IOC-05" name="IOC-STATS"/>
+	<!--ADAndor.andorCCD ADDR="0" BUFFERS="2000" INSTALLPATH="/dls_sw/prod/R3.14.12.7/support/andorCCDSDK/2-102dls4/andorCCDSDKApp/src/sdk/andor/etc" P="BL99P-EA-DET-03" PORT="DET3.cam" R=":CAM:" TIMEOUT="1"/-->
+	<ADAndor.andorCCD ADDR="0" BUFFERS="2000" INSTALLPATH="/dls_sw/prod/R3.14.12.7/support/ANAndor/etc" P="BL99P-EA-DET-03" PORT="DET3.cam" R=":CAM:" TIMEOUT="1"/>
+	<!--<ADZMQ.NDZMQPlugin DEST_ADDR="127.0.0.1:1515" NDARRAY_PORT="DET3.cam" P="BL99P-EA-DET-03" PORT="DET3.zmq" QUEUE="1000" R=":ZMQ:" TRANSPORT="tcp" ZMQ_TYPE="PUSH"/>-->
+	<ADCore.NDPosPlugin ADDR="0" BLOCK="0" ENABLED="1" NDARRAY_PORT="DET3.cam" P="BL99P-EA-DET-03" PORT="DET3.pos" QUEUE="1000" R=":POS:" TIMEOUT="1"/>
+</components>
