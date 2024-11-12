@@ -1,9 +1,10 @@
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.converters.globalHandler import globalHandler
 
 xml_component = "EPICS_BASE"
 yaml_component = "epics"
 
-
+@globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "EpicsEnvSet":
         if entity["key"] == "EPICS_CA_MAX_ARRAY_BYTES":

@@ -1,4 +1,5 @@
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.converters.globalHandler import globalHandler
 
 xml_component = "devIocStats"
 
@@ -11,7 +12,7 @@ defaults = {
     }
 }
 
-
+@globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if (
         entity_type == "devIocStatsHelper" or entity_type == "iocAdminSoft"

@@ -4,7 +4,7 @@
 	<devIocStats.devIocStatsHelper ioc="BL45P-MO-IOC-01" name="MO1_STATS"/>
 	<pmac.pmacAsynIPPort IP="172.23.59.21" name="BRICK1port"/>
 	<pmac.GeoBrick P="BL45P-MO-STEP-01" Port="BRICK1port" name="BRICK1" />
-	<pmac.pmacDisableLimitsCheck Axis="2" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.2"/>
+	<pmac.pmacDisableLimitsCheck Axis="2" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.2" gda_name="Hello"/>
 	<pmac.pmacDisableLimitsCheck Axis="3" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.3"/>
 	<pmac.pmacDisableLimitsCheck Axis="4" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.4"/>
 	<pmac.pmacDisableLimitsCheck Axis="5" Controller="BRICK1" name="BRICK1.DIS_LIM_CHECK.5"/>

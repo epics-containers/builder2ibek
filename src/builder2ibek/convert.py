@@ -50,20 +50,19 @@ def do_one_element(element: Element, ioc: Generic_IOC):
 
     # then dispatch to a specific handler if there is one
     assert isinstance(element, Element)
-    if element.module in module_infos:
-        info = module_infos[element.module]
-        entity.type = f"{info.yaml_component}.{element.name}"
-        new_xml = info.handler(entity, element.name, ioc)
-        if new_xml:
-            new_builder = Builder()
-            new_builder.load_string(new_xml)
-            ioc.entities.remove(entity)
-            do_dispatch(new_builder, ioc)
-        if entity.is_deleted():
-            ioc.entities.remove(entity)
-        else:
-            add_defaults(entity, info.defaults)
-
+    info = module_infos[element.module] if element.module in module_infos else module_infos["generic"]
+       
+    entity.type = f"{info.yaml_component}.{element.name}"
+    new_xml = info.handler(entity, element.name, ioc)
+    if new_xml:
+        new_builder = Builder()
+        new_builder.load_string(new_xml)
+        ioc.entities.remove(entity)
+        do_dispatch(new_builder, ioc)
+    if entity.is_deleted():
+        ioc.entities.remove(entity)
+    else:
+        add_defaults(entity, info.defaults)
 
 def add_defaults(entity: dict[str, Any], defaults: dict[str, dict[str, Any]]):
     this_entity_defaults = defaults.get(entity["type"])
