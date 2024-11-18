@@ -4,7 +4,7 @@ xml_component = "generic"
 
 def handler(entity, entity_type, ioc, realHandler=None):
     """
-    Default behavior: XML to YAML generic conversion module
+    Generic/global entity handler
     """
     entity.remove("gda_name")
     entity.remove("gda_desc")
@@ -14,7 +14,7 @@ def handler(entity, entity_type, ioc, realHandler=None):
     else:
         return None
 
-def globalHandler(realHandler=None):
+def globalHandler(realHandler):
     """
     Decorator for generic global handler
     """
