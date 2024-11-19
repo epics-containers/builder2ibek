@@ -1,9 +1,8 @@
 # Changes here will be overwritten by Copier
-_commit: 2.1.0
+_commit: 2.5.0
 _src_path: gh:diamondlightsource/python-copier-template
 author_email: giles.knap@diamond.ac.uk
 author_name: Giles Knap
-component_owner: group:default/sscc
 description: Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml
 distribution_name: builder2ibek
 docker: false

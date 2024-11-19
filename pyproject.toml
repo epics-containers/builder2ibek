@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=64", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,11 +7,9 @@ name = "builder2ibek"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 description = "Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml"
 dependencies = ["ibek"] # Add project dependencies here, e.g. ["click", "numpy"]
@@ -45,7 +43,7 @@ name = "Giles Knap"
 
 
 [tool.setuptools_scm]
-write_to = "src/builder2ibek/_version.py"
+version_file = "src/builder2ibek/_version.py"
 
 [tool.mypy]
 ignore_missing_imports = true # Ignore missing stubs in imported modules
@@ -97,11 +95,18 @@ lint.ignore = [
 ]
 line-length = 88
 lint.select = [
-    "B",  # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-    "C4", # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
-    "E",  # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
-    "F",  # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
-    "W",  # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
-    "I",  # isort - https://docs.astral.sh/ruff/rules/#isort-i
-    "UP", # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "B",   # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "C4",  # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "E",   # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
+    "F",   # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "W",   # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
+    "I",   # isort - https://docs.astral.sh/ruff/rules/#isort-i
+    "UP",  # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "SLF", # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# By default, private member access is allowed in tests
+# See https://github.com/DiamondLightSource/python-copier-template/issues/154
+# Remove this line to forbid private member access in tests
+"tests/**/*" = ["SLF001"]

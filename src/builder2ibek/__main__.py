@@ -1,6 +1,13 @@
+<<<<<<< before updating
 import re
 from pathlib import Path
 from typing import Optional
+=======
+"""Interface for ``python -m builder2ibek``."""
+
+from argparse import ArgumentParser
+from collections.abc import Sequence
+>>>>>>> after updating
 
 import typer
 from ruamel.yaml import YAML, CommentedMap
@@ -12,6 +19,7 @@ from builder2ibek.convert import dispatch
 cli = typer.Typer()
 yaml = YAML()
 
+<<<<<<< before updating
 
 def version_callback(value: bool):
     if value:
@@ -86,8 +94,19 @@ def beamline(
     """
     typer.echo("Not implemented yet")
     raise typer.Exit(code=1)
+=======
+def main(args: Sequence[str] | None = None) -> None:
+    """Argument parser for the CLI."""
+    parser = ArgumentParser()
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=__version__,
+    )
+    parser.parse_args(args)
+>>>>>>> after updating
 
 
-# test with: python -m builder2ibek
 if __name__ == "__main__":
     cli()
