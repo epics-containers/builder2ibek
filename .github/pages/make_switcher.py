@@ -5,17 +5,10 @@ import logging
 from argparse import ArgumentParser
 from pathlib import Path
 from subprocess import CalledProcessError, check_output
-<<<<<<< before updating
-from typing import Optional
-
-
-def report_output(stdout: bytes, label: str) -> list[str]:
-=======
 
 
 def report_output(stdout: bytes, label: str) -> list[str]:
     """Print and return something received frm stdout."""
->>>>>>> after updating
     ret = stdout.decode().strip().split("\n")
     print(f"{label}: {ret}")
     return ret
@@ -33,11 +26,7 @@ def get_sorted_tags_list() -> list[str]:
     return report_output(stdout, "Tags list")
 
 
-<<<<<<< before updating
-def get_versions(ref: str, add: Optional[str]) -> list[str]:
-=======
 def get_versions(ref: str, add: str | None) -> list[str]:
->>>>>>> after updating
     """Generate the file containing the list of all GitHub Pages builds."""
     # Get the directories (i.e. builds) from the GitHub Pages branch
     try:
