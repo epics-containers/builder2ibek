@@ -2,6 +2,7 @@ from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "generic"
 
+
 def handler(entity, entity_type, ioc, realHandler=None):
     """
     Generic/global entity handler
@@ -14,8 +15,11 @@ def handler(entity, entity_type, ioc, realHandler=None):
     else:
         return None
 
+
 def globalHandler(realHandler):
     """
     Decorator for generic global handler
     """
-    return lambda entity, entity_type, ioc: handler(entity, entity_type, ioc, realHandler)
+    return lambda entity, entity_type, ioc: handler(
+        entity, entity_type, ioc, realHandler
+    )

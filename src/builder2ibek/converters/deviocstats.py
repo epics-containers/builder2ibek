@@ -12,6 +12,7 @@ defaults = {
     }
 }
 
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if (

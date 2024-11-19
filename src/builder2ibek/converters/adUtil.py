@@ -13,6 +13,7 @@ schema = ""
 
 GDA_PLUGINS = Path(__file__).parent / "gdaPlugins.yaml"
 
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "gdaPlugins":

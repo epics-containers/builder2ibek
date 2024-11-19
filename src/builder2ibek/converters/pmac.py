@@ -16,6 +16,7 @@ schema = (
     "2023.11.1/ibek.ioc.schema.json"
 )
 
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """

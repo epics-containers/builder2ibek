@@ -3,6 +3,7 @@ from builder2ibek.converters.globalHandler import globalHandler
 
 xml_component = "ADZMQ"
 
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
