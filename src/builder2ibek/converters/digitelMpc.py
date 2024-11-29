@@ -11,6 +11,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     if entity_type in ["digitelMpc", "digitelMpcTsp"]:
         # transform unit into quoted 2 digit format
-        unit = int(entity.get("unit")) # type: ignore
+        unit = int(entity.get("unit"))  # type: ignore
         unit_enum = f"{unit:02d}"
         entity.unit = unit_enum
