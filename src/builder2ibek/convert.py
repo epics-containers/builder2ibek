@@ -5,6 +5,7 @@ Generic XML to YAML conversion functions
 from typing import Any
 
 from builder2ibek.builder import Builder, Element
+from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.moduleinfos import module_infos
 from builder2ibek.types import Entity, Generic_IOC
 
@@ -50,6 +51,7 @@ def do_one_element(element: Element, ioc: Generic_IOC):
 
     # then dispatch to a specific handler if there is one
     assert isinstance(element, Element)
+
     info = (
         module_infos[element.module]
         if element.module in module_infos
