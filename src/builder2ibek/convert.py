@@ -5,7 +5,6 @@ Generic XML to YAML conversion functions
 from typing import Any
 
 from builder2ibek.builder import Builder, Element
-from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.moduleinfos import module_infos
 from builder2ibek.types import Entity, Generic_IOC
 
