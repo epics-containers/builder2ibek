@@ -4,6 +4,7 @@ from pathlib import Path
 
 import ruamel.yaml as yaml
 
+from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "adUtil"
@@ -13,6 +14,7 @@ schema = ""
 GDA_PLUGINS = Path(__file__).parent / "gdaPlugins.yaml"
 
 
+@globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "gdaPlugins":
         ioc.entities.remove(entity)

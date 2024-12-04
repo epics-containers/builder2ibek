@@ -88,6 +88,5 @@ def beamline(
     raise typer.Exit(code=1)
 
 
-# test with: python -m builder2ibek
 if __name__ == "__main__":
     cli()

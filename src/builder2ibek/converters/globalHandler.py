@@ -1,13 +1,23 @@
-from builder2ibek.types import Entity, Generic_IOC
-
-xml_component = "global"
+xml_component = "generic"
 
 
-def globalHandler(
-    entity: Entity, entity_type: str, ioc: Generic_IOC, target_handler=None
-):
+def handler(entity, entity_type, ioc, realHandler=None):
+    """
+    Generic/global entity handler
+    """
     entity.remove("gda_name")
     entity.remove("gda_desc")
 
-    if target_handler:
-        return target_handler(entity, entity_type, ioc)
+    if realHandler:
+        return realHandler(entity, entity_type, ioc)
+    else:
+        return None
+
+
+def globalHandler(realHandler):
+    """
+    Decorator for generic/global handler
+    """
+    return lambda entity, entity_type, ioc: handler(
+        entity, entity_type, ioc, realHandler
+    )

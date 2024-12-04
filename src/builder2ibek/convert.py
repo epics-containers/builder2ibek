@@ -5,7 +5,6 @@ Generic XML to YAML conversion functions
 from typing import Any
 
 from builder2ibek.builder import Builder, Element
-from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.moduleinfos import module_infos
 from builder2ibek.types import Entity, Generic_IOC
 
@@ -51,27 +50,23 @@ def do_one_element(element: Element, ioc: Generic_IOC):
 
     # then dispatch to a specific handler if there is one
     assert isinstance(element, Element)
-    if element.module in module_infos:
-        info = module_infos[element.module]
-        entity.type = f"{info.yaml_component}.{element.name}"
 
-        new_xml = globalHandler(entity, element.name, ioc, info.handler)
-        if new_xml:
-            handle_new_xml(new_xml, entity, ioc, info)
-    else:
-        new_xml = globalHandler(entity, element.name, ioc)
-        if new_xml:
-            handle_new_xml(new_xml, entity, ioc)
+    info = (
+        module_infos[element.module]
+        if element.module in module_infos
+        else module_infos["generic"]
+    )
 
-
-def handle_new_xml(new_xml: str, entity: Entity, ioc: Generic_IOC, info=None):
-    new_builder = Builder()
-    new_builder.load_string(new_xml)
-    ioc.entities.remove(entity)
-    do_dispatch(new_builder, ioc)
+    entity.type = f"{info.yaml_component}.{element.name}"
+    new_xml = info.handler(entity, element.name, ioc)
+    if new_xml:
+        new_builder = Builder()
+        new_builder.load_string(new_xml)
+        ioc.entities.remove(entity)
+        do_dispatch(new_builder, ioc)
     if entity.is_deleted():
         ioc.entities.remove(entity)
-    if not entity.is_deleted() and info:
+    else:
         add_defaults(entity, info.defaults)
 
 
