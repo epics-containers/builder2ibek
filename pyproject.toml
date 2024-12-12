@@ -33,6 +33,7 @@ dev = [
 
 [project.scripts]
 builder2ibek = "builder2ibek.__main__:cli"
+autosave-convert = "builder2ibek.autosave:cli"
 
 [project.urls]
 GitHub = "https://github.com/epics-containers/builder2ibek"
