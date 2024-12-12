@@ -16,12 +16,7 @@ entities:
   - type: epics.EpicsCaMaxArrayBytes
     max_bytes: 9000000
 
-  - type: devIocStats.devIocStatsHelper
-    __command__: delete
-    ioc: BL99P-EA-IOC-05
-    name: IOC-STATS
-
-  - type: ADAndor.andorCCD
+  - type: generic.andorCCD
     ADDR: 0
     BUFFERS: 2000
     INSTALLPATH: /dls_sw/prod/R3.14.12.7/support/ANAndor/etc
@@ -30,7 +25,7 @@ entities:
     R: ':CAM:'
     TIMEOUT: 1
 
-  - type: ADCore.NDPosPlugin
+  - type: generic.NDPosPlugin
     ADDR: 0
     BLOCK: 0
     ENABLED: 1
