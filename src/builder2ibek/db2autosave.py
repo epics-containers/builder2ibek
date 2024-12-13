@@ -60,7 +60,7 @@ def parse_templates(out_folder: Path, db_list: list[Path]):
     Areadetector and other support modules use:
         template_name_positions.req for save on pass 0
         template_name_settings.req for save on pass 0 and pass 1
-        the autosave docs seem to back the idea that pass 1 only is not used
+        the autosave docs seem to back the idea that pass 1 only is never used
 
     So this translation will make
         0 => template_name_positions.req
@@ -77,11 +77,10 @@ def parse_templates(out_folder: Path, db_list: list[Path]):
                     this_set = positions
                 case 1 | 2:
                     this_set = settings
-            for match in regex_autosave[n].finditer(text):
-                this_set.add(f"{match.group(2)} {match.group(1)}")
+            for result in regex_autosave[n].finditer(text):
+                this_set.add(f"{result.group(2)} {result.group(1)}")
 
-        stem = db.stem
-        req_file = out_folder / f"{stem}_positions.req"
-        req_file.write_text("\n".join(positions))
-        req_file = out_folder / f"{stem}_settings.req"
-        req_file.write_text("\n".join(settings))
+        req_file = out_folder / f"{db.stem}_positions.req"
+        req_file.write_text("\n".join(positions) + "\n")
+        req_file = out_folder / f"{db.stem}_settings.req"
+        req_file.write_text("\n".join(settings) + "\n")
