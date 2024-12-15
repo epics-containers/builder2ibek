@@ -6,6 +6,7 @@ import typer
 from builder2ibek import __version__
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
+from builder2ibek.dbcompare import compare_dbs
 
 cli = typer.Typer()
 
@@ -50,14 +51,15 @@ def beamline2yaml(
     output: Path = typer.Argument(..., help="Output root folder"),
 ):
     """
-    Convert whole beamline's IOCs from builder to ibek (TODO)
+    <<<<<<< HEAD
+        Convert whole beamline's IOCs from builder to ibek (TODO)
+    =======
+        Convert all IOCs in a BLXXI-SUPPORT project into a set of ibek services
+        folders (TODO)
+    >>>>>>> 4af36b9 (add db compare)
     """
     typer.echo("Not implemented yet")
     raise typer.Exit(code=1)
-
-
-if __name__ == "__main__":
-    cli()
 
 
 @cli.command()
@@ -73,3 +75,16 @@ def autosave(
     Convert DLS autosave DB template comments into autosave req files
     """
     parse_templates(out_folder, db_list)
+
+
+@cli.command()
+def db_compare(original: Path, new: Path):
+    """
+    Compare two DB files and output the differences
+    """
+
+    compare_dbs(original, new)
+
+
+if __name__ == "__main__":
+    cli()

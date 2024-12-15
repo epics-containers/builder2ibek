@@ -5,19 +5,26 @@
 
 # builder2ibek
 
-Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml
-
-This is where you should write a short paragraph that describes what your module does,
-how it does it, and why people should use it.
+A tool suite for converting DLS XML builder projects to epics-containers ibek.
 
 Source          | <https://github.com/epics-containers/builder2ibek>
 :---:           | :---:
 PyPI            | `pip install builder2ibek`
 Releases        | <https://github.com/epics-containers/builder2ibek/releases>
 
-This is where you should put some images or code snippets that illustrate
-some relevant examples. If it is a library then you might put some
-introductory code here:
+<pre><font color="#AAAAAA">╭─ Commands ───────────────────────────────────────────────────────────────────╮</font>
+<font color="#AAAAAA">│ </font><font color="#2AA1B3"><b>xml2yaml       </b></font> Convert a builder XML IOC instance definition file into an   │
+<font color="#AAAAAA">│ </font><font color="#2AA1B3"><b>               </b></font> ibek YAML file                                               │
+<font color="#AAAAAA">│ </font><font color="#2AA1B3"><b>beamline2yaml  </b></font> Convert all IOCs in a BLXXI-SUPPORT project into a set of    │
+<font color="#AAAAAA">│ </font><font color="#2AA1B3"><b>               </b></font> ibek services folders (TODO)                                 │
+<font color="#AAAAAA">│ </font><font color="#2AA1B3"><b>autosave       </b></font> Convert DLS autosave DB template comments into autosave req  │
+<font color="#AAAAAA">│ </font><font color="#2AA1B3"><b>               </b></font> files                                                        │
+<font color="#AAAAAA">│ </font><font color="#2AA1B3"><b>db-compare     </b></font> Compare two DB files and output the differences              │
+<font color="#AAAAAA">╰──────────────────────────────────────────────────────────────────────────────╯</font>
+</pre>
+
+```bash
+builder2ibek
 
 ```python
 from builder2ibek import __version__
