@@ -29,68 +29,68 @@ entities:
     name: EPICS_CAS_BEACON_ADDR_LIST
     value: 172.23.194.105
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: GCTLR_A_01_PORT
     port: 192.168.3.11:7002
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: GCTLR_S_01_PORT
     port: 192.168.3.11:7003
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_S_01_PORT
     port: 192.168.3.11:7004
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_01_PORT
     port: 192.168.3.11:7005
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_02_PORT
     port: 192.168.3.11:7006
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: RGA_PC_01_PORT
     port: 192.168.3.12:7001
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: GCTLR_A_02_PORT
     port: 192.168.3.12:7003
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: GCTLR_A_03_PORT
     port: 192.168.3.12:7004
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_03_PORT
     port: 192.168.3.12:7005
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_04_PORT
     port: 192.168.3.12:7006
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_05_PORT
     port: 192.168.3.12:7007
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_06_PORT
     port: 192.168.3.12:7008
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_07_PORT
     port: 192.168.3.12:7009
 
-  - type: generic.AsynIP
+  - type: asyn.AsynIP
     name: MPC_A_08_PORT
     port: 192.168.3.12:7010
 
-  - type: generic.FINSUDPInit
+  - type: FINS.FINSUDPInit
     ip: 192.168.3.10
     name: VLVCC_01_FINS
     simulation: None
 
-  - type: generic.EtherIPInit
+  - type: ether_ip.EtherIPInit
     device: SR03C-VA-VLVCC-01
     ip: 192.168.3.10
     name: VLVCC_01.INFO
@@ -561,37 +561,37 @@ entities:
     tag: V
     tagidx: 4
 
-  - type: generic.rga
+  - type: rga.rga
     channel: 1
     device: SR03S-VA-RGA-01
     port: RGA_PC_01_PORT
 
-  - type: generic.rga
+  - type: rga.rga
     channel: 2
     device: SR03A-VA-RGA-01
     port: RGA_PC_01_PORT
 
-  - type: generic.rga
+  - type: rga.rga
     channel: 3
     device: SR03A-VA-RGA-02
     port: RGA_PC_01_PORT
 
-  - type: generic.rga
+  - type: rga.rga
     channel: 4
     device: FE03I-VA-RGA-01
     port: RGA_PC_01_PORT
 
-  - type: generic.rga
+  - type: rga.rga
     channel: 5
     device: BL03I-VA-RGA-01
     port: RGA_PC_01_PORT
 
-  - type: generic.rga
+  - type: rga.rga
     channel: 6
     device: SR03I-VA-RGA-01
     port: RGA_PC_01_PORT
 
-  - type: generic.spaceTemplate
+  - type: vacuumSpace.spaceTemplate
     device: SR03S-VA-SPACE-01
     gauge: SR03S-VA-GGAUG-01
     img: SR03S-VA-GIMG-01
@@ -599,7 +599,7 @@ entities:
     pirg: SR03S-VA-GPIRG-01
     valve: SR03S-VA-GVALV-01
 
-  - type: generic.spaceTemplate
+  - type: vacuumSpace.spaceTemplate
     device: SR03A-VA-SPACE-01
     gauge: SR03A-VA-GGAUG-01
     img: SR03A-VA-GIMG-01
@@ -607,7 +607,7 @@ entities:
     pirg: SR03A-VA-GPIRG-01
     valve: SR03A-VA-GVALV-01
 
-  - type: generic.spaceTemplate
+  - type: vacuumSpace.spaceTemplate
     device: SR03C-VA-SPACE-01
     gauge: SR03C-VA-GGAUG-01
     img: SR03C-VA-GIMG-01
@@ -813,7 +813,7 @@ entities:
     valve7: SR03S-VA-GVALV-01
     valve8: SR03S-VA-GVALV-01
 
-  - type: generic.rgaGroup
+  - type: rga.rgaGroup
     device: SR03C-VA-GRGA-01
     rga1: SR03S-VA-RGA-01
     rga2: SR03A-VA-RGA-01
@@ -907,7 +907,7 @@ entities:
     port: VLVCC_01_EIP
     tagidx: 2
 
-  - type: generic.bi
+  - type: userIO.bi
     DESC: Rack 01 Fan Status
     DTYP: Soft Channel
     INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B0 CP
@@ -921,7 +921,7 @@ entities:
     archiver_rate: 3600 Monitor
     name: VAFAN_01
 
-  - type: generic.bi
+  - type: userIO.bi
     DESC: Rack 02 Fan Status
     DTYP: Soft Channel
     INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B1 CP
@@ -935,7 +935,7 @@ entities:
     archiver_rate: 3600 Monitor
     name: VAFAN_02
 
-  - type: generic.bi
+  - type: userIO.bi
     DESC: Rack 03 Fan Status
     DTYP: Soft Channel
     INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B2 CP
@@ -949,7 +949,7 @@ entities:
     archiver_rate: 3600 Monitor
     name: VAFAN_03
 
-  - type: generic.bi
+  - type: userIO.bi
     DESC: Rack 01 Duplex PSU Status
     DTYP: Soft Channel
     INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B3 CP
@@ -963,7 +963,7 @@ entities:
     archiver_rate: 3600 Monitor
     name: VAPSU_01
 
-  - type: generic.bi
+  - type: userIO.bi
     DESC: Rack 02 Duplex PSU Status
     DTYP: Soft Channel
     INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B4 CP
@@ -1059,14 +1059,14 @@ entities:
     master: FV.MASTER
     name: FV.G8
 
-  - type: generic.Moxa
+  - type: terminalServer.Moxa
     HOST: 192.168.3.11
     NCHANS: 16
     P: SR03C-VA-TSERV-01
     R: ''
     name: TSERV1
 
-  - type: generic.Moxa
+  - type: terminalServer.Moxa
     HOST: 192.168.3.12
     NCHANS: 16
     P: SR03C-VA-TSERV-02

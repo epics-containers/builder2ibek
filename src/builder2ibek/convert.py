@@ -88,11 +88,11 @@ def do_one_element(element: Element, ioc: Generic_IOC):
     # then dispatch to a specific handler if there is one
     assert isinstance(element, Element)
 
-    info = (
-        module_infos[element.module]
-        if element.module in module_infos
-        else module_infos["generic"]
-    )
+    if element.module in module_infos:
+        info = module_infos[element.module]
+    else:
+        info = module_infos["generic"]
+        info.yaml_component = element.module
 
     entity.type = f"{info.yaml_component}.{element.name}"
     new_xml = info.handler(entity, element.name, ioc)

@@ -18,3 +18,12 @@ def test_convert(samples: Path):
         convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
 
         assert out_yaml.read_text() == sample_yaml.read_text()
+
+
+def test_debug(samples: Path):
+    """
+    A single test to debug the conversion process
+    """
+    in_xml = samples / "BL99P-EA-IOC-05.xml"
+    out_yml = samples / "BL99P-EA-IOC-05.yaml"
+    convert_file(in_xml, out_yml, "/epics/ibek-defs/ioc.schema.json")

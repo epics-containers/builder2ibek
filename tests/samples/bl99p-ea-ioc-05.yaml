@@ -16,7 +16,7 @@ entities:
   - type: epics.EpicsCaMaxArrayBytes
     max_bytes: 9000000
 
-  - type: generic.andorCCD
+  - type: ADAndor.andorCCD
     ADDR: 0
     BUFFERS: 2000
     INSTALLPATH: /dls_sw/prod/R3.14.12.7/support/ANAndor/etc
@@ -25,7 +25,7 @@ entities:
     R: ':CAM:'
     TIMEOUT: 1
 
-  - type: generic.NDPosPlugin
+  - type: ADCore.NDPosPlugin
     ADDR: 0
     BLOCK: 0
     ENABLED: 1
