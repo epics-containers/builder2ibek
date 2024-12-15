@@ -21,9 +21,9 @@ def compare_dbs(original: Path, new: Path):
     for record in regex_record.finditer(new_text):
         new_set.add(f"{record.group(1)} {record.group(2)}")
 
+    print("*******************************************************************")
     print("Records in original but not in new:")
     print("\n".join(sorted(old_set - new_set)))
-    print("\n")
+    print("*******************************************************************")
     print("Records in new but not in original:")
     print("\n".join(sorted(new_set - old_set)))
-    print("\n")
