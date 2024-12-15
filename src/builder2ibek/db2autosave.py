@@ -1,53 +1,10 @@
 import re
 from pathlib import Path
 
-import typer
-
-from builder2ibek import __version__
-
-cli = typer.Typer()
-
-
-def version_callback(value: bool):
-    if value:
-        typer.echo(__version__)
-        raise typer.Exit()
-
-
-@cli.callback()
-def main(
-    version: bool | None = typer.Option(
-        None,
-        "--version",
-        callback=version_callback,
-        is_eager=True,
-        help="Print the version of builder2ibek and exit",
-    ),
-):
-    """
-    Convert DLS autosave DB template comments into autosave req files
-    """
-
-
 regex_autosave = [
     re.compile(rf'# *% *autosave *{n} *(.*)[\s\S]*?record *\(.*, *"?([^"]*)"?\)')
     for n in range(3)
 ]
-
-
-@cli.command()
-def db_files(
-    out_folder: Path = typer.Option(
-        ".", help="Output folder to write autosave request files"
-    ),
-    db_list: list[Path] = typer.Argument(
-        ..., help="List of autosave req files to link "
-    ),
-):
-    """
-    Convert DLS autosave DB template comments into autosave req files
-    """
-    parse_templates(out_folder, db_list)
 
 
 def parse_templates(out_folder: Path, db_list: list[Path]):

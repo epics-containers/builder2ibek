@@ -5,6 +5,7 @@ import typer
 
 from builder2ibek import __version__
 from builder2ibek.convert import convert_file
+from builder2ibek.db2autosave import parse_templates
 
 cli = typer.Typer()
 
@@ -25,7 +26,7 @@ def main(
         help="Print the version of builder2ibek and exit",
     ),
 ):
-    """Convert build XML to ibek YAML"""
+    """Convert xmlbuilder assets to epics-containers assets"""
 
 
 @cli.command()
@@ -44,12 +45,12 @@ def xml2yaml(
 
 
 @cli.command()
-def builder2ibek(
+def beamline2yaml(
     input: Path = typer.Argument(..., help="Path to root folder BLXX-BUILDER"),
     output: Path = typer.Argument(..., help="Output root folder"),
 ):
     """
-    Convert whole beamline's IOCs from builder to ibek (TODO
+    Convert whole beamline's IOCs from builder to ibek (TODO)
     """
     typer.echo("Not implemented yet")
     raise typer.Exit(code=1)
@@ -57,3 +58,18 @@ def builder2ibek(
 
 if __name__ == "__main__":
     cli()
+
+
+@cli.command()
+def autosave(
+    out_folder: Path = typer.Option(
+        ".", help="Output folder to write autosave request files"
+    ),
+    db_list: list[Path] = typer.Argument(
+        ..., help="List of DB templates with autosave comments"
+    ),
+):
+    """
+    Convert DLS autosave DB template comments into autosave req files
+    """
+    parse_templates(out_folder, db_list)
