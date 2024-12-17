@@ -1,5 +1,6 @@
-Records in original but not in new:
 *******************************************************************
+Records in original but not in new:
+
 bo SR03C-VA-IOC-01:SRHEARTBT
 calc SR03A-VA-GAUGE-01:PLOG_CALC
 calc SR03A-VA-GAUGE-02:PLOG_CALC
@@ -37,8 +38,9 @@ stringout SR03C-VA-IOC-01:RRTIME
 stringout SR03C-VA-IOC-01:SRRECENTST
 stringout SR03C-VA-IOC-01:SRSTATUSST
 
-Records in new but not in original:
 *******************************************************************
+Records in new but not in original:
+
 aSub SR03A-VA-MIMG-01:MEAN
 aSub SR03C-VA-MIMG-01:MEAN
 aSub SR03S-VA-MIMG-01:MEAN
@@ -135,7 +137,8 @@ stringout SR03C-VA-IOC-01:SR_rebootTime
 stringout SR03C-VA-IOC-01:SR_recentlyStr
 stringout SR03C-VA-IOC-01:SR_statusStr
 
-ecords in original:    7436
+*******************************************************************
+records in original:    7436
   records in new:         7495
   records missing in new: 36
   records extra in new:   95

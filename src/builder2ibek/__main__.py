@@ -84,7 +84,7 @@ def db_compare(
     ignore: list[str] = typer.Option(
         [], help="List of record name sub strings to ignore"
     ),
-    output: Optional[Path] = typer.Option(..., help="Output file"),
+    output: Optional[Path] = typer.Option(None, help="Output file"),
 ):
     """
     Compare two DB files and output the differences

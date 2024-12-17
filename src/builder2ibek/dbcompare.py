@@ -38,15 +38,16 @@ def compare_dbs(
                 new_only_filtered.remove(rec)
 
     result = (
-        "Records in original but not in new:\n"
-        + "*******************************************************************\n"
+        "*******************************************************************\n"
+        + "Records in original but not in new:\n\n"
         + "\n".join(old_only_filtered)
         + "\n\n"
-        + "Records in new but not in original:\n"
         + "*******************************************************************\n"
+        + "Records in new but not in original:\n\n"
         + "\n".join(new_only_filtered)
         + "\n\n"
-        + f"\records in original:    {len(old_set)}\n"
+        + "*******************************************************************\n"
+        + f"records in original:    {len(old_set)}\n"
         f"  records in new:         {len(new_set)}\n"
         f"  records missing in new: {len(old_only_filtered)}\n"
         f"  records extra in new:   {len(new_only_filtered)}\n"
