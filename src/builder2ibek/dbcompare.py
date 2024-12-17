@@ -4,7 +4,9 @@ from pathlib import Path
 regex_record = re.compile(r'record *\( *([^,]*), *"?([^"]*)"? *\)[\s\S]{')
 
 
-def compare_dbs(original: Path, new: Path):
+def compare_dbs(
+    original: Path, new: Path, ignore: list[str], output: Path | None = None
+):
     """
     validate that two DBs have the same set of records
 
@@ -23,14 +25,33 @@ def compare_dbs(original: Path, new: Path):
 
     old_only = sorted(old_set - new_set)
     new_only = sorted(new_set - old_set)
-    print("\n*****************************************************************")
-    print("Records in original but not in new:")
-    print("\n".join(old_only))
-    print("\n*****************************************************************")
-    print("Records in new but not in original:")
-    print("\n".join(new_only))
-    print("\n*****************************************************************")
-    print("  records in original:    ", len(old_set))
-    print("  records in new:         ", len(new_set))
-    print("  records missing in new: ", len(old_only))
-    print("  records extra in new:   ", len(new_only))
+
+    old_only_filtered = old_only.copy()
+    new_only_filtered = new_only.copy()
+    for record in old_only:
+        for s in ignore:
+            if s in record:
+                old_only_filtered.remove(record)
+    for record in new_only:
+        for s in ignore:
+            if s in record:
+                new_only_filtered.remove(record)
+
+    result = (
+        "Records in original but not in new:\n"
+        + "*******************************************************************\n"
+        + "\n".join(old_only_filtered)
+        + "\n\n"
+        + "Records in new but not in original:\n"
+        + "*******************************************************************\n"
+        + "\n".join(new_only_filtered)
+        + "\n\n"
+        + f"\records in original:    {len(old_set)}\n"
+        f"  records in new:         {len(new_set)}\n"
+        f"  records missing in new: {len(old_only_filtered)}\n"
+        f"  records extra in new:   {len(new_only_filtered)}\n"
+    )
+    if not output:
+        print(result)
+    else:
+        output.write_text(result)

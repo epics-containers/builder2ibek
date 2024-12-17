@@ -78,12 +78,19 @@ def autosave(
 
 
 @cli.command()
-def db_compare(original: Path, new: Path):
+def db_compare(
+    original: Path,
+    new: Path,
+    ignore: list[str] = typer.Option(
+        [], help="List of record name sub strings to ignore"
+    ),
+    output: Optional[Path] = typer.Option(..., help="Output file"),
+):
     """
     Compare two DB files and output the differences
     """
 
-    compare_dbs(original, new)
+    compare_dbs(original, new, ignore, output)
 
 
 if __name__ == "__main__":
