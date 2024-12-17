@@ -8,3 +8,5 @@ for x in *.xml; do
   echo converting $x to $y
   builder2ibek xml2yaml $x --yaml $y
 done
+
+builder2ibek db-compare ./SR03C-VA-IOC-01_expanded.db ./sr03c-va-ioc-01.db --output ./compare.diff

@@ -34,7 +34,7 @@ def main(
 def xml2yaml(
     xml: Path = typer.Argument(..., help="Filename of the builder XML file"),
     yaml: Optional[Path] = typer.Option(..., help="Output file"),
-    schema: Optional[str] = typer.Option(
+    schema: str = typer.Option(
         "/epics/ibek-defs/ioc.schema.json",
         help="Generic IOC schema (added to top of the yaml output)",
     ),

@@ -29,6 +29,9 @@ entities:
     name: EPICS_CAS_BEACON_ADDR_LIST
     value: 172.23.194.105
 
+  - type: autosave.Autosave
+    P: 'SR03C-VA-IOC-01:'
+
   - type: asyn.AsynIP
     name: GCTLR_A_01_PORT
     port: 192.168.3.11:7002
@@ -1059,14 +1062,14 @@ entities:
     master: FV.MASTER
     name: FV.G8
 
-  - type: terminalServer.Moxa
+  - type: terminalServer.Moxa16
     HOST: 192.168.3.11
     NCHANS: 16
     P: SR03C-VA-TSERV-01
     R: ''
     name: TSERV1
 
-  - type: terminalServer.Moxa
+  - type: terminalServer.Moxa16
     HOST: 192.168.3.12
     NCHANS: 16
     P: SR03C-VA-TSERV-02

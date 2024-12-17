@@ -26,8 +26,8 @@ def parse_templates(out_folder: Path, db_list: list[Path]):
     for db in db_list:
         text = db.read_text()
 
-        positions = set()
-        settings = set()
+        positions: set[str] = set()
+        settings: set[str] = set()
         for n in range(3):
             match n:
                 case 0:

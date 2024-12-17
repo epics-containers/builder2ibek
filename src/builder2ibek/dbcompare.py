@@ -16,10 +16,10 @@ def compare_dbs(
     old_text = original.read_text()
     new_text = new.read_text()
 
-    old_set = set()
+    old_set: set[str] = set()
     for record in regex_record.finditer(old_text):
         old_set.add(f"{record.group(1)} {record.group(2)}")
-    new_set = set()
+    new_set: set[str] = set()
     for record in regex_record.finditer(new_text):
         new_set.add(f"{record.group(1)} {record.group(2)}")
 
@@ -28,14 +28,14 @@ def compare_dbs(
 
     old_only_filtered = old_only.copy()
     new_only_filtered = new_only.copy()
-    for record in old_only:
+    for rec in old_only:
         for s in ignore:
-            if s in record:
-                old_only_filtered.remove(record)
-    for record in new_only:
+            if s in rec:
+                old_only_filtered.remove(rec)
+    for rec in new_only:
         for s in ignore:
-            if s in record:
-                new_only_filtered.remove(record)
+            if s in rec:
+                new_only_filtered.remove(rec)
 
     result = (
         "Records in original but not in new:\n"

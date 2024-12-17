@@ -10,8 +10,8 @@ conversion_samples = [
 
 
 def test_convert(samples: Path):
-    samples = samples.glob("*.xml")
-    for sample_xml in samples:
+    all_samples = samples.glob("*.xml")
+    for sample_xml in all_samples:
         sample_yaml = Path(str(sample_xml.with_suffix(".yaml")).lower())
         out_yaml = Path("/tmp") / sample_yaml.name
 

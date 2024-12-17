@@ -13,7 +13,7 @@ from builder2ibek.moduleinfos import module_infos
 from builder2ibek.types import Entity, Generic_IOC
 
 
-def convert_file(xml: Path, yaml: Path, schema: str) -> str:
+def convert_file(xml: Path, yaml: Path, schema: str):
     def tidy_up(yaml):
         # add blank lines between major fields
         for field in [
