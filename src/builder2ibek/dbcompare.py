@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 # https://regex101.com/r/M5dmVh/1
-# extract record name, type, and fields from an EPICS database file
+# extract record type, name and fields from an EPICS database file
 regex_record = re.compile(r'record *\( *([^,]*), *"?([^"]*)"? *\)[\s\S]*?{([\s\S]*?)}')
 regex_field = re.compile(r'field *\( *([^,]*), *"?([^"]*)"? *\)')
 
@@ -19,12 +19,10 @@ class EpicsDb:
 def normalize_float_records(s: set[str]) -> set[str]:
     normalised = set()
     for item in s:
-        splits = item.split(maxsplit=1)
-        name = splits[0]
-        value = splits[1] if len(splits) > 1 else ""
         try:
+            name, value = item.split(maxsplit=1)
             normalised.add(f"{name} {float(value)}")
-        except ValueError:
+        except (ValueError, IndexError):
             normalised.add(item)
     return normalised
 
@@ -60,10 +58,10 @@ def compare_dbs(
         (old_only_filtered, old_only),
         (new_only_filtered, new_only),
     ]:
-        for record in unfiltered:
+        for record_str in unfiltered:
             for s in ignore:
-                if s in record:
-                    filtered.remove(record)
+                if s in record_str:
+                    filtered.remove(record_str)
 
     result = (
         "*******************************************************************\n"
@@ -82,12 +80,12 @@ def compare_dbs(
         + "*******************************************************************\n"
     )
 
-    for record in both:
+    for record_str in both:
         # validate the fields are the same
-        old_norm = normalize_float_records(old.fields[record])
-        new_norm = normalize_float_records(new.fields[record])
+        old_norm = normalize_float_records(old.fields[record_str])
+        new_norm = normalize_float_records(new.fields[record_str])
         if old_norm != new_norm:
-            result += f"\nfields for record {record} are different between the two DBs"
+            result += f"\nfields for '{record_str}' are different between the two DBs"
 
     if not output:
         print(result)
