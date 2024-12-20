@@ -16,6 +16,19 @@ class EpicsDb:
     fields: dict[str, set[str]] = field(default_factory=lambda: {})
 
 
+def normalize_float_records(s: set[str]) -> set[str]:
+    normalised = set()
+    for item in s:
+        splits = item.split(maxsplit=1)
+        name = splits[0]
+        value = splits[1] if len(splits) > 1 else ""
+        try:
+            normalised.add(f"{name} {float(value)}")
+        except ValueError:
+            normalised.add(item)
+    return normalised
+
+
 def compare_dbs(
     old_path: Path, new_path: Path, ignore: list[str], output: Path | None = None
 ):
@@ -31,15 +44,15 @@ def compare_dbs(
     for db in [old, new]:
         db.text = db.path.read_text()
         for record in regex_record.finditer(db.text):
-            db.records.add(f"{record.group(1)} {record.group(2)}")
-            db.fields[record.group(2)] = set()
+            rec_str = f"{record.group(1)} {record.group(2)}"
+            db.records.add(rec_str)
+            db.fields[rec_str] = set()
             for rec_field in regex_field.finditer(record.group(3)):
-                db.fields[record.group(2)].add(
-                    f"{rec_field.group(1)} {rec_field.group(2)}"
-                )
+                db.fields[rec_str].add(f"{rec_field.group(1)} {rec_field.group(2)}")
 
     old_only = sorted(old.records - new.records)
     new_only = sorted(new.records - old.records)
+    both = sorted(old.records & new.records)
 
     old_only_filtered = old_only.copy()
     new_only_filtered = new_only.copy()
@@ -66,7 +79,16 @@ def compare_dbs(
         f"  records in new:         {len(new.records)}\n"
         f"  records missing in new: {len(old_only_filtered)}\n"
         f"  records extra in new:   {len(new_only_filtered)}\n"
+        + "*******************************************************************\n"
     )
+
+    for record in both:
+        # validate the fields are the same
+        old_norm = normalize_float_records(old.fields[record])
+        new_norm = normalize_float_records(new.fields[record])
+        if old_norm != new_norm:
+            result += f"\nfields for record {record} are different between the two DBs"
+
     if not output:
         print(result)
     else:
