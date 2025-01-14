@@ -2,7 +2,7 @@
 Dataclasses for representing XML and YAML in memory
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +18,12 @@ class Entity(dict[str, Any]):
     Generic Entity has functions for using . notation which makes the code
     in the convertors package easier to type and read
     """
+
+    _extra_entities: list["Entity"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        Entity._extra_entities = []
 
     def __getattr__(self, __name: str) -> Any:
         if __name in self:
@@ -35,6 +41,12 @@ class Entity(dict[str, Any]):
         if attr in self:
             self[new] = self[attr]
             del self[attr]
+
+    def add_entity(self, entity: "Entity"):
+        self._extra_entities.append(entity)
+
+    def get_extra_entities(self):
+        return self._extra_entities
 
     def delete_me(self):
         self.__command__ = "delete"

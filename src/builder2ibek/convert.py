@@ -96,6 +96,17 @@ def do_one_element(element: Element, ioc: Generic_IOC):
 
     entity.type = f"{info.yaml_component}.{element.name}"
     new_xml = info.handler(entity, element.name, ioc)
+    # if the handler added some new entities add them into the IOC
+    extras = entity.get_extra_entities()
+    if extras:
+        for extra_entity in extras:
+            ioc.entities.append(extra_entity)
+        # move the new entity to after these extras at it is likely to depend on them
+        ioc.entities.remove(entity)
+        ioc.entities.append(entity)
+
+    # if the handler returns a new XML string, parse it and dispatch the
+    # new entities it defines to the correct handler
     if new_xml:
         new_builder = Builder()
         new_builder.load_string(new_xml)

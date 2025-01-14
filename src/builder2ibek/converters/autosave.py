@@ -19,3 +19,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
         entity.remove("path")
         entity.remove("server")
+        entity.remove("skip_1")
+        entity.remove("vx_gid")
+        entity.remove("vx_uid")
+        entity.debug = bool(entity.debug)
