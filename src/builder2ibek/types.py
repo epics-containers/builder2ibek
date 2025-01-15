@@ -2,7 +2,7 @@
 Dataclasses for representing XML and YAML in memory
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
