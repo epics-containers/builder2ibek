@@ -90,4 +90,4 @@ def compare_dbs(
     if not output:
         print(result)
     else:
-        output.write_text(result)
+        output.write_text(result + "\n")

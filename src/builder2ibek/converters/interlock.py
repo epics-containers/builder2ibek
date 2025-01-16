@@ -5,7 +5,7 @@ from builder2ibek.utils import hex_to_int
 xml_component = "interlock"
 
 # records the port names of the read100 entities keyed by name
-read100Objects = {}
+read100Objects: dict[str, str] = {}
 
 
 @globalHandler
