@@ -3,6 +3,7 @@ from enum import Enum
 from builder2ibek.converters.epics_base import add_interrupt_vector
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import make_bool
 
 xml_component = "ipac"
 
@@ -28,8 +29,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.direction = Direction(entity.direction).name
         entity.remove("name")
         for key in ["invertin", "invertout", "ip_support"]:
-            value = str(entity[key])
-            if value.lower() == "true":
-                entity[key] = True
-            elif value.lower() == "false":
-                entity[key] = False
+            entity[key] = make_bool(entity[key])
