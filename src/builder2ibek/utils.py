@@ -51,7 +51,7 @@ hz_list = [
 ]
 
 
-def int_to_Hertz(entity: Entity, key: str):
+def int_to_hertz(entity: Entity, key: str):
     """
     Convert an integer key to a Hertz key
     """

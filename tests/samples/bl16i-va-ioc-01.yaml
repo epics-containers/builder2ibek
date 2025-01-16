@@ -47,13 +47,13 @@ entities:
   - type: Hy8401ip.Hy8401
     cardid: 50
     carrier: IPAC5
-    clockRate: 15
+    clockRate: 100kHz
     ipslot: 0
 
   - type: Hy8401ip.Hy8401
     cardid: 51
     carrier: IPAC5
-    clockRate: 15
+    clockRate: 100kHz
     ipslot: 1
 
   - type: epics.InterruptVectorVME
