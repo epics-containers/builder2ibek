@@ -29,3 +29,32 @@ def hex_to_int(entity: Entity, prefix: str):
         hex_key = f"{prefix}{hex(n)[2:].upper()}"
         if hex_key in entity:
             entity.rename(hex_key, f"{prefix}{n}")
+
+
+hz_list = [
+    "1Hz",
+    "2Hz",
+    "5Hz",
+    "10Hz",
+    "20Hz",
+    "50Hz",
+    "100Hz",
+    "200Hz",
+    "500Hz",
+    "1kHz",
+    "2kHz",
+    "5kHz",
+    "10kHz",
+    "20kHz",
+    "50kHz",
+    "100kHz",
+]
+
+
+def int_to_Hertz(entity: Entity, key: str):
+    """
+    Convert an integer key to a Hertz key
+    """
+    if key in entity and type(entity[key]) is int:
+        hz = hz_list[entity[key]]
+        entity[key] = hz

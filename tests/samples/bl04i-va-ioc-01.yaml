@@ -1136,19 +1136,16 @@ entities:
   - type: rackFan.rackFan
     c: 60
     device: BL04I-PS-FANC-01
-    name: VAFAN1
     s: 11
 
   - type: rackFan.rackFan
     c: 60
     device: BL04I-PS-PSU-01
-    name: PSUFAN
     s: 12
 
   - type: rackFan.rackFan
     c: 60
     device: BL04I-VA-RACK-01:PSU-01
-    name: PSUHEALTH
     s: 13
 
   - type: water.flow

@@ -159,36 +159,43 @@ entities:
     dom: SR03S
     id: 1
     input: SR03S-VA-GAUGE-01:RAW
+    name: GAUGE_S_01
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03S
     id: 2
     input: SR03S-VA-GAUGE-02:RAW
+    name: GAUGE_S_02
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03A
     id: 1
     input: SR03A-VA-GAUGE-01:RAW
+    name: GAUGE_A_01
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03A
     id: 2
     input: SR03A-VA-GAUGE-02:RAW
+    name: GAUGE_A_02
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03A
     id: 3
     input: SR03A-VA-GAUGE-03:RAW
+    name: GAUGE_A_03
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03A
     id: 4
     input: SR03A-VA-GAUGE-04:RAW
+    name: GAUGE_A_04
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03A
     id: 31
     input: SR03A-VA-GAUGE-31:RAW
+    name: GAUGE_A_31
 
   - type: mks937a.mks937aImg
     GCTLR: GCTLR_S_01

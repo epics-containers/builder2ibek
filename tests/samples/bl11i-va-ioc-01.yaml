@@ -221,79 +221,66 @@ entities:
   - type: rackFan.rackFan
     c: 60
     device: BL11I-EA-FANC-01
-    name: FANC1
     s: 0
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-PS-FANC-01
-    name: FANC2
     s: 1
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-PS-PSU-01
-    name: FANC3
     s: 2
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-VA-FANC-01
-    name: FANC4
     s: 3
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-MO-FANC-01
-    name: FANC5
     s: 4
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-MO-FANC-02
-    name: FANC6
     s: 5
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-VA-FANC-02
-    name: FANC7
     s: 6
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-NT-FANC-01
-    name: FANC8
     s: 7
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-DA-FANC-01
-    name: FANC9
     s: 8
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-MO-FANC-03
-    name: FANC10
     s: 9
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-EA-FANC-02
-    name: FANC11
     s: 10
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-EA-FANC-03
-    name: FANC12
     s: 11
 
   - type: rackFan.rackFan
     c: 60
     device: BL11I-OP-FANC-01
-    name: FANC13
     s: 12
 
   - type: rackFan.rackFan
@@ -305,7 +292,6 @@ entities:
   - type: rackFan.rackFan
     c: 60
     device: BL11I-EA-ROBOT-01:MOVN
-    name: ROBOT
     s: 37
 
   - type: temperature.temperaturePLCRead
