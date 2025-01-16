@@ -11,5 +11,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
 
     # remove GUI only parameters (except those that use name for object ref)
-    if entity_type not in ["mks937bGauge", "mks937bImg"]:
+    if entity_type not in ["mks937bGauge", "mks937bImg", "mks937b", "mks937bPirg"]:
         entity.remove("name")

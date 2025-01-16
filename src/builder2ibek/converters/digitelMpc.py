@@ -14,3 +14,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         unit = int(entity.get("unit"))  # type: ignore
         unit_enum = f"{unit:02d}"
         entity.unit = unit_enum
+    elif entity_type in ["digitelMpcIonp", "digitelMpcIonpGroup"]:
+        entity.remove("name")
