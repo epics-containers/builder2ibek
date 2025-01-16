@@ -17,6 +17,10 @@ class InterruptVector:
     def __post_init__(self):
         InterruptVector._interrupt_vector += 1
 
+    @classmethod
+    def reset(cls):
+        cls._interrupt_vector = 1
+
 
 # a decorator that will be used to add an interrupt vector to the entity
 def add_interrupt_vector():

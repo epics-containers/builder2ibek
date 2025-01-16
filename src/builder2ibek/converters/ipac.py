@@ -29,4 +29,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.direction = Direction(entity.direction).name
         entity.remove("name")
         for key in ["invertin", "invertout", "ip_support"]:
-            entity[key] = make_bool(entity[key])
+            if key in entity:
+                entity[key] = make_bool(entity[key])

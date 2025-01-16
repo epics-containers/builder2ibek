@@ -27,6 +27,5 @@ def hex_to_int(entity: Entity, prefix: str):
     """
     for n in range(10, 16):
         hex_key = f"{prefix}{hex(n)[2:].upper()}"
-        print(hex_key)
         if hex_key in entity:
             entity.rename(hex_key, f"{prefix}{n}")

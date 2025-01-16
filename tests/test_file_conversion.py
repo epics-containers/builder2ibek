@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from builder2ibek.convert import convert_file
+from builder2ibek.converters.epics_base import InterruptVector
 
 conversion_samples = [
     "tests/samples/BL45P-MO-IOC-01.xml",
@@ -18,6 +19,8 @@ def test_convert(samples: Path):
         convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
 
         assert out_yaml.read_text() == sample_yaml.read_text()
+        # reset the interrupt vector counter
+        InterruptVector.reset()
 
 
 def test_debug(samples: Path):
