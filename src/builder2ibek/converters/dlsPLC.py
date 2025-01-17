@@ -15,5 +15,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         id = int(id_val)  # type: ignore
         id_enum = f"{id:02d}"
         entity.id = id_enum
-    elif entity_type == "NX102_readReal":
+    elif entity_type in [
+        "NX102_readReal",
+        "read100",
+        "externalValve",
+        "dummyValve",
+        "overrideRequestMain",
+    ]:
         entity.remove("name")

@@ -891,19 +891,15 @@ entities:
 
   - type: digitelMpc.dummyIonp
     device: BL16I-VA-DIONP-01
-    name: BL16I-VA-DIONP-01
 
   - type: digitelMpc.dummyIonp
     device: BL16I-VA-DIONP-02
-    name: BL16I-VA-DIONP-02
 
   - type: digitelMpc.dummyIonp
     device: BL16I-VA-DIONP-13
-    name: BL16I-VA-DIONP-13
 
   - type: digitelMpc.dummyIonp
     device: BL16I-VA-DIONP-14
-    name: BL16I-VA-DIONP-14
 
   - type: FINS.FINSHostlink
     asyn_port: ty_40_0
@@ -920,43 +916,36 @@ entities:
   - type: dlsPLC.read100
     century: 0
     device: BL16I-VA-VLVCC-01
-    name: VLVCC01.0
     port: VLVCC01
 
   - type: dlsPLC.read100
     century: 3
     device: BL16I-VA-VLVCC-01
-    name: VLVCC01.3
     port: VLVCC01
 
   - type: dlsPLC.read100
     century: 0
     device: BL16I-VA-VLVCC-02
-    name: VLVCC02.0
     port: VLVCC02
 
   - type: dlsPLC.read100
     century: 1
     device: BL16I-VA-VLVCC-02
-    name: VLVCC02.1
     port: VLVCC02
 
   - type: dlsPLC.read100
     century: 0
     device: BL16I-MP-TMPCC-01
-    name: TMPCC01.0
     port: TMPCC01
 
   - type: dlsPLC.read100
     century: 1
     device: BL16I-MP-TMPCC-01
-    name: TMPCC01.1
     port: TMPCC01
 
   - type: dlsPLC.read100
     century: 2
     device: BL16I-MP-TMPCC-01
-    name: TMPCC01.2
     port: TMPCC01
 
   - type: dlsPLC.vacValveDebounce
@@ -1641,20 +1630,16 @@ entities:
 
   - type: dlsPLC.externalValve
     device: FE16I-VA-VALVE-02
-    name: FE16I-VA-VALVE-02
 
   - type: dlsPLC.dummyValve
     device: BL16I-VA-DVALV-01
-    name: BL16I-VA-DVALV-01
 
   - type: dlsPLC.dummyValve
     device: BL16I-VA-DVALV-02
-    name: BL16I-VA-DVALV-02
 
   - type: dlsPLC.overrideRequestMain
     P: BL16I-VA-VLVCC-01
     Q: :OVERRIDE
-    name: VLCC01.Override
     outaddr: 80
     port: VLVCC01
 
