@@ -18,7 +18,17 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "interlock":
         entity.type = "dlsPLC.interlock"
-        entity.addr = str(entity.addr)  # TODO make int in dlsPLC.ibek.support.yaml
-        # entity.remove("name")
-
         hex_to_int(entity, "ilk")
+
+    if entity_type == "overrideRequestMain":
+        entity.type = "dlsPLC.overrideRequestMain"
+        # https://confluence.diamond.ac.uk/x/i4kuAw#:~:text=addr%2C%20in%2C%20and,is%20outaddr%2D1
+        entity.outaddr = int(entity.addr) * 10 + int(entity["in"])
+        entity.remove("in")
+        entity.remove("out")
+        entity.remove("addr")
+        entity.remove("name")
+
+    if entity_type == "overrideRequestIndividual":
+        entity.type = "dlsPLC.overrideRequestIndividual"
+        entity.remove("FIELD")

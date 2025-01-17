@@ -20,7 +20,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         read100Objects[entity.name] = entity.port
 
         entity.type = "dlsPLC.read100"
-        entity.century = "0"  # TODO make int in dlsPLC.ibek.support.yaml
+        entity.century = 0
         entity.remove("name")
 
     if entity_type == "vacuumValveRead2":
@@ -36,7 +36,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.type = "dlsPLC.vacValve"
 
         entity.rename("crate", "vlvcc")
-        entity.addr = str(int(entity.valve) * 10)  # TODO should be int
+        entity.addr = int(entity.valve) * 10
         entity.remove("valve")
 
         entity.port = read100Objects[entity.vlvcc]
+
+    elif entity_type == "vacuumValveGroup":
+        entity.type = "dlsPLC.vacValveGroup"
+        entity.remove("name")

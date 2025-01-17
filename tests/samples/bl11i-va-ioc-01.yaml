@@ -615,12 +615,12 @@ entities:
     name: D1
 
   - type: dlsPLC.read100
-    century: '0'
+    century: 0
     device: BL11I-VA-VLVCC-01
     port: ty_40_3
 
   - type: dlsPLC.read100
-    century: '0'
+    century: 0
     device: BL11I-VA-VLVCC-02
     port: ty_41_3
 
@@ -633,7 +633,7 @@ entities:
     port: ty_40_3
 
   - type: dlsPLC.vacValve
-    addr: '10'
+    addr: 10
     device: BL11I-VA-VALVE-01
     gilk0: Gauge01
     gilk1: Gauge02
@@ -651,7 +651,7 @@ entities:
     vlvcc: VLVCC1
 
   - type: dlsPLC.vacValve
-    addr: '20'
+    addr: 20
     device: BL11I-VA-VALVE-02
     gilk0: Gauge01
     gilk1: Gauge02
@@ -670,7 +670,7 @@ entities:
     vlvcc: VLVCC1
 
   - type: dlsPLC.vacValve
-    addr: '40'
+    addr: 40
     device: BL11I-VA-VALVE-03
     gilk0: Gauge01
     gilk1: Gauge02
@@ -688,7 +688,7 @@ entities:
     vlvcc: VLVCC1
 
   - type: dlsPLC.vacValve
-    addr: '50'
+    addr: 50
     device: BL11I-VA-VALVE-04
     ilk0: Air press. OK
     ilk1: IMG5 Healthy
@@ -702,7 +702,7 @@ entities:
     vlvcc: VLVCC1
 
   - type: dlsPLC.vacValve
-    addr: '20'
+    addr: 20
     device: BL11I-VA-VALVE-05
     ilk0: Air press. OK
     ilk1: IMG6 Healthy
@@ -716,7 +716,7 @@ entities:
     vlvcc: VLVCC2
 
   - type: dlsPLC.vacValve
-    addr: '30'
+    addr: 30
     device: BL11I-VA-VALVE-06
     ilk0: Air press. OK
     ilk1: IMG7 Healthy
@@ -730,7 +730,7 @@ entities:
     vlvcc: VLVCC2
 
   - type: dlsPLC.vacValve
-    addr: '10'
+    addr: 10
     device: BL11I-PS-SHTR-01
     ilk0: Air press. OK
     ilk1: Guardline A
@@ -749,7 +749,7 @@ entities:
     vlvcc: VLVCC2
 
   - type: dlsPLC.vacValve
-    addr: '30'
+    addr: 30
     device: BL11I-DI-PHDGN-02
     ilk15: Valve Fault
     name: D2
@@ -757,7 +757,7 @@ entities:
     vlvcc: VLVCC1
 
   - type: dlsPLC.vacValve
-    addr: '60'
+    addr: 60
     device: BL11I-DI-PHDGN-03
     ilk15: Valve Fault
     name: D3
@@ -765,7 +765,7 @@ entities:
     vlvcc: VLVCC1
 
   - type: dlsPLC.vacValve
-    addr: '40'
+    addr: 40
     device: BL11I-DI-PHDGN-04
     ilk15: Valve Fault
     name: D4
@@ -773,7 +773,7 @@ entities:
     vlvcc: VLVCC2
 
   - type: dlsPLC.vacValve
-    addr: '60'
+    addr: 60
     device: BL11I-PS-SHTR-02
     ilk0: Air press. OK
     ilk1: Guardline A
@@ -788,7 +788,7 @@ entities:
     vlvcc: VLVCC2
 
   - type: dlsPLC.interlock
-    addr: '7'
+    addr: 7
     desc: Waterflow Interlocks
     device: BL11I-VA-VLVCC-01
     ilk0: GBC Water
@@ -800,7 +800,7 @@ entities:
     port: ty_40_3
 
   - type: dlsPLC.interlock
-    addr: '9'
+    addr: 9
     desc: Front End Absorber
     device: BL11I-VA-VLVCC-01
     ilk0: Water OK
@@ -823,7 +823,7 @@ entities:
     port: ty_40_3
 
   - type: dlsPLC.interlock
-    addr: '1'
+    addr: 1
     desc: Temperatures Zone 1
     device: BL11I-VA-TMPCC-01
     ilk0: GBC Temp 1
@@ -835,7 +835,7 @@ entities:
     port: ty_40_2
 
   - type: dlsPLC.interlock
-    addr: '2'
+    addr: 2
     desc: Temperatures Zone 2
     device: BL11I-VA-TMPCC-01
     ilk0: S1 ApA Temp 1
@@ -851,7 +851,7 @@ entities:
     port: ty_40_2
 
   - type: dlsPLC.interlock
-    addr: '39'
+    addr: 39
     desc: Machine Beam Critical
     device: BL11I-VA-VLVCC-01
     ilk0: Valve1 Open

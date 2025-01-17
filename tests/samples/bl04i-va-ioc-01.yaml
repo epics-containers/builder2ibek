@@ -829,12 +829,12 @@ entities:
     ionp8: BL04I-VA-IONP-07
 
   - type: dlsPLC.read100
-    century: '0'
+    century: 0
     device: BL04I-VA-VLVCC-01
     port: ty_40_0
 
   - type: dlsPLC.vacValve
-    addr: '10'
+    addr: 10
     device: BL04I-VA-VALVE-01
     gilk0: GAUGE-01
     gilk1: GAUGE-02
@@ -873,7 +873,7 @@ entities:
     vlvcc: VLVCC01
 
   - type: dlsPLC.vacValve
-    addr: '20'
+    addr: 20
     device: BL04I-VA-VALVE-02
     gilk0: GAUGE-01
     gilk1: GAUGE-02
@@ -912,7 +912,7 @@ entities:
     vlvcc: VLVCC01
 
   - type: dlsPLC.vacValve
-    addr: '30'
+    addr: 30
     device: BL04I-VA-VALVE-03
     gilk0: GAUGE-01
     gilk1: GAUGE-02
@@ -951,7 +951,7 @@ entities:
     vlvcc: VLVCC01
 
   - type: dlsPLC.vacValve
-    addr: '50'
+    addr: 50
     device: BL04I-VA-VALVE-11
     gilk0: GAUGE-01
     gilk1: GAUGE-02
@@ -990,7 +990,7 @@ entities:
     vlvcc: VLVCC01
 
   - type: dlsPLC.vacValve
-    addr: '40'
+    addr: 40
     device: BL04I-PS-SHTR-01
     gilk0: ''
     gilk1: ''
@@ -1042,7 +1042,7 @@ entities:
     port: ty_40_0
 
   - type: dlsPLC.interlock
-    addr: '7'
+    addr: 7
     desc: Water Flow Interlocks
     device: BL04I-VA-VLVCC-01
     ilk0: I04 Filter
@@ -1066,7 +1066,7 @@ entities:
     port: ty_40_0
 
   - type: dlsPLC.interlock
-    addr: '9'
+    addr: 9
     desc: Front End Permit
     device: BL04I-VA-VLVCC-01
     ilk0: Waterflows
@@ -1090,7 +1090,7 @@ entities:
     port: ty_40_0
 
   - type: dlsPLC.interlock
-    addr: '39'
+    addr: 39
     desc: Machine Beam Critical
     device: BL04I-VA-VLVCC-01
     ilk0: V11 Open
@@ -1229,19 +1229,15 @@ entities:
     S: 9
     name: DCM.OB1
 
-  - type: interlock.overrideRequestMain
+  - type: dlsPLC.overrideRequestMain
     P: BL04I-VA-VLVCC-01
     Q: :OVERRIDE
-    addr: 8
-    in: 1
-    name: ITLK
-    out: 0
+    outaddr: 81
     port: ty_40_0
 
-  - type: interlock.overrideRequestIndividual
+  - type: dlsPLC.overrideRequestIndividual
     BIT: 1
     DESC: HFM Piezo Overrride
-    FIELD: B
     OVERRIDE: BL04I-VA-VLVCC-01:OVERRIDE
     P: BL04I-OP-HFM-01:ILK
     PRESSURE1: BL04I-VA-GAUGE-04:P
@@ -1249,10 +1245,9 @@ entities:
     SETPOINT: 500
     name: HFMOR
 
-  - type: interlock.overrideRequestIndividual
+  - type: dlsPLC.overrideRequestIndividual
     BIT: 2
     DESC: VFM Piezo Override
-    FIELD: C
     OVERRIDE: BL04I-VA-VLVCC-01:OVERRIDE
     P: BL04I-OP-VFM-01:ILK
     PRESSURE1: BL04I-VA-GAUGE-05:P
@@ -1260,10 +1255,9 @@ entities:
     SETPOINT: 500
     name: VFMOR
 
-  - type: interlock.overrideRequestIndividual
+  - type: dlsPLC.overrideRequestIndividual
     BIT: 3
     DESC: Bimorph Override
-    FIELD: D
     OVERRIDE: BL04I-VA-VLVCC-01:OVERRIDE
     P: BL04I-OP-BIM-01:ILK
     PRESSURE1: BL04I-VA-GAUGE-04:P
@@ -1283,10 +1277,9 @@ entities:
     evr: BL04I-VA-EVR-01
     name: CMS.OB1
 
-  - type: vacuumValve.vacuumValveGroup
+  - type: dlsPLC.vacValveGroup
     delay: 10
     device: BL04I-VA-GVALV-98
-    name: GVALV98
     valve1: FE02I-VA-VALVE-02
     valve2: BL04I-VA-VALVE-11
     valve3: BL04I-VA-VALVE-01
@@ -1296,10 +1289,9 @@ entities:
     valve7: BL04I-VA-VALVE-02
     valve8: BL04I-VA-VALVE-02
 
-  - type: vacuumValve.vacuumValveGroup
+  - type: dlsPLC.vacValveGroup
     delay: 10
     device: BL04I-VA-GVALV-99
-    name: GVALV99
     valve1: BL04I-VA-VALVE-03
     valve2: BL04I-VA-VALVE-03
     valve3: BL04I-VA-VALVE-03
