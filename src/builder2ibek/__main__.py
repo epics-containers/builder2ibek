@@ -51,12 +51,8 @@ def beamline2yaml(
     output: Path = typer.Argument(..., help="Output root folder"),
 ):
     """
-    <<<<<<< HEAD
-        Convert whole beamline's IOCs from builder to ibek (TODO)
-    =======
-        Convert all IOCs in a BLXXI-SUPPORT project into a set of ibek services
-        folders (TODO)
-    >>>>>>> 4af36b9 (add db compare)
+    TODO: Convert all IOCs in a BLXXI-SUPPORT project into a set of ibek services
+    folders (not yet implemented)
     """
     typer.echo("Not implemented yet")
     raise typer.Exit(code=1)
