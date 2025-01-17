@@ -53,5 +53,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("at_end")
 
     elif entity_type == "dbpf":
-        entity.type = "epics.Dbpf"
         entity.value = str({entity.value})

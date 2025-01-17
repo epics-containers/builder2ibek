@@ -1935,18 +1935,18 @@ entities:
     device: BL16I-VA-RACK-01:PSU-01
     s: 9
 
-  - type: epics.Dbpf
+  - type: epics.dbpf
     pv: BL16I-VA-PIRG-21:CTL:SETSP
     value: '{0.2}'
 
-  - type: epics.Dbpf
+  - type: epics.dbpf
     pv: BL16I-VA-IMG-21:CTL:SP.HIGH
     value: '{0.3}'
 
-  - type: epics.Dbpf
+  - type: epics.dbpf
     pv: BL16I-VA-SPACE-21:PSTA.B
     value: '{1e-05}'
 
-  - type: epics.Dbpf
+  - type: epics.dbpf
     pv: BL16I-VA-SPACE-21:P.HIGH
     value: '{1e-05}'
