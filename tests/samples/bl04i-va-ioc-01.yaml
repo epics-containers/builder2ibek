@@ -48,10 +48,14 @@ entities:
     name: BL04I-VA-IOC-01.Slot5
     slot: 5
 
+  - type: epics.InterruptVectorVME
+    name: Vec4
+
   - type: ipac.Hy8001
     cardid: 60
     direction: Input
     intLevel: 0
+    interrupt_vector: Vec4
     invertin: true
     invertout: true
     ip_support: true
@@ -59,26 +63,31 @@ entities:
     slot: 6
 
   - type: epics.InterruptVectorVME
-    name: Vec4
-
-  - type: DLS8515.DLS8515
-    carrier: BL04I-VA-IOC-01.Slot4
-    interrupt_vector: Vec4
-    ipslot: 0
-    name: BL04I-VA-IOC-01.Slot4.A
-
-  - type: epics.InterruptVectorVME
     name: Vec5
 
   - type: DLS8515.DLS8515
     carrier: BL04I-VA-IOC-01.Slot4
     interrupt_vector: Vec5
+    ipslot: 0
+    name: BL04I-VA-IOC-01.Slot4.A
+
+  - type: epics.InterruptVectorVME
+    name: Vec6
+
+  - type: DLS8515.DLS8515
+    carrier: BL04I-VA-IOC-01.Slot4
+    interrupt_vector: Vec6
     ipslot: 2
     name: BL04I-VA-IOC-01.Slot4.C
 
+  - type: epics.InterruptVectorVME
+    name: Vec7
+
   - type: DLS8515.DLS8516
     carrier: BL04I-VA-IOC-01.Slot4
+    interrupt_vector: Vec7
     ipslot: 1
+    name: BL04I-VA-IOC-01.Slot4.B
 
   - type: asyn.AsynSerial
     name: ty_40_0
@@ -197,26 +206,32 @@ entities:
     channel: 0
     fullduplex: true
 
+  - type: epics.InterruptVectorVME
+    name: Vec8
+
   - type: Hy8401ip.Hy8401
     carrier: BL04I-VA-IOC-01.Slot5
+    interrupt_vector: Vec8
     ipslot: 0
+
+  - type: epics.InterruptVectorVME
+    name: Vec9
 
   - type: Hy8402ip.Hy8402
     carrier: BL04I-VA-IOC-01.Slot5
+    interrupt_vector: Vec9
     ipslot: 1
 
   - type: cmsIon.RS4hour
     device: BL04I-VA-EVR-01
     name: EVR1.OB1
 
-  - type: TimingTemplates.generalTimeTemplate
+  - type: TimingTemplates.GeneralTime
     device: BL04I-VA-IOC-01
-    name: VA1
 
-  - type: TimingTemplates.evr_alive
+  - type: TimingTemplates.EvrAlive
     SYSTEM: BL04I-VA-EVR-01
     device: BL04I-VA-EVR-01
-    name: EVR1
 
   - type: mks937a.mks937a
     device: BL04I-VA-GCTLR-02

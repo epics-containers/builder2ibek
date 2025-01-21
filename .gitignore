@@ -69,3 +69,6 @@ lockfiles/
 
 # ruff cache
 .ruff_cache/
+
+# vscode workspaces
+**/*.code-workspace

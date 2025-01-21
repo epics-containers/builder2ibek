@@ -18,7 +18,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.interrupt_vector = vec.name
 
     elif entity_type == "DLS8516":
-        entity.remove("name")
+        vec = add_interrupt_vector()
+        entity.add_entity(vec)
+        entity.interrupt_vector = vec.name
 
     elif entity_type == "DLS8516channel":
         entity.remove("name")
