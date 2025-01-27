@@ -1,0 +1,62 @@
+
+################################################################################
+
+# This version separates the channel and name so that signals can easily
+# be reassigned to new channels
+
+# macros:
+
+# system	device part of the record name
+# name		descriptive string to make record name
+# rec		used to make the EVRs record name
+# channel	field name
+# default	default value
+# hopr		
+# lopr
+
+################################################################################
+
+# calculates real pulse trigger delay/width in microseconds
+
+record(calc, "$(system):CALC-$(name)")
+{
+	field(PINI, "YES")
+	field(CALC, "4*B/A")
+	field(INPA, "499.654")
+	field(INPB, "$(system):$(rec=SET-ER).$(channel) CP")
+	field(PREC, "5")
+}
+
+# user input to set required delay/width in miroseconds
+
+#% archiver 5 Monitor
+
+record(ao, "$(system):USEC-$(name)")
+{
+	field(SCAN, "Passive")
+	field(PINI, "YES")
+	field(DTYP, "Raw Soft Channel")
+	field(DOL,  "$(default)")
+	field(OMSL, "closed_loop")
+	field(LINR, "NO CONVERSION")
+	field(LOPR, "$(lopr)")
+	field(HOPR, "$(hopr)")
+	field(DRVL, "$(lopr)")
+	field(DRVH, "$(hopr)")
+	field(PREC, "3")
+	field(EGU,  "usec")
+	field(FLNK, "$(system):TICK-$(name)")
+}
+
+# converts microseconds to event clock ticks
+
+record(calcout, "$(system):TICK-$(name)")
+{
+	field(PINI, "YES")
+	field(CALC, "A*B/4")
+	field(INPA, "$(system):USEC-$(name)")
+	field(INPB, "499.654")
+	field(OUT,  "$(system):$(rec=SET-ER).$(channel)")
+	field(PREC, "0")
+	field(FLNK, "$(system):$(rec=SET-ER)")
+}

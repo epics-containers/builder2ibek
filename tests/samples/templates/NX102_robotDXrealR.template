@@ -1,0 +1,28 @@
+
+# NX102_robotDXrealR.template
+
+#% macro, __doc__, Template database for reading a real value for a DX200 controller variable through NX102 PLC
+#% macro, name, Object name and gui association name
+#% macro, device, PV prefix
+#% macro, variable, PV suffix for this robot variable
+#% macro, desc, Description
+#% macro, port, port name of ether_ip driver
+#% macro, tagread, tag name of ether_ip read value
+#% macro, scan, value update time
+#% macro, egu, Engineering units
+#% macro, prec, precision for reporting value back
+
+# This associates an edm screen with the template
+# % gui, $(name=), edm, NX102_robotDXrealR.edl, device=$(device)$(variable)
+# % gui, $(name=), edmembed, NX102_robotDXrealR-embed.edl, device=$(device)$(variable),label=$(desc=)
+# This associates a BOY screen with the template
+include "NX102_robotDXrealR_detail.template"
+
+record(ai, "$(device)$(variable)") {
+  field(DESC, "Get value $(desc=)")
+  field(DTYP, "EtherIP")
+  field(SCAN, "$(scan=1 second)")
+  field(EGU, "$(egu=)")
+  field(PREC, "$(prec=2)")
+  field(INP, "@$(port) $(tagread)")
+}

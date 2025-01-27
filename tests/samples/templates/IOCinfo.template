@@ -1,0 +1,57 @@
+#% macro, __doc__, Provides basic information about the IOC, supplementing the 
+# information provided by vxStats: provides temperature information.
+#% macro, device, Device name
+#% macro, high, Temperature for MINOR severity alarm, default 50 deg
+#% macro, hihi, Temperature for MAJOR severity alarm, default 60 deg
+#% macro, hyst, Alarm deadband value, default 2 deg
+
+#% archiver 10 Monitor
+#% alh
+#% alh $SEVRCOMMAND UP_MAJOR dls-alh-handler.py $(device):SYSTEMP
+
+record(ai, "$(device):SYSTEMP")
+{
+	field(SCAN, "10 second")
+	field(DTYP, "IOCinfo")
+	field(INP,  "@SYSTEMP")
+	field(PINI, "YES")
+	field(EGU,  "C")
+	field(HOPR, "80")
+	field(LOPR, "20")
+	field(DESC, "System Temperature")
+	field(PREC, "1")
+	field(HIHI, "$(hihi=60)")
+	field(HIGH, "$(high=50)")
+	field(HHSV, "MAJOR")
+	field(HSV,  "MINOR")
+	field(ADEL, "$(adel=0.5)")
+	field(HYST, "$(hyst=2)")
+}
+
+record(longin, "$(device):CPUSLOT")
+{
+	field(DESC, "VME Slot")
+	field(PINI, "YES")
+	field(DTYP, "IOCinfo")
+	field(INP,  "@CPUSLOT")
+	field(EGU,  "Slot")
+	field(HOPR, "21")
+	field(LOPR, "1")
+	field(HIHI, "21")
+	field(LOLO, "0")
+	field(HHSV, "MAJOR")
+	field(LLSV, "MAJOR")
+}
+
+#% archiver 60 Monitor
+
+record(longin, "$(device):BATTERY")
+{
+	field(DESC, "Battery voltage <2.5V")
+	field(PINI, "YES")
+	field(DTYP, "IOCinfo")
+	field(INP,  "@BATTERY")
+	field(SCAN, "10 second")
+	field(HIGH, "1")
+	field(HSV,  "MINOR")
+}

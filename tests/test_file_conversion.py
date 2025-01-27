@@ -1,13 +1,11 @@
+"""
+Tests to validate that the conversion of the xml files to yaml files is correct.
+"""
+
 from pathlib import Path
 
 from builder2ibek.convert import convert_file
 from builder2ibek.converters.epics_base import InterruptVector
-
-conversion_samples = [
-    "tests/samples/BL45P-MO-IOC-01.xml",
-    "tests/samples/BL99P-EA-IOC-05.xml",
-    "tests/samples/SR03-VA-IOC-01.xml",
-]
 
 
 def test_convert(samples: Path):
@@ -25,7 +23,8 @@ def test_convert(samples: Path):
 
 def test_debug(samples: Path):
     """
-    A single test to debug the conversion process
+    A single test to debug the conversion process (a redundant test, just useful
+    for launching the debugger against the convert_file function)
     """
     in_xml = samples / "BL99P-EA-IOC-05.xml"
     out_yml = samples / "BL99P-EA-IOC-05.yaml"

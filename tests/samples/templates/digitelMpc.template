@@ -1,0 +1,146 @@
+# digitelMpc.db
+#% macro, __doc__, Template database for digitel MPC - Controller
+# Pete Owens - 30/3/04
+#
+# substitutions:
+#% macro, device, device name
+#% macro, port, asyn serial port number
+#% macro, unit, unit number for multi-drop serial
+#% macro, proto, StreamDevice Protocol definition file. Defaults to digitelMpc.proto
+################################################################################
+
+# This associates an edm screen with the template
+# % gui, $(name=), edm, digitelMpc.edl, device=$(device)
+
+# Get Model Number
+#
+#% controldesk Model Number readback
+#
+record(mbbi, "$(device):MODEL")
+    {
+    field(DESC, "Model Number")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=digitelMpc.proto) model($(unit=01)) $(port)")
+    field(SCAN, "10 second")
+    field(ZRST, "MPC2")
+    field(ONST, "MPCe")
+    field(TWST, "MPCq")
+    field(THST, "QPC")
+    }
+#record(stringin, "$(device):MODEL")
+#{
+#    field(DESC, "Model Number")
+#    field(DTYP, "stream")
+#    field(INP,  "@$(proto=digitelMpc.proto) model($(unit=01)) $(port)")
+#    field(SCAN, "10 second")
+#    field(FLNK, "$(device):CALCMODEL")
+#}
+
+### Check for presence of Digitel MPCq which behaves slightly differently to the MPC DD and MPCe
+record(mbbi, "$(device):MODELENUM")
+    {
+    field(DESC, "Enumerated Model")
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(ZRST, "MPC2")
+    field(ONST, "MPCe")
+    field(TWST, "MPCq")
+    field(THST, "QPC")
+    }
+
+#record(aSub, "$(device):CALCMODEL")
+#    {
+#    field(SNAM, "modelCalc")
+#    field(INAM, "modelInit")
+#    field(INPA, "$(device):MODEL MS")
+#    field(FTA,  "STRING")
+#    field(FTVA, "SHORT")
+#    field(NOA,  "1")
+#    field(NOVA, "1")
+#    field(OUTA, "$(device):MODELENUM PP MS")
+#    field(EFLG, "ALWAYS")
+#    }
+
+################################################################################
+# Get Version
+#
+#% controldesk Firmware Revision readback
+#
+record(stringin, "$(device):VERSION") 
+{
+    field(DESC, "Firmware Revision")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=digitelMpc.proto) version($(unit=01)) $(port)")
+    field(SCAN, "10 second")
+}
+
+################################################################################
+# Automatically Restart on power up
+#
+#record(bo, "$(device):SETAUTOST")
+#{
+#    field(DESC, "Auto Restart")
+#    field(DTYP, "stream")
+#    field(OUT,  "@$(proto=digitelMpc.proto) setautost($(unit=01)) $(port)")
+#    field(ZNAM, "No")
+#    field(ONAM, "Yes")
+#    field(DOL,  "0")
+#    field(PINI, "YES")
+#}
+#
+#% controldesk Auto Restart smon
+#
+#record(bi, "$(device):AUTOST")
+#{
+#    field(DESC, "Auto Restart")
+#    field(DTYP, "stream")
+#    field(INP,  "@$(proto=digitelMpc.proto) autost($(unit=01)) $(port)")
+#    field(SCAN, "10 second")
+#    field(ZNAM, "No")
+#    field(ONAM, "Yes")
+#}
+################################################################################
+# Reset Software
+#
+#% archiver 10 Monitor
+#% controldesk Reset Software scon
+#
+record(bo, "$(device):RESET")
+{
+    field(DESC, "Reset Software")
+    field(DTYP, "stream")
+    field(OUT,  "@$(proto=digitelMpc.proto) reset($(unit=01)) $(port)")
+    field(ZNAM, "Reset")
+    field(ONAM, "Reset")
+}
+################################################################################
+
+record(stringin, "$(device):DEBUG")
+{
+    field(DESC, "Generic command")
+    field(DTYP, "stream")
+    field(INP,  "@$(proto=digitelMpc.proto) debug($(unit=01)) $(port)")
+    field(SCAN, "Passive")
+}
+
+# PINI set to ensure the record is initialised with TIMEOUT status,
+# which will only change to OK once communication starts.
+record(mbbi, "$(device):COMMS")
+    {
+    field(DESC, "Communication Status")
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(ZRST, "TIMEOUT")
+    field(ONST, "OK")
+    field(INP, "0")
+    field(PINI, "YES")
+    }
+
+record(scalcout, "$(device):COMMSMATCH")
+    {
+    field(INAA, "$(device):MODEL.STAT MS CP")
+    field(CALC, "printf('%d',AA!='TIMEOUT'?1:0)")
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+    field(OUT, "$(device):COMMS PP MS")
+    }

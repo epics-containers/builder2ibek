@@ -1,0 +1,1302 @@
+#
+# NX102_PreVacCoils_SMStatus.vdb is expanded to
+#  NX102_PreVacCoils_SMStatus.template by VDCT utility called flatdb.
+#
+# Developed for B07 HiTES1 End Station.  Currently does not use VDB
+# expansion of lower level template vdb files.
+#
+# Coil is the term PreVac use for a piece of data about a component
+# or aspect of the the Sample Manipulator system.  We dont know what it
+# actually means.
+#
+# Some of the PreVac Coils are R, others RW, which does not work well
+# with this driver.
+#
+# To avoid confusion between comms port and the vacuum ports on the
+# rotary distribution chamber, have used the term posport meaning
+# position port in macro names and comments.  A posport corresponds so
+# a vacuum chamber where a sample might be moved from or to.  A posport
+# has an index, which is used in status and control, but also an ID number
+# which is one greater than the index.  PosportID 0 is for when something
+# has gone wrong and the transfer has failed to complete and failed to
+# recover.  PreVac refer to this as "Arm" meaning the sample
+# manipulator arm in the Rotary Distribution Chamber (a.k.a. UFO).
+#
+#% macro, __doc__, Template database for status info on PreVac Sample Manipulator (in addition to that for individual SM Ports).
+#
+#% macro, device, Mandatory.  Device name.
+#% macro, port,   Mandatory.  Comms port (DLS NX102) PLC controller is on.
+#
+#% macro, staprefix,              Optional.  Defaults to :STA           Prefix for the SM status records.
+#% macro, posportprefix,          Optional.  Defaults to :POSPORT       Prefix for records for individual ports.  Must match port template.
+#% macro, posportID0_shortdesc,   Optional.  Defaults to Arm.           Short description of zeroth port (for error recovery only).  The posportID1...7_shortdesc macros are not populated by default, so you must set some of them to make things sensible.  Leave the ones not present (i.e. no chamber connected as empty string.)
+#% macro, posportID1_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 1, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID2_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 2, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID3_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 3, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID4_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 4, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID5_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 5, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID6_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 6, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID7_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 7, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID8_shortdesc,   Optional.  Defaults to empty string.  Short description of posport with ID 8, recommend use an abbreviated chamber name but only if a chamber is present.
+#% macro, posportID0_sourceSV,    Optional.  Defaults to MINOR.         Alarm severity for posport ID 0 for the Arm as source.  It is allowed as part of error recovery.
+#% macro, posportID0_targetSV,    Optional.  Defaults to MAJOR.         Alarm severity for posport ID 0 for the Arm as target.
+#% macro, posportID1_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 1, same for source and target.
+#% macro, posportID2_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 2, same for source and target.
+#% macro, posportID3_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 3, same for source and target.
+#% macro, posportID4_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 4, same for source and target.
+#% macro, posportID5_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 5, same for source and target.
+#% macro, posportID6_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 6, same for source and target.
+#% macro, posportID7_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 7, same for source and target.
+#% macro, posportID8_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 8, same for source and target.
+#
+#% macro, name,                   Optional.  Defaults to empty.         Object name and associated gui name
+#
+# This associates an EDM screen with the template
+# % gui, $(name=), edm, NX102_PreVacSMStatus.edl, device=$(device), staprefix=$(staprefix=:STA)
+#
+# The strings explaining the meaning of the status bits are NOT read
+# back from the PLC.  Furthermore there are no macros allowing the
+# labels on the bits of the status word to be set in the
+# template. Instead they are hardcoded into the edl file as they were
+# provided by PreVac.  This is not ideal but it is because many of the
+# strings exceed by a long way the limit of 39 characters which in
+# EPICS R3.14.12.7 is the maximum length of the .VAL field of a string
+# record.
+#
+# The manipulator status is in an array of registers read from modbus.
+# Originally the array tag name was Modbus_Read_Data_Registers, but
+# this resulted in constructed syntax strings which were too long for
+# the INP field limited by the EPICS base string length limit, so the
+# name agreed to be shortened to MB_Read_Reg.  Also the sub tag name
+# was originally Words but this was also shortened to W for the same
+# reason.
+# MB_Read_Reg.W[0] Unused
+# MB_Read_Reg.W[1] Source Chamber Index (0-7 for Ports 1-8) or -1 as unsigned int for Arm (the latter for recovery from certain failures).
+# MB_Read_Reg.W[2] Target Chamber Index (0-7 for Ports 1-8)
+# MB_Read_Reg.W[3] Manipulator Transfer Status.  This has 2 bytes, each of which consists of 8 individual status flag bits.
+# MB_Read_Reg.W[4] Manipulator Motor Status.  This has 2 bytes, each of which consists of 8 individual status flag bits.
+# MB_Read_Reg.W[5] Transfer actual step.
+# MB_Read_Reg.W[6] Transfer Error Code.  This has 2 bytes, each bit of which represents an error condition.  It is not clear if multiple flags will be set simultaneously.
+# MB_Read_Reg.W[7] ??Error Code??.  This has 2 bytes, each of which represents an error condition.
+# MB_Read_Reg.W[8] Arm motor error code.  See servo amp manual.
+# *** NOTE: 14/06/2022: We have observed this code being displayed on
+# ***       the PreVac HMI after incidents in commissioning and it did
+# ***       not work in EPICS which showed a zero and it does not
+# ***       appear to be the same as the error flags in Word[7].  This
+# ***       tag needs to change, but there is no spec yet on what it
+# ***       should be as Nick Dawkins does not think it is coming back
+# ***       from the PreVac PLC to the NX102 PLC.  It might become
+# ***       Word[8] or it might need a separate tag of its own.
+# *** UPDATE: 17/06/2022 We were originally given two lots of
+# ***       information concerning word 7 which were not
+# ***       consistent.  It is now confirmed that there
+# ***       should have been a Word[8] which is not
+# ***       implemented in the PLC yet as it was only
+# ***       appeared in later versions of the PreVac
+# ***       documentation.- coming soon.
+#
+# There are further flags on the status of the modbus system itself.
+# Not sure if these are provided by the modbus or determined by the NX102.
+# Either way they are read back from the NX102.
+#
+# Status Word 1
+#
+# The index number of the source chamber i.e. where the sample
+# manipulator will fetch or is fetching the sample from.  This is like
+# the port ID of the Rotary Distribution Chamber Ports, but it is one
+# less, i.e. Port ID 1-8 ==> Index 0-7 respectively.
+#
+record(ai, "$(device)$(staprefix=:STA):SOURCEIDX_RBV_UNSIGNED") {
+  field(DESC, "Index of Source Chamber (0to7)")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[1]")
+  field(SCAN, ".5 second")
+  field(FLNK, "$(device)$(staprefix=:STA):SOURCEIDX_CALCSIGN")
+}
+
+#
+# The source index is in the same data array for the ether_ip readback
+# which is shared with many other words of status bits and therefore
+# unsigned.  However it turned out that the Source index has to be
+# given the value of -1 to recover from some transfer failures, which
+# is then appears in EPICS as the two's complement.  To display
+# correctly as -1, the inverse two's complement would be required.
+# [The two's complement has no effect on +ve numbers and its inverse
+# recovers them the same.]
+#
+# But the array data is WORD type, equivalent to unsigned short type
+# (two bytes) and EPICS ai value is a double (8 bytes).  So using
+# simpler formula exploiting the fact we know the values are low.
+#
+record(calcout, "$(device)$(staprefix=:STA):SOURCEIDX_CALCSIGN") {
+  field(DESC, "Convert source unsigned to signed")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(INPA, "$(device)$(staprefix=:STA):SOURCEIDX_RBV_UNSIGNED")
+  field(CALC, "(A>65535)?65535-A:A")
+  field(OUT, "$(device)$(staprefix=:STA):SOURCEIDX_RBV PP")
+}
+
+#
+# The index number of the source chamber i.e. where the sample
+# manipulator will fetch or is fetching the sample from.  This is like
+# the port ID of the Rotary Distribution Chamber Ports, but it is one
+# less, i.e. Port ID 1-8 ==> Index 0-7 respectively or -1 for the
+# Transfer Arm
+#
+# [In the event of failure of transfer into the target chamber the
+# system automatically tries to return the sample to the source
+# chamber, but if that fails too or if the user issues a STOP from HMI
+# (TBC or Abort from EPICS) then the sample is left on the arm.]
+#
+record(ai, "$(device)$(staprefix=:STA):SOURCEIDX_RBV") {
+  field(DESC, "Index of Source Chamber (-1to7)")
+  field(SCAN, "Passive")
+  field(FLNK, "$(device)$(staprefix=:STA):SOURCEPORTID_CALC")
+}
+
+#
+# Convert the source index into the source port ID
+#
+record(calc, "$(device)$(staprefix=:STA):SOURCEPORTID_CALC") {
+  field(DESC, "Calc portID as port index+1.")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(staprefix=:STA):SOURCEIDX_RBV")
+  field(CALC, "A+1")
+  field(FLNK, "$(device)$(staprefix=:STA):SOURCEPORTID_RBV")
+}
+
+# The currently selected source portID.
+# Interprets the source portID for user and onward calculations.
+# The transfer arm is a valid source, but is not allowed as target.
+# The default alarm status for the Arm is MINOR because this
+# should only be happening in the event of error recovery.
+#
+record(mbbi, "$(device)$(staprefix=:STA):SOURCEPORTID_RBV") {
+  field(DESC, "Source Chamber portID (0to8)")
+  field(SCAN, "Passive")
+  field(INP, "$(device)$(staprefix=:STA):SOURCEPORTID_CALC")
+  field(ZRST, "$(posportID0_shortdesc=Arm)")
+  field(ZRSV, "$(posportID0_sourceSV=MINOR)")
+  field(ONST, "$(posportID1_shortdesc=)")
+  field(ONSV, "$(posportID1_SV=NO_ALARM)")
+  field(TWST, "$(posportID2_shortdesc=)")
+  field(TWSV, "$(posportID2_SV=NO_ALARM)")
+  field(THST, "$(posportID3_shortdesc=)")
+  field(THSV, "$(posportID3_SV=NO_ALARM)")
+  field(FRST, "$(posportID4_shortdesc=)")
+  field(FRSV, "$(posportID4_SV=NO_ALARM)")
+  field(FVST, "$(posportID5_shortdesc=)")
+  field(FVSV, "$(posportID5_SV=NO_ALARM)")
+  field(SXST, "$(posportID6_shortdesc=)")
+  field(SXSV, "$(posportID6_SV=NO_ALARM)")
+  field(SVST, "$(posportID7_shortdesc=)")
+  field(SVSV, "$(posportID7_SV=NO_ALARM)")
+  field(EIST, "$(posportID8_shortdesc=)")
+  field(EISV, "$(posportID8_SV=NO_ALARM)")
+  field(FLNK, "$(device)$(staprefix=:STA):SOURCEPORTID_RBV_FAN")
+}
+
+#
+# Fanout to calculations dependent on the Source posportID.
+#
+record(fanout, "$(device)$(staprefix=:STA):SOURCEPORTID_RBV_FAN") {
+  field(DESC, "Propagate Source posport ID RBV")
+  field(SCAN, "Passive")
+  field(LNK1, "$(device)$(staprefix=:STA):S_AND_T_CHECK")
+  field(LNK2, "$(device)$(staprefix=:STA):IS_SOURCE_CALC1")
+}
+
+#
+# Status Word 2
+#
+# The index number of the target chamber i.e. where the sample
+# manipulator will move or is moving the sample to.  The Arm
+# is not a valid target, so it does not have to be read into
+# an unsigned record.
+#
+record(ai, "$(device)$(staprefix=:STA):TARGETIDX_RBV") {
+  field(DESC, "Index of Target Chamber (0-7)")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[2]")
+  field(SCAN, ".5 second")
+  field(FLNK, "$(device)$(staprefix=:STA):TARGETPORTID_CALC")
+}
+
+#
+# Convert the target index into the target port ID
+#
+record(calc, "$(device)$(staprefix=:STA):TARGETPORTID_CALC") {
+  field(DESC, "Calc portID as port index+1.")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(staprefix=:STA):TARGETIDX_RBV")
+  field(CALC, "A+1")
+  field(FLNK, "$(device)$(staprefix=:STA):TARGETPORTID_RBV")
+}
+
+# The currently selected target portID.
+# Interprets the target portID for user.
+# The transfer arm is a valid source, but is not allowed as target.
+#
+record(mbbi, "$(device)$(staprefix=:STA):TARGETPORTID_RBV") {
+  field(DESC, "Source Chamber portID (0to8)")
+  field(SCAN, "Passive")
+  field(INP, "$(device)$(staprefix=:STA):TARGETPORTID_CALC")
+  field(ZRST, "$(posportID0_shortdesc=Arm)")
+  field(ZRSV, "$(posportID0_targetSV=MAJOR)")
+  field(ONST, "$(posportID1_shortdesc=)")
+  field(ONSV, "$(posportID1_SV=NO_ALARM)")
+  field(TWST, "$(posportID2_shortdesc=)")
+  field(TWSV, "$(posportID2_SV=NO_ALARM)")
+  field(THST, "$(posportID3_shortdesc=)")
+  field(THSV, "$(posportID3_SV=NO_ALARM)")
+  field(FRST, "$(posportID4_shortdesc=)")
+  field(FRSV, "$(posportID4_SV=NO_ALARM)")
+  field(FVST, "$(posportID5_shortdesc=)")
+  field(FVSV, "$(posportID5_SV=NO_ALARM)")
+  field(SXST, "$(posportID6_shortdesc=)")
+  field(SXSV, "$(posportID6_SV=NO_ALARM)")
+  field(SVST, "$(posportID7_shortdesc=)")
+  field(SVSV, "$(posportID7_SV=NO_ALARM)")
+  field(EIST, "$(posportID8_shortdesc=)")
+  field(EISV, "$(posportID8_SV=NO_ALARM)")
+  field(FLNK, "$(device)$(staprefix=:STA):TARGETPORTID_RBV_FAN")
+}
+
+#
+# Fanout to calculations dependent on the Target posportID RBV.
+#
+record(fanout, "$(device)$(staprefix=:STA):TARGETPORTID_RBV_FAN") {
+  field(DESC, "Propagate Target posport ID RBV")
+  field(SCAN, "Passive")
+  field(LNK1, "$(device)$(staprefix=:STA):S_AND_T_CHECK")
+  field(LNK2, "$(device)$(staprefix=:STA):IS_TARGET_CALC1")
+}
+
+#
+# Check Source and Target.  Currently this is only whether they
+# have been specified the same.
+#
+record(calcout, "$(device)$(staprefix=:STA):S_AND_T_CHECK") {
+  field(DESC, "Check Source and Target.")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(staprefix=:STA):SOURCEPORTID_RBV")
+  field(INPB, "$(device)$(staprefix=:STA):TARGETPORTID_RBV")
+  field(CALC, "A=B?1:0")
+  field(OUT, "$(device)$(staprefix=:STA):S_AND_T_SAME PP")
+}
+
+#
+# Record for whether the Source and Target ID requested are the
+# same, which does not make much sense.  Currently EPICS
+# will process a request to make such a move, but the modbus
+# PLC will not.
+#
+record(bi, "$(device)$(staprefix=:STA):S_AND_T_SAME") {
+  field(DESC, "Source and Target posport ID the same?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Different")
+  field(ZSV, "NO_ALARM")
+  field(ONAM, "Same")
+  field(OSV, "MINOR")
+}
+
+#
+# Status Word 3 Byte 0 and Byte 1, Bits 0-7 and Bits 8-15
+#
+# First byte of status word is error flags.
+# Byte 0 Errors
+#  bit 0 - UFO chamber error
+#  bit 1 - No Vacuum
+#  bit 2 - Motor Error
+#  bit 3 - Transfer Error
+#  bit 4 - Transfer Critical Error
+#  bit 5 - PfT: Source chamber no signal ReadyForTransfer
+#  bit 6 - PfT: Target chamber no signal ReadyForTransfer
+#  bit 7 - PfT: Motor is not in rotaric mode (arm not hide ?)
+#
+# Second byte of status word is transfer status flags.
+# Byte 2 Transfer Information
+#  bit 0 - Sample in UFO arm
+#  bit 1 - Service active
+#  bit 2 - Vacuum trigger OK
+#  bit 3 - Transfer in progress
+#  bit 4 - Transfer finished
+#  bit 5 - Prepare For Transfer In Progress
+#  bit 6 - Prepare For Transfer finished
+#  bit 7 - Aborted
+#
+# The B flag on the input says read from bit 0 and NOBT field defines
+# to read all 16 bits.
+#
+record(mbbiDirect, "$(device)$(staprefix=:STA):TRANSFERSTATUS") {
+  field(DESC, "Sample Manipulator Status Error Flags")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[3] B 0")
+  field(NOBT, "16")
+  field(SCAN, ".5 second")
+}
+
+#
+# Status Word 4 Byte 0 and Byte 1, Bits 0-7 and Bits 16-31
+#
+# The first byte is flags about the rotary distribution chamber arm motor.
+#  Byte 0 Motor information
+#   bit 0 - Serwo ON status
+#   bit 1 - Motor in calibrated
+#   bit 2 - Motor is calibrating
+#   bit 3 - Motor is moving
+#   bit 4 - Motor can't start calib – homed limit switch active
+#   bit 5 - reserved
+#   bit 6 - reserved
+#   bit 7 - Error: Venting Procedure Active (option)
+#
+# The second byte is further error flags, some about the motor, some not.
+# Byte 1 Errors 2
+#  bit 0 - Source chamber index out of range
+#  bit 1 - Target chamber index out of range
+#  bit 2 - Error from source chamber
+#  bit 3 - Error from target chamber
+#  bit 4 - Busy from source chamber
+#  bit 5 - Busy from target chamber
+#  bit 6 - Arm motor calibration timeout reached
+#  bit 7 - No compressed air
+#
+# The B flag on the input says read from bit 0 and NOBT field defines
+# to read all 16 bits.
+#
+record(mbbiDirect, "$(device)$(staprefix=:STA):MOTORSTATUS") {
+  field(DESC, "Sample Manipulator Motor Status Flags")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[4] B 0")
+  field(NOBT, "16")
+  field(SCAN, ".5 second")
+}
+
+#
+# Status Word 5.
+# The transfer step.
+#
+record(ai, "$(device)$(staprefix=:STA):TRANSFERSTEP") {
+  field(DESC, "Code step of current transfer")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[5]")
+  field(SCAN, ".5 second")
+}
+
+#
+# Status Word 6 Byte 0 and Byte 1, Bits 0-7 and Bits 8-15
+#
+# First byte is errors before start transferring
+#  Byte 0
+#   bit 0 - Prepare for transfer not finished
+#   bit 1 - Motor error
+#   bit 2 - Source chamber error
+#   bit 3 - Target chamber error
+#   bit 4 - Source chamber busy
+#   bit 5 - Target chamber busy
+#   bit 6 - Sample not present in source chamber
+#   bit 7 - Sample present in target chamber
+#
+# Second byte is start of codes for things going wrong on transfer.
+#  Byte 1
+#   bit 0 - Source chamber: Ready to Transfer signal timeout
+#   bit 1 - Target chamber: Ready to Transfer signal timeout
+#   bit 2 - Source chamber gate: open/close timeout
+#   bit 3 - Can't take sample from source chamber
+#   bit 4 - Target chamber gate: open/close timeout
+#   bit 5 - Target chamber: ReadyForTransfer signal lost before open gate
+#   bit 6 - Can't leave sample in target chamber
+#   bit 7 - Can't leave sample in target chamber (wrong holder size -
+#           sensor detection (option))
+#
+record(mbbiDirect, "$(device)$(staprefix=:STA):TRANSFERERRORS1") {
+  field(DESC, "Sample Manip Transfer Error Flags 1")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[6] B 0")
+  field(NOBT, "16")
+  field(SCAN, ".5 second")
+}
+
+#
+# Status Word 7 Byte 0 and Byte 1, Bits 0-7 and Bits 8-15
+#
+# First byte continues with error codes and has abort flags.
+#  Byte 2
+#   bit 0 - Error Mode - can't leave sample back in source chamber
+#   bit 1 - Aborting active
+#   bit 2 - Aborted
+#   bit 3 - Arm linear distance smaller than check holder distance
+#   bit 4 - Reserved
+#   bit 5 - Reserved
+#   bit 6 - Reserved
+#   bit 7 - Can't start - wrong holder type sensor in target chamber
+#           active (option)
+#
+# The second byte has some "internal" errors and reserved bits.
+#  Byte 3
+#   bit 0 - Internal error 1 (arm on wrong position)
+#   bit 1 - Holder on ARM flag active during start transfer (source
+#           chamber index must be set to „-1“ if holder is present on arm)
+#   bit 2 - Internal error 2 (arm on wrong position encoder readout)
+#   bit 3 - Reserved
+#   bit 4 - Reserved
+#   bit 5 - Reserved
+#   bit 6 - Reserved
+#   bit 7 - Reserved
+#
+record(mbbiDirect, "$(device)$(staprefix=:STA):TRANSFERERRORS2") {
+  field(DESC, "Sample Manip Transfer Error Flags 2")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[7] B 0")
+  field(NOBT, "16")
+  field(SCAN, ".5 second")
+}
+
+#
+# Status Word 8.
+# The arm motor error code.  The information refers us to the
+# servo amp manual for what this means.
+#
+record(ai, "$(device)$(staprefix=:STA):MOTORERRORCODE") {
+  field(DESC, "Arm motor amp error code")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) MB_Read_Reg.W[8]")
+  field(SCAN, ".5 second")
+}
+
+#
+# Boolean Status Flags regarding communication with the PreVac
+# Modbus PLC from the NX102 PLC.
+#
+# Modbus_Connected_OK
+# Modbus_Coils_Read_OK
+# Modbus_Coil_Data_Invalid
+# Modbus_Registers_Read_OK
+# Modbus_Register_Data_Invalid
+#
+# Modbus_Connected_OK
+#
+record(bi, "$(device)$(staprefix=:STA):MODBUS:CONNECTED_OK") {
+  field(DESC, "Connection status NX102 to Modbus PLC")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Modbus_Connected_OK")
+  field(ZNAM, "Not Connected")
+  field(ZSV, "MAJOR")
+  field(ONAM, "Connected")
+  field(OSV, "NO_ALARM")
+  field(SCAN, ".5 second")
+}
+
+#
+# Modbus_Coils_Read_OK
+#
+record(bi, "$(device)$(staprefix=:STA):MODBUS:COILS_READ") {
+  field(DESC, "Status of Coils read from Modbus PLC")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Modbus_Coils_Read_OK")
+  field(ZNAM, "Bad")
+  field(ZSV, "MAJOR")
+  field(ONAM, "OK")
+  field(OSV, "NO_ALARM")
+  field(SCAN, ".5 second")
+}
+
+#
+# Modbus_Coil_Data_Invalid
+#
+record(bi, "$(device)$(staprefix=:STA):MODBUS:COILS_INVALID") {
+  field(DESC, "Status of Coils data in NX102 PLC")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Modbus_Coil_Data_Invalid")
+  field(ZNAM, "Valid")
+  field(ZSV, "NO_ALARM")
+  field(ONAM, "Invalid")
+  field(OSV, "MAJOR")
+  field(SCAN, ".5 second")
+}
+
+#
+# Modbus_Registers_Read_OK
+#
+record(bi, "$(device)$(staprefix=:STA):MODBUS:REGISTERS_READ") {
+  field(DESC, "Status of Register read from Modbus PLC")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Modbus_Registers_Read_OK")
+  field(ZNAM, "Bad")
+  field(ZSV, "MAJOR")
+  field(ONAM, "OK")
+  field(OSV, "NO_ALARM")
+  field(SCAN, ".5 second")
+}
+
+#
+# Modbus_Register_Data_Invalid
+#
+record(bi, "$(device)$(staprefix=:STA):MODBUS:REGISTERS_INVALID") {
+  field(DESC, "Status of Modbus register data in NX102")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Modbus_Register_Data_Invalid")
+  field(ZNAM, "Valid")
+  field(ZSV, "NO_ALARM")
+  field(ONAM, "Invalid")
+  field(OSV, "MAJOR")
+  field(SCAN, ".5 second")
+}
+
+#
+# Stale data calculation.
+#
+# A number of the PVs above could imply stale data is being displayed
+# on the screen and experience showed that this was not noticed because
+# it only shows up on the status screen, so need to add a warning to
+# other screens.  Therefore munge together all the relevant PVs into
+# one which can control the visibility of a warning message.  Put it
+# on a slow scan rather than forward link from all 5 inputs at .5 sec
+#
+record(calcout, "$(device)$(staprefix=:STA):MODBUS:IS_STALE_CALC") {
+  field(DESC, "Combine Modbus data status")
+  field(SCAN, "5 second")
+  field(INPA, "$(device)$(staprefix=:STA):MODBUS:CONNECTED_OK")
+  field(INPB, "$(device)$(staprefix=:STA):MODBUS:COILS_READ")
+  field(INPC, "$(device)$(staprefix=:STA):MODBUS:COILS_INVALID")
+  field(INPD, "$(device)$(staprefix=:STA):MODBUS:REGISTERS_READ")
+  field(INPE, "$(device)$(staprefix=:STA):MODBUS:REGISTERS_INVALID")
+  field(CALC, "A=1&&B=1&&C=0&&D=1&&E=0?0:1")
+  field(OUT, "$(device)$(staprefix=:STA):MODBUS:IS_STALE PP")
+}
+
+#
+# Stale data record.
+#
+# Initialise to Stale.
+#
+record(bi, "$(device)$(staprefix=:STA):MODBUS:IS_STALE") {
+  field(DESC, "Overall status of Modbus data")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Stale")
+  field(ZSV, "NO_ALARM")
+  field(ONAM, "Stale")
+  field(OSV, "MAJOR")
+  field(PINI, "YES")
+  field(VAL, "1")
+}
+
+# -----------------------------------------------------------------------
+# *****************************************
+# * Start of records for individual ports *
+# *****************************************
+#
+# Originally tried putting these into the port template, but the problem is with
+# trying to support all 8 ports 1-8 for future configurations, it resulted
+# in broken links for the ports which do not have a port template.  This probably
+# could be handled with further records and calculations, but it got complicated,
+# so decided to simplify.
+#
+# First records for whether the position port of fixed ID is the one
+# currently selected as the source and target.  They are not greatly
+# sanity checked, the system will allow the user to select ports which are not
+# present or allowed, but it will try to tell them so.
+#
+# REMINDER: posport ID number = posport index + 1
+#
+# Posport0 Source Record
+# The Arm.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)0:IS_SOURCE") {
+  field(DESC, "Is Posport0 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport0 Target Record
+# The record is still required, even though the Arm is NOT ALLOWED as Target.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)0:IS_TARGET") {
+  field(DESC, "Is Posport0 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Posport1 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)1:IS_SOURCE") {
+  field(DESC, "Is Posport1 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport1 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)1:IS_TARGET") {
+  field(DESC, "Is Posport1 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+
+}
+
+#
+# Posport2 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)2:IS_SOURCE") {
+  field(DESC, "Is Posport2 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport2 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)2:IS_TARGET") {
+  field(DESC, "Is Posport2 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Posport3 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)3:IS_SOURCE") {
+  field(DESC, "Is Posport3 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport3 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)3:IS_TARGET") {
+  field(DESC, "Is Posport3 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Posport4 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)4:IS_SOURCE") {
+  field(DESC, "Is Posport4 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport4 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)4:IS_TARGET") {
+  field(DESC, "Is Posport4 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Posport5 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)5:IS_SOURCE") {
+  field(DESC, "Is Posport5 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport5 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)5:IS_TARGET") {
+  field(DESC, "Is Posport5 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Posport6 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)6:IS_SOURCE") {
+  field(DESC, "Is Posport6 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport6 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)6:IS_TARGET") {
+  field(DESC, "Is Posport6 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Posport7 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)7:IS_SOURCE") {
+  field(DESC, "Is Posport7 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport7 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)7:IS_TARGET") {
+  field(DESC, "Is Posport7 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Posport8 Source Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)8:IS_SOURCE") {
+  field(DESC, "Is Posport8 selected as source?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Source")
+  field(ONAM, "Source")
+}
+
+#
+# Posport8 Target Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)8:IS_TARGET") {
+  field(DESC, "Is Posport8 selected as target?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Target")
+  field(ONAM, "Target")
+}
+
+#
+# Calculate whether each port is the currently selected Source port by comparing
+# its (fixed) posportID number with the one currently read back as Source.  Unfortunately
+# there are not enough fields in a single transform record to do all 9 posports in one
+# so two are required to achieve it.
+#
+# NOTE:  This is based on the readback from the NX102 PLC in the status template,
+#        and NOT the demand value selected by the user in the control template,
+#        as experience shows that can be out of sync when the DLS PLC loses contact
+#        with the NX102 PLC.
+#
+# First Source transform, posports 0 to 6
+#
+record(transform, "$(device)$(staprefix=:STA):IS_SOURCE_CALC1") {
+  field(DESC, "Compare Posport IDs to Source RBV")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(CMTA, "Current Source posport ID, 0 to 8")
+  field(INPA, "$(device)$(staprefix=:STA):SOURCEPORTID_RBV")
+  field(CMTB, "Posport 0 $(posportID0_shortdesc=Arm))
+  field(INPB, "0")
+  field(CMTC, "Posport 1 $(posportID1_shortdesc=))
+  field(INPC, "1")
+  field(CMTD, "Posport 2 $(posportID2_shortdesc=))
+  field(INPD, "2")
+  field(CMTE, "Posport 3 $(posportID3_shortdesc=))
+  field(INPE, "3")
+  field(CMTF, "Posport 4 $(posportID4_shortdesc=))
+  field(INPF, "4")
+  field(CMTG, "Posport 5 $(posportID5_shortdesc=))
+  field(INPG, "5")
+  field(CMTH, "Posport 6 $(posportID6_shortdesc=))
+  field(INPH, "6")
+  field(CMTI, "Compare Posport 0 $(posportID0_shortdesc=Arm))
+  field(CLCI, "A=B?1:0")
+  field(OUTI, "$(device)$(posportprefix=:POSPORT)0:IS_SOURCE PP")
+  field(CMTJ, "Compare Posport 1 $(posportID1_shortdesc=))
+  field(CLCJ, "A=C?1:0")
+  field(OUTJ, "$(device)$(posportprefix=:POSPORT)1:IS_SOURCE PP")
+  field(CMTK, "Compare Posport 2 $(posportID2_shortdesc=))
+  field(CLCK, "A=D?1:0")
+  field(OUTK, "$(device)$(posportprefix=:POSPORT)2:IS_SOURCE PP")
+  field(CMTL, "Compare Posport 3 $(posportID3_shortdesc=))
+  field(CLCL, "A=E?1:0")
+  field(OUTL, "$(device)$(posportprefix=:POSPORT)3:IS_SOURCE PP")
+  field(CMTM, "Compare Posport 4 $(posportID4_shortdesc=))
+  field(CLCM, "A=F?1:0")
+  field(OUTM, "$(device)$(posportprefix=:POSPORT)4:IS_SOURCE PP")
+  field(CMTN, "Compare Posport 5 $(posportID5_shortdesc=))
+  field(CLCN, "A=G?1:0")
+  field(OUTN, "$(device)$(posportprefix=:POSPORT)5:IS_SOURCE PP")
+  field(CMTO, "Compare Posport 6 $(posportID6_shortdesc=))
+  field(CLCO, "A=H?1:0")
+  field(OUTO, "$(device)$(posportprefix=:POSPORT)6:IS_SOURCE PP")
+  field(FLNK, "$(device)$(staprefix=:STA):IS_SOURCE_CALC2"
+}
+
+#
+# Second source transform, posports 7 to 8
+#
+record(transform, "$(device)$(staprefix=:STA):IS_SOURCE_CALC2") {
+  field(DESC, "Compare Posport IDs to Source RBV")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(CMTA, "Current Source posport ID, 0 to 8")
+  field(INPA, "$(device)$(staprefix=:STA):SOURCEPORTID_RBV")
+  field(CMTB, "Posport 7 $(posportID7_shortdesc=))
+  field(INPB, "7")
+  field(CMTC, "Posport 8 $(posportID7_shortdesc=))
+  field(INPC, "8")
+  field(CMTD, "Compare Posport 7 $(posportID7_shortdesc=))
+  field(CLCD, "A=B?1:0")
+  field(OUTD, "$(device)$(posportprefix=:POSPORT)7:IS_SOURCE PP")
+  field(CMTE, "Compare Posport 8 $(posportID8_shortdesc=))
+  field(CLCE, "A=C?1:0")
+  field(OUTE, "$(device)$(posportprefix=:POSPORT)8:IS_SOURCE PP")
+}
+
+#
+# First Target transform, posports 0 to 6
+#
+record(transform, "$(device)$(staprefix=:STA):IS_TARGET_CALC1") {
+  field(DESC, "Compare Posport IDs to Target RBV")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(CMTA, "Current Target posport ID, 0 to 8")
+  field(INPA, "$(device)$(staprefix=:STA):TARGETPORTID_RBV")
+  field(CMTB, "Posport 0 $(posportID0_shortdesc=Arm))
+  field(INPB, "0")
+  field(CMTC, "Posport 1 $(posportID1_shortdesc=))
+  field(INPC, "1")
+  field(CMTD, "Posport 2 $(posportID2_shortdesc=))
+  field(INPD, "2")
+  field(CMTE, "Posport 3 $(posportID3_shortdesc=))
+  field(INPE, "3")
+  field(CMTF, "Posport 4 $(posportID4_shortdesc=))
+  field(INPF, "4")
+  field(CMTG, "Posport 5 $(posportID5_shortdesc=))
+  field(INPG, "5")
+  field(CMTH, "Posport 6 $(posportID6_shortdesc=))
+  field(INPH, "6")
+  field(CMTI, "Compare Posport 0 $(posportID0_shortdesc=Arm))
+  field(CLCI, "A=B?1:0")
+  field(OUTI, "$(device)$(posportprefix=:POSPORT)0:IS_TARGET PP")
+  field(CMTJ, "Compare Posport 1 $(posportID1_shortdesc=))
+  field(CLCJ, "A=C?1:0")
+  field(OUTJ, "$(device)$(posportprefix=:POSPORT)1:IS_TARGET PP")
+  field(CMTK, "Compare Posport 2 $(posportID2_shortdesc=))
+  field(CLCK, "A=D?1:0")
+  field(OUTK, "$(device)$(posportprefix=:POSPORT)2:IS_TARGET PP")
+  field(CMTL, "Compare Posport 3 $(posportID3_shortdesc=))
+  field(CLCL, "A=E?1:0")
+  field(OUTL, "$(device)$(posportprefix=:POSPORT)3:IS_TARGET PP")
+  field(CMTM, "Compare Posport 4 $(posportID4_shortdesc=))
+  field(CLCM, "A=F?1:0")
+  field(OUTM, "$(device)$(posportprefix=:POSPORT)4:IS_TARGET PP")
+  field(CMTN, "Compare Posport 5 $(posportID5_shortdesc=))
+  field(CLCN, "A=G?1:0")
+  field(OUTN, "$(device)$(posportprefix=:POSPORT)5:IS_TARGET PP")
+  field(CMTO, "Compare Posport 6 $(posportID6_shortdesc=))
+  field(CLCO, "A=H?1:0")
+  field(OUTO, "$(device)$(posportprefix=:POSPORT)6:IS_TARGET PP")
+  field(FLNK, "$(device)$(staprefix=:STA):IS_TARGET_CALC2"
+}
+
+#
+# Second target transform, posports 7 to 8
+#
+record(transform, "$(device)$(staprefix=:STA):IS_TARGET_CALC2") {
+  field(DESC, "Compare Posport IDs to Target RBV")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(CMTA, "Current Target posport ID, 0 to 8")
+  field(INPA, "$(device)$(staprefix=:STA):TARGETPORTID_RBV")
+  field(CMTB, "Posport 7 $(posportID8_shortdesc=))
+  field(INPB, "7")
+  field(CMTC, "Posport 8 $(posportID7_shortdesc=))
+  field(INPC, "8")
+  field(CMTD, "Compare Posport 7 $(posportID7_shortdesc=))
+  field(CLCD, "A=B?1:0")
+  field(OUTD, "$(device)$(posportprefix=:POSPORT)7:IS_TARGET PP")
+  field(CMTE, "Compare Posport 8 $(posportID8_shortdesc=))
+  field(CLCE, "A=C?1:0")
+  field(OUTE, "$(device)$(posportprefix=:POSPORT)8:IS_TARGET PP")
+}
+
+#
+# Records for whether a port is present on the system.
+# The Arm, posport 0 is always present, but it helps keep things
+# systematic to provide a record for it.
+# The other records all default to Not Present, but they will be
+# set by records in their Port template if they are present.
+#
+# Posport0 Present Record
+# The Arm, posport 0 is always present, but it helps keep things
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)0:IS_PRESENT") {
+  field(DESC, "Is Posport0 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "1")
+}
+
+#
+# Posport1 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)1:IS_PRESENT") {
+  field(DESC, "Is Posport1 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport2 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)2:IS_PRESENT") {
+  field(DESC, "Is Posport2 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+
+#
+# Posport3 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)3:IS_PRESENT") {
+  field(DESC, "Is Posport3 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport4 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)4:IS_PRESENT") {
+  field(DESC, "Is Posport4 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport5 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)5:IS_PRESENT") {
+  field(DESC, "Is Posport5 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+
+#
+# Posport6 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)6:IS_PRESENT") {
+  field(DESC, "Is Posport6 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport7 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)7:IS_PRESENT") {
+  field(DESC, "Is Posport7 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport8 Present Record
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)8:IS_PRESENT") {
+  field(DESC, "Is Posport8 present on manipulator?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Present")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Sample Manipulator Ready records.
+#
+# The chambers beyond the ports also have GeoBrick controlled sample manipulators in them
+# There are interlock signals for when those manipulators are ready to pass a sample.
+# The values are calculated in the Port template.
+#
+# Posport0 Sample Manipulator Ready record.
+#
+# Posport0 must also implement this record to avoid broken link, but
+# the meaning is slightly different (TBC).
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)0:SAMPLEMANIP:READY") {
+  field(DESC, "Is Arm in Posport0 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport1 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)1:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport1 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport2 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)2:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport2 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport3 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)3:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport3 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport4 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)4:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport4 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport5 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)5:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport5 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport6 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)6:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport6 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport7 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)7:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport7 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport8 Sample Manipulator Ready record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)8:SAMPLEMANIP:READY") {
+  field(DESC, "Is SM in Posport8 chamber ready?")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Ready")
+  field(ONAM, "Ready")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Sample Holder In Chamber records.
+#
+# Whether the chamber associated with a port has a sample holder in it.
+# The records all default to No Sample Holder, but they will be
+# set by records in their Port template if they are present and
+# if the readback status indicates a sample holder is present.
+#
+# It does not keep track of what size of sample holder, whether there
+# is a sample in the sample holder, whether further samples are
+# available in the chamber or any information about what the sample
+# might be, all of which are to be managed by GDA.  It simply means
+# there is a sample holder available for the manipulator to grab.
+#
+# Posports 1 to 8 may or may not have a sample holder in them in
+# normal operation.  Attempting a transfer from a posport chamber
+# which is not indicating it has a sample holder is probably going to
+# fail.  Attempting a transfer to a posport chamber which is already
+# indicating a sample holder is also probably going to fail.
+#
+# Posport0 Sample Holder in Chamber record.
+#
+# The Arm, posport 0, can have a sample holder on it and is expected
+# to do so as normal during transfer.  It can also happen the transfer
+# fails, then the recovery fails and the sample holder gets stuck on the
+# Arm.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)0:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Is sample holder in Posport0 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM, "Present")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport1 Sample Holder In Chamber record.
+#
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)1:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport1 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport2 Sample Holder In Chamber record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)2:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport2 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport3 Sample Holder In Chamber record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)3:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport3 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport4 Sample Holder In Chamber record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)4:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport4 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport5 Sample Holder In Chamber record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)5:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport5 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport6 Sample Holder In Chamber record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)6:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport6 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport7 Sample Holder In Chamber record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)7:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport7 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Posport8 Sample Holder In Chamber record.
+#
+record(bi, "$(device)$(posportprefix=:POSPORT)8:SAMPLEHOLDER:IN_CHAMBER") {
+  field(DESC, "Sample present in Posport8 chamber?")
+  field(SCAN, "Passive")
+  field(ZNAM, "No Sample Holder")
+  field(ONAM,  "Has Sample Holder")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+# ***************************************
+# * End of records for individual ports *
+# ***************************************
+# -----------------------------------------------------------------------
+#

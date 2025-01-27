@@ -1,0 +1,1420 @@
+#
+# NX102_PreVacCoils_SMControl.vdb is expanded to
+#  NX102_PreVacCoils_SMControl.template by VDCT utility called flatdb.
+#
+#% macro, __doc__, Template database for a control of PreVac Sample Manipulator.  Two parameters for source and target chambers (where to transfer sample from and to respectively) have to be written.  Further writes to NX PLC registers act commands to turn on motors and gas, and transfer commands for Prepare, Transfer, Abort, Reset.  Each of these writes has to have associated pulsed trigger writes to cause the NX PLC to act on the latest value.  The NX PLC processes the requested value and decides whether to pass it to the PreVac Modbus PLC.  If the latter, the PreVac Modbus PLC also processes the requested value and decides whether to act on it or not.  EPICS does not have any direct communication with the PreVac Modbus PLC.  Intentions for macros as follows: (1) Strings for posportID<n>_shortdesc macros should be provided only for ports which are present, but they should be left alone as empty strings for ports which are not present.  (2) Alarm severities of MAJOR should be defined for posportID<n>_SV macros for ports which are not present, but those which are present are left alone as NO_ALARM.  (3) Setting the posportID<n>_compass macros must result in a unique compass direction for all ports n=1-8 for the embedded diagram display on the Control screen to work properly.  The default values conform to this.  (4) Set targetparam_init to a posport ID number of a port which is present.  (5) The value of posportIDs_allowedmask defaults to a safe value of 0, which causes no transfers to be allowed, so you must define it according to the ports present to allow transfers.  (NOTE: In descriptions and macro names, "arm" is a noun referring to the sample manipulator arm and not a verb as used for a fast valve).
+#
+#% macro, device,          Mandatory. Device name.
+#% macro, port,            Mandatory. Comms port (DLS NX102) PLC controller is on.
+#% macro, tag_sourceparam, Mandatory. NX PLC tag string to write the source chamber parameter.
+#% macro, tag_targetparam, Mandatory. NX PLC tag string to write the target chamber parameter.
+#% macro, tag_setcoil,     Mandatory. NX PLC tag string to set a Coil to TRUE.
+#% macro, tag_unsetcoil,   Mandatory. NX PLC tag string to set a Coil to FALSE.
+#
+#% macro, tag_Tsourceparam,       Optional.  Defaults to T$(tag_sourceparam).  NX PLC tag string to set the trigger to set the source chamber parameter.
+#% macro, tag_Ttargetparam,       Optional.  Defaults to T$(tag_targetparam).  NX PLC tag string to set the trigger to set the target chamber parameter.
+#% macro, tag_Tsetcoil,           Optional.  Defaults to T$(tag_setcoil).      NX PLC tag string to set the trigger to set a Coil to TRUE.
+#% macro, tag_Tunsetcoil,         Optional.  Defaults to T$(tag_unsetcoil).    NX PLC tag string to set the trigger to set a Coil to FALSE.
+#% macro, coilout_scanrate,       Optional.  Defaults to .2   The value of scanrate which when writing to NX PLC the coil output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists. (These are the records which run commands).
+#% macro, paramout_scanrate,      Optional.  Defaults to .2   The value of scanrate which when writing to NX PLC the parameter output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+#% macro, trigger_scanrate,       Optional.  Defaults to .2   The value of scanrate which when writing to NX PLC triggers the trigger output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+#% macro, posportIDs_allowedmask, Optional.  Defaults to 0.   Mask of bits set for each posportID number which is allowed as source and target.  (i.e. a chamber is present).  Bit 0 represents the Arm - do NOT set that bit, it is not allowed as a target and has special functionality for error recovery as a source.  Although the macro is optional, the default value doesnt allow any transfers, so you must set this.
+#
+#% macro, posportID0_shortdesc,   Optional.  Defaults to Arm.           Short (for menu) description of zeroth port (for error recovery only).  The posportID1...7_shortdesc macros are not populated by default, so you must set some of them to get a readable menu button.
+#% macro, posportID1_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 1.
+#% macro, posportID2_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 2.
+#% macro, posportID3_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 3.
+#% macro, posportID4_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 4.
+#% macro, posportID5_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 5.
+#% macro, posportID6_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 6.
+#% macro, posportID7_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 7.
+#% macro, posportID8_shortdesc,   Optional.  Defaults to empty string.  Short (for menu) description of posport 8.
+#% macro, posportID0_sourceSV,    Optional.  Defaults to MINOR.         Alarm severity for posport ID 0 for the Arm as source.  It is allowed as part of error recovery.
+#% macro, posportID0_targetSV,    Optional.  Defaults to MAJOR.         Alarm severity for posport ID 0 for the Arm as target.
+#% macro, posportID1_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 1, same for source and target.
+#% macro, posportID2_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 2, same for source and target.
+#% macro, posportID3_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 3, same for source and target.
+#% macro, posportID4_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 4, same for source and target.
+#% macro, posportID5_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 5, same for source and target.
+#% macro, posportID6_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 6, same for source and target.
+#% macro, posportID7_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 7, same for source and target.
+#% macro, posportID8_SV,          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 8, same for source and target.
+#% macro, posportID1_compass,     Optional.  Defaults to E.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen for posport ID1.
+#% macro, posportID2_compass,     Optional.  Defaults to NE.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID2.
+#% macro, posportID3_compass,     Optional.  Defaults to N.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID3.
+#% macro, posportID4_compass,     Optional.  Defaults to NW.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID4.
+#% macro, posportID5_compass,     Optional.  Defaults to W.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID5.
+#% macro, posportID6_compass,     Optional.  Defaults to SW.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID6.
+#% macro, posportID7_compass,     Optional.  Defaults to S.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID7.
+#% macro, posportID8_compass,     Optional.  Defaults to SE.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID8.
+#
+#% macro, ctrlprefix,             Optional.  Defaults to :CTRL          Prefix for SM control records.
+#% macro, paramprefix,            Optional.  Defaults to :PARAM         Prefix for SM parameter records.
+#% macro, paramprec,              Optional.  Defaults to 0.             Precision of the parameter value.
+#% macro, staprefix,              Optional.  Defaults to :STA           Prefix for SM status records for screens.  Must match SM status template.
+#% macro, posportprefix,          Optional.  Defaults to :POSPORT       Prefix for SM port status records for screens.  Must match definitions for SM port status template.
+#
+#% macro, sourceparam_shortdesc,  Optional.  Defaults to Source.        Short description or name of the Source parameter.
+#% macro, targetparam_shortdesc,  Optional.  Defaults to Target.        Short description or name of the Target parameter.
+#% macro, sourceparam_longdesc,   Optional.  Defaults to $(sourceparam_shortdesc=Source) chamber to move from.  Long description of the Source Parameter.
+#% macro, targetparam_longdesc,   Optional.  Defaults to $(targetparam_shortdesc=Target) chamber to move to.  Long description of the Target Parameter.
+#% macro, sourceparam_init,       Optional.  Defaults to 0 (Arm).       Initial value of the user demand for the Source parameter.  Helps the display on reboot in the absence of autosave.
+#% macro, targetparam_init,       Optional.  Defaults to 1.             Initial value of the user demand for the Target parameter.  Helps the display on reboot in the absence of autosave.  The default value could not be left at 0 because the Arm is never allowed as target.  The value of 1 is arbitrary.  Recommend set this to the ID of one of the ports which is present in the manipulator configuration.
+#% macro, trigger_onval,          Optional.  Defaults to 1.             Value to write to a trigger tag to pulse the trigger on.  Must be consistent with trigger_offval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+#% macro, trigger_offval,         Optional.  Defaults to 0.             Value to write to a trigger tag to pulse the trigger off.  Must be consistent with trigger_onval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+#% macro, trigger_ONAM,           Optional.  Defaults to Trigger On.    Label for 1 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+#% macro, trigger_ZNAM,           Optional.  Defaults to Trigger Off.   Label for 0 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+#% macro, trigger_pulseDLY,       Optional.  Defaults to 1.0.           Delay in seconds between sending Trigger On and Trigger Off writes when pulsing a trigger.
+#% macro, ackprepare_bitno,       Optional.  Defaults to 0.             Number (0 to 15) of the bit in the status word which acknowledges response to the prepare transfer command.
+#% macro, acktransfer_bitno,      Optional.  Defaults to 1.             Number (0 to 15) of the bit in the status word which acknowledges response to the transfer command.
+#% macro, ackabort_bitno,         Optional.  Defaults to 2.             Number (0 to 15) of the bit in the status word which acknowledges response to the abort transfer command.
+#% macro, ackclear_bitno,         Optional.  Defaults to 3.             Number (0 to 15) of the bit in the status word which acknowledges response to the clear error command.
+#% macro, ackprepare_status,      Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the prepare transfer command from.
+#% macro, acktransfer_status,     Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the transfer command from.
+#% macro, ackabort_status,        Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the abort transfer command from.
+#% macro, ackclear_status,        Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the clear error command from.
+#% macro, ackprepare_ZNAM,        Optional.  Defaults to No Request.     Label for off state (ZNAM field) of prepare for transfer command acknowledgement.
+#% macro, acktransfer_ZNAM,       Optional.  Defaults to No Request.     Label for off state (ZNAM field) of transfer command acknowledgement.
+#% macro, ackabort_ZNAM,          Optional.  Defaults to No Request.     Label for off state (ZNAM field) of abort transfer command acknowledgement.
+#% macro, ackclear_ZNAM,          Optional.  Defaults to No Request.     Label for off state (ZNAM field) of clear error command acknowledgement.
+#% macro, ackprepare_ONAM,        Optional.  Defaults to Request.        Label for on state (ONAM field) of prepare for transfer command acknowledgement.
+#% macro, acktransfer_ONAM,       Optional.  Defaults to Request.        Label for on state (ONAM field) of transfer command acknowledgement.
+#% macro, ackabort_ONAM,          Optional.  Defaults to Request.        Label for on state (ONAM field) of abort transfer command acknowledgement.
+#% macro, ackclear_ONAM,          Optional.  Defaults to Request.        Label for on state (ONAM field) of clear error command acknowledgement.
+#% macro, acksource_ZNAM,         Optional.  Defaults to No Trigger.     Label for off state (ZNAM field) of source parameter acknowledgement.
+#% macro, acktarget_ZNAM,         Optional.  Defaults to No Trigger.     Label for off state (ZNAM field) of target parameter acknowledgement.
+#% macro, acksource_ONAM,         Optional.  Defaults to Trigger.        Label for on state (ONAM field) of source parameter acknowledgement.
+#% macro, acktarget_ONAM,         Optional.  Defaults to Trigger.        Label for on state (ONAM field) of target parameter acknowledgement.
+#% macro, ackmotorcurrenton_ZNAM,   Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of motor current on command acknowledgement.
+#% macro, ackmotorcurrentoff_ZNAM,  Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of motor current off command acknowledgement.
+#% macro, ackmotorcurrenton_ONAM,   Optional.  Defaults to Trigger.      Label for on state (ONAM field) of motor current on command acknowledgement.
+#% macro, ackmotorcurrentoff_ONAM,  Optional.  Defaults to Trigger.      Label for on state (ONAM field) of motor current off command acknowledgement.
+#% macro, ackcompressedairon_ZNAM,  Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of compressed air on command acknowledgement.
+#% macro, ackcompressedairoff_ZNAM, Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of compressed air off command acknowledgement.
+#% macro, ackcompressedairon_ONAM,  Optional.  Defaults to Trigger.      Label for on state (ONAM field) of compressed air on command acknowledgement.
+#% macro, ackcompressedairoff_ONAM, Optional.  Defaults to Trigger.      Label for on state (ONAM field) of compressed air off command acknowledgement.
+#% macro, ackholderonarmon_ZNAM,    Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of acknowledgement for command to set the Holder On Arm status to True.
+#% macro, ackholderonarmoff_ZNAM,   Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of acknowledgement for command to set the Holder On Arm status to False.
+#% macro, ackholderonarmon_ONAM,    Optional.  Defaults to Trigger.      Label for on state (ONAM field) of acknowledgement for command to set the Holder On Arm status to True.
+#% macro, ackholderonarmoff_ONAM,   Optional.  Defaults to Trigger.      Label for on state (ONAM field) of acknowledgement for command to set the Holder On Arm status to False.
+#% macro, ingprepare_ZNAM,          Optional.  Defaults to Not Preparing.     Label for off state (ZNAM field) of in progress for prepare command.
+#% macro, ingprepare_ONAM,          Optional.  Defaults to Preparing.         Label for on state (ONAM field) of in progress for prepare command.
+#% macro, ingtransfer_ZNAM,         Optional.  Defaults to Not Transferring.  Label for off state (ZNAM field) of in progress for transfer command.
+#% macro, ingtransfer_ONAM,         Optional.  Defaults to Transferring.      Label for on state (ONAM field) of in progress for transfer command.
+#% macro, ingabort_ZNAM,            Optional.  Defaults to Not Aborting.      Label for off state (ZNAM field) of in progress for abort command.
+#% macro, ingabort_ONAM,            Optional.  Defaults to Aborting.          Label for on state (ONAM field) of in progress for abort command.
+#% macro, ingclear_ZNAM,            Optional.  Defaults to Not Clearing.      Label for off state (ZNAM field) of in progress for clear command.
+#% macro, ingclear_ONAM,            Optional.  Defaults to Clearing.          Label for on state (ONAM field) of in progress for clear command.
+#% macro, ingprepare_bitno,         Optional.  Defaults to 11.           Number (0 to 15) of the bit in the status word for the in progress status for the prepare command.
+#% macro, ingtransfer_bitno,        Optional.  Defaults to 10.           Number (0 to 15) of the bit in the status word for the in progress status for the transfer command.
+#% macro, ingabort_bitno1,          Optional.  Defaults to 1.            Number (0 to 15) of the bit in the status word for the in progress status for the abort command.
+#% macro, ingabort_bitno2,          Optional.  Defaults to 15.           Number (0 to 15) of the bit in the status word for the aborted status for the abort command.
+#% macro, ingprepare_status,        Optional.  Defaults to $(device)$(posportprefix=:POSPORT)0:POSSTA).  Record for status word to link to extract in progress status for the prepare command from.
+#% macro, ingtransfer_status,       Optional.  Defaults to $(device)$(posportprefix=:POSPORT)0:POSSTA).  Record for status word to link to extract in progress status for the transfer command from.
+#% macro, ingabort_status1,         Optional.  Defaults to $(device)$(staprefix=:STA):TRANSFERERRORS2).   Record for status word to link to extract in progress status for the abort command from.
+#% macro, ingabort_status2,         Optional.  Defaults to $(device)$(staprefix=:STA):TRANSFERSTATUS).    Record for status word to link to extract aborted status for the abort command from.  This is required because of the behaviour during HiTES1 commissioning of the PreVac Modbus PLC failing to update some of its status including the aborting in progress bit which once set persists until the next command.
+#
+# NOTE: There are no ingclear macros because have not figured out a way of calculating this from the status information available.
+#
+#% macro, name,                   Optional.  Defaults to empty.         Object name and associated gui name
+#
+# This associates an EDM screen with the template
+# % gui, $(name=), edm, NX102_PreVacSMControl.edl, device=$(device), paramprefix=$(paramprefix=:PARAM), ctrlprefix=$(ctrlprefix=:CTRL), staprefix=$(staprefix=:STA), posportprefix=$(posportprefix=:POSPORT), $(posportID1_compass=E)_posportID=1, $(posportID2_compass=NE)_posportID=2, $(posportID3_compass=N)_posportID=3, $(posportID4_compass=NW)_posportID=4, $(posportID5_compass=W)_posportID=5, $(posportID6_compass=SW)_posportID=6, $(posportID7_compass=S)_posportID=7, $(posportID8_compass=SE)_posportID=8
+#
+# NOTE: For initial implementation for commissioning BL07B SM55B requirement stated as no sanity checking of the
+#       parameters or commands, relying on the PLC until have further experience with use.  This means moves can
+#       be prepared which are not allowed and will fail because for example there is no sample in the Source chamber.
+#
+# -------------------------------------------------------------------------------------------------------------
+# *******************************************
+# * Start of Records for Setting Parameters *
+# *******************************************
+#
+# Parameter write allowed.
+#
+# Record to allow or inhibit the write of the parameter take place.
+# We dont want to attempt to write a new value while prep or transfer
+# is in progress and want user to know they cannot do that.
+#
+# NOTE: Devices like valves have the ability to lock their use with a whylocked feature.
+#       This record does not cover that functionality and it might be required as a future addition. 
+#
+record(bi, "$(device)$(paramprefix=:PARAM):WRITEALLOWED") {
+  field(DESC, "Allow/inhibit write parameters")
+  field(VAL, "1")
+  field(ONAM, "Allowed")
+  field(ZNAM, "Inhibited")
+}
+
+#
+# Record of bitmask for portIDs allowed as target.
+#
+# There can be 8 posports, but are developing and testing on a system
+# with only 4 posports present.  (i.e. the distribution chamber only
+# has vacuum connections to 4 other chambers).  This mask is such that
+# bit number for the port should be set to 1 if the port is present and
+# therefore allowed as a target.
+#
+# Also this will help if ever there is a temporary problem with one of the chambers and it
+# needs to be disallowed its bit can be flipped.  The Arm portID 0 is not allowed as a target.
+#
+record(ai, "$(device)$(paramprefix=:PARAM):TARGET_PORTIDS_ALLOWEDMASK") {
+  field(DESC, "Bitmask for portIDs allowed as target.")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(VAL, "$(posportIDs_allowedmask=0)")
+  field(FLNK, "$(device)$(paramprefix=:PARAM):SOURCE_PORTIDS_ALLOWEDMASK:CALC")
+}
+
+#
+# The source mask is calculated from the target mask, adding the Arm as
+# a permitted source (i.e. set bit 0).
+# We are doing bit arithmetic set set a mask bit, but it is safer to use normal arithmetic.
+#
+record(calc, "$(device)$(paramprefix=:PARAM):SOURCE_PORTIDS_ALLOWEDMASK:CALC") {
+  field(DESC, "Calc source portIDs allowed bitmask")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(paramprefix=:PARAM):TARGET_PORTIDS_ALLOWEDMASK")
+  field(CALC, "A+1")
+  field(FLNK, "$(device)$(paramprefix=:PARAM):SOURCE_PORTIDS_ALLOWEDMASK")
+}
+
+#
+# Record of bitmask for portIDs allowed as source.
+#
+# This is the result of the calculation to add the Arm as a valid source.
+#
+record(ai, "$(device)$(paramprefix=:PARAM):SOURCE_PORTIDS_ALLOWEDMASK") {
+  field(DESC, "Bitmask for portIDs allowed as source.")
+  field(SCAN, "Passive")
+  field(PINI, "NO")
+  field(INP, "$(device)$(paramprefix=:PARAM):SOURCE_PORTIDS_ALLOWEDMASK:CALC")
+}
+
+# Values for user to enter their desired selection of source
+# and target portID.
+# The transfer arm is a valid source, but is not allowed as target.
+#
+record(mbbo, "$(device)$(paramprefix=:PARAM):SOURCE_PORTID:DMD") {
+  field(DESC, "EPICS users desired Source posportID")
+  field(ZRST, "$(posportID0_shortdesc=Arm)" )
+  field(ZRSV, "$(posportID0_sourceSV=MINOR)")
+  field(ONST, "$(posportID1_shortdesc=)")
+  field(ONSV, "$(posportID1_SV=NO_ALARM)")
+  field(TWST, "$(posportID2_shortdesc=)")
+  field(TWSV, "$(posportID2_SV=NO_ALARM)")
+  field(THST, "$(posportID3_shortdesc=)")
+  field(THSV, "$(posportID3_SV=NO_ALARM)")
+  field(FRST, "$(posportID4_shortdesc=)")
+  field(FRSV, "$(posportID4_SV=NO_ALARM)")
+  field(FVST, "$(posportID5_shortdesc=)")
+  field(FVSV, "$(posportID5_SV=NO_ALARM)")
+  field(SXST, "$(posportID6_shortdesc=)")
+  field(SXSV, "$(posportID6_SV=NO_ALARM)")
+  field(SVST, "$(posportID7_shortdesc=)")
+  field(SVSV, "$(posportID7_SV=NO_ALARM)")
+  field(EIST, "$(posportID8_shortdesc=)")
+  field(EISV, "$(posportID8_SV=NO_ALARM)")
+  field(VAL, "$(sourceparam_init=0)")
+  field(FLNK, "$(device)$(paramprefix=:PARAM):SOURCE_PORTID:CHECK")
+}
+
+record(mbbo, "$(device)$(paramprefix=:PARAM):TARGET_PORTID:DMD") {
+  field(ZRSV, "$(posportID0_targetSV=MAJOR)")
+  field(ONST, "$(posportID1_shortdesc=)")
+  field(ONSV, "$(posportID1_SV=NO_ALARM)")
+  field(TWST, "$(posportID2_shortdesc=)")
+  field(TWSV, "$(posportID2_SV=NO_ALARM)")
+  field(THST, "$(posportID3_shortdesc=)")
+  field(THSV, "$(posportID3_SV=NO_ALARM)")
+  field(FRST, "$(posportID4_shortdesc=)")
+  field(FRSV, "$(posportID4_SV=NO_ALARM)")
+  field(FVST, "$(posportID5_shortdesc=)")
+  field(FVSV, "$(posportID5_SV=NO_ALARM)")
+  field(SXST, "$(posportID6_shortdesc=)")
+  field(SXSV, "$(posportID6_SV=NO_ALARM)")
+  field(SVST, "$(posportID7_shortdesc=)")
+  field(SVSV, "$(posportID7_SV=NO_ALARM)")
+  field(EIST, "$(posportID8_shortdesc=)")
+  field(EISV, "$(posportID8_SV=NO_ALARM)")
+  field(VAL, "$(targetparam_init=1)")
+  field(FLNK, "$(device)$(paramprefix=:PARAM):TARGET_PORTID:CHECK PP")
+}
+
+# Record to check the source posportID requested is allowed as a source and
+# convert the source posportID to the index.
+#
+record(transform, "$(device)$(paramprefix=:PARAM):SOURCE_PORTID:CHECK") {
+  field(DESC, "If allowed source index=portID-1")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(paramprefix=:PARAM):SOURCE_PORTID:DMD NPP")
+  field(INPB, "$(device)$(paramprefix=:PARAM):SOURCE_PORTIDS_ALLOWEDMASK NPP")
+  field(CMTC, "Extract portID bit from bitmask.")
+  field(CLCC, "2**A&B?1:0")
+  field(OUTC, "$(device)$(paramprefix=:PARAM):SOURCE_PORTID_ALLOWED PP" )
+  field(CMTD, "Convert posportID to index")
+  field(CLCD, "A-1")
+  field(OUTD, "$(device)$(paramprefix=:PARAM):SOURCE_INDX:DMD PP")
+}
+
+# Record to check the target posportID requested is allowed as a target and
+# convert the target posportID to the index.
+#
+record(transform, "$(device)$(paramprefix=:PARAM):TARGET_PORTID:CHECK") {
+  field(DESC, "If allowed source index=portID-1")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(paramprefix=:PARAM):TARGET_PORTID:DMD NPP")
+  field(INPB, "$(device)$(paramprefix=:PARAM):TARGET_PORTIDS_ALLOWEDMASK NPP")
+  field(CMTC, "Extract portID bit from bitmask")
+  field(CLCC, "2**A&B?1:0")
+  field(OUTC, "$(device)$(paramprefix=:PARAM):TARGET_PORTID_ALLOWED PP" )
+  field(CMTD, "Convert posportID to index")
+  field(CLCD, "A-1")
+  field(OUTD, "$(device)$(paramprefix=:PARAM):TARGET_INDX:DMD PP")
+}
+
+# Record for whether the current value of the requested source port ID is allowed.
+record(bo, "$(device)$(paramprefix=:PARAM):SOURCE_PORTID_ALLOWED") {
+  field(DESC, "Source posportID allowed.")
+  field(SCAN, "Passive")
+  field(ZNAM, "Not Allowed")
+  field(ZSV,  "MAJOR")
+  field(ONAM, "Allowed")
+  field(OSV,  "NO_ALARM")
+}
+
+# Record for whether the current value of the requested target port ID is allowed.
+record(bo, "$(device)$(paramprefix=:PARAM):TARGET_PORTID_ALLOWED") {
+  field(DESC, "Target posportID allowed.")
+  field(SCAN, "Passive")
+  field(ZSV,  "MAJOR")
+  field(ZNAM, "Not Allowed")
+  field(ONAM, "Allowed")
+  field(OSV,  "NO_ALARM")
+}
+
+#
+# The source and target index.  Note this will be -1 for the Arm.
+# They do not get written directly, their value is passed
+# to a calculation record which checks if the parameter write
+# is inhibited.
+#
+record(ao, "$(device)$(paramprefix=:PARAM):SOURCE_INDX:DMD") {
+  field(DESC, "Desired value of Source parameter")
+  field(SCAN, "Passive")
+  field(PREC, "$(paramprec=0)")
+  field(OUT, "$(device)$(paramprefix=:PARAM):SOURCE:CALCWRITE.A PP")
+}
+
+record(ao, "$(device)$(paramprefix=:PARAM):TARGET_INDX:DMD") {
+  field(DESC, "Desired value of Target parameter")
+  field(SCAN, "Passive")
+  field(PREC, "$(paramprec=0)")
+  field(OUT, "$(device)$(paramprefix=:PARAM):TARGET:CALCWRITE.A PP")
+}
+
+# Only pass request through to PLC if it is currently allowed.
+record(calcout, "$(device)$(paramprefix=:PARAM):SOURCE:CALCWRITE") {
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(paramprefix=:PARAM):SOURCE_INDX:DMD NPP")
+  field(INPB, "$(device)$(paramprefix=:PARAM):WRITEALLOWED")
+  field(CALC, "(B=0)?0:1")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(OUT, "$(device)$(paramprefix=:PARAM):SOURCE:ACTUALWRITE PP")
+}
+
+record(calcout, "$(device)$(paramprefix=:PARAM):TARGET:CALCWRITE") {
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(paramprefix=:PARAM):TARGET_INDX:DMD NPP")
+  field(INPB, "$(device)$(paramprefix=:PARAM):WRITEALLOWED")
+  field(CALC, "(B=0)?0:1")
+  field(OOPT, "When Non-zero")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "A")
+  field(OUT, "$(device)$(paramprefix=:PARAM):TARGET:ACTUALWRITE PP")
+}
+
+# Send the requests down to the PLC
+#
+# REMINDER: OMSL field "supervisory" on output record is the default and means
+#           values can be written into it.
+#
+# The ether_ip driver sets the value the same as the readback if it fails to write.
+# The FORCE keyword forces the system not to do that, but it also keeps trying to write.
+# Originally the FORCE tag was on there, but there were problems with it locking out
+# setting things from the PLC or the HMI, so it was removed.  It forward links to a
+# trigger pulse record to tell the NX PLC a fresh value is present.
+#
+# The S flag has to be set to register the record with one of the scan polls.
+# The source parameter can have values -1 to 7 representing Arm and posports 1-8 respectively.
+#
+record(ao, "$(device)$(paramprefix=:PARAM):SOURCE:ACTUALWRITE") {
+  field(DESC, "Write value of Source index parameter")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(OUT, "@$(port) $(tag_sourceparam) S $(paramout_scanrate=.5)")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(device)$(paramprefix=:PARAM):SOURCE:TRIGGER:PULSE")
+}
+
+# The target parameter can have values 0-7 representing posports 1-8 respectively.
+# (Unconfirmed -1 is NOT allowed as a target as you should not aim to leave the sample on the Arm).
+record(ao, "$(device)$(paramprefix=:PARAM):TARGET:ACTUALWRITE") {
+  field(DESC, "Write value of Target index parameter")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(OUT, "@$(port) $(tag_targetparam) S $(paramout_scanrate=.5)")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(device)$(paramprefix=:PARAM):TARGET:TRIGGER:PULSE")
+}
+
+# Short description of the parameters
+record(stringout, "$(device)$(paramprefix=:PARAM):SOURCE:SHORTDESC") {
+  field(DESC, "Short description of Source parameter")
+  field(PINI, "YES")
+  field(VAL, "$(sourceparam_shortdesc=Source)")
+}
+
+record(stringout, "$(device)$(paramprefix=:PARAM):TARGET:SHORTDESC") {
+  field(DESC, "Short description of Target parameter")
+  field(PINI, "YES")
+  field(VAL, "$(targetparam_shortdesc=Target)")
+}
+
+# Long description of parameters.
+# Provided for GUI help.
+#
+record(stringout, "$(device)$(paramprefix=:PARAM):SOURCE:LONGDESC") {
+  field(DESC, "Long description of Source parameter")
+  field(PINI, "YES")
+  field(VAL, "$(sourceparam_longdesc=$(sourceparam_shortdesc=Source) chamber to move from.)")
+}
+
+record(stringout, "$(device)$(paramprefix=:PARAM):TARGET:LONGDESC") {
+  field(DESC, "Long description of Target parameter")
+  field(PINI, "YES")
+  field(VAL, "$(targetparam_longdesc= $(targetparam_shortdesc=Target) chamber to move to.)")
+}
+
+# *****************************************
+# * End of Records for Setting Parameters *
+# *****************************************
+# -------------------------------------------------------------------------------------------------------------
+# **************************************************
+# * Start of Records for Coil Numbers for Commands *
+# **************************************************
+#
+# So far PLC has not implemented an interface for commands to the manipulator other than directly writing to
+# particular Coil Numbers.  The Coil Numbers are hardcoded into these PINIed records for now.  This is the first
+# use of Coil Numbers by EPICS.
+#
+# The records appear in order of Coil Number.
+#
+# Coil Number for command "Prepare Transfer".  (It appears as Prepare for Transfer or PfT in some status and documentation info).
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):COILNO:PREPARE_TRANSFER") {
+  field(DESC, "Coil No for Prepare Transfer command")
+  field(PINI, "YES")
+  field(VAL, "80")
+}
+
+#
+# Coil Number for command "Transfer".
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):COILNO:DO_TRANSFER") {
+  field(DESC, "Coil No for Transfer command")
+  field(PINI, "YES")
+  field(VAL, "81")
+}
+
+#
+# Coil Number for command "Abort Transfer".
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):COILNO:ABORT_TRANSFER") {
+  field(DESC, "Coil No for Abort Transfer command")
+  field(PINI, "YES")
+  field(VAL, "82")
+}
+
+#
+# Coil Number for command "Clear Error".
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):COILNO:CLEAR_ERROR") {
+  field(DESC, "Coil No for Clear Error command")
+  field(PINI, "YES")
+  field(VAL, "83")
+}
+
+#
+# Coil Number for commands for Arm "Motor Current" (On/Off).
+#
+# The current for the motor which rotates the arm and also causes it to expand to grab a sample and contract to rotate inside the distribution chamber (UFO).
+# NOTE:  The arm only ever rotates in one direction.
+#
+# Since Arm is also used as a verb in the context of vacuum systems, it has been omitted from record names
+# so as not to cause confusion over what it means.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):COILNO:MOTOR_CURRENT") {
+  field(DESC, "Coil No for Motor Current On/Off")
+  field(PINI, "YES")
+  field(VAL, "84")
+}
+
+#
+# Coil Number for commands for "Compressed Air" (On/Off).
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):COILNO:COMPRESSED_AIR") {
+  field(DESC, "Coil No for Compressed Air On/Off")
+  field(PINI, "YES")
+  field(VAL, "85")
+}
+
+#
+# Coil Number for commands for "Holder On Arm" Status Control.
+#
+# If the system thinks the sample holder is stuck on the Arm there is
+# a manual procedure in the instructions for inspecting it to confirm
+# yea or nay and it can involve changing this as part of recovery.
+#
+# In the name of this PV, "ON" is a preposition and does not imply On
+# status value it can be On or Off and neither is "ARM" anything to do
+# with arming anything for use, it refers to the sample manipulator
+# rotation arm.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):COILNO:HOLDER_ONARM") {
+  field(DESC, "Coil No for Holder OnArm Status")
+  field(PINI, "YES")
+  field(VAL, "89")
+}
+
+# ************************************************
+# * End of Records for Coil Numbers for Commands *
+# ************************************************
+# -------------------------------------------------------------------------------------------------------------
+# *********************************
+# * Start of Records For Commands *
+# *********************************
+#
+# Since the DLS NX PLC has not implemented an interface for commands to the
+# manipulator there are tags which allow writing of a TRUE or FALSE to
+# particular Coil numbers which have the effect of triggering a
+# command.  The command records have links to write a coil number to one of
+# the coil records below, which perform the write to the NX PLC.
+#
+# There are broadly two categories of command allowed:
+# (1) To turn things on and off, e.g. Motor Current.
+# (2) Actions as part of transfer control, e.g. Prepare.
+#
+# There is no systematic distinction between these.  However a
+# judgement has been made that setting some individual combinations
+# does not make sense, so is not supported.
+#
+# Not sure whether TRUE and FALSE are 1 and 0 but believe so
+# and dont actually need to know.  The tags are such that different
+# tags and therefore different records have to be used for TRUE and
+# FALSE.  The value of the records is one of the coil numbers.
+#
+# Initial spec is that no sanity checking is done on parameters before
+# writing a command and not to implement BUSY record until after
+# control has been tested from EPICS.
+#
+# REMINDER: OMSL field "closed_loop" on output record means it will take
+#           its value from its DOL field.
+#
+# Unset the Prepare Transfer Request.
+# Cant think why you would want to do this, so it is commented out for now.
+#
+#record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:PREPARE_TRANSFER") {
+#  field(DESC, "Unset Prepare Transfer")
+#  field(SCAN, "Passive")
+#  field(OMSL, "closed_loop")
+#  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:PREPARE_TRANSFER")
+#  field(OUT, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL PP")
+#}
+#
+#
+# Prepare Transfer Command.
+# This is the first command in the recommended list to do a move.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:PREPARE_TRANSFER") {
+  field(DESC, "Prepare Transfer Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:PREPARE_TRANSFER")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):SET:COIL PP")
+}
+
+#
+# Unset the Do Transfer Request.
+# Cant think why you would want to do this, so it is commented out for now.
+#
+#record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:DO_TRANSFER") {
+#  field(DESC, "Unset Do Transfer Command")
+#  field(SCAN, "Passive")
+#  field(OMSL, "closed_loop")
+#  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:DO_TRANSFER")
+#  field(OUT, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL PP")
+#}
+#
+#
+# Transfer Command.
+# This is the second command in the recommended list to achieve a transfer.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:DO_TRANSFER") {
+  field(DESC, "Do Transfer Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:DO_TRANSFER")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):SET:COIL PP")
+}
+
+#
+# Unset the Abort Transfer.
+# Cant think why you would want to do this, so it is commented out for now.
+#
+#record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:ABORT_TRANSFER") {
+#  field(DESC, "Unset Do Transfer Command")
+#  field(SCAN, "Passive")
+#  field(OMSL, "closed_loop")
+#  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:ABORT_TRANSFER")
+#  field(OUT, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL PP")
+#}
+#
+#
+# Abort Transfer Command.
+#
+# This command is for if the user wants to stop the transfer or
+# if the transfer has gone wrong.  It will cause the manipulator
+# to try to put the sample back where it came from (but that might
+# fail).
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:ABORT_TRANSFER") {
+  field(DESC, "Abort Transfer Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:ABORT_TRANSFER")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):SET:COIL PP")
+}
+
+#
+# Unset the Clear Error.
+# Cant think why you would want to do this, so it is commented out for now.
+#
+#record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:CLEAR_ERROR") {
+#  field(DESC, "Unset Clear Error Command")
+#  field(SCAN, "Passive")
+#  field(OMSL, "closed_loop")
+#  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:CLEAR_ERROR")
+#  field(OUT, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL PP")
+#}
+#
+#
+# Clear Error Command.
+#
+# This command is part of the instructions for recovering after a problem.
+# The manipulator does not do anything as a result of this, but it changes
+# the status registers.
+#
+# WARNING: During HiTES1 commissioning it was discovered that the
+#          error status readback is not updated in response to this
+#          command so it appears not to have worked.  However, it is
+#          updated on the next Prepare command, so it only becomes
+#          apparent at that stage that the Clear command took effect.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:CLEAR_ERROR") {
+  field(DESC, "Abort Transfer Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:CLEAR_ERROR")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):SET:COIL PP")
+}
+
+#
+# Turn Motor Current Off command.
+#
+# User might want to do this after all transfers have finished.
+# It might become part of recovery from errors.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:MOTOR_CURRENT") {
+  field(DESC, "Turn Motor Current Off Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:MOTOR_CURRENT")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL PP")
+}
+
+#
+# Turn Motor Current On command.
+#
+# The motor current must be on before a transfer can be done.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:MOTOR_CURRENT") {
+  field(DESC, "Turn Motor Current On Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:MOTOR_CURRENT")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):SET:COIL PP")
+}
+
+#
+# Turn Compressed Air Off command.
+#
+# There is no particular reason to turn it off except maybe for
+# tidiness when the system is not in use so it is supported.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:COMPRESSED_AIR") {
+  field(DESC, "Turn Compressed Air Off Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:COMPRESSED_AIR")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL PP")
+}
+
+#
+# Turn Compressed Air On command.
+#
+# The Compressed Air must be on before a transfer can be done, so the
+# valves on the vacuum connections Rotary Distribution Chamber (UFO)
+# can be opened and closed to allow the sample manipulator transfer
+# arm to pass through.  The valves are referred to as "Gates" in
+# PreVac documentation.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:COMPRESSED_AIR") {
+  field(DESC, "Turn Compressed Air On Command")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:COMPRESSED_AIR")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):SET:COIL PP")
+}
+
+#
+# Record enables/disables control of the Holder_On_Arm flag.
+#
+# The Holder_On_Arm flag control is only for expert use and should not be done
+# accidentally or by over zealous user after a transfer error.
+# Therefore it needs to be protected.
+#
+# (1) Controls the visibility of the Holder On Arm control buttons on the screen
+# (2) Disables processing of the Holder On Arm set and unset records via their SDIS fields.
+#
+# It initialises to Disabled. There is no mechanism to enable it other
+# than a caput to this record, i.e. it cannot be enabled from the
+# screen.
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):HOLDER_ONARM:ENABLE") {
+  field(DESC, "Holder On Arm control enable")
+  field(SCAN, "Passive")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+  field(PINI, "YES")
+  field(VAL, "0")
+}
+
+#
+# Set Holder On Arm Status FALSE command.
+#
+# There are instructions to do this as part of a manual recovery
+# procedure if transfer has failed in a certain way after inspecting
+# inside to make sure the sample did not get stuck on the arm in the
+# rotary distribution chamber.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:HOLDER_ONARM") {
+  field(DESC, "Set Holder On Arm Status FALSE Command")
+  field(DISV, "0")
+  field(SDIS, "$(device)$(ctrlprefix=:CTRL):HOLDER_ONARM:ENABLE")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:HOLDER_ONARM")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL PP")
+}
+
+#
+# Set Holder On Arm Status TRUE command.
+#
+# There are no instructions for doing this, but it might get the system
+# out of a hole during some sort of error recovery.
+#
+# (If there genuinely is a sample on the Arm, this can be recovered by
+# selecting the Arm as the source of the transfer and prepping and
+# doing the move (but the Arm is never allowed as the target, but the
+# (untested) the system probably requires the status to be TRUE before
+# it will accept a request to use the Arm as the source.))
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:HOLDER_ONARM") {
+  field(DESC, "Set Holder On Arm Status TRUE Command")
+  field(DISV, "0")
+  field(SDIS, "$(device)$(ctrlprefix=:CTRL):HOLDER_ONARM:ENABLE")
+  field(SCAN, "Passive")
+  field(OMSL, "closed_loop")
+  field(DOL, "$(device)$(ctrlprefix=:CTRL):COILNO:HOLDER_ONARM")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):SET:COIL PP")
+}
+
+# *******************************
+# * End of Records For Commands *
+# *******************************
+# -------------------------------------------------------------------------------------------------------------
+# **************************************
+# * Start of Records to Write to Coils *
+# **************************************
+#
+# Records to write to the NX PLC to set the value of a PreVac Modbus
+# PLC Coil of given Number to TRUE or FALSE.
+#
+# Not sure whether TRUE and FALSE are 1 and 0 but believe so
+# and dont actually need to know.  The tags are such that different
+# tags and therefore different records have to be used for TRUE and
+# FALSE.  The value of the records is one of the Coil numbers.
+#
+# Command records above have links to set the VAL field of the
+# COIL record to the Coil number associated with the command and cause
+# the COIL record to process, which will cause the command as
+# described to be run.
+#
+# To be confirmed:
+# The EtherIP FORCE keyword does NOT (TBC) appear in the OUT field of these records.
+#
+# According to the development notes, the NX PLC reads the Coil number
+# that has been written to the register addressed by its tag, writes
+# to the Coil number on the Modbus PLC and then crucially changes the
+# value of the register addressed by the tag to 999.  The idea of this
+# is probably to prevent stale commands being run again and also as a
+# sort of Done/Ready state.
+#
+# Therefore the value of the register is expected to change soon after
+# it has been written.  The behaviour of the FORCE keyword is to cause
+# the EtherIP driver to repeat the write if the readback does not
+# match the value, so that risks getting into infinite loop.  The
+# absence of the FORCE keyword means it will read the new value back
+# into the record.
+#
+# Set Coil Record
+#
+# Writes to the NX PLC to set the value of a Coil of given Number to
+# TRUE in the PreVac Modbus PLC.  It forward links to a trigger pulse record
+# to tell the NX PLC a fresh value is present.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):SET:COIL") {
+  field(DESC, "Sets value of Coil No in .VAL to TRUE")
+  field(DTYP, "EtherIP")
+  field(OUT, "@$(port) $(tag_setcoil) S $(coilout_scanrate=.2)")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(device)$(ctrlprefix=:CTRL):SET:COIL:TRIGGER:PULSE")
+}
+
+# Unset Coil Record
+#
+# Writes to the NX PLC to set the value of a Coil of given Number to
+# FALSE in the PreVac Modbus PLC.  It forward links to a trigger pulse record
+# to tell the NX PLC a fresh value is present.
+#
+record(ao, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL") {
+  field(DESC, "Sets value of Coil No in .VAL to FALSE")
+  field(DTYP, "EtherIP")
+  field(OUT, "@$(port) $(tag_unsetcoil) S $(coilout_scanrate=.2)")
+  field(PRIO, "HIGH")
+  field(FLNK, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL:TRIGGER:PULSE")
+}
+
+# ************************************
+# * End of Records to Write to Coils *
+# ************************************
+# -------------------------------------------------------------------------------------------------------------
+# ***********************************************
+# * Start of Records to Write to Trigger Action *
+# ***********************************************
+#
+# Once an EtherIP write record has written to the tag to set the source or
+# target or set or unset a given coil number, further writes have to be
+# done to "trigger" the command to be acted upon by the NX102 PLC.
+#
+# This allows EPICS to repeat a command by writing the same value
+# again without the PLC treating it as stale request because it has
+# the same value, which was something which could not be made to work
+# without the trigger.
+#
+# There are a number of reasons why the same write might need to be repeated, e.g.
+# 1) Its intended function did not work and it needs to be retried, e.g. lost contact with modbus PLC
+# 2) User sets the source and target and issues "Prepare".
+#    Then user changes their mind about the source or target so changes it,
+#    then needs to issue "Prepare" again, which sets the same coil number twice in a row so the new value is the same as the old.
+# 3) A user sets air on from EPICS.  Then a user sets the air off on the modbus HMI to fix something on the end station.
+#    Then a user sets the air on from EPICS.  EPICS has written the same value twice in a row,
+#    the events could the same or different users and be days apart.
+#
+# Writes to "pulse" the trigger tells the NX102 PLC there is a fresh
+# value in the assocated location and to act on it, whether it has
+# changed or not.  It will not take any action unless it receives a
+# trigger.  Pulsing consists of turning the trigger on for a short
+# time and turning it off again.  Not sure if the PLC acts on the leading
+# or falling edge.  Assumed that 1 is "On" and 0 is "Off", but using
+# macros just in case with defaults as stated.
+#
+# It is up to the NX PLC what it does - usually it passes the data to
+# the Modbus PLC as intended but there might be some reason why it
+# will not allow this and of course that part could simply fail.
+#
+# Records to hold values for trigger states.
+#
+# Start off with them all sharing the same values.  They have been
+# stated to be binary.
+#
+# Record to hold the Trigger On value.
+#
+record(bo, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE") {
+  field(DESC, "Value to pulse a trigger on")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+  field(ONAM, "$(trigger_ONAM=Trigger On)")
+  field(VAL, "$(trigger_onval=1)")
+}
+
+#
+# Record to hold the Trigger Off value.
+#
+record(bo, "$(device)$(ctrlprefix=:CTRL):TRIGGER:OFF_VALUE") {
+  field(DESC, "Value to pulse a trigger off")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+  field(ONAM, "$(trigger_ONAM=Trigger On)")
+  field(VAL, "$(trigger_offval=0)")
+}
+
+#
+# Records to write to triggers.
+#
+# Write value to trigger update source parameter.
+#
+record(bo, "$(device)$(paramprefix=:PARAM):SOURCE:TRIGGER") {
+  field(DESC, "Trigger to set Source Chamber parameter")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+  field(ONAM, "$(trigger_ONAM=Trigger On)")
+  field(OMSL, "supervisory")
+  field(OUT, "@$(port) $(tag_Tsourceparam=T$(tag_sourceparam)) S $(trigger_scanrate=.2)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Write value to trigger update target parameter.
+#
+record(bo, "$(device)$(paramprefix=:PARAM):TARGET:TRIGGER") {
+  field(DESC, "Trigger to set Target Chamber parameter")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+  field(ONAM, "$(trigger_ONAM=Trigger On)")
+  field(OMSL, "supervisory")
+  field(OUT, "@$(port) $(tag_Ttargetparam=T$(tag_targetparam)) S $(trigger_scanrate=.2)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Write value to trigger set coil number commands.
+#
+record(bo, "$(device)$(ctrlprefix=:CTRL):SET:COIL:TRIGGER") {
+  field(DESC, "Trigger to set Coil to TRUE")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+  field(ONAM, "$(trigger_ONAM=Trigger On)")
+  field(OMSL, "supervisory")
+  field(OUT, "@$(port) $(tag_Tsetcoil=T$(tag_setcoil)) S $(trigger_scanrate=.2)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Write value to trigger unset coil number commands.
+#
+record(bo, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL:TRIGGER") {
+  field(DESC, "Trigger to set Coil to FALSE")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+  field(ONAM, "$(trigger_ONAM=Trigger On)")
+  field(OMSL, "supervisory")
+  field(OUT, "@$(port) $(tag_Tunsetcoil=T$(tag_unsetcoil)) S $(trigger_scanrate=.2)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Records to pulse triggers.
+#
+# Pulsing consists of turning it on and then turning it off after a delay which is
+# introduced with a sequence record.
+#
+# WARNING: The seq record fields DOL<n>, LNK<n> in EPICS R3.14.12.7 are numbered
+#          n=1-A, but by EPICS R3.15.8 the numbering has been changed to n=0-F
+#
+# Record to pulse the Source Trigger.
+#
+record(seq, "$(device)$(paramprefix=:PARAM):SOURCE:TRIGGER:PULSE") {
+  field(DESC, "Source Trigger pulse sequence")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(LNK1, "$(device)$(paramprefix=:PARAM):SOURCE:TRIGGER PP")
+  field(DLY2, "$(trigger_pulseDLY=1.0)")
+  field(DOL2, "$(device)$(ctrlprefix=:CTRL):TRIGGER:OFF_VALUE")
+  field(LNK2, "$(device)$(paramprefix=:PARAM):SOURCE:TRIGGER PP")
+}
+
+#
+# Record to pulse the Target Trigger.
+#
+record(seq, "$(device)$(paramprefix=:PARAM):TARGET:TRIGGER:PULSE") {
+  field(DESC, "Target Trigger pulse sequence")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(LNK1, "$(device)$(paramprefix=:PARAM):TARGET:TRIGGER PP")
+  field(DLY2, "$(trigger_pulseDLY=1.0)")
+  field(DOL2, "$(device)$(ctrlprefix=:CTRL):TRIGGER:OFF_VALUE")
+  field(LNK2, "$(device)$(paramprefix=:PARAM):TARGET:TRIGGER PP")
+}
+
+#
+# Record to pulse the set coil number true Trigger.
+#
+record(seq, "$(device)$(ctrlprefix=:CTRL):SET:COIL:TRIGGER:PULSE") {
+  field(DESC, "Set Coil True Trigger pulse sequence")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(LNK1, "$(device)$(ctrlprefix=:CTRL):SET:COIL:TRIGGER PP")
+  field(DLY2, "$(trigger_pulseDLY=1.0)")
+  field(DOL2, "$(device)$(ctrlprefix=:CTRL):TRIGGER:OFF_VALUE")
+  field(LNK2, "$(device)$(ctrlprefix=:CTRL):SET:COIL:TRIGGER PP")
+}
+
+#
+# Record to pulse the unset coil number (set it false) Trigger.
+#
+record(seq, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL:TRIGGER:PULSE") {
+  field(DESC, "Set Coil False Trigger pulse sequence")
+  field(SCAN, "Passive")
+  field(SELM, "All")
+  field(DOL1, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(LNK1, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL:TRIGGER PP")
+  field(DLY2, "$(trigger_pulseDLY=1.0)")
+  field(DOL2, "$(device)$(ctrlprefix=:CTRL):TRIGGER:OFF_VALUE")
+  field(LNK2, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL:TRIGGER PP")
+}
+
+# *********************************************
+# * End of Records to Write to Trigger Action *
+# *********************************************
+# -------------------------------------------------------------------------------------------------------------
+# ************************************************
+# * Start of Records for Command Acknowledgement *
+# ************************************************
+#
+# There is a lot of status information provided from the PreVac system
+# but it is difficult to know when a command has been completed or
+# successful and since everything goes via the same set or
+# unset coil mechanism, there is no return code for an individual
+# command.
+#
+# Have identified, however that there are some bits labelled as "Request"
+# which at least acknowledge a command has been made.   They come on briefly,
+# so they only need to be extracted, nothing stateful is needed in EPICS.
+# They will also come on when a request is made from the PreVac HMI or from
+# the DLS NX102 without the involvement of EPICS.
+#
+# Records to hold acknowledgements.
+#
+# Prepare Command Request Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:PREPARE_TRANSFER") {
+  field(DESC, "Prepare command acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackprepare_ZNAM=No Request)")
+  field(ONAM, "$(ackprepare_ONAM=Request)")
+}
+
+#
+# Transfer Command Request Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:DO_TRANSFER") {
+  field(DESC, "Transfer command acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(acktransfer_ZNAM=No Request)")
+  field(ONAM, "$(acktransfer_ONAM=Request)")
+}
+
+#
+# Abort Command Request Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:ABORT_TRANSFER") {
+  field(DESC, "Abort command acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackabort_ZNAM=No Request)")
+  field(ONAM, "$(ackabort_ONAM=Request)")
+}
+
+#
+# Clear Error Command Request Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:CLEAR_ERROR") {
+  field(DESC, "Clear Error command acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackclear_ZNAM=No Request)")
+  field(ONAM, "$(ackclear_ONAM=Request)")
+}
+
+#
+# Motor Current On Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:MOTOR_CURRENT_ON") {
+  field(DESC, "Motor current on acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackmotorcurrenton_ZNAM=No Trigger)")
+  field(ONAM, "$(ackmotorcurrenton_ONAM=Trigger)")
+}
+
+#
+# Motor Current Off Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:MOTOR_CURRENT_OFF") {
+  field(DESC, "Motor current off acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackmotorcurrentoff_ZNAM=No Trigger)")
+  field(ONAM, "$(ackmotorcurrentoff_ONAM=Trigger)")
+}
+
+#
+# Compressed Air On Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:COMPRESSED_AIR_ON") {
+  field(DESC, "Compressed Air on acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackcompressedairon_ZNAM=No Trigger)")
+  field(ONAM, "$(ackcompressedairon_ONAM=Trigger)")
+}
+
+#
+# Compressed Air Off Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:COMPRESSED_AIR_OFF") {
+  field(DESC, "Compressed Air off acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackcompressedairoff_ZNAM=No Trigger)")
+  field(ONAM, "$(ackcompressedairoff_ONAM=Trigger)")
+}
+
+#
+# REMINDER: Holder on Arm On and Off allow you to set the
+#           status of the flag of whether the sample holder
+#           is in the RDC.  Its purpose is for recovery when
+#           things have gone horribly wrong and the PreVac
+#           system has become confused about whether it is there
+#           or not and should only be done as part of intervention
+#           by experts having visually inspected the chamber.
+#           Therefore it is supported from EPICS, but the
+#           buttons on the GUI have been made invisible.
+#
+# Holder On Arm On Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:HOLDER_ONARM_ON") {
+  field(DESC, "Holder on Arm on acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackholderonarmon_ZNAM=No Trigger)")
+  field(ONAM, "$(ackholderonarmon_ONAM=Trigger)")
+}
+
+#
+# Holder On Arm Off Acknowledgement Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ACK:HOLDER_ONARM_OFF") {
+  field(DESC, "Holder on Arm off acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ackholderonarmoff_ZNAM=No Trigger)")
+  field(ONAM, "$(ackholderonarmoff_ONAM=Trigger)")
+}
+
+#
+# Source Acknowledgement Record
+#
+record(bi, "$(device)$(paramprefix=:PARAM):ACK:SOURCE") {
+  field(DESC, "Source param acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(acksource_ZNAM=No Trigger)")
+  field(ONAM, "$(acksource_ONAM=Trigger)")
+}
+
+#
+# Target Acknowledgement Record
+#
+record(bi, "$(device)$(paramprefix=:PARAM):ACK:TARGET") {
+  field(DESC, "Target param acknowledgement")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(acktarget_ZNAM=No Trigger)")
+  field(ONAM, "$(acktarget_ONAM=Trigger)")
+}
+
+#
+# Records to calculate the acknowledgements.
+#
+# Need the macros to tell us which bit to extract from which status
+# value read back from the PreVac.  This is currently the posport 0
+# status word, so that is the default.  Shift the status record by
+# bitno places to get it into position and bitmask it off with a 1.
+# The input links to the status records have the CP flag so they will
+# process when the status record updates.  They have been placed
+# outside macro definitions to make sure they are present.
+#
+# Record to calculate the Prepare For Transfer Command Acknowledgement.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ACK:PREPARE_TRANSFER:CALC") {
+  field(DESC, "Extract Prepare command acknowledgement")
+  field(SCAN, "Passive")
+  field(INPA, "$(ackprepare_bitno=0)")
+  field(INPB, "$(ackprepare_status=$(device)$(posportprefix=:POSPORT)0:POSSTA) CP")
+  field(CALC, "(B>>A)&1")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ACK:PREPARE_TRANSFER PP")
+}
+
+#
+# Record to calculate the Transfer Command Acknowledgement.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ACK:DO_TRANSFER:CALC") {
+  field(DESC, "Extract Transfer command acknowledgement")
+  field(SCAN, "Passive")
+  field(INPA, "$(acktransfer_bitno=1)")
+  field(INPB, "$(acktransfer_status=$(device)$(posportprefix=:POSPORT)0:POSSTA) CP")
+  field(CALC, "(B>>A)&1")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ACK:DO_TRANSFER PP")
+}
+
+#
+# Record to calculate the Abort Transfer Command Acknowledgement.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ACK:ABORT_TRANSFER:CALC") {
+  field(DESC, "Extract Abort command acknowledgement")
+  field(SCAN, "Passive")
+  field(INPA, "$(ackabort_bitno=2)")
+  field(INPB, "$(ackabort_status=$(device)$(posportprefix=:POSPORT)0:POSSTA) CP")
+  field(CALC, "(B>>A)&1")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ACK:ABORT_TRANSFER PP")
+}
+
+#
+# Record to calculate the Clear Error Command Acknowledgement.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ACK:CLEAR_ERROR:CALC") {
+  field(DESC, "Extract Clear command acknowledgement")
+  field(SCAN, "Passive")
+  field(INPA, "$(ackclear_bitno=3)")
+  field(INPB, "$(ackclear_status=$(device)$(posportprefix=:POSPORT)0:POSSTA) CP")
+  field(CALC, "(B>>A)&1")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ACK:CLEAR_ERROR PP")
+}
+
+#
+# There is no request bit for the other commands or the source and target parameters,
+# so have to use the EPICS triggering to calculate something to acknowledge acting on
+# the users request.
+#
+# Records to calculate the Set Coil and Unset Coil Acknowledgements for Motor Current,
+# Compressed Air and Holder on Arm.
+# They compare the state of the triggers with trigger on and the coil number written with
+# the motor current coil number and if they match, then triggering is in progress.
+# REMINDER: In calc field formula "#" is the logical Not Equal operator.
+#
+# Record to calculate the Set Coil Acknowledgements.
+#
+record(transform, "$(device)$(ctrlprefix=:CTRL):ACK:SET:COIL:CALCS") {
+  field(DESC, "Set Coil acknowledgements")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(INPB, "$(device)$(ctrlprefix=:CTRL):SET:COIL:TRIGGER CP")
+  field(INPC, "$(device)$(ctrlprefix=:CTRL):SET:COIL")
+  field(INPD, "$(device)$(ctrlprefix=:CTRL):COILNO:MOTOR_CURRENT")
+  field(INPE, "$(device)$(ctrlprefix=:CTRL):COILNO:COMPRESSED_AIR")
+  field(INPF, "$(device)$(ctrlprefix=:CTRL):COILNO:HOLDER_ONARM")
+  field(CLCD, "D#C?0:A=B?1:0")
+  field(CLCE, "E#C?0:A=B?1:0")
+  field(CLCF, "F#C?0:A=B?1:0")
+  field(OUTD, "$(device)$(ctrlprefix=:CTRL):ACK:MOTOR_CURRENT_ON PP")
+  field(OUTE, "$(device)$(ctrlprefix=:CTRL):ACK:COMPRESSED_AIR_ON PP")
+  field(OUTF, "$(device)$(ctrlprefix=:CTRL):ACK:HOLDER_ONARM_ON PP")
+}
+
+#
+# Record to calculate the Unset Coil Acknowledgements for Motor Current, Compressed Air and Holder on Arm.
+#
+record(transform, "$(device)$(ctrlprefix=:CTRL):ACK:UNSET:COIL:CALCS") {
+  field(DESC, "Unset Coil acknowledgements")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(INPB, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL:TRIGGER CP")
+  field(INPC, "$(device)$(ctrlprefix=:CTRL):UNSET:COIL")
+  field(INPD, "$(device)$(ctrlprefix=:CTRL):COILNO:MOTOR_CURRENT")
+  field(INPE, "$(device)$(ctrlprefix=:CTRL):COILNO:COMPRESSED_AIR")
+  field(INPF, "$(device)$(ctrlprefix=:CTRL):COILNO:HOLDER_ONARM")
+  field(CLCD, "D#C?0:A=B?1:0")
+  field(CLCE, "E#C?0:A=B?1:0")
+  field(CLCF, "F#C?0:A=B?1:0")
+  field(OUTD, "$(device)$(ctrlprefix=:CTRL):ACK:MOTOR_CURRENT_OFF PP")
+  field(OUTE, "$(device)$(ctrlprefix=:CTRL):ACK:COMPRESSED_AIR_OFF PP")
+  field(OUTF, "$(device)$(ctrlprefix=:CTRL):ACK:HOLDER_ONARM_OFF PP")
+}
+
+#
+# Record to calculate the Source Parameter Acknowledgement.
+#
+record(calcout, "$(device)$(paramprefix=:PARAM):ACK:SOURCE:CALC") {
+  field(DESC, "Source parameter acknowledgement")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(INPB, "$(device)$(paramprefix=:PARAM):SOURCE:TRIGGER CP")
+  field(CALC, "A=B?1:0")
+  field(OUT, "$(device)$(paramprefix=:PARAM):ACK:SOURCE PP")
+}
+
+#
+# Record to calculate the Source Parameter Acknowledgement.
+#
+record(calcout, "$(device)$(paramprefix=:PARAM):ACK:TARGET:CALC") {
+  field(DESC, "Target parameter acknowledgement")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(ctrlprefix=:CTRL):TRIGGER:ON_VALUE")
+  field(INPB, "$(device)$(paramprefix=:PARAM):TARGET:TRIGGER CP")
+  field(CALC, "A=B?1:0")
+  field(OUT, "$(device)$(paramprefix=:PARAM):ACK:TARGET PP")
+}
+
+# **********************************************
+# * End of Records for Command Acknowledgement *
+# **********************************************
+# -------------------------------------------------------------------------------------------------------------
+# *****************************************
+# * Start of Records for Command Progress *
+# *****************************************
+#
+# Notes only so far.
+#
+# Cannot rely on the RH status being up to date, it is not always updated for readback as things change??
+#
+# Prepare: Pft in Progress is lit.  Eventually Pft Finished is lit, but only if successful.
+# Transfer: Transfer in Progress is lit.  Eventually Transfer finished comes on but only if successful.
+# Abort: Get Aborting lit.  Eventually you get Aborted (the LH one), but Aborting stays lit.
+#
+# Clear: Does not appear to do anything immediately.
+#
+# Motor Is Moving comes on and off all the time, cant use it for.
+#
+# Motor is Calibrating comes on sometimes.
+# TBC: Motor in Calibrated comes on when motor calibration is successful.
+# Arm motor calibration timeout reached comes on when it fails.
+#
+# Prepare for Transfer In Progress Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ING:PREPARE_TRANSFER") {
+  field(DESC, "Prepare for Transfer in Progress")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ingprepare_ZNAM=Not Preparing)")
+  field(ONAM, "$(ingprepare_ONAM=Preparing)")
+}
+
+#
+# Transfer In Progress Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ING:DO_TRANSFER") {
+  field(DESC, "Transfer in Progress")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ingtransfer_ZNAM=Not Transferring)")
+  field(ONAM, "$(ingtransfer_ONAM=Transferring)")
+}
+
+#
+# Abort In Progress Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ING:ABORT_TRANSFER") {
+  field(DESC, "Abort in Progress")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ingabort_ZNAM=Not Aborting)")
+  field(ONAM, "$(ingabort_ONAM=Aborting)")
+}
+
+#
+# Clear In Progress Record
+#
+record(bi, "$(device)$(ctrlprefix=:CTRL):ING:CLEAR_ERRORS") {
+  field(DESC, "Clear Errors in Progress")
+  field(SCAN, "Passive")
+  field(ZNAM, "$(ingclear_ZNAM=Not Clearing)")
+  field(ONAM, "$(ingclear_ONAM=Clearing)")
+}
+
+#
+# Record to calculate the Prepare For Transfer In Progress.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ING:PREPARE_TRANSFER:CALC") {
+  field(DESC, "Extract Prepare In Progress")
+  field(SCAN, "Passive")
+  field(INPA, "$(ingprepare_bitno=11)")
+  field(INPB, "$(ingprepare_status=$(device)$(posportprefix=:POSPORT)0:POSSTA) CP")
+  field(CALC, "(B>>A)&1")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ING:PREPARE_TRANSFER PP")
+}
+
+#
+# Record to calculate the Transfer In Progress.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ING:DO_TRANSFER:CALC") {
+  field(DESC, "Extract Transfer In Progress")
+  field(SCAN, "Passive")
+  field(INPA, "$(ingtransfer_bitno=10)")
+  field(INPB, "$(ingtransfer_status=$(device)$(posportprefix=:POSPORT)0:POSSTA) CP")
+  field(CALC, "(B>>A)&1")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ING:DO_TRANSFER PP")
+}
+
+#
+# Record to calculate the Abort In Progress.
+#
+# It will matter to the user because the motor is still moving during an
+# abort as it will attempt to return the holder to the source chamber.
+#
+# Unfortunately are not certain how to calculate this reliably because
+# the RHS error status words are not updated properly by the PreVac modbus
+# PLC - the "Aborting active" bit stays on even when the "Aborted" bit has
+# come on on the LHS and the "Aborted" bit on the RHS never comes on.
+# We dont know if this is a bug or a feature in the PreVac PLC. Can only
+# code against its current behaviour.  If that behaviour is changed by
+# fixing the bug, then this calculation will be incorrect.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ING:ABORT_TRANSFER:CALC") {
+  field(DESC, "Abort Transfer In Progress")
+  field(SCAN, "Passive")
+  field(INPA, "$(ingabort_bitno1=1)")
+  field(INPB, "$(ingabort_status1=$(device)$(staprefix=:STA):TRANSFERERRORS2) CP")
+  field(INPC, "$(ingabort_bitno2=15)")
+  field(INPD, "$(ingabort_status2=$(device)$(staprefix=:STA):TRANSFERSTATUS) CP")
+  field(CALC, "((B>>A)&1=1)&&((D>>C)&1=0)")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ING:ABORT_TRANSFER PP")
+}
+
+#
+# Record to calculate the Clear In Progress.
+#
+# Have not worked out how can do this, so put a dummy calculation to
+# initialise the binary record.  It is less likely to matter than the
+# Abort.  Need the PINI on this record while it has a dummy calculation
+# because there is no CP link in the input, so it will never process
+# otherwise.
+#
+record(calcout, "$(device)$(ctrlprefix=:CTRL):ING:CLEAR_ERRORS:CALC") {
+  field(DESC, "Clear Errors In Progress")
+  field(SCAN, "Passive")
+  field(INPA, "0")
+  field(CALC, "A")
+  field(OUT, "$(device)$(ctrlprefix=:CTRL):ING:CLEAR_ERRORS PP")
+  field(PINI, "YES")
+}

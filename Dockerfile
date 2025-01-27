@@ -4,9 +4,9 @@ ARG PYTHON_VERSION=3.11
 FROM python:${PYTHON_VERSION} AS developer
 
 # Add any system dependencies for the developer/build environment here
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    graphviz \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     graphviz \
+#     && rm -rf /var/lib/apt/lists/*
 
 # Set up a virtual environment and put it in PATH
 RUN python -m venv /venv

@@ -1,0 +1,39 @@
+# % macro, SYSTEM, Device prefix
+# % macro, CHANNEL, Device suffix
+# % macro, DEFAULT, Default
+# % macro, GUIMIN, Min for gui
+# % macro, GUIMAX, Max for gui
+# % macro, GROUP, Group
+
+record(calc, $(SYSTEM):GCALC-$(CHANNEL)) {
+  field(PINI, "YES")
+  field(CALC, "4000000*B/A")
+  field(INPA, "499.654e6")
+  field(INPB, "$(SYSTEM):SET-HW.$(CHANNEL) CP")
+  field(PREC, "5")
+}
+
+record(calcout, $(SYSTEM):SCALC-$(CHANNEL)) {
+  field(PINI, "YES")
+  field(CALC, "(A+C)*(B/4000000)")
+  field(INPA, "$(SYSTEM):SUSEC-$(CHANNEL)")
+  field(INPB, "499.654e6")
+  field(OUT,  "$(SYSTEM):SET-HW.$(CHANNEL) PP")
+  field(PREC, "5")
+  field(INPC, "$(GROUP) CP")
+}
+
+#% archiver 30 Monitor
+record(ao, $(SYSTEM):SUSEC-$(CHANNEL)) {
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "Raw Soft Channel")
+  field(DOL,  "$(DEFAULT)")
+  field(OMSL, "closed_loop")
+  field(LINR, "NO CONVERSION")
+  field(LOPR, "$(GUIMIN)")
+  field(HOPR, "$(GUIMAX)")
+  field(PREC, "5")
+  field(EGU,  "uSec")
+  field(FLNK, "$(SYSTEM):SCALC-$(CHANNEL)")
+}

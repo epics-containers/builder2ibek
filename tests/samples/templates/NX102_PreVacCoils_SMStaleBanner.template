@@ -1,0 +1,50 @@
+
+# NX102_PreVacCoils_SMStaleBanner.vdb is expanded to
+#  NX102_PreVacCoils_SMStaleBanner.template by VDCT utility called flatdb.
+#
+# Developed for B07 HiTES1 End Station.  Currently does not use VDB
+# expansion of lower level template vdb files.
+#
+# Unfortunately this template is required to allow the Python IOC
+# builder to add the stale warning banner embedded screen to the
+# automatically generated device screen.(The PV used by the embedded
+# screen is actually in the Status template,
+# NX102_PreVacCoils_SMStatus.vdb).  It is the same banner which
+# appears on the Status and Control screens.  Originally it had no
+# records in it, but when built expansion by flatdb had removed all
+# the comment lines apart from the VDCT header lines and it is the
+# percent gui comment line which does the business of this template.
+# This is because the comment lines were not attached to a record and
+# VDCT removes all comment lines not immediately followed by a record
+# definition and flatdb appears to do the same.  (It also removes
+# comments on an expand command).  Therefore had to add a dummy
+# record.
+#
+#% macro, __doc__, Template for Warning GUI banner for stale data from the PreVac Sample Manipulator controller.
+#
+#% macro, device,     Mandatory.  Device name of sample manipulator.
+#
+#% macro, staprefix,  Optional.   Defaults to :STA           Prefix for the SM status records.
+#
+#% macro, name,       Optional.   Defaults to empty.         Object name and associated gui name
+#
+# This associates an EDM screen with the template
+# % gui, $(name=), edmembed, NX102_PreVacSMStale-embed.edl, device=$(device), staprefix=$(staprefix=:STA)
+#
+# Dummy stale data record.
+#
+# Initialise to Stale.
+#
+# Although this record is not used on the screen decided to make it give the correct information.
+#
+record(bi, "$(device)$(staprefix=:STA):MODBUS:IS_STALE_DUMMY") {
+  field(DESC, "Overall status of Modbus data")
+  field(SCAN, "Passive")
+  field(INP, "$(device)$(staprefix=:STA):MODBUS:IS_STALE CP")
+  field(ZNAM, "Not Stale")
+  field(ZSV, "NO_ALARM")
+  field(ONAM, "Stale")
+  field(OSV, "MAJOR")
+  field(PINI, "YES")
+  field(VAL, "1")
+}

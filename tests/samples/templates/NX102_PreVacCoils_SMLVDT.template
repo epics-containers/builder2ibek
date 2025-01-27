@@ -1,0 +1,599 @@
+#
+# NX102_PreVacCoils_SMLVDT.vdb is expanded to
+#  NX102_PreVacCoils_SMLVDT.template by VDCT utility called flatdb.
+#
+#% macro, __doc__, Template database for an LVDT on PreVac Sample Manipulator.
+#
+#% macro, device,         Mandatory. Device name.
+#% macro, port,           Mandatory. Comms port (DLS NX102) PLC controller is on.
+#% macro, lvdtID,         Mandatory. ID of the LVDT.  Defacto it is a number but it need not be.
+#% macro, tag,            Mandatory. NX PLC tag string.
+#
+#% macro, lvdtprefix,     Optional.  Defaults to ":LVDT".                       Prefix for SM LVDT records.
+#% macro, lvdt_shortname, Optional.  Defaults to "LVDT$(lvdtID)".               Short name of the LVDT.
+#% macro, lvdt_shortdesc, Optional.  Defaults to "LVDT $(lvdtID)".              Short description of the LVDT.
+#% macro, lvdt_longdesc,  Optional.  Defaults to "Manipulator LVDT $(lvdtID)".  Longer description of the LVDT.
+#% macro, tagidx,         Optional.  Defaults to "$(lvdtID)".                   NX PLC tag string array index.
+#
+# The following macros allow definition of the EPICS fields on the ai record for the position, the name of the EPICS field appearing in the macro.
+#% macro, pos_SCAN,      Optional.  Defaults to ".5 second".  EPICS .SCAN field.  Scan rate for reading encoder.  NOTE: This is the normal EPICS .SCAN field scanrate and the EtherIP S Flag for scanrate is not in use here.
+#% macro, pos_PREC,      Optional.  Defaults to 3.            Precision on the encoder position value.
+#% macro, pos_EGU,       Optional.  Defaults to empty string. Engineering units on the encoder value.
+#% macro, pos_LINR,      Optional.  Defaults to empty string. Values can be "NO CONVERSION", "SLOPE" (must define pos_ESLO and and pos_EOFF), "LINEAR" (must define pos_EGUL and pos_EGUF), (or name of special table) and it will default to "NO CONVERSION".  Conversion method for encoder value.  See EPICS record reference manual sections on the ai record and the convert menu and conversion.
+#% macro, pos_EGUL,      Optional.  Defaults to empty string.  Low end of LINEAR conversion scale for encoder value.
+#% macro, pos_EGUF,      Optional.  Defaults to empty string.  High end or full value on LINEAR conversion scale for encoder value. 
+#% macro, pos_EOFF,      Optional.  Defaults to empty string.  The offset on the value for SLOPE conversion.  It will default to 0.
+#% macro, pos_ESLO,      Optional.  Defaults to empty string.  The slope on the value for SLOPE conversion.  It will default to 1.
+#% macro, pos_AOFF,      Optional.  Defaults to empty string.  The raw adjustment offset on the value for conversion for all types of conversion.  It will default to 0.
+#% macro, pos_ASLO,      Optional.  Defaults to empty string.  The raw adjustment slope on the value for conversion for all types of conversion.   It will default to 1.
+#% macro, pos_SMOO,      Optional.  Defaults to empty string.  The smoothing fraction parameter on the smoothing algorithm, value between 0 (no smoothing) and 1 (value never changes), it will default to 0.
+#% macro, pos_HOPR,      Optional.  Defaults to empty string.  The position high operator display value.  Will default to 0.
+#% macro, pos_LOPR,      Optional.  Defaults to empty string.  The position low operator display value.   Will default to 0.
+#% macro, pos_HIHI,      Optional.  Defaults to empty string.  The position high high limit.  It will default to 0.
+#% macro, pos_HIGH,      Optional.  Defaults to empty string.  The position high limit.       It will default to 0.
+#% macro, pos_LOW,       Optional.  Defaults to empty string.  The position low limit.        It will default to 0.
+#% macro, pos_LOLO,      Optional.  Defaults to empty string.  The position low low limit.    It will default to 0.
+#% macro, pos_HHSV,      Optional.  Defaults to empty string.  The alarm severity for the HIHI alarm.  It will default to NO_ALARM.
+#% macro, pos_HSV,       Optional.  Defaults to empty string.  The alarm severity for the HIGH alarm.  It will default to NO_ALARM.
+#% macro, pos_LSV,       Optional.  Defaults to empty string.  The alarm severity for the LOW alarm.   It will default to NO_ALARM.
+#% macro, pos_LLSV,      Optional.  Defaults to empty string.  The alarm severity for the LOLO alarm.  It will default to NO_ALARM.
+#% macro, pos_HYST,      Optional.  Defaults to empty string.  The alarm deadband or hysteresis for the scaled position.                 It will default to 0.
+#% macro, pos_ADEL,      Optional.  Defaults to empty string.  The archiver deadband, to stop archiving noise, for the scaled position.  It will default to 0.
+#% macro, pos_MDEL,      Optional.  Defaults to empty string.  The monitor deadband, to stop reacting noise, for the scaled position.    It will default to 0.
+#% macro, raw_EGU,       Optional.  Defaults to count.         Engineering units on the encoder raw value.
+#% macro, raw_HYST,      Optional.  Defaults to empty string.  The alarm deadband or hysteresis for the raw position.                    It will default to 0.
+#% macro, raw_ADEL,      Optional.  Defaults to empty string.  The archiver deadband, to stop archiving noise, for the raw position.     It will default to 0.
+#% macro, raw_MDEL,      Optional.  Defaults to empty string.  The monitor deadband, to stop reacting noise, for the raw position.       It will default to 0.
+#% macro, slope_PREC,    Optional.  Defaults to 6.             Precision on the derived encoder slope value.
+#% macro, cal_SCAN,      Optional.  Defaults to "1 second".    EPICS .SCAN field.  Scan rate for reading calibration parameters.  NOTE: This is the normal EPICS .SCAN field scanrate and the EtherIP S Flag for scanrate is not in use here.
+#% macro, calout_scanrate, Optional.  Defaults to .5   The value of scanrate which when writing to NX PLC the calibration output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+#
+# The following macros define behaviour of records to pulse the trigger to request the PLC to act on new calibration parameters.
+#% macro, trigger_scanrate,      Optional.  Defaults to .2            The value of scanrate which when writing to NX PLC triggers the trigger output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+#% macro, trigger_onval,         Optional.  Defaults to 1.            Value to write to a trigger tag to pulse the trigger on.  Must be consistent with trigger_offval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+#% macro, trigger_offval,        Optional.  Defaults to 0.            Value to write to a trigger tag to pulse the trigger off.  Must be consistent with trigger_onval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+#% macro, trigger_ONAM,          Optional.  Defaults to Trigger On.   Label for 1 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+#% macro, trigger_ZNAM,          Optional.  Defaults to Trigger Off.  Label for 0 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+#% macro, trigger_pulsestartDLY, Optional.  Defaults to 1.0.          Delay in seconds between last calibration parameter write and pulsing the trigger.
+#% macro, trigger_pulsewidthDLY, Optional.  Defaults to 1.0.          Delay in seconds between sending Trigger On and Trigger Off writes when pulsing a trigger.
+#
+#% macro, name,          Optional.  Defaults to empty.         Object name and associated gui name.
+#
+# This associates an edm screen with the template
+# % gui, $(name=), edmembed, NX102_PreVacSMLVDT-embed.edl, device=$(device), lvdtprefix=$(lvdtprefix=:LVDT), lvdtID=$(lvdtID)
+#
+# Developed for B07 HiTES1 End Station.  Currently does not use VDB
+# expansion of lower level template vdb files.
+#
+# LVDT stands for Linear Variable Differential Transformer or Linear
+# Variable Displacement Transducer.  It is a type of encoder in use
+# on the Sample Manipulator system.  At time of template development 
+# they have not been added to HiTES1 and it is not yet clear how these are going
+# to be used and what their position value means.  Believed they
+# are required on HiTES1 to help SM55B collaborate with the other
+# sample manipulators on HiTES1.
+#
+# The position readback record.
+#
+# Tag name suggests the PLC has already converted the encoder count
+# into a position value so initial requirement is to read that value
+# back and display it without further calculation but the options to
+# set the conversion fields are provided just in case.  The tag names
+# provided on HiTES1 are simple (if rather long) so have not provided
+# further macros or used the lvdtID macro to construct it.  The value
+# is stated to be of type Real.
+#
+# The EPICS record manual says the conversion fields are applied
+# unless DTYP is "Soft Channel", which it cannot be because it has to be
+# DTYP EtherIP to read back from the NX102 PLC.
+#
+# The calibration of the LVDTs has been problematic.  Since they are
+# now used in the interlocking they have to be converted in the PLC,
+# so the calibration is in the PLC.  We were reading back the converted value,
+# so the slope got changed to 1 and offset 0 in the IOC.
+# This is horrible
+# as it has changed the PLC into a position reporter, which is a job
+# normally done by EPICS in collaboration with a GeoBrick.  We need
+# to set the conversion, but really need the raw counts to make things
+# make sense.
+#
+# % archiver 1 Monitor
+#
+record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):POS_RBV") {
+  field(DESC, "LVDT $(lvdtID) scaled value from PLC")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Scaled[$(tagidx=$(lvdtID))]")
+  field(SCAN, "$(pos_SCAN=.5 second)")
+  field(PREC, "$(pos_PREC=3)")
+  field(EGU, "$(pos_EGU=)")
+  field(LINR, "$(pos_LINR=)")
+  field(EGUL, "$(pos_EGUL=)")
+  field(EGUF, "$(pos_EGUF=)")
+  field(EOFF, "$(pos_EOFF=)")
+  field(ESLO, "$(pos_ESLO=)")
+  field(AOFF, "$(pos_AOFF=)")
+  field(ASLO, "$(pos_ASLO=)")
+  field(SMOO, "$(pos_SMOO=)")
+  field(HOPR, "$(pos_HOPR=)")
+  field(LOPR, "$(pos_LOPR=)")
+  field(HIHI, "$(pos_HIHI=)")
+  field(HHSV, "$(pos_HHSV=)")
+  field(HIGH, "$(pos_HIGH=)")
+  field(HSV, "$(pos_HSV=)")
+  field(LOW, "$(pos_LOW=)")
+  field(LSV, "$(pos_LSV=)")
+  field(LOLO, "$(pos_LOLO=)")
+  field(LLSV, "$(pos_LLSV=)")
+  field(HYST, "$(pos_HYST=)")
+  field(ADEL, "$(pos_ADEL=)")
+  field(MDEL, "$(pos_MDEL=)")
+}
+
+#
+# % archiver 1 Monitor
+#
+record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):RAW_RBV") {
+  field(DESC, "LVDT $(lvdtID) raw value from PLC")
+  field(DTYP, "EtherIP")
+  field(SCAN, "$(pos_SCAN=.5 second)")
+  field(INP, "@$(port) $(tag).Raw[$(tagidx=$(lvdtID))]")
+  field(EGU, "$(raw_EGU=count)")
+  field(HYST, "$(raw_HYST=)")
+  field(ADEL, "$(raw_ADEL=)")
+  field(MDEL, "$(raw_MDEL=)")
+}
+
+#
+# Need to change things so the calibrations are readback from the PLC, so
+# they are not buried there.  Unfortunately it does not use anything so
+# straight forward as a slope and offset, oh no.  It has a calibration
+# function which requires calibration two points A & B (tagged with numbers 0
+# & 1 respectively) to have the raw (tagged as X) and scaled (tagged as Y)
+# values provided and then uses those to convert to slope and offset.  That
+# means we have to read back those four values.  Then on top of that there
+# is an offset, which also has to be read back.
+#
+# Calibration Point A raw value.
+#
+# % archiver 60 monitor
+#
+record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:RAW_RBV") {
+  field(DESC, "Get LVDT $(lvdtID) Calibn Point A raw")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).X0[$(tagidx=$(lvdtID))]")
+  field(SCAN, "$(cal_SCAN=1 second)")
+  field(EGU, "$(raw_EGU=count)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:RBVCALC")
+}
+
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:RAW_WRITE") {
+  field(DESC, "Set LVDT $(lvdtID) Calibn Point A raw")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(OUT, "@$(port) $(tag).Set_X0[$(tagidx=$(lvdtID))] S $(calout_scanrate=.5)")
+  field(EGU, "$(raw_EGU=count)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Calibration Point B raw value.
+#
+# % archiver 60 monitor
+#
+record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:RAW_RBV") {
+  field(DESC, "Get LVDT $(lvdtID) Calibn Point B raw")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).X1[$(tagidx=$(lvdtID))]")
+  field(SCAN, "$(cal_SCAN=1 second)")
+  field(EGU, "$(raw_EGU=count)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:RBVCALC")
+}
+
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:RAW_WRITE") {
+  field(DESC, "Set LVDT $(lvdtID) Calibn Point B raw")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(OUT, "@$(port) $(tag).Set_X1[$(tagidx=$(lvdtID))] S $(calout_scanrate=.5)")
+  field(EGU, "$(raw_EGU=count)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Calibration Point A position value.
+#
+# % archiver 60 monitor
+#
+record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:POS_RBV") {
+  field(DESC, "Get LVDT $(lvdtID) Calibn Point A posn")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Y0[$(tagidx=$(lvdtID))]")
+  field(SCAN, "$(cal_SCAN=1 second)")
+  field(PREC, "$(pos_PREC=3)")
+  field(EGU, "$(pos_EGU=)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:RBVCALC")
+}
+
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:POS_WRITE") {
+  field(DESC, "Set LVDT $(lvdtID) Calibn Point A posn")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(OUT, "@$(port) $(tag).Set_Y0[$(tagidx=$(lvdtID))] S $(calout_scanrate=.5)")
+  field(EGU, "$(pos_EGU=)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Calibration Point B position value.
+#
+# % archiver 60 monitor
+#
+record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:POS_RBV") {
+  field(DESC, "Get LVDT $(lvdtID) Calibn Point B posn")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Y1[$(tagidx=$(lvdtID))]")
+  field(SCAN, "$(cal_SCAN=1 second)")
+  field(PREC, "$(pos_PREC=3)")
+  field(EGU, "$(pos_EGU=)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:RBVCALC")
+}
+
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:POS_WRITE") {
+  field(DESC, "Set LVDT $(lvdtID) Calibn Point B posn")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(OUT, "@$(port) $(tag).Set_Y1[$(tagidx=$(lvdtID))] S $(calout_scanrate=.5)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Calibration offset value as read back from the PLC.
+# This is the adjustment it will use on the current value.
+# It is offset1 in EPICS name because we calculation another offset
+# derived from the intersection of the calibration line with the y axis.
+# This record therefore does NOT forward link to the calculation for the derived slope off.
+#
+# % archiver 60 monitor
+#
+record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET1_RBV") {
+  field(DESC, "Get LVDT $(lvdtID) Calibn offset")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Offset[$(tagidx=$(lvdtID))]")
+  field(SCAN, "$(cal_SCAN=1 second)")
+  field(PREC, "$(pos_PREC=3)")
+  field(EGU, "$(pos_EGU=)")
+}
+
+# Send the request down to the PLC
+#
+# REMINDER: OMSL field "supervisory" on output record is the default and means
+#           values can be written into it.
+#
+# The ether_ip driver sets the value the same as the readback if it fails to write.
+# The FORCE keyword forces the system not to do that, but it also keeps trying to write.
+# In other parts of the manipulator software the FORCE tag was originally on there, but there
+# were problems with it locking out setting things from the PLC or the HMI, so it was removed.
+#
+# The S flag has to be set to register the record with one of the scan polls.
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET1_WRITE") {
+  field(DESC, "Set LVDT $(lvdtID) Calibn offset")
+  field(DTYP, "EtherIP")
+  field(SCAN, "Passive")
+  field(OUT, "@$(port) $(tag).Set_Offset[$(tagidx=$(lvdtID))] S $(calout_scanrate=.5)")
+  field(PRIO, "HIGH")
+}
+
+#
+# Whether the calibration is locked in the PLC.
+# The PLC will ignore changes when this is set.
+# TBD: This might be read only.  If it is made writable, it will probably timeout.
+# Had probs reading this as bi in testing probably because it is different
+# datatype, therefore convert it in EPICS.
+#
+#record(ai, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:PERMISSION_RBV") {
+#  field(DESC, "Get LVDT $(lvdtID) Calibn Permission")
+#  field(DTYP, "EtherIP")
+#  field(INP, "@$(port) $(tag).ScaleLckd[$(tagidx=$(lvdtID))]")
+#  field(SCAN, "$(cal_SCAN=1 second)")
+#  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:LOCKED_RBV")
+#}
+#
+# This is bi for now, but it could become mbbi depending on details TBD in PLC.
+# Converts to value read back to a binary for interpretation.
+# Might need to be Raw Soft Channel type.
+#
+#record(bi, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:LOCKED_RBV") {
+#  field(DESC, "Interpret LVDT $(lvdtID) Calibn Permission")
+#  field(SCAN, "Passive")
+#  field(INP, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:PERMISSION_RBV")
+#  field(ONAM, "Locked")
+#  field(ZNAM, "Unlocked")
+#}
+#
+# Convert the calibration points to derived slope and derived offset for display to user.
+#
+# % archiver 60 monitor
+#
+record(transform, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:RBVCALC") {
+  field(DESC, "Calc LVDT $(lvdtID) Calibn slope & offset")
+  field(SCAN, "Passive")
+  field(INPA, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:POS_RBV")
+  field(INPB, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:POS_RBV")
+  field(INPC, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:RAW_RBV")
+  field(INPD, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:RAW_RBV")
+  field(CLCE, "(B-A)/(D-C)")
+  field(OUTE, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPE_DER PP")
+  field(CLCF, "A-E*C")
+  field(OUTF, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET2_DER PP")
+}
+
+#
+# The derived calibration slope calculated from the parameters in use by the PLC
+# as read back from there.  Precision slope_PREC tends to be more than pos_PREC.
+#
+# % archiver 60 monitor
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPE_DER") {
+  field(DESC, "LVDT $(lvdtID) Calibn Slope $(pos_EGU=)/$(raw_EGU=count)")
+  field(SCAN, "Passive")
+  field(EGU, "$(pos_EGU=)/$(raw_EGU=count)")
+  field(PREC, "$(slope_PREC=6)")
+}
+
+#
+# The derived calibration offset calculated from the parameters in use by the PLC as read
+# back from there.  This is NOT the calibration offset read back from the PLC.
+#
+# % archiver 60 monitor
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET2_DER") {
+  field(DESC, "LVDT $(lvdtID) Calibn Offset (EGU)")
+  field(SCAN, "Passive")
+  field(EGU, "$(pos_EGU=)")
+  field(PREC, "$(pos_PREC=3)")
+}
+
+# Next need records to allow user to enter the values for two new calibration points.
+#
+# Although the values from the PVs are never written to the PLC, are still keeping
+# DMD in the name, so that systematically stuff derived from the PLC is RBV and stuff
+# derived from the user's entries is DMD.  The DMD records do NOT write to the PLC,
+# there are further records which do that, only when the user is satisfied and clicks
+# a button (??name TBD Go??Set??Write??Save??)
+#
+# Raw value for new Calibration Point A.
+#
+# % autosave 1 VAL
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:RAW_DMD") {
+  field(DESC, "LVDT $(lvdtID) Calibn PointA new raw val")
+  field(SCAN, "Passive")
+  field(EGU, "$(raw_EGU=count)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:DMDCALC")
+}
+
+#
+# Raw value for new Calibration Point B.
+#
+# % autosave 1 VAL
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:RAW_DMD") {
+  field(DESC, "LVDT $(lvdtID) Calibn PointB new raw val")
+  field(SCAN, "Passive")
+  field(EGU, "$(raw_EGU=count)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:DMDCALC")
+}
+
+#
+# Desired position value for new Calibration Point A.
+#
+# % autosave 1 VAL
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:POS_DMD") {
+  field(DESC, "LVDT $(lvdtID) Calibn PointA new pos val")
+  field(SCAN, "Passive")
+  field(PREC, "$(pos_PREC=3)")
+  field(EGU, "$(pos_EGU=)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:DMDCALC")
+}
+
+#
+# Desired position for new Calibration Point B.
+#
+# % autosave 1 VAL
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:POS_DMD") {
+  field(DESC, "LVDT $(lvdtID) Calibn PointB new pos val")
+  field(PREC, "$(pos_PREC=3)")
+  field(EGU, "$(pos_EGU=)")
+  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:DMDCALC")
+}
+
+#
+# Convert the proposed new calibration points to slope and offset for display to user.
+#
+record(transform, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPEOFF:DMDCALC") {
+  field(DESC, "Calc LVDT $(lvdtID) new calibn slope & offset")
+  field(INPA, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:POSVAL:DMD")
+  field(INPB, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:EGUVAL:DMD")
+  field(INPC, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:COUNTVAL:DMD")
+  field(INPD, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:COUNTVAL:DMD")
+  field(CLCE, "(B-A)/(D-C)")
+  field(OUTE, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPE_DMDDER PP")
+  field(CLCF, "A-E*C")
+  field(OUTF, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET2_DMDDER")
+}
+
+
+#
+# Calculated new value of slope derived from the users demand PointA and PointB PVs.
+# This is displayed for user info, but is NOT written to the PLC.
+#
+# % autosave 1 VAL
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:SLOPE_DMDDER") {
+  field(DESC, "LVDT$(lvdtID) new calibn slope $(pos_EGU=)/$(raw_EGU=count)")
+  field(SCAN, "Passive")
+  field(EGU, "$(pos_EGU=)/$(raw_EGU=count)")
+  field(PREC, "$(slope_PREC=6)")
+}
+
+#
+# Calculated new value of offset derived from the users demand Point A and Point B PVs.
+# This is displayed for user info, but is NOT written to the PLC.
+#
+# % autosave 1 VAL
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET2_DMDDER") {
+  field(DESC, "LVDT$(lvdtID) new derivd calibn offset $(pos_EGU=)")
+  field(SCAN, "Passive")
+  field(EGU, "$(pos_EGU=)")
+  field(PREC, "$(pos_PREC=3)")
+}
+
+#
+# Desired new value of offset.  Not derived and does NOT forward
+# link to the derived offset calculation.
+#
+# % autosave 1 VAL
+#
+record(ao, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET1_DMD") {
+  field(DESC, "LVDT $(lvdtID) Calibn desired offset val $(pos_EGU=)")
+  field(SCAN, "Passive")
+  field(EGU, "$(pos_EGU=)")
+  field(PREC, "$(pos_PREC=3)")
+}
+
+##
+## Records to hold values for trigger states.
+##
+## The PLC needs the trigger to blip or dip, depending on the trigger macro
+## settings, before it will check the new calibration parameters.
+##
+## They are expected to be binary.
+##
+## Record to hold the Trigger On value.
+##
+#record(bo, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):TRIGGER:ON_VALUE") {
+#  field(DESC, "Value to pulse a trigger on")
+#  field(SCAN, "Passive")
+#  field(PINI, "YES")
+#  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+#  field(ONAM, "$(trigger_ONAM=Trigger On)")
+#  field(VAL, "$(trigger_onval=1)")
+#}
+#
+##
+## Record to hold the Trigger Off value.
+##
+#record(bo, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):TRIGGER:OFF_VALUE") {
+#  field(DESC, "Value to pulse a trigger off")
+#  field(SCAN, "Passive")
+#  field(PINI, "YES")
+#  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+#  field(ONAM, "$(trigger_ONAM=Trigger On)")
+#  field(VAL, "$(trigger_offval=0)")
+#}
+#
+## Record to write to trigger state value down to the PLC.
+##
+## Write value to trigger update calibration parameters.
+##
+#record(bo, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:TRIGGER") {
+#  field(DESC, "Trigger to set calibration parameters")
+#  field(DTYP, "EtherIP")
+#  field(SCAN, "Passive")
+#  field(ZNAM, "$(trigger_ZNAM=Trigger Off)")
+#  field(ONAM, "$(trigger_ONAM=Trigger On)")
+#  field(OMSL, "supervisory")
+## Tag name made up - actual name TBC by PLC team.
+#  field(OUT, "@$(port) $(tag).Tcalib[$(tagidx=$(lvdtID))] S $(trigger_scanrate=.2)")
+#  field(PRIO, "HIGH")
+#}
+#
+##
+## Record to pulse the Calibration Trigger.
+## (Did consider merging this with the write seq, but it will be easier
+## to test if it is kept separate).  Because of the behaviour of the etherIP driver
+## pooling data comms, timing this is going to be a bituvva black art.
+##
+#record(seq, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:TRIGGER:PULSE") {
+#  field(DESC, "LVDT$(lvdtID) Calibn Trigger pulse seq")
+#  field(SCAN, "Passive")
+#  field(SELM, "All")
+#  field(DLY1, "$(trigger_pulsestartDLY=1.0)")
+#  field(DOL1, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):TRIGGER:ON_VALUE")
+#  field(LNK1, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:TRIGGER PP")
+#  field(DLY2, "$(trigger_pulsewidthDLY=1.0)")
+#  field(DOL2, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):TRIGGER:OFF_VALUE")
+#  field(LNK2, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:TRIGGER PP")
+#}
+#
+##
+## Record writes all the parameters to the PLC and then links to pulse the trigger to the PLC to act on them.
+##
+#record(seq, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:WRITESEQ") {
+#  field(DESC, "Write all LVDT$(lvdtID) calibrn params.")
+#  field(SCAN, "Passive")
+#  field(SELM, "All")
+#  field(DOL1, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:RAW_DMD")
+#  field(LNK1, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:RAW_WRITE PP")
+#  field(DOL2, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:POS_DMD")
+#  field(LNK2, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTA:POS_WRITE PP")
+#  field(DOL3, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:RAW_DMD")
+#  field(LNK3, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:RAW_WRITE PP")
+#  field(DOL4, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:POS_DMD")
+#  field(LNK4, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:POINTB:POS_WRITE PP")
+#  field(DOL5, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET1_DMD")
+#  field(LNK5, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:OFFSET1_WRITE PP")
+## Forward link to record to Trigger pulse.
+#  field(FLNK, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:TRIGGER:PULSE")
+#}
+#
+##
+## Record for user to hit button to action their new DMD values.
+## This record is processed by the Go button on the screen so
+## the database decides what other PVs might be involved and not the screen.
+##
+#record(fanout, "$(device))$(lvdtprefix=:LVDT)$(lvdtID):CALIB:DO_NEWCAL") {
+#  field(LNK1, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):CALIB:WRITESEQ")
+#}
+#
+# ID of the LVDT.
+#
+# At present this is a numeric value, but it is not used in calcs so it can be a string.
+#
+record(stringout, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):LVDTID") {
+  field(DESC, "ID of LVDT $(lvdtID)")
+  field(PINI, "YES")
+  field(VAL, "$(lvdtID)")
+}
+
+# Short name of the LVDT.
+# This will be used for GUI display.
+#
+record(stringout, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):SHORTNAME") {
+  field(DESC, "Short name of LVDT $(lvdtID)")
+  field(PINI, "YES")
+  field(VAL, "$(lvdt_shortname=LVDT$(lvdtID))")
+}
+
+# Short description of the LVDT.
+# This will be used for GUI display.
+#
+record(stringout, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):SHORTDESC") {
+  field(DESC, "Short description of LVDT $(lvdtID)")
+  field(PINI, "YES")
+  field(VAL, "$(lvdt_shortdesc=LVDT $(lvdtID))")
+}
+
+# Long description of the LVDT.  Provides an opportunity to mention 
+# a Position Port or a Chamber name which dont have records for yet
+# as not certain how the LVDTs will be deployed.
+# (This is used for GUI help, not for calcs (so far).
+#
+record(stringout, "$(device)$(lvdtprefix=:LVDT)$(lvdtID):LONGDESC") {
+  field(DESC, "Long description of LVDT $(lvdtID)")
+  field(PINI, "YES")
+  field(VAL, "$(lvdt_longdesc=Manipulator LVDT $(lvdtID))")
+}

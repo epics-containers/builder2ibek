@@ -1,0 +1,42 @@
+# RackTemperature.template
+#
+# % macro, __doc__, Template database for a single temperature ADC channel via VME card.
+#
+# Pete Owens - 8/1/2009
+# 
+# substitutions:
+# % macro, name, Mandatory.  Record name for the temperature PV.
+# % macro, c,    Mandatory.  ADC card number.
+# % macro, s,    Mandatory.  ADC signal number.
+#
+# % macro, DESC, Optional.   The PV DESC field description.  Defaults to "Rack temperature".
+#
+################################################################################
+# Raw ADC Channel
+#
+#% controldesk Rack Temperature
+#% archiver 0.1 Monitor
+#% alh
+record(ai, "$(name)") 
+{
+    field(DESC, "$(DESC=Rack temperature)")
+    field(DTYP, "Hy8401ip")
+    field(INP,  "#C$(c) S$(s)")
+    field(SCAN, ".1 second")
+    field(EGU,  "C")
+    field(LINR, "LINEAR")
+    field(PREC, "1")
+    field(ADEL, "0.1")
+    field(EGUF, "100")
+    field(EGUL, "-100")
+    field(HOPR, "30")
+    field(LOPR, "0")
+    field(HIHI, "25")
+    field(HIGH, "22")
+    field(LOW,  "10")
+    field(LOLO, "0")
+    field(HHSV, "MAJOR")
+    field(HSV,  "MINOR")
+    field(LSV,  "MINOR")
+    field(LLSV, "MAJOR")
+}

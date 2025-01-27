@@ -1,0 +1,163 @@
+
+#
+# NX102_PreVacCoils_SMPort.vdb is expanded to NX102_PreVacCoils_SMPort.template by flatdb.
+#
+# Developed for B07 HiTES1 End Station.  This is a higher level template which declares VDB expansion
+# of lower level template NX102_PreVacCoils_SMPortPostionStatus.vdb
+#
+# Coil is the term PreVac use for a piece of data about a component
+# or aspect of the the Sample Manipulator system.  We dont know what it
+# actually means.
+#
+# Some of the PreVac Coils are R, others RW; there are concerns about
+# about reading and writing to the same piece of data with this driver.
+# Also they are in groups of 10, with info re certain aspects of the system.
+# The NX102 PLC code collates the coils into readonly words more convenient
+# to read back.  This template deals with one of the groups of 10 of the
+# original coils.  The actual Coils can be read back but this should be made
+# unnecessary by the collated words and so is not implemented.
+#
+#% macro, __doc__, Template database for status info regarding a Port on PreVac Sample Manipulator.
+#
+#% macro, device,        Mandatory. Device name.
+#% macro, posportID,     Mandatory. ID of the vacuum port position for the sample manipulator.  Must be integer 1 to 8 or 0 for special case of Arm in RDC/UFO and overall status.
+#% macro, port,          Mandatory. Comms port (DLS NX102) PLC controller is on.
+#% macro, tag,           Mandatory. NX PLC tag string e.g. V (from V.Control[1])
+#% macro, tagidx,        Mandatory. NX PLC tag index number e.g. 1 (from V.Control[1])
+#% macro, tagname,       Mandatory. NX PLC tag name.
+#% macro, tagprefix,     Mandatory. NX PLC prefix to tag name.
+#
+#% macro, posportprefix, Optional.  Defaults to ":POSPORT".            Prefix for the vacuum port position records.
+#% macro, smready_bitno, Optional.  Defaults to "1".                   Bit number in port position status for whether sample manipulator inside the chamber is in position ready to participate in the transfer, values 0-15.  The Arm/RDC/UFO port is likely to have non-default value, as it needs to address the "Master Interlock Status" bit, whereas the other ports address the "ReadyForTransfer" bit.  NOTE: The intended use is for signals derived from GPIO on GeoBricks with other sample manipulator motors on them.
+#% macro, sampleholder_bitno, Optional.  Defaults to "2".              Bit number in port position status for whether sample holder is present inside the chamber, values 0-15.  The Arm/RDC/UFO port is likely to have non-default value, as it needs to address the "Holder On Arm" bit, whereas the other ports address the "Sample Inside" bit.  NOTE: The sample holder might not have a sample in it!
+#% macro, desc_label0,   Optional.  Defaults to "PrepareForTransfer".  Descriptive label for bit0 of the Coil word.
+#% macro, desc_label1,   Optional.  Defaults to "ReadyForTransfer".    Descriptive label for bit1 of the Coil word.
+#% macro, desc_label2,   Optional.  Defaults to "SampleInside".        Descriptive label for bit2 of the Coil word.
+#% macro, desc_label3,   Optional.  Defaults to "Error".               Descriptive label for bit3 of the Coil word.
+#% macro, desc_label4,   Optional.  Defaults to "Busy".                Descriptive label for bit4 of the Coil word.
+#% macro, desc_label5,   Optional.  Defaults to "GateOpenRequest".     Descriptive label for bit5 of the Coil word.
+#% macro, desc_label6,   Optional.  Defaults to "GateOpen".            Descriptive label for bit6 of the Coil word.
+#% macro, desc_label7,   Optional.  Defaults to "GateClosed".          Descriptive label for bit7 of the Coil word.
+#% macro, desc_label8,   Optional.  Defaults to "ArmOnPort".           Descriptive label for bit8 of the Coil word.
+#% macro, desc_label9,   Optional.  Defaults to "ReservedForFuture".   Descriptive label for bit9 of the Coil word.
+#% macro, desc_label10,  Optional.  Defaults to "".                    Descriptive label for bit10 of the Coil word.
+#% macro, desc_label11,  Optional.  Defaults to "".                    Descriptive label for bit11 of the Coil word.
+#% macro, desc_label12,  Optional.  Defaults to "".                    Descriptive label for bit12 of the Coil word.
+#% macro, desc_label13,  Optional.  Defaults to "".                    Descriptive label for bit13 of the Coil word.
+#% macro, desc_label14,  Optional.  Defaults to "".                    Descriptive label for bit14 of the Coil word.
+#% macro, desc_label15,  Optional.  Defaults to "".                    Descriptive label for bit15 of the Coil word.
+#% macro, longdesc,      Optional.  Defaults to "Manipulator Position Port $(posportID) status."  Description of position port.
+#% macro, shortdesc,     Optional.  Defaults to "Posport$(posportID)"  Short, abbreviated description of position port.
+#
+#% macro, chamber_name,      Optional.  Defaults to "".               Name of vacuum chamber associated with position port.
+#% macro, chamber_shortname, Optional.  Defaults to "".               Short name of vacuum chamber associated with position port.
+#
+#% macro, valve_device,      Optional.  Defaults to "".               Device name of vacuum valve associated with position port.  So far it is a string for info only, no calcs.
+#% macro, valve_shortname,   Optional.  Defaults to "".               Short, abbreviated name of vacuum valve associated with the position port.
+#% macro, valve_desc,        Optional.  Defaults to "".               Description of vacuum valve associated with position port.
+#
+#% macro, name,              Optional.  Defaults to empty.            Object name and associated gui name
+#
+# This associates an edm screen with the template
+# % gui, $(name=), edmembed, NX102_PreVacSMPort-embed.edl, device=$(device), posportprefix=$(posportprefix=:POSPORT), posportID=$(posportID)
+#
+# Device name of vacuum valve associated with the position port.
+# (This is a one to one relationship at time of writing).
+# This is used for GUI help, not for calcs (so far).
+#
+record(stringout, "$(device)$(posportprefix=:POSPORT)$(posportID):VALVE") {
+  field(DESC, "Position port $(posportID) associated valve")
+  field(PINI, "YES")
+  field(VAL, "$(valve_device=)")
+}
+
+# Long description of the vacuum valve associated with the position port.
+# (This is a one to one relationship at time of writing). This is used for
+# GUI help, not for calcs (so far).
+#
+record(stringout, "$(device)$(posportprefix=:POSPORT)$(posportID):VALVEDESC") {
+  field(DESC, "Position port $(posportID) associated valve")
+  field(PINI, "YES")
+  field(VAL, "$(valve_desc=)")
+}
+
+# Short name of vacuum valve associated with the position port.
+record(stringout, "$(device)$(posportprefix=:POSPORT)$(posportID):VALVESHORTNAME") {
+  field(DESC, "Posport$(posportID) valve shortname")
+  field(PINI, "YES")
+  field(VAL, "$(valve_shortname=)")
+}
+
+# Long description of the vacuum chamber associated with the position port
+# (other than the Rotary Distribution Chamber all the ports are on).
+#
+record(stringout, "$(device)$(posportprefix=:POSPORT)$(posportID):CHAMBER") {
+  field(DESC, "Posport$(posportID) chamber name")
+  field(PINI, "YES")
+  field(VAL, "$(chamber_name=)")
+}
+
+# Name of vacuum chamber associated with the position port (other than
+# Rotary Distribution Chamber all the ports are on.
+#
+record(stringout, "$(device)$(posportprefix=:POSPORT)$(posportID):CHAMBERSHORTNAME") {
+  field(DESC, "Posport$(posportID) chamber shortname")
+  field(PINI, "YES")
+  field(VAL, "$(chamber_shortname=)")
+}
+
+#
+# Initialise the IS_PRESENT record for the position port in the status template to present.
+#
+record(bo, "$(device)$(posportprefix=:POSPORT)$(posportID):SET_PRESENT") {
+  field(DESC, "Initialise Posport$(posportID) to be present")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DOL, "1")
+  field(OMSL, "closed_loop")
+  field(OUT, "$(device)$(posportprefix=:POSPORT)$(posportID):IS_PRESENT PP")
+}
+
+#
+# The expand command cannot appear first in the vdb file because the
+# comment on an expand command gets zapped during the expansion
+# processing by flat db, so it will consume the header with all the
+# macro definitions in it, which has to be attached to a statement
+# because VDCT itself zaps comments which have blank lines or spaces
+# leaving them unattached.  Therefore have chosen to put the expansion
+# last.
+#
+# There are further macros defined in the template which do not have
+# an entry in the expand command and they are passed through
+# untouched, notably device and posportID.  The posportprefix and
+# label macros are mandatory in the lower level template and expanded
+# to become optional in the high level template.
+#
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag)"
+substitute "_TAGNAME=$(tagname)"
+substitute "_TAGPREFIX=$(tagprefix)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_posportprefix=$(posportprefix=:POSPORT)"
+substitute "_smready_bitno=$(smready_bitno=1)"
+substitute "_sampleholder_bitno=$(sampleholder_bitno=2)"
+substitute "_desc_label0=$(desc_label0=PrepareForTransfer)"
+substitute "_desc_label1=$(desc_label1=ReadyForTransfer)"
+substitute "_desc_label2=$(desc_label2=SampleInside)"
+substitute "_desc_label3=$(desc_label3=Error)"
+substitute "_desc_label4=$(desc_label4=Busy)"
+substitute "_desc_label5=$(desc_label5=GateOpenRequest)"
+substitute "_desc_label6=$(desc_label6=GateOpen)"
+substitute "_desc_label7=$(desc_label7=GateClosed)"
+substitute "_desc_label8=$(desc_label8=ArmOnPort)"
+substitute "_desc_label9=$(desc_label9=ReservedForFuture)"
+substitute "_desc_label10=$(desc_label10=)"
+substitute "_desc_label11=$(desc_label11=)"
+substitute "_desc_label12=$(desc_label12=)"
+substitute "_desc_label13=$(desc_label13=)"
+substitute "_desc_label14=$(desc_label14=)"
+substitute "_desc_label15=$(desc_label15=)"
+substitute "_longdesc=$(longdesc=Manipulator Position Port $(posportID) status.)"
+substitute "_shortdesc=$(shortdesc=Posport$(posportID))"
+
+include "NX102_PreVacCoils_SMPortPositionStatus.template"

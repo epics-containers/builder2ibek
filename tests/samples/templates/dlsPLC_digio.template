@@ -1,0 +1,214 @@
+
+## ^ Not really - I had to lie to it to get it to flatten this hand-crafted file!
+
+#% macro, __doc__, Template that reads the valve control crate PLC READBACK 
+# waveform and extracts the digital input fields in D4 (macro default - can be modified).
+# The memory map spreadsheet defines this area as being a list containing
+# warning level switches for EPICS to display, but it is a bit more versatile than that
+# and in front-ends actually reflects LO and LOLO status.
+# A macro is being used instead of hard coding D4, so that other words can be decoded
+# if needed.
+#
+#% macro, device, Device prefix (for valve control crate record instance)
+#% macro, address, D address from which to fetch digital input word (Default = 4)
+#% macro, znam, Meaning of a zero value (Default = Off)
+#% macro, onam, Meaning of a one value (Default = On)
+#% macro, zsv , Severity code to associate with zero value (Default = MAJOR)
+#% macro, osv , Severity code to associate with one value (Default = NO_ALARM)
+#
+
+################################################################################
+# Read 1 word of memory from the READBACK waveform
+# defaulting to D4 (WFS)
+#
+#
+record(subArray, "$(device):GETD$(address=4)")
+    {
+    field(DESC, "Digital input from PLC")
+    field(FTVL, "USHORT")
+    field(INP, "$(vlvcc):DM0XX CP MS")
+    field(MALM, "100")
+    field(INDX, "$(address=4)")
+    }
+
+record(mbbiDirect, "$(device):D$(address=4)")
+    {
+    field(DESC, "PLC Digital inputs from D$(address=4)")
+    field(SCAN, "1 second")
+    field(INP, "$(device):GETD$(address=4) PP MS")
+    }
+
+record(bi, "$(device):D$(address=4)IN0")
+    {
+    field(DESC, "D$(address=4) digital input 0")
+    field(INP, "$(device):D$(address=4).B0 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK, "$(device):D$(address=4)IN1")
+    }
+
+record(bi, "$(device):D$(address=4)IN1")
+    {
+    field(DESC, "D$(address=4) digital input 1")
+    field(INP, "$(device):D$(address=4).B1 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK, "$(device):D$(address=4)IN2")
+    }
+
+record(bi, "$(device):D$(address=4)IN2")
+    {
+    field(DESC, "D$(address=4) digital input 2")
+    field(INP, "$(device):D$(address=4).B2 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK, "$(device):D$(address=4)IN3")
+    }
+    
+record(bi, "$(device):D$(address=4)IN3")
+    {
+    field(DESC, "D$(address=4) digital input 3")
+    field(INP, "$(device):D$(address=4).B3 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN4")
+    }
+        
+record(bi, "$(device):D$(address=4)IN4")
+    {
+    field(DESC, "D$(address=4) digital input 4")
+    field(INP, "$(device):D$(address=4).B4 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN5")
+    }
+        
+record(bi, "$(device):D$(address=4)IN5")
+    {
+    field(DESC, "D$(address=4) digital input 5")
+    field(INP, "$(device):D$(address=4).B5 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN6")
+    }
+        
+record(bi, "$(device):D$(address=4)IN6")
+    {
+    field(DESC, "D$(address=4) digital input 6")
+    field(INP, "$(device):D$(address=4).B6 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN7")
+    }
+        
+record(bi, "$(device):D$(address=4)IN7")
+    {
+    field(DESC, "D$(address=4) digital input 7")
+    field(INP, "$(device):D$(address=4).B7 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN8")
+    }
+        
+record(bi, "$(device):D$(address=4)IN8")
+    {
+    field(DESC, "D$(address=4) digital input 8")
+    field(INP, "$(device):D$(address=4).B8 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN9")
+    }
+        
+record(bi, "$(device):D$(address=4)IN9")
+    {
+    field(DESC, "D$(address=4) digital input 9")
+    field(INP, "$(device):D$(address=4).B9 CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN10")
+    }
+        
+record(bi, "$(device):D$(address=4)IN10")
+    {
+    field(DESC, "D$(address=4) digital input 10")
+    field(INP, "$(device):D$(address=4).BA CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN11")
+    }
+        
+record(bi, "$(device):D$(address=4)IN11")
+    {
+    field(DESC, "D$(address=4) digital input 11")
+    field(INP, "$(device):D$(address=4).BB CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN12")
+    }
+    
+record(bi, "$(device):D$(address=4)IN12")
+    {
+    field(DESC, "D$(address=4) digital input 12")
+    field(INP, "$(device):D$(address=4).BC CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN13")
+    }
+        
+record(bi, "$(device):D$(address=4)IN13")
+    {
+    field(DESC, "D$(address=4) digital input 13")
+    field(INP, "$(device):D$(address=4).BD CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN14")
+    }
+        
+record(bi, "$(device):D$(address=4)IN14")
+    {
+    field(DESC, "D$(address=4) digital input 14")
+    field(INP, "$(device):D$(address=4).BE CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    field(FLNK,"$(device):D$(address=4)IN15")
+    }
+        
+record(bi, "$(device):D$(address=4)IN15")
+    {
+    field(DESC, "D$(address=4) digital input 15")
+    field(INP, "$(device):D$(address=4).BF CP MS")
+    field(ZSV, "$(zsv=MAJOR)")
+    field(OSV, "$(osv=NO_ALARM)")
+    field(ZNAM, "$(znam=Off)")
+    field(ONAM, "$(onam=On)")
+    }

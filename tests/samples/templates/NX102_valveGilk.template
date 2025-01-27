@@ -1,0 +1,436 @@
+
+
+################################################################################
+#% archiver 10 Monitor
+#% controldesk IMG Interlock Status smon
+#
+# The NOBT field specifies that 16 consecutive bits of data will be read into 
+# the record.
+# The ether_ip B flag value of zero in the INP field specifies the address
+# of the first bit of the 16 is the first bit in the element value.
+#
+record(mbbiDirect, "$(device):IMGILK") {
+  field(DESC, "IMG Interlocks")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.IMG[$(ILKNUM)] B 0")
+  field(SCAN, "1 second")
+  field(NOBT, "16")
+}
+
+################################################################################
+#% archiver 10 Monitor
+#% controldesk Pirani Interlock Status smon
+#
+record(mbbiDirect, "$(device):PIRGILK") {
+  field(DESC, "Pirani Interlocks")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.PIRG[$(ILKNUM)] B 0")
+  field(SCAN, "1 second")
+  field(NOBT, "16")
+}
+
+################################################################################
+# Combined Gauge Interlock Status.
+#
+#% archiver 10 Monitor
+record(mbbiDirect, "$(device):GAUGEILK") {
+  field(DESC, "Combined Gauge Interlock")
+  field(INP, "$(device):CALGILK MS")
+}
+
+# Calculation to combine IMG and PIRG interlock status to make
+# combined gauge status.
+#
+record(calc, "$(device):CALGILK") {
+  field(CALC, "A&B")
+  field(FLNK, "$(device):GAUGEILK")
+  field(INPA, "$(device):IMGILK CP MS")
+  field(INPB, "$(device):PIRGILK CP MS")
+}
+
+################################################################################
+# Individual Gauge Interlocks
+#
+# The ZNAM and ONAM fields of these records are initialised by records below
+# which read back the interlock description label strings for the individual
+# bits of the interlock and write into these records.
+#
+record(bi, "$(device):GILK0") {
+  field(DESC, "Gauge ILK 0")
+  field(INP, "$(device):GAUGEILK.B0 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK1") {
+  field(DESC, "Gauge ILK 1")
+  field(INP, "$(device):GAUGEILK.B1 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK2") {
+  field(DESC, "Gauge ILK 2")
+  field(INP, "$(device):GAUGEILK.B2 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK3") {
+  field(DESC, "Gauge ILK 3")
+  field(INP, "$(device):GAUGEILK.B3 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK4") {
+  field(DESC, "Gauge ILK 4")
+  field(INP, "$(device):GAUGEILK.B4 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK5") {
+  field(DESC, "Gauge ILK 5")
+  field(INP, "$(device):GAUGEILK.B5 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK6") {
+  field(DESC, "Gauge ILK 6")
+  field(INP, "$(device):GAUGEILK.B6 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK7") {
+  field(DESC, "Gauge ILK 7")
+  field(INP, "$(device):GAUGEILK.B7 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK8") {
+  field(DESC, "Gauge ILK 8")
+  field(INP, "$(device):GAUGEILK.B8 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK10") {
+  field(DESC, "Gauge ILK 10")
+  field(INP, "$(device):GAUGEILK.BA CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK11") {
+  field(DESC, "Gauge ILK 11")
+  field(INP, "$(device):GAUGEILK.BB CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK12") {
+  field(DESC, "Gauge ILK 12")
+  field(INP, "$(device):GAUGEILK.BC CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK14") {
+  field(DESC, "Gauge ILK 14")
+  field(INP, "$(device):GAUGEILK.BE CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK15") {
+  field(DESC, "Gauge ILK 15")
+  field(INP, "$(device):GAUGEILK.BF CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+################################################################################
+# Descriptions of the Individual Gauge Interlock bits read back from the PLC.
+# The ether_ip S 0 flag means scan period time of 0, required because the record
+# is I/O Intr and does not specify a time.
+# The ether_ip E flag means read one element of the array, not to bundle all
+# requests for that array.
+#
+record(stringin, "$(device):GILK0:DESC") {
+  field(DESC, "Gauge Ilk Bit 0 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B00_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK0:FAN")
+}
+
+record(stringin, "$(device):GILK1:DESC") {
+  field(DESC, "Gauge Ilk Bit 1 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B01_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK1:FAN")
+}
+
+record(stringin, "$(device):GILK2:DESC") {
+  field(DESC, "Gauge Ilk Bit 2 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B02_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK2:FAN")
+}
+
+record(stringin, "$(device):GILK3:DESC") {
+  field(DESC, "Gauge Ilk Bit 3 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B03_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK3:FAN")
+}
+
+record(stringin, "$(device):GILK4:DESC") {
+  field(DESC, "Gauge Ilk Bit 4 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B04_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK4:FAN")
+}
+
+record(stringin, "$(device):GILK5:DESC") {
+  field(DESC, "Gauge Ilk Bit 5 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B05_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK5:FAN")
+}
+
+record(stringin, "$(device):GILK6:DESC") {
+  field(DESC, "Gauge Ilk Bit 6 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B06_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK6:FAN")
+}
+
+record(stringin, "$(device):GILK7:DESC") {
+  field(DESC, "Gauge Ilk Bit 7 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B07_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK7:FAN")
+}
+
+record(stringin, "$(device):GILK8:DESC") {
+  field(DESC, "Gauge Ilk Bit 8 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B08_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK8:FAN")
+}
+
+record(stringin, "$(device):GILK9:DESC") {
+  field(DESC, "Gauge Ilk Bit 9 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B09_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK9:FAN")
+}
+
+record(stringin, "$(device):GILK10:DESC") {
+  field(DESC, "Gauge Ilk Bit 10 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B10_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK10:FAN")
+}
+
+record(stringin, "$(device):GILK11:DESC") {
+  field(DESC, "Gauge Ilk Bit 11 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B11_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK11:FAN")
+}
+
+record(stringin, "$(device):GILK12:DESC") {
+  field(DESC, "Gauge Ilk Bit 12 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B12_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK12:FAN")
+}
+
+record(stringin, "$(device):GILK13:DESC") {
+  field(DESC, "Gauge Ilk Bit 13 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B13_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK13:FAN")
+}
+
+record(stringin, "$(device):GILK14:DESC") {
+  field(DESC, "Gauge Ilk Bit 14 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B14_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK14:FAN")
+}
+
+record(stringin, "$(device):GILK15:DESC") {
+  field(DESC, "Gauge Ilk Bit 15 Description")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) Gauge.B15_Desc[$(ILKNUM)] S 0 E")
+  field(FLNK, "$(device):GILK15:FAN")
+}
+
+################################################################################
+# Records to fanout out the description strings of the Individual
+# Gauge Interlock bits read back from the PLC to where they are
+# required on the the Individual Gauge Interlock records.
+#
+record(sseq, "$(device):GILK0:FAN") {
+  field(DOL1, "$(device):GILK0:DESC")
+  field(LNK1, "$(device):GILK0.ZNAM")
+  field(DOL2, "$(device):GILK0:DESC")
+  field(LNK2, "$(device):GILK0.ONAM")
+}
+
+record(sseq, "$(device):GILK1:FAN") {
+  field(DOL1, "$(device):GILK1:DESC")
+  field(LNK1, "$(device):GILK1.ZNAM")
+  field(DOL2, "$(device):GILK1:DESC")
+  field(LNK2, "$(device):GILK1.ONAM")
+}
+
+record(sseq, "$(device):GILK2:FAN") {
+  field(DOL1, "$(device):GILK2:DESC")
+  field(LNK1, "$(device):GILK2.ZNAM")
+  field(DOL2, "$(device):GILK2:DESC")
+  field(LNK2, "$(device):GILK2.ONAM")
+}
+
+record(sseq, "$(device):GILK3:FAN") {
+  field(DOL1, "$(device):GILK3:DESC")
+  field(LNK1, "$(device):GILK3.ZNAM")
+  field(DOL2, "$(device):GILK3:DESC")
+  field(LNK2, "$(device):GILK3.ONAM")
+}
+
+record(sseq, "$(device):GILK4:FAN") {
+  field(DOL1, "$(device):GILK4:DESC")
+  field(LNK1, "$(device):GILK4.ZNAM")
+  field(DOL2, "$(device):GILK4:DESC")
+  field(LNK2, "$(device):GILK4.ONAM")
+}
+
+record(sseq, "$(device):GILK5:FAN") {
+  field(DOL1, "$(device):GILK5:DESC")
+  field(LNK1, "$(device):GILK5.ZNAM")
+  field(DOL2, "$(device):GILK5:DESC")
+  field(LNK2, "$(device):GILK5.ONAM")
+}
+
+record(sseq, "$(device):GILK6:FAN") {
+  field(DOL1, "$(device):GILK6:DESC")
+  field(LNK1, "$(device):GILK6.ZNAM")
+  field(DOL2, "$(device):GILK6:DESC")
+  field(LNK2, "$(device):GILK6.ONAM")
+}
+
+record(sseq, "$(device):GILK7:FAN") {
+  field(DOL1, "$(device):GILK7:DESC")
+  field(LNK1, "$(device):GILK7.ZNAM")
+  field(DOL2, "$(device):GILK7:DESC")
+  field(LNK2, "$(device):GILK7.ONAM")
+}
+
+record(bi, "$(device):GILK9") {
+  field(DESC, "Gauge ILK 9")
+  field(INP, "$(device):GAUGEILK.B9 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):GILK13") {
+  field(DESC, "Gauge ILK 13")
+  field(INP, "$(device):GAUGEILK.BD CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(sseq, "$(device):GILK8:FAN") {
+  field(DOL1, "$(device):GILK8:DESC")
+  field(LNK1, "$(device):GILK8.ZNAM")
+  field(DOL2, "$(device):GILK8:DESC")
+  field(LNK2, "$(device):GILK8.ONAM")
+}
+
+record(sseq, "$(device):GILK9:FAN") {
+  field(DOL1, "$(device):GILK9:DESC")
+  field(LNK1, "$(device):GILK9.ZNAM")
+  field(DOL2, "$(device):GILK9:DESC")
+  field(LNK2, "$(device):GILK9.ONAM")
+}
+
+record(sseq, "$(device):GILK10:FAN") {
+  field(DOL1, "$(device):GILK10:DESC")
+  field(LNK1, "$(device):GILK10.ZNAM")
+  field(DOL2, "$(device):GILK10:DESC")
+  field(LNK2, "$(device):GILK10.ONAM")
+}
+
+record(sseq, "$(device):GILK11:FAN") {
+  field(DOL1, "$(device):GILK11:DESC")
+  field(LNK1, "$(device):GILK11.ZNAM")
+  field(DOL2, "$(device):GILK11:DESC")
+  field(LNK2, "$(device):GILK11.ONAM")
+}
+
+record(sseq, "$(device):GILK12:FAN") {
+  field(DOL1, "$(device):GILK12:DESC")
+  field(LNK1, "$(device):GILK12.ZNAM")
+  field(DOL2, "$(device):GILK12:DESC")
+  field(LNK2, "$(device):GILK12.ONAM")
+}
+
+record(sseq, "$(device):GILK13:FAN") {
+  field(DOL1, "$(device):GILK13:DESC")
+  field(LNK1, "$(device):GILK13.ZNAM")
+  field(DOL2, "$(device):GILK13:DESC")
+  field(LNK2, "$(device):GILK13.ONAM")
+}
+
+record(sseq, "$(device):GILK14:FAN") {
+  field(DOL1, "$(device):GILK14:DESC")
+  field(LNK1, "$(device):GILK14.ZNAM")
+  field(DOL2, "$(device):GILK14:DESC")
+  field(LNK2, "$(device):GILK14.ONAM")
+}
+
+record(sseq, "$(device):GILK15:FAN") {
+  field(DOL1, "$(device):GILK15:DESC")
+  field(LNK1, "$(device):GILK15.ZNAM")
+  field(DOL2, "$(device):GILK15:DESC")
+  field(LNK2, "$(device):GILK15.ONAM")
+}

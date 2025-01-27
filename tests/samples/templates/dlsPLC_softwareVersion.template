@@ -1,0 +1,35 @@
+
+# % macro, __doc__, Template that reads software version from a PLC. 
+# % macro, device, Device prefix
+record(subArray, "$(device):INPSOFT") {
+  field(DESC, "Software version")
+  field(FLNK, "$(device):CALSRVC")
+  field(FTVL, "USHORT")
+  field(INP, "$(device):DM0XX MS CP")
+  field(MALM, "100")
+  field(INDX, "1")
+}
+
+record(calc, "$(device):CALSRVC") {
+  field(CALC, "(((A>>8)=67)||(A=25345))?1:0")
+  field(INPA, "$(device):INPSOFT.VAL MS")
+  field(FLNK, "$(device):SRVC")
+}
+
+# SR Valve Controller
+#% archiver 10 Monitor
+#% controldesk SR Valve smon
+#
+record(bi, "$(device):SRVC") {
+  field(DESC, "SR Valve Controller")
+  field(INP, "$(device):CALSRVC MS")
+  field(PHAS, "1")
+  field(ZNAM, "No")
+  field(ONAM, "Yes")
+}
+
+record(longin, "$(device):SOFTWARE") {
+  field(DESC, "Software version")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(device):INPSOFT CP MS")
+}

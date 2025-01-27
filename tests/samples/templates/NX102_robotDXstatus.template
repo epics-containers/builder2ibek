@@ -1,0 +1,137 @@
+
+
+# NX102_robotDXstatus.template
+#% macro, __doc__, Template database for reading the status of a DX200 controller through NX102 PLC
+#% macro, name, Object name and gui association name
+#% macro, P, PV prefix
+#% macro, Q, PV suffix
+#% macro, port, port name of ether_ip driver
+#% macro, tag, ether_ip tag name of robot status
+#% macro, scan, value update time
+#% macro, numbits, number of bits used
+#% macro, desc, Description
+#% macro, label0, Label string for status bit 0
+#% macro, label1, Label string for status bit 1
+#% macro, label2, Label string for status bit 2
+#% macro, label3, Label string for status bit 3
+#% macro, label4, Label string for status bit 4
+#% macro, label5, Label string for status bit 5
+#% macro, label6, Label string for status bit 6
+#% macro, label7, Label string for status bit 7
+#% macro, label8, Label string for status bit 8
+#% macro, label9, Label string for status bit 9
+#% macro, labelA, Label string for status bit 10
+#% macro, labelB, Label string for status bit 11
+#% macro, labelC, Label string for status bit 12
+#% macro, labelD, Label string for status bit 13
+#% macro, labelE, Label string for status bit 14
+#% macro, labelF, Label string for status bit 15
+
+# This associates an edm screen with the template
+#  gui, $(name=), edm, NX102_robotDXstatus.edl, P=$(P)$(Q)
+#  gui, $(name=), edmembed, NX102_robotDXstatus-embed.edl, P=$(P)$(Q),label=$(desc=)
+
+# This associates a BOY screen with the template
+include "NX102_robotDXstatus_detail.template"
+
+record(ai, "$(P)$(Q)_RAWVAL") {
+  field(DESC, "raw value from PLC tag")
+  field(SCAN, "$(scan=1 second)")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag)")
+  field(FLNK, "$(P)$(Q)")
+}
+
+record(mbbiDirect, "$(P)$(Q)") {
+  field(DESC, "Status bit field")
+  field(SCAN, "Passive")
+  field(DTYP, "Raw Soft Channel")
+  field(NOBT, "$(numbits)")
+  field(INP, "$(P)$(Q)_RAWVAL PP")
+}
+
+# expand("NX102_robotDXstatusbit.template", statusBit0) {
+#   macro(PV, "$(P)$(Q)")
+#   macro(R, ":B0")
+#   macro(label, "$(label0=unused)")
+# }
+
+record(stringout, "$(P)$(Q):B00") {
+  field(DESC, "$(label0=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B01") {
+  field(DESC, "$(label1=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B02") {
+  field(DESC, "$(label2=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B03") {
+  field(DESC, "$(label3=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B04") {
+  field(DESC, "$(label4=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B05") {
+  field(DESC, "$(label5=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B06") {
+  field(DESC, "$(label6=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B07") {
+  field(DESC, "$(label7=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B08") {
+  field(DESC, "$(label8=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B09") {
+  field(DESC, "$(label9=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B10") {
+  field(DESC, "$(labelA=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B11") {
+  field(DESC, "$(labelB=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B12") {
+  field(DESC, "$(labelC=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B13") {
+  field(DESC, "$(labelD=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B14") {
+  field(DESC, "$(labelE=unused)")
+  field(SCAN, "Passive")
+}
+
+record(stringout, "$(P)$(Q):B15") {
+  field(DESC, "$(labelF=unused)")
+  field(SCAN, "Passive")
+}

@@ -1,0 +1,31 @@
+
+# NX102_digitalIn_Debounced.template
+#% macro, __doc__, Template database reading debounced inputs from word
+# temperature PLC.
+#% macro, name, name
+#% macro, device, PV prefix
+#% macro, port, port name of ether_ip driver
+#% macro, tag, etherip tag
+#% macro, tagidx, tag index
+
+substitute "_device=$(device)"
+substitute "_type=BIT"
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag=Digital_In)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_has_debounce=1"
+
+include "NX102_readWord.template"
+
+
+# % archiver 10 Monitor
+# % controldesk Current Flow Status smon
+record(mbbiDirect, "$(device):DBBIT") {
+  field(DESC, "Debounced Current Inputs")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag=Digital_In).Debounced[$(tagidx)] B 0")
+  field(SCAN, ".5 second")
+  field(NOBT, "16")
+}
+
+#! TemplateField("word","TAGIDX",16777215,0,1)

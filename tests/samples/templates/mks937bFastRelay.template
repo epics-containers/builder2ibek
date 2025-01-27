@@ -1,0 +1,137 @@
+# mks937bFastRelay.template
+#% macro, __doc__, Template database for an mks937b Multi-Sensor System fast-relay output trigger configuration. 
+# A note on the optional macros: they default to an appropriate hard-coded 
+# value if no value is passed for expansion. 
+# They are provided to allow the default set points to be changed. 
+# Once the set point needs to be changed it may be necessary to alter  
+# various other fields defining the range of allowed values. 
+# For the majority of applications the defaults should be used.  The levels 
+# should only be changed at the request of the vacuum group for non-standard 
+# vacuum systems.
+#
+# required substitutions:
+#% macro, device,  device name
+#% macro, port,    serial port (steam device code ie /ty/0/1 => ty_0_1)
+#% macro, address, Controller address (001 .. 253)
+#% macro, channel, MKS 937B channel number (1-4)
+
+# optional substitutions:
+#% macro, frcsp_desc,   The DESC field on the relay setpoint record 
+#% macro, frcsp_level,  The desired relay setpoint value.
+#% macro, frcsp_drvh,   The DRVH field on relay setpoint records 
+#                       (limits max value of relay setpoint)
+#% macro, frcsp_drvl,   The DRVL field on relay setpoint records. 
+#                       (limits min value of relay setpoint)
+#% macro, frcsp_hopr,   The HOPR field on relay setpoint records 
+#                       (high operator value - helps display set correct range).
+#% macro, frcsp_lopr,   The LOPR field on relay setpoint records 
+#                       (low operator value - helps display set correct range).
+#% macro, ilk_write_access_pv ,   Link to the interlocks setpoint global write access record.
+#
+################################################################################
+# 
+# FRLY triggers
+#
+#
+# Force processing of slow PP records 
+record(fanout, "$(device):FRLY:FAN10S")
+{
+    field(DESC, "Fast Relay Scan fanout")
+    field(SCAN, "10 second")
+    field(LNK1, "$(device):FRLY:SP PP")
+    field(SELM, "All")
+}
+
+
+#% archiver 10 Monitor
+#% controldesk IMG FRLY trigger readback
+#
+record(ai, "$(device):FRLY:SP") 
+{
+  field(DESC, "$(frcsp_desc=Fast Relay Trigger level)")
+  field(DTYP, "stream")
+  field(INP, "@mks937b.protocol getfrc_sp($(address),$(channel),$(device):ERRORNUM) $(port) 0")
+  field(SCAN, "Passive")
+  field(EGU, "mbar")
+  field(PREC, "1")
+  field(HOPR, "$(frcsp_hopr=1.0e-2)")
+  field(LOPR, "$(frcsp_lopr=1.3e-5)")
+}
+
+
+# -----------------------------------------------------------------------------------------
+# These two records work together to provide one scan
+# to correctly initialise the SETSP record just once
+# at startup.
+#
+record(bo, "$(device):FRLY:INITSETSPSDIS") 
+{
+  field(DTYP, "Soft Channel")
+  field(VAL, "1")
+  field(OUT, "$(device):FRLY:INITSETSPFAN.DISA")
+}
+record(fanout, "$(device):FRLY:INITSETSPFAN")
+{
+    field(DESC, "Relay 1s Scan fanout")
+    field(SCAN, "1 second")
+    field(LNK1, "$(device):FRLY:ILKSETSP:NOWRITE")
+    field(LNK2, "$(device):FRLY:SETSP")
+    field(LNK3, "$(device):FRLY:INITSETSPSDIS")
+    field(SELM, "All")
+}
+
+record(ao, "$(device):FRLY:SETSP") 
+{
+  field(DESC, "$(frcsp_desc=Fast Relay Trigger level)")
+  field(DTYP, "stream")
+  field(OUT, "@mks937b.protocol setfrc_sp($(address),$(channel)) $(port) 0")
+  field(EGU, "mbar")
+  field(PREC, "1")
+  #field(PINI, "YES")
+  field(SDIS, "$(device):FRLY:ILKSETSP:NOWRITE")
+  field(DRVH, "$(frcsp_drvh=1.2e-2)")
+  field(DRVL, "$(frcsp_drvl=2.7e-10)")
+  field(DOL,  "$(frcsp_level=1.0e-6)")
+  field(FLNK, "$(device):FRLY:SP PP")
+}
+
+record(calc, "$(device):FRLY:EXISTS") 
+{
+  field(DESC, "Fast Relay Output Exists")
+  field(CALC, "1")
+  field(INPA, "$(channel)")
+  field(INPB, "1")
+  field(PINI, "YES")
+}
+
+#
+# The :CONSTZERO record allows the :ILKSETSP:NOWRITE record (below)
+# to have a PV link rather than constant zero value, which would be 
+# invalid with the "MS CP" modifiers
+#
+record(bi, "$(device):FRLY:CONSTZERO")
+  {
+  field(DESC, "Constant zero value")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(INP, "0")
+  field(ZNAM, "Zero")
+  field(ONAM, "One")
+  }
+
+# Disable the writing of setpoints to hardware so the machine does not trip
+# when the IOC is rebooted with lower default interlock pressures
+# This record is local to the relay instance, but controlled by the global
+# access record - given in the macro parameters. If not supplied, it will
+# assume an empty INP and do nothing.
+#
+record(bi, "$(device):FRLY:ILKSETSP:NOWRITE")
+  {
+  field(DESC, "ILK setpoint access")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(INP, "$(ilk_write_access_pv=$(device):FRLY:CONSTZERO) MS CP")
+  field(ZNAM, "Allow")
+  field(ONAM, "Inhibit")
+  }
+  

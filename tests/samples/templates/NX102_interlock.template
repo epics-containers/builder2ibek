@@ -1,0 +1,104 @@
+
+# NX102_interlock.vdb expanded to NX102_interlock.template by flatdb.
+# % macro, __doc__, Template showing the status of various MPS interlocks in
+# an Omron NX102 PLC.
+# % macro, device, device prefix
+# % macro, port, port name of ether_ip driver
+# % macro, interlock, Interlock suffix (e.g. :INT1)
+# % macro, tag, NX PLC tag string e.g. ILK (from ILK.Control[1])
+# % macro, tagidx, NX PLC tag index number e.g. 1 (from ILK.Control[1])
+# % macro, desc, Permit description (e.g. Front end permit)
+# % macro, name, Object name and gui association name
+# % macro, auto_reset, Set to 1 to push the reset button whenever the raw interlocks are all ok
+# 
+# This associates an edm screen with the template
+# % gui, $(name=), edm, NX102_interlock.edl, device=$(device), interlock=$(interlock)
+# % gui, $(name=), edmembed, NX102_interlock-embed-small.edl, device=$(device), interlock=$(interlock), desc=$(desc)
+# This associates BOY screens with the template
+# % gui, $(name=), boydetail, dlsPLCApp_opi/NX102_interlock_small_detail.opi, device=$(device), interlock=$(interlock), name=$(name=)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_interlock_small_embed_box.opi, device=$(device), interlock=$(interlock), name=$(name=)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_interlock_small_embed.opi, device=$(device), interlock=$(interlock), name=$(name=)
+#
+# The interface record interprets the NX102 interface for the
+# interlock according to the PLC spreadsheet after its value is read
+# back from the PLC.
+# Interface 0 is a standard interlock which can be reset.
+# Interface 1 shows the status word of an interlock, but it cannot be reset.
+# The record allows gui screens to manage whether to present a Reset button
+# or not (similarly latched and ini columns).
+# The template actually implements the extra stuff in any case, but the
+# PLC will not allow it i.e. the INTERFACE and INTERFACE:RAW records do NOT
+# interact with other records in the database at time of writing (by acting
+# the RESET DISA, DISV , SDIS fields for example).
+#
+record(mbbi, "$(device)$(interlock):INTERFACE") {
+  field(DTYP, "Soft Channel")
+  field(INP, "$(device)$(interlock):INTERFACE:RAW")
+  field(ZRST, "Resettable Ilk")
+  field(ONST, "Status Only Ilk")
+}
+
+# Read back the interface code for the interlock from the PLC.
+# Hard coded scan rate inherited from copying the valve template equivalent.
+record(ai, "$(device)$(interlock):INTERFACE:RAW") {
+  field(SCAN, "10 second")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Interfc[$(tagidx)]")
+  field(FLNK, "$(device)$(interlock):INTERFACE")
+}
+
+# Added a layer of indirection here due to the underlying ether_ip driver
+# It is set up to also read the value from the PLC, which is set to 65535 after
+# a reset, and triggers the record to process, sending a 2 (reset command)
+# Therefore the control value was continuously toggling between 2 and 65535
+# This way, the CONTROL:WR record holds that value and the RESET record
+# only processes when either caput or the AUTORESET record triggers it
+record(ao, "$(device)$(interlock):RESET") {
+  field(DESC, "Write number to a tag on PLC")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(device)$(interlock):CONTROL:WR PP")
+  field(DOL, "2")
+  field(OMSL, "closed_loop")
+  field(DRVH, "2")
+}
+
+# S 1 necessary on passive field to provide read rate from PLC
+# See ether_ip for more details
+record(ao, "$(device)$(interlock):CONTROL:WR") {
+  field(DESC, "Write to control value on PLC")
+  field(SCAN, "Passive")
+  field(DTYP, "EtherIP")
+  field(OUT, "@$(port) $(tag).Control[$(tagidx)] S 1")
+}
+
+# If auto_reset macro has been defined as 1, the AUTORESET record
+# triggers the RESET record to clear the latched interlocks when the
+# raw interlocks clear.
+record(calcout, "$(device)$(interlock):AUTORESET") {
+  field(INPA, "$(device)$(interlock):RAWILK CP")
+  field(B, "$(auto_reset=0)")
+  field(CALC, "B=1&&A=65535")
+  field(OOPT, "Transition To Non-zero")
+  field(OUT, "$(device)$(interlock):RESET.PROC PP")
+}
+
+record(stringout, "$(device)$(interlock):NAME") {
+  field(DESC, "Name of interlock")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(desc)")
+}
+
+# The VDCT expand command causes a utility called flatdb to be run which
+# includes the target file and substitutes the macro definitions as specified.
+#
+# Empty tag prefix for standalone interlocks.
+substitute "_device=$(device)"
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_TAGPREFIX="
+substitute "_typeprefix="
+substitute "_DIR=$(interlock):"
+
+include "NX102_valveIlk.template"

@@ -1,0 +1,223 @@
+
+
+# dlsPLC_interlockSummary.template
+#% macro, __doc__, Template database for a summary PV of up to 24 interlocks
+#% macro, device, device name
+#% macro, ilk1, Interlock suffix (e.g. INT1)
+#% macro, ilk2, Interlock suffix (e.g. INT1)
+#% macro, ilk3, Interlock suffix (e.g. INT1)
+#% macro, ilk4, Interlock suffix (e.g. INT1)
+#% macro, ilk5, Interlock suffix (e.g. INT1)
+#% macro, ilk6, Interlock suffix (e.g. INT1)
+#% macro, ilk7, Interlock suffix (e.g. INT1)
+#% macro, ilk8, Interlock suffix (e.g. INT1)
+#% macro, ilk9, Interlock suffix (e.g. INT1)
+#% macro, ilk10, Interlock suffix (e.g. INT1)
+#% macro, ilk11, Interlock suffix (e.g. INT1)
+#% macro, ilk12, Interlock suffix (e.g. INT1)
+#% macro, ilk13, Interlock suffix (e.g. INT1)
+#% macro, ilk14, Interlock suffix (e.g. INT1)
+#% macro, ilk15, Interlock suffix (e.g. INT1)
+#% macro, ilk16, Interlock suffix (e.g. INT1)
+#% macro, ilk17, Interlock suffix (e.g. INT1)
+#% macro, ilk18, Interlock suffix (e.g. INT1)
+#% macro, ilk19, Interlock suffix (e.g. INT1)
+#% macro, ilk20, Interlock suffix (e.g. INT1)
+#% macro, ilk21, Interlock suffix (e.g. INT1)
+#% macro, ilk22, Interlock suffix (e.g. INT1)
+#% macro, ilk23, Interlock suffix (e.g. INT1)
+#% macro, ilk24, Interlock suffix (e.g. INT1)
+
+
+record(ai, "$(device):ILK:OK-VALUE") {
+  field(DESC, "Value for interlock OK comparison")
+  field(PINI, "YES")
+  field(VAL, "65535")
+}
+
+record(ai, "$(device):NO-INTERLOCK:ILK") {
+  field(DESC, "Placeholder for no interlock")
+  field(INP, "$(device):ILK:OK-VALUE.VAL CP")
+}
+
+record(calc, "$(device):ILK:GLOBAL1") {
+  field(CALC, "A&B&C&D&E&F&G&H&I&J&K&L")
+  field(INPA, "$(device):ILK:CHECK1 CP")
+  field(INPB, "$(device):ILK:CHECK2 CP")
+  field(INPC, "$(device):ILK:CHECK3 CP")
+  field(INPD, "$(device):ILK:CHECK4 CP")
+  field(INPE, "$(device):ILK:CHECK5 CP")
+  field(INPF, "$(device):ILK:CHECK6 CP")
+  field(INPG, "$(device):ILK:CHECK7 CP")
+  field(INPH, "$(device):ILK:CHECK8 CP")
+  field(INPI, "$(device):ILK:CHECK9 CP")
+  field(INPJ, "$(device):ILK:CHECK10 CP")
+  field(INPK, "$(device):ILK:CHECK11 CP")
+  field(INPL, "$(device):ILK:CHECK12 CP")
+}
+
+record(calc, "$(device):ILK:GLOBAL2") {
+  field(CALC, "A&B&C&D&E&F&G&H&I&J&K&L")
+  field(INPA, "$(device):ILK:CHECK13 CP")
+  field(INPB, "$(device):ILK:CHECK14 CP")
+  field(INPC, "$(device):ILK:CHECK15 CP")
+  field(INPD, "$(device):ILK:CHECK16 CP")
+  field(INPE, "$(device):ILK:CHECK17 CP")
+  field(INPF, "$(device):ILK:CHECK18 CP")
+  field(INPG, "$(device):ILK:CHECK19 CP")
+  field(INPH, "$(device):ILK:CHECK20 CP")
+  field(INPI, "$(device):ILK:CHECK21 CP")
+  field(INPJ, "$(device):ILK:CHECK22 CP")
+  field(INPK, "$(device):ILK:CHECK23 CP")
+  field(INPL, "$(device):ILK:CHECK24 CP")
+}
+
+record(calc, "$(device):ILK:GLOBAL") {
+  field(DESC, "Global indicator for interlocks OK")
+  field(CALC, "A & B")
+  field(INPA, "$(device):ILK:GLOBAL1.VAL CP")
+  field(INPB, "$(device):ILK:GLOBAL2.VAL CP")
+}
+
+substitute "_N=1"
+substitute "_ilk=$(ilk1=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=2"
+substitute "_ilk=$(ilk2=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=3"
+substitute "_ilk=$(ilk3=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=4"
+substitute "_ilk=$(ilk4=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=5"
+substitute "_ilk=$(ilk5=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=6"
+substitute "_ilk=$(ilk6=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=7"
+substitute "_ilk=$(ilk7=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=8"
+substitute "_ilk=$(ilk8=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=9"
+substitute "_ilk=$(ilk9=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=10"
+substitute "_ilk=$(ilk10=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=11"
+substitute "_ilk=$(ilk11=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=12"
+substitute "_ilk=$(ilk12=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=13"
+substitute "_ilk=$(ilk13=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=14"
+substitute "_ilk=$(ilk14=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=15"
+substitute "_ilk=$(ilk15=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=16"
+substitute "_ilk=$(ilk16=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=17"
+substitute "_ilk=$(ilk17=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=18"
+substitute "_ilk=$(ilk18=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=19"
+substitute "_ilk=$(ilk19=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=20"
+substitute "_ilk=$(ilk20=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=21"
+substitute "_ilk=$(ilk21=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=22"
+substitute "_ilk=$(ilk22=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=23"
+substitute "_ilk=$(ilk23=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"
+
+
+substitute "_N=24"
+substitute "_ilk=$(ilk24=NO-INTERLOCK)"
+
+include "dlsPLC_interlock_check.template"

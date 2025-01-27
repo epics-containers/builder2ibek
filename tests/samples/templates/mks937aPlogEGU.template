@@ -1,0 +1,18 @@
+################################################################################
+# mks937aPlogEGU.template
+#
+# Template to read mks937a pressure from another device (PLC) in EGUs. This template
+# converts to LOG and is to be used as the input to the PLOG PV
+#
+# substitutions:
+# % macro, device, device name
+# % macro, p_egu_pv, Raw value ADC PV name
+################################################################################
+
+#% archiver 20 Monitor
+record(calc, "$(device)")
+{
+    field(DESC, "Conversion of P to PLOG")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(p_egu_pv) CP MS")
+}

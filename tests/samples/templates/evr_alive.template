@@ -1,0 +1,24 @@
+# % macro, SYSTEM, Device prefix
+# % macro, device, Device prefix
+
+# decrement the event counter at a constant rate
+
+record(calcout, "$(SYSTEM=$(device)):HBT-CHECK")
+{
+	field(SCAN, ".5 second")
+	field(CALC, "(VAL>0)?VAL-1:0")
+
+	field(LOLO, "1")
+	field(LLSV, "MAJOR")
+}
+
+# reset our event counter each time we receive the Linac heart beat event
+
+record(calcout, "$(SYSTEM=$(device)):HBT-COUNT")
+{
+	field(SCAN, "Event")
+	field(EVNT, "37")
+	
+	field(CALC, "5")
+	field(OUT,  "$(SYSTEM=$(device)):HBT-CHECK")
+}

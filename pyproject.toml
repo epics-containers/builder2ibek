@@ -26,6 +26,7 @@ dev = [
     "pre-commit",
     "pytest",
     "pytest-cov",
+    "pytest-mock",
     "ruff",
     "tox-direct",
     "types-mock",

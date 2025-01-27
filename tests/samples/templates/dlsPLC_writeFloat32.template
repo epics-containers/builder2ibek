@@ -1,0 +1,32 @@
+
+
+record(waveform, "$(P)$(Q):SET") {
+  field(DESC, "Set 1 float word")
+  field(SCAN, "Passive")
+  field(DTYP, "asynFloat32ArrayOut")
+  field(INP, "@asyn($(port), $(addr), $(timeout=0)) FINS_DM_WRITE_32")
+  field(FTVL, "FLOAT")
+  field(PRIO, "MEDIUM")
+}
+
+# % macro, __doc__, Write an float32 value into a PLC DM variable
+# % macro, P, device prefix
+# % macro, Q, device suffix
+# % macro, port, asyn port name of FINS driver
+# % macro, timeout, Timeout in seconds for the FINS protocol reads/writes
+# % macro, addr, DM variable of the LOWERer address of the float32
+# % macro, name, Object name and gui association name
+# % macro, drvl, Drive low limit
+# % macro, drvh, Drive high limit
+# 
+# This associates an edm screen with the template
+# % gui, $(name=), edmembed, dlsPLC_writeSingle.edl, P=$(P),Q=$(Q)
+# This makes the component icon reflect the severity
+# % gui, $(name=), sevr
+# % archiver 10 Monitor
+record(ao, "$(P)$(Q)") {
+  field(PREC, "3")
+  field(OUT, "$(P)$(Q):SET PP MS")
+  field(DRVL, "$(drvl=0)")
+  field(DRVH, "$(drvh=0)")
+}

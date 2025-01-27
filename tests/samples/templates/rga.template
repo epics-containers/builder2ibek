@@ -1,0 +1,5612 @@
+# rga.db
+# Template database for an RGA
+# Pete Owens - 24-6-04
+#
+# It appears that any mass to be displayed on the summary rga.edl
+# has its SDIS field set to DIS20
+# IJG 11-5-11
+#
+# Macros:
+#% macro, device, Device Prefix
+#% macro, port, Asyn Serial Port e.g. ty_40_0
+#% macro, channel, RGA channel number (port number of PC comm port 1-4)
+#% macro, name, Object and gui association name
+#% macro, mm00_label, Optional
+#% macro, mm01_label, Optional
+#% macro, mm02_label, Optional
+#% macro, mm03_label, Optional
+#% macro, mm04_label, Optional
+#% macro, mm05_label, Optional
+#% macro, mm06_label, Optional
+#% macro, mm07_label, Optional
+#% macro, mm08_label, Optional
+#% macro, mm09_label, Optional
+#% macro, mm10_label, Optional
+#% macro, mm11_label, Optional
+#% macro, mm12_label, Optional
+#% macro, mm13_label, Optional
+#% macro, mm14_label, Optional
+#% macro, mm015_label, Optional
+#% macro, mm00_mass, Optional
+#% macro, mm01_mass, Optional
+#% macro, mm02_mass, Optional
+#% macro, mm03_mass, Optional
+#% macro, mm04_mass, Optional
+#% macro, mm05_mass, Optional
+#% macro, mm06_mass, Optional
+#% macro, mm07_mass, Optional
+#% macro, mm08_mass, Optional
+#% macro, mm09_mass, Optional
+#% macro, mm10_mass, Optional
+#% macro, mm11_mass, Optional
+#% macro, mm12_mass, Optional
+#% macro, mm13_mass, Optional
+#% macro, mm14_mass, Optional
+#% macro, mm15_mass, Optional
+#% macro, pjmm00_label, Optional
+#% macro, pjmm01_label, Optional
+#% macro, pjmm02_label, Optional
+#% macro, pjmm03_label, Optional
+#% macro, pjmm04_label, Optional
+#% macro, pjmm05_label, Optional
+#% macro, pjmm06_label, Optional
+#% macro, pjmm07_label, Optional
+#% macro, pjmm08_label, Optional
+#% macro, pjmm09_label, Optional
+#% macro, pjmm10_label, Optional
+#% macro, pjmm11_label, Optional
+#% macro, pjmm12_label, Optional
+#% macro, pjmm13_label, Optional
+#% macro, pjmm14_label, Optional
+#% macro, pjmm015_label, Optional
+#% macro, pjmm00_mass, Optional
+#% macro, pjmm01_mass, Optional
+#% macro, pjmm02_mass, Optional
+#% macro, pjmm03_mass, Optional
+#% macro, pjmm04_mass, Optional
+#% macro, pjmm05_mass, Optional
+#% macro, pjmm06_mass, Optional
+#% macro, pjmm07_mass, Optional
+#% macro, pjmm08_mass, Optional
+#% macro, pjmm09_mass, Optional
+#% macro, pjmm10_mass, Optional
+#% macro, pjmm11_mass, Optional
+#% macro, pjmm12_mass, Optional
+#% macro, pjmm13_mass, Optional
+#% macro, pjmm14_mass, Optional
+#% macro, pjmm15_mass, Optional
+
+################################################################################
+
+# This associates an edm screen with the template
+# % gui, $(name=), edm, rga.edl, device=$(device)
+# This associates a BOY screen with the template
+# % gui, $(name=), boycomponent, rgaApp_opi/rga.opi, device=$(device), desc=$(device), name=$(name=)
+# % gui, $(name=), boyembed, rgaApp_opi/rga_embed.opi, device=$(device), desc=$(device), name=$(name=)
+# % gui, $(name=), readback, Status,                $(device):STA
+
+# Head Connected
+#
+#
+#% archiver 10 Monitor
+#
+record(stringin, "$(device):HEAD")
+{
+    field(DESC, "Head")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol head($(channel)) $(port) 0")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Head Status
+#
+record(calc, "$(device):STA")
+{
+    field(DESC, "Overall status")
+    field(CALC, "((A>4)&&(A<=7)&&(B#1))?0:A")
+    field(SCAN, "1 second")
+    field(INPA, "$(device):HEADSTA PP")
+    field(INPB, "$(device):FILSTA PP")
+    field(INPC, "$(device):SEV MS")
+}
+record(calc, "$(device):SEV")
+{
+    field(DESC, "Persistent Severity")
+    field(CALC, "(B=3)?((A>999)?1000:(A+1)):0")
+    field(SCAN, "1 second")
+    field(INPA, "$(device):SEV.VAL")
+    field(INPB, "$(device):HEADSTA.SEVR")
+    field(HIGH, "30")
+    field(HIHI, "120")
+    field(HSV,  "MAJOR")
+    field(HHSV, "INVALID")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Head Status smon
+#
+record(mbbi, "$(device):HEADSTA")
+{
+    field(DESC, "Head Status")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol sta($(channel)) $(port) 0")
+#    field(SCAN, "1 second")
+    field(FLNK, "$(device):DIS200")
+    field(ZRST, "Idle")
+    field(ONST, "Local Control")
+    field(TWST, "Degas Filament")
+    field(THST, "Cal Faraday")
+    field(FRST, "Cal Multiplier")
+    field(FVST, "Barchart 1-50")
+    field(SXST, "Barchart 1-100")
+    field(SVST, "Barchart 1-200")
+    field(EIST, "Analog 1-200")
+    field(NIST, "No RGA")
+    field(TEST, "Peak Jump")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "MINOR")
+    field(ONSV, "MINOR")
+    field(TWSV, "MINOR")
+    field(THSV, "MINOR")
+    field(FRSV, "MINOR")
+    field(FVSV, "NO_ALARM")
+    field(SXSV, "NO_ALARM")
+    field(SVSV, "NO_ALARM")
+    field(EISV, "NO_ALARM")
+    field(NISV, "INVALID")
+    field(TESV, "NO_ALARM")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Head Status scon
+#
+record(mbbo, "$(device):CON")
+{
+    field(DESC, "Head Status")
+    field(DTYP, "stream")
+    field(OUT,  "@rga.protocol con($(channel)) $(port) 0")
+    field(NOBT, "4")
+    field(ZRVL, "0")
+    field(ONVL, "1")
+    field(TWVL, "2")
+    field(THVL, "3")
+    field(FRVL, "4")
+    field(FVVL, "5")
+    field(SXVL, "6")
+    field(SVVL, "7")
+    field(EIVL, "8")
+    field(TEVL, "10")
+    field(ZRST, "Stop")
+    field(ONST, "Local Control")
+    field(TWST, "Degas Filament")
+    field(THST, "Cal Faraday")
+    field(FRST, "Cal Multiplier")
+    field(FVST, "Barchart 1-50")
+    field(SXST, "Barchart 1-100")
+    field(SVST, "Barchart 1-200")
+#    field(EIST, "Analog 1-200")
+    field(TEST, "Peak Jump")
+}
+################################################################################
+# Disable Barcharts
+#
+#% archiver 10 Monitor
+#
+record(bo, "$(device):SEL")
+{
+    field(DESC, "Select Bars")
+    field(FLNK, "$(device):DIS200")
+    field(VAL,  "0")
+    field(ZNAM, "Selected")
+    field(ONAM, "All")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):DIS200")
+{
+    field(DESC, "Disable 200")
+    field(CALC, "(A=7)&&(B=1)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):SEL")
+    field(FLNK, "$(device):DIS100")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):DIS100")
+{
+    field(DESC, "Disable 100")
+    field(CALC, "((A=6)||(A=7))&&(B=1)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):SEL")
+    field(FLNK, "$(device):DIS50")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):DIS50")
+{
+    field(DESC, "Disable 50")
+    field(CALC, "(A>=5)&&(A<=7)&&(B=1)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):SEL")
+    field(FLNK, "$(device):DIS20")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):DIS20")
+{
+    field(DESC, "Disable Select")
+    field(CALC, "(A>=5)&&(A<=7)?0:1")
+    field(INPA, "$(device):STA")
+    field(FLNK, "$(device):DISPJ")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):DISPJ")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):SEL")
+    field(FLNK, "$(device):DISPJ1")
+}
+record(calc, "$(device):DISPJ1")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN1.DESC")
+    field(FLNK, "$(device):DISPJ2")
+}
+record(calc, "$(device):DISPJ2")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN2.DESC")
+    field(FLNK, "$(device):DISPJ3")
+}
+record(calc, "$(device):DISPJ3")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN3.DESC")
+    field(FLNK, "$(device):DISPJ4")
+}
+record(calc, "$(device):DISPJ4")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN4.DESC")
+    field(FLNK, "$(device):DISPJ5")
+}
+record(calc, "$(device):DISPJ5")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN5.DESC")
+    field(FLNK, "$(device):DISPJ6")
+}
+record(calc, "$(device):DISPJ6")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN6.DESC")
+    field(FLNK, "$(device):DISPJ7")
+}
+record(calc, "$(device):DISPJ7")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN7.DESC")
+    field(FLNK, "$(device):DISPJ8")
+}
+record(calc, "$(device):DISPJ8")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN8.DESC")
+    field(FLNK, "$(device):DISPJ9")
+}
+record(calc, "$(device):DISPJ9")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN9.DESC")
+    field(FLNK, "$(device):DISPJ10")
+}
+record(calc, "$(device):DISPJ10")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN10.DESC")
+    field(FLNK, "$(device):DISPJ11")
+}
+record(calc, "$(device):DISPJ11")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN11.DESC")
+    field(FLNK, "$(device):DISPJ12")
+}
+record(calc, "$(device):DISPJ12")
+{
+    field(DESC, "Disable Peak Jump")
+    field(CALC, "(A=10)&&(B>0)?0:1")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):PJ:BIN12.DESC")
+}
+################################################################################
+# Current Selected Filament
+#
+#
+#% archiver 10 Monitor
+#% controldesk Filament smon
+#
+record(bi,"$(device):FIL") 
+{
+    field(DESC, "Filament")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol fil($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+    field(SDIS, "$(device):MODE")
+    field(ZNAM, "Filament 1")
+    field(ONAM, "Filament 2")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Filament scon
+#
+record(bo, "$(device):SETFIL")
+{
+    field(DESC, "Filament")
+    field(DTYP, "stream")
+    field(OUT,  "@rga.protocol setfil($(channel)) $(port) 0")
+    field(ZNAM, "Filament 1")
+    field(ONAM, "Filament 2")
+}
+################################################################################
+# Filament Status
+#
+#
+#% archiver 10 Monitor
+#% controldesk Filament Status smon
+#
+record(mbbi, "$(device):FILSTA")
+{
+    field(DESC, "Filament Status")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol filsta($(channel)) $(port) 0")
+#    field(SCAN, "1 second")
+    field(SDIS, "$(device):MODE")
+    field(ZRST, "Off")
+    field(ONST, "On")
+    field(TWST, "Warming up")
+    field(THST, "Cooling Down")
+    field(FRST, "Failed")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "MAJOR")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Filament Status scon
+#
+record(bo, "$(device):FILCON")
+{
+    field(DESC, "Filament Control")
+    field(DTYP, "stream")
+    field(OUT,  "@rga.protocol filcon($(channel)) $(port) 0")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+################################################################################
+# IMG Interlock Status
+#
+#% archiver 10 Monitor
+#% controldesk IMG Interlock smon
+#
+record(bi, "$(device):ILK") 
+{
+    field(DESC, "IMG Interlock")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol ilk($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+    field(SDIS, "$(device):MODE")
+    field(ZNAM, "OK")
+    field(ONAM, "Tripped")
+    field(ZSV,  "NO_ALARM")
+    field(OSV,  "MAJOR")
+}
+################################################################################
+# Multiplier Status
+#
+#% archiver 10 Monitor
+#% controldesk Multiplier smon
+#
+record(bi,"$(device):MLTSTA") 
+{
+    field(DESC, "Multiplier")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol mltsta($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Multiplier scon
+#
+record(bo, "$(device):MLTCON")
+{
+    field(DESC, "Multiplier")
+    field(DTYP, "stream")
+    field(OUT,  "@rga.protocol mltcon($(channel)) $(port) 0")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
+}
+################################################################################
+# Scan Mode Status
+#
+#% archiver 10 Monitor
+#% controldesk Scan Mode smon
+#
+record(bi,"$(device):SCAN") 
+{
+    field(DESC, "Scan Mode")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol scan($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+    field(ZNAM, "Single")
+    field(ONAM, "Continuous")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Scan Mode scon
+#
+record(bo, "$(device):SETSCAN")
+{
+    field(DESC, "Scan Mode")
+    field(DTYP, "stream")
+    field(OUT,  "@rga.protocol setscan($(channel)) $(port) 0")
+    field(ZNAM, "Single")
+    field(ONAM, "Continuous")
+}
+################################################################################
+# Control Mode Status
+#
+#% archiver 10 Monitor
+#
+record(bi,"$(device):MODE") 
+{
+    field(DESC, "Scan Mode")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol mode($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+    field(ZNAM, "Remote")
+    field(ONAM, "Local")
+}
+#
+#% archiver 10 Monitor
+#
+record(bo, "$(device):SETMODE")
+{
+    field(DESC, "Scan Mode")
+    field(DTYP, "stream")
+    field(OUT,  "@rga.protocol setmode($(channel)) $(port) 0")
+    field(ZNAM, "Remote")
+    field(ONAM, "Local")
+}
+################################################################################
+# Are there data to read
+#
+#% archiver 10 Monitor
+#% controldesk Data to read smon
+#
+record(mbbi, "$(device):DATA")
+{
+    field(DESC, "Data to read")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol data($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+    field(ZRST, "No Data")
+    field(ONST, "Barchart 1-50")
+    field(TWST, "Barchart 1-100")
+    field(THST, "Barchart 1-200")
+    field(FRST, "Analog 1-200")
+    field(FVST, "Peak Jump")
+    field(UNSV, "NO_ALARM")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "NO_ALARM")
+    field(FVSV, "NO_ALARM")
+}
+################################################################################
+# Date of current scan
+#
+#% archiver 10 Monitor
+#% controldesk Date readback
+#
+record(stringin, "$(device):DATE")
+{
+    field(DESC, "Date")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol date($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+}
+###
+### THESE RECORDS REMOVED TO SAVE RS232 BANDWIDTH
+### When we move to 3.14 we can use sCalcout
+###
+#record(stringin, "$(device):YEAR")
+#{
+#    field(DESC, "Year")
+#    field(DTYP, "stream")
+#    field(INP,  "@rga.protocol year($(channel)) $(port) 0")
+#    field(SCAN, "10 second")
+#    field(SDIS, "$(device):DIS50")
+#}
+#record(longin, "$(device):MON")
+#{
+#    field(DESC, "Month")
+#    field(DTYP, "stream")
+#    field(INP,  "@rga.protocol mon($(channel)) $(port) 0")
+#    field(SCAN, "10 second")
+#    field(SDIS, "$(device):DIS50")
+#    field(HOPR, "12")
+#    field(LOPR, "1")
+#    field(HIGH, "12")
+#    field(LOW,  "1")
+#    field(HSV,  "MINOR")
+#    field(LSV,  "MINOR")
+#}
+#record(longin, "$(device):DAY")
+#{
+#    field(DESC, "Day")
+#    field(DTYP, "stream")
+#    field(INP,  "@rga.protocol day($(channel)) $(port) 0")
+#    field(SCAN, "10 second")
+#    field(SDIS, "$(device):DIS50")
+#    field(HOPR, "31")
+#    field(LOPR, "1")
+#    field(HIGH, "31")
+#    field(LOW,  "1")
+#    field(HSV,  "MINOR")
+#    field(LSV,  "MINOR")
+#}
+#record(stringin, "$(device):HOUR")
+#{
+#    field(DESC, "Hour")
+#    field(DTYP, "stream")
+#    field(INP,  "@rga.protocol hour($(channel)) $(port) 0")
+#    field(SCAN, "10 second")
+#    field(SDIS, "$(device):DIS50")
+#}
+#record(stringin, "$(device):MIN")
+#{
+#    field(DESC, "Minute")
+#    field(DTYP, "stream")
+#    field(INP,  "@rga.protocol min($(channel)) $(port) 0")
+#    field(SCAN, "10 second")
+#    field(SDIS, "$(device):DIS50")
+#}
+#record(stringin, "$(device):SEC")
+#{
+#    field(DESC, "Second")
+#    field(DTYP, "stream")
+#    field(INP,  "@rga.protocol sec($(channel)) $(port) 0")
+#    field(SCAN, "10 second")
+#    field(SDIS, "$(device):DIS50")
+#}
+################################################################################
+# Detector Setting
+#
+#% archiver 10 Monitor
+#% controldesk Detector Setting smon
+#
+record(mbbi, "$(device):DET")
+{
+    field(DESC, "Detector Setting")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol det($(channel)) $(port) 0")
+    field(SCAN, "1 second")
+    field(ZRST, "No Data")
+    field(ONST, "Faraday")
+    field(TWST, "Multiplier")
+}
+################################################################################
+# Total Pressure
+#
+#% archiver 10 Monitor
+#% controldesk Total Pressure readback
+#
+record(ai, "$(device):TOTP")
+{
+    field(DESC, "Total Pressure")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol total($(channel)) $(port) 0")
+    field(SCAN, "10 second")
+    field(FLNK, "$(device):TOTPLOG")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(calcout, "$(device):TOTPADEL")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):TOTP.ADEL")
+    field(INPA, "$(device):TOTP")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):TOTPLOG")
+{
+    field(DESC, "Total Pressure")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):TOTP MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+################################################################################
+# Sum Partial
+#
+#% archiver 10 Monitor
+#% controldesk Sum of Peaks readback
+#
+record(ai, "$(device):SUMP")
+{
+    field(DESC, "Sum of Peaks")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol sum($(channel)) $(port) 0")
+    field(SCAN, "10 second")
+    field(FLNK, "$(device):SUMPLOG")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(calcout, "$(device):SUMPADEL")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):SUMP.ADEL")
+    field(INPA, "$(device):SUMP")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):SUMPLOG")
+{
+    field(DESC, "Sum of Peaks")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):SUMP MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+################################################################################
+# Bar Chart Deadband
+#
+record(calcout, "$(device):ADEL:M2")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M2.ADEL")
+    field(INPA, "$(device):BAR:M2")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M4")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M4.ADEL")
+    field(INPA, "$(device):BAR:M4")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M14")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M14.ADEL")
+    field(INPA, "$(device):BAR:M14")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M15")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M15.ADEL")
+    field(INPA, "$(device):BAR:M15")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M16")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M16.ADEL")
+    field(INPA, "$(device):BAR:M16")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M18")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M18.ADEL")
+    field(INPA, "$(device):BAR:M18")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M28")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M28.ADEL")
+    field(INPA, "$(device):BAR:M28")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M32")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M32.ADEL")
+    field(INPA, "$(device):BAR:M32")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M40")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M40.ADEL")
+    field(INPA, "$(device):BAR:M40")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M44")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M44.ADEL")
+    field(INPA, "$(device):BAR:M44")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+record(calcout, "$(device):ADEL:M69")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):BAR:M69.ADEL")
+    field(INPA, "$(device):BAR:M69")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Bar Chart
+#
+record(ai, "$(device):BAR:M1")
+{
+    field(DESC, "Mass 1")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),1) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M1")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk H2 readback
+#
+record(ai, "$(device):BAR:M2")
+{
+    field(DESC, "H2")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),2) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M2")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M3")
+{
+    field(DESC, "Mass 3")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),3) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M3")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk He readback
+#
+record(ai, "$(device):BAR:M4")
+{
+    field(DESC, "He")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),4) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M4")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M5")
+{
+    field(DESC, "Mass 5")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),5) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M5")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M6")
+{
+    field(DESC, "Mass 6")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),6) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M6")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M7")
+{
+    field(DESC, "Mass 7")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),7) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M7")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M8")
+{
+    field(DESC, "Mass 8")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),8) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M8")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M9")
+{
+    field(DESC, "Mass 9")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),9) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M9")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M10")
+{
+    field(DESC, "Mass 10")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),10) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M10")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M11")
+{
+    field(DESC, "Mass 11")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),11) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M11")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M12")
+{
+    field(DESC, "Mass 12")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),12) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M12")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M13")
+{
+    field(DESC, "Mass 13")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),13) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M13")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk CH2/N2++ readback
+#
+record(ai, "$(device):BAR:M14")
+{
+    field(DESC, "CH2/N2++")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),14) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M14")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk CH3 readback
+#
+record(ai, "$(device):BAR:M15")
+{
+    field(DESC, "CH3")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),15) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M15")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk CH4 readback
+#
+record(ai, "$(device):BAR:M16")
+{
+    field(DESC, "CH4")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),16) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M16")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk OH readback
+#
+record(ai, "$(device):BAR:M17")
+{
+    field(DESC, "OH")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),17) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M17")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk H20 readback
+#
+record(ai, "$(device):BAR:M18")
+{
+    field(DESC, "H20")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),18) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M18")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M19")
+{
+    field(DESC, "Mass 19")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),19) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M19")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M20")
+{
+    field(DESC, "Neon")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),20) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M20")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M21")
+{
+    field(DESC, "Mass 21")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),21) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M21")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M22")
+{
+    field(DESC, "Mass 22")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),22) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M22")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M23")
+{
+    field(DESC, "Mass 23")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),23) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M23")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M24")
+{
+    field(DESC, "Mass 24")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),24) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M24")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M25")
+{
+    field(DESC, "Mass 25")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),25) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M25")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M26")
+{
+    field(DESC, "Mass 26")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),26) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M26")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M27")
+{
+    field(DESC, "Mass 27")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),27) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M27")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk N2/CO readback
+#
+record(ai, "$(device):BAR:M28")
+{
+    field(DESC, "N2/CO")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),28) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M28")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M29")
+{
+    field(DESC, "Mass 29")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),29) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M29")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M30")
+{
+    field(DESC, "NO")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),30) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M30")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M31")
+{
+    field(DESC, "Mass 31")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),31) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M31")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk O2 readback
+#
+record(ai, "$(device):BAR:M32")
+{
+    field(DESC, "O2")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),32) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M32")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M33")
+{
+    field(DESC, "Mass 33")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),33) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M33")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M34")
+{
+    field(DESC, "Mass 34")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),34) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M34")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M35")
+{
+    field(DESC, "Mass 35")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),35) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M35")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M36")
+{
+    field(DESC, "Mass 36")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),36) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M36")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M37")
+{
+    field(DESC, "Mass 37")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),37) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M37")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M38")
+{
+    field(DESC, "Fluorine")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),38) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M38")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M39")
+{
+    field(DESC, "Mass 39")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),39) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M39")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Ar readback
+#
+record(ai, "$(device):BAR:M40")
+{
+    field(DESC, "Ar")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),40) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M40")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M41")
+{
+    field(DESC, "Mass 41")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),41) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M41")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M42")
+{
+    field(DESC, "Mass 42")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),42) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M42")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M43")
+{
+    field(DESC, "Mass 43")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),43) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M43")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk CO2 readback
+#
+record(ai, "$(device):BAR:M44")
+{
+    field(DESC, "CO2")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),44) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M44")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M45")
+{
+    field(DESC, "Mass 45")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),45) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M45")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M46")
+{
+    field(DESC, "NO2")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),46) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M46")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M47")
+{
+    field(DESC, "Mass 47")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),47) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M47")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M48")
+{
+    field(DESC, "Ozone")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),48) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M48")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M49")
+{
+    field(DESC, "Mass 49")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),49) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M49")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M50")
+{
+    field(DESC, "Mass 50")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),50) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS50")
+    field(FLNK, "$(device):LOG:M50")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M51")
+{
+    field(DESC, "Mass 51")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),51) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M51")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M52")
+{
+    field(DESC, "Mass 52")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),52) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M52")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M53")
+{
+    field(DESC, "Mass 53")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),53) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M53")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M54")
+{
+    field(DESC, "Mass 54")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),54) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M54")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M55")
+{
+    field(DESC, "Mass 55")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),55) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M55")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M56")
+{
+    field(DESC, "Mass 56")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),56) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M56")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M57")
+{
+    field(DESC, "Mass 57")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),57) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M57")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M58")
+{
+    field(DESC, "Mass 58")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),58) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M58")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M59")
+{
+    field(DESC, "Mass 59")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),59) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M59")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M60")
+{
+    field(DESC, "Buckyball")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),60) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M60")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M61")
+{
+    field(DESC, "Mass 61")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),61) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M61")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M62")
+{
+    field(DESC, "Mass 62")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),62) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M62")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M63")
+{
+    field(DESC, "Mass 63")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),63) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M63")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M64")
+{
+    field(DESC, "Mass 64")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),64) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M64")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M65")
+{
+    field(DESC, "Mass 65")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),65) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M65")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M66")
+{
+    field(DESC, "Mass 66")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),66) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M66")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M67")
+{
+    field(DESC, "Mass 67")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),67) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M67")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M68")
+{
+    field(DESC, "Mass 68")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),68) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M68")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Ar readback
+#
+record(ai, "$(device):BAR:M69")
+{
+    field(DESC, "CF3/C5H9")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),69) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS20")
+    field(FLNK, "$(device):LOG:M69")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M70")
+{
+    field(DESC, "Chlorine")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),70) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M70")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M71")
+{
+    field(DESC, "Mass 71")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),71) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M71")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M72")
+{
+    field(DESC, "Mass 72")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),72) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M72")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M73")
+{
+    field(DESC, "Mass 73")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),73) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M73")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M74")
+{
+    field(DESC, "Mass 74")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),74) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M74")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M75")
+{
+    field(DESC, "Mass 75")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),75) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M75")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M76")
+{
+    field(DESC, "Mass 76")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),76) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M76")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M77")
+{
+    field(DESC, "Mass 77")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),77) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M77")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M78")
+{
+    field(DESC, "Mass 78")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),78) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M78")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M79")
+{
+    field(DESC, "Mass 79")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),79) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M79")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M80")
+{
+    field(DESC, "Mass 80")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),80) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M80")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M81")
+{
+    field(DESC, "Mass 81")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),81) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M81")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M82")
+{
+    field(DESC, "Mass 82")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),82) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M82")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M83")
+{
+    field(DESC, "Mass 83")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),83) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M83")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M84")
+{
+    field(DESC, "Krypton")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),84) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M84")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M85")
+{
+    field(DESC, "Mass 85")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),85) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M85")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M86")
+{
+    field(DESC, "Mass 86")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),86) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M86")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M87")
+{
+    field(DESC, "Mass 87")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),87) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M87")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M88")
+{
+    field(DESC, "Mass 88")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),88) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M88")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M89")
+{
+    field(DESC, "Mass 89")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),89) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M89")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M90")
+{
+    field(DESC, "Mass 90")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),90) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M90")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M91")
+{
+    field(DESC, "Mass 91")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),91) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M91")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M92")
+{
+    field(DESC, "Mass 92")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),92) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M92")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M93")
+{
+    field(DESC, "Mass 93")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),93) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M93")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M94")
+{
+    field(DESC, "Mass 94")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),94) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M94")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M95")
+{
+    field(DESC, "Mass 95")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),95) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M95")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M96")
+{
+    field(DESC, "Mass 96")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),96) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M96")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M97")
+{
+    field(DESC, "Mass 97")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),97) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M97")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M98")
+{
+    field(DESC, "Mass 98")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),98) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M98")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M99")
+{
+    field(DESC, "Mass 99")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),99) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M99")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M100")
+{
+    field(DESC, "Mass 100")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),100) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS100")
+    field(FLNK, "$(device):LOG:M100")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M101")
+{
+    field(DESC, "Mass 101")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),101) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M101")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M102")
+{
+    field(DESC, "Mass 102")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),102) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M102")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M103")
+{
+    field(DESC, "Mass 103")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),103) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M103")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M104")
+{
+    field(DESC, "Mass 104")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),104) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M104")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M105")
+{
+    field(DESC, "Mass 105")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),105) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M105")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M106")
+{
+    field(DESC, "Mass 106")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),106) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M106")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M107")
+{
+    field(DESC, "Mass 107")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),107) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M107")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M108")
+{
+    field(DESC, "Mass 108")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),108) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M108")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M109")
+{
+    field(DESC, "Mass 109")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),109) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M109")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M110")
+{
+    field(DESC, "Mass 110")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),110) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M110")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M111")
+{
+    field(DESC, "Mass 111")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),111) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M111")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M112")
+{
+    field(DESC, "Mass 112")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),112) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M112")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M113")
+{
+    field(DESC, "Mass 113")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),113) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M113")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M114")
+{
+    field(DESC, "Mass 114")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),114) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M114")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M115")
+{
+    field(DESC, "Mass 115")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),115) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M115")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M116")
+{
+    field(DESC, "Mass 116")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),116) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M116")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M117")
+{
+    field(DESC, "Mass 117")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),117) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M117")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M118")
+{
+    field(DESC, "Mass 118")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),118) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M118")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M119")
+{
+    field(DESC, "Mass 119")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),119) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M119")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M120")
+{
+    field(DESC, "Mass 120")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),120) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M120")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M121")
+{
+    field(DESC, "Mass 121")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),121) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M121")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M122")
+{
+    field(DESC, "Mass 122")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),122) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M122")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M123")
+{
+    field(DESC, "Mass 123")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),123) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M123")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M124")
+{
+    field(DESC, "Mass 124")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),124) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M124")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M125")
+{
+    field(DESC, "Mass 125")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),125) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M125")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M126")
+{
+    field(DESC, "Mass 126")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),126) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M126")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M127")
+{
+    field(DESC, "Mass 127")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),127) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M127")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M128")
+{
+    field(DESC, "Mass 128")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),128) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M128")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M129")
+{
+    field(DESC, "Mass 129")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),129) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M129")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M130")
+{
+    field(DESC, "Mass 130")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),130) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M130")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M131")
+{
+    field(DESC, "Xenon")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),131) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M131")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M132")
+{
+    field(DESC, "Mass 132")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),132) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M132")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M133")
+{
+    field(DESC, "Mass 133")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),133) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M133")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M134")
+{
+    field(DESC, "Mass 134")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),134) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M134")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M135")
+{
+    field(DESC, "Mass 135")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),135) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M135")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M136")
+{
+    field(DESC, "Mass 136")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),136) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M136")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M137")
+{
+    field(DESC, "Mass 137")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),137) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M137")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M138")
+{
+    field(DESC, "Mass 138")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),138) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M138")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M139")
+{
+    field(DESC, "Mass 139")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),139) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M139")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M140")
+{
+    field(DESC, "Mass 140")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),140) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M140")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M141")
+{
+    field(DESC, "Mass 141")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),141) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M141")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M142")
+{
+    field(DESC, "Mass 142")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),142) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M142")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M143")
+{
+    field(DESC, "Mass 143")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),143) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M143")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M144")
+{
+    field(DESC, "Mass 144")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),144) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M144")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M145")
+{
+    field(DESC, "Mass 145")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),145) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M145")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M146")
+{
+    field(DESC, "Mass 146")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),146) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M146")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M147")
+{
+    field(DESC, "Mass 147")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),147) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M147")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M148")
+{
+    field(DESC, "Mass 148")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),148) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M148")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M149")
+{
+    field(DESC, "Mass 149")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),149) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M149")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M150")
+{
+    field(DESC, "Mass 150")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),150) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M150")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M151")
+{
+    field(DESC, "Mass 151")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),151) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M151")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M152")
+{
+    field(DESC, "Mass 152")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),152) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M152")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M153")
+{
+    field(DESC, "Mass 153")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),153) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M153")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M154")
+{
+    field(DESC, "Mass 154")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),154) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M154")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M155")
+{
+    field(DESC, "Mass 155")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),155) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M155")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M156")
+{
+    field(DESC, "Mass 156")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),156) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M156")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M157")
+{
+    field(DESC, "Mass 157")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),157) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M157")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M158")
+{
+    field(DESC, "Mass 158")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),158) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M158")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M159")
+{
+    field(DESC, "Mass 159")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),159) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M159")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M160")
+{
+    field(DESC, "Bromine")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),160) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M160")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M161")
+{
+    field(DESC, "Mass 161")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),161) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M161")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M162")
+{
+    field(DESC, "Mass 162")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),162) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M162")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M163")
+{
+    field(DESC, "Mass 163")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),163) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M163")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M164")
+{
+    field(DESC, "Mass 164")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),164) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M164")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M165")
+{
+    field(DESC, "Mass 165")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),165) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M165")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M166")
+{
+    field(DESC, "Mass 166")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),166) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M166")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M167")
+{
+    field(DESC, "Mass 167")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),167) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M167")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M168")
+{
+    field(DESC, "Mass 168")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),168) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M168")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M169")
+{
+    field(DESC, "Mass 169")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),169) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M169")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M170")
+{
+    field(DESC, "Mass 170")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),170) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M170")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M171")
+{
+    field(DESC, "Mass 171")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),171) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M171")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M172")
+{
+    field(DESC, "Mass 172")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),172) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M172")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M173")
+{
+    field(DESC, "Mass 173")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),173) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M173")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M174")
+{
+    field(DESC, "Mass 174")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),174) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M174")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M175")
+{
+    field(DESC, "Mass 175")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),175) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M175")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M176")
+{
+    field(DESC, "Mass 176")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),176) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M176")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M177")
+{
+    field(DESC, "Mass 177")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),177) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M177")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M178")
+{
+    field(DESC, "Mass 178")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),178) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M178")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M179")
+{
+    field(DESC, "Mass 179")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),179) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M179")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M180")
+{
+    field(DESC, "Mass 180")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),180) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M180")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M181")
+{
+    field(DESC, "Mass 181")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),181) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M181")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M182")
+{
+    field(DESC, "Mass 182")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),182) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M182")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M183")
+{
+    field(DESC, "Mass 183")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),183) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M183")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M184")
+{
+    field(DESC, "Mass 184")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),184) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M184")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M185")
+{
+    field(DESC, "Mass 185")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),185) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M185")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M186")
+{
+    field(DESC, "Mass 186")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),186) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M186")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M187")
+{
+    field(DESC, "Mass 187")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),187) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M187")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M188")
+{
+    field(DESC, "Mass 188")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),188) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M188")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M189")
+{
+    field(DESC, "Mass 189")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),189) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M189")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M190")
+{
+    field(DESC, "Mass 190")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),190) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M190")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M191")
+{
+    field(DESC, "Mass 191")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),191) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M191")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M192")
+{
+    field(DESC, "Mass 192")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),192) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M192")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M193")
+{
+    field(DESC, "Mass 193")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),193) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M193")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M194")
+{
+    field(DESC, "Mass 194")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),194) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M194")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M195")
+{
+    field(DESC, "Mass 195")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),195) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M195")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M196")
+{
+    field(DESC, "Mass 196")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),196) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M196")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M197")
+{
+    field(DESC, "Mass 197")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),197) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M197")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M198")
+{
+    field(DESC, "Mass 198")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),198) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M198")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M199")
+{
+    field(DESC, "Mass 199")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),199) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M199")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+record(ai, "$(device):BAR:M200")
+{
+    field(DESC, "Mass 200")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol bar($(channel),200) $(port) 0")
+    field(SCAN, "10 second")
+    field(SDIS, "$(device):DIS200")
+    field(FLNK, "$(device):LOG:M200")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+################################################################################
+# Log of Bar Chart
+#
+record(calc, "$(device):LOG:M1")
+{
+    field(DESC, "Mass 1")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M1 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M2")
+{
+    field(DESC, "H2")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M2 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M3")
+{
+    field(DESC, "Mass 3")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M3 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M4")
+{
+    field(DESC, "He")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M4 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M5")
+{
+    field(DESC, "Mass 5")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M5 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M6")
+{
+    field(DESC, "Mass 6")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M6 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M7")
+{
+    field(DESC, "Mass 7")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M7 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M8")
+{
+    field(DESC, "Mass 8")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M8 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M9")
+{
+    field(DESC, "Mass 9")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M9 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M10")
+{
+    field(DESC, "Mass 10")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M10 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M11")
+{
+    field(DESC, "Mass 11")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M11 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M12")
+{
+    field(DESC, "Mass 12")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M12 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M13")
+{
+    field(DESC, "Mass 13")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M13 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M14")
+{
+    field(DESC, "CH2/N2++")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M14 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M15")
+{
+    field(DESC, "CH3")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M15 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M16")
+{
+    field(DESC, "CH4")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M16 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M17")
+{
+    field(DESC, "OH")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M17 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M18")
+{
+    field(DESC, "H20")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M18 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M19")
+{
+    field(DESC, "Mass 19")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M19 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M20")
+{
+    field(DESC, "Neon")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M20 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M21")
+{
+    field(DESC, "Mass 21")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M21 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M22")
+{
+    field(DESC, "Mass 22")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M22 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M23")
+{
+    field(DESC, "Mass 23")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M23 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M24")
+{
+    field(DESC, "Mass 24")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M24 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M25")
+{
+    field(DESC, "Mass 25")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M25 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M26")
+{
+    field(DESC, "Mass 26")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M26 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M27")
+{
+    field(DESC, "Mass 27")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M27 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M28")
+{
+    field(DESC, "N2/CO")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M28 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M29")
+{
+    field(DESC, "Mass 29")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M29 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M30")
+{
+    field(DESC, "NO")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M30 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M31")
+{
+    field(DESC, "Mass 31")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M31 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M32")
+{
+    field(DESC, "O2")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M32 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M33")
+{
+    field(DESC, "Mass 33")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M33 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M34")
+{
+    field(DESC, "Mass 34")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M34 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M35")
+{
+    field(DESC, "Mass 35")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M35 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M36")
+{
+    field(DESC, "Mass 36")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M36 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M37")
+{
+    field(DESC, "Mass 37")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M37 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M38")
+{
+    field(DESC, "Fluorine")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M38 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M39")
+{
+    field(DESC, "Mass 39")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M39 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M40")
+{
+    field(DESC, "Ar")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M40 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M41")
+{
+    field(DESC, "Mass 41")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M41 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M42")
+{
+    field(DESC, "Mass 42")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M42 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M43")
+{
+    field(DESC, "Mass 43")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M43 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M44")
+{
+    field(DESC, "CO2")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M44 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M45")
+{
+    field(DESC, "Mass 45")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M45 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M46")
+{
+    field(DESC, "NO2")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M46 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M47")
+{
+    field(DESC, "Mass 47")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M47 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M48")
+{
+    field(DESC, "Ozone")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M48 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M49")
+{
+    field(DESC, "Mass 49")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M49 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M50")
+{
+    field(DESC, "Mass 50")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M50 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M51")
+{
+    field(DESC, "Mass 51")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M51 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M52")
+{
+    field(DESC, "Mass 52")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M52 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M53")
+{
+    field(DESC, "Mass 53")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M53 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M54")
+{
+    field(DESC, "Mass 54")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M54 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M55")
+{
+    field(DESC, "Mass 55")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M55 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M56")
+{
+    field(DESC, "Mass 56")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M56 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M57")
+{
+    field(DESC, "Mass 57")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M57 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M58")
+{
+    field(DESC, "Mass 58")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M58 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M59")
+{
+    field(DESC, "Mass 59")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M59 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M60")
+{
+    field(DESC, "Buckyball")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M60 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M61")
+{
+    field(DESC, "Mass 61")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M61 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M62")
+{
+    field(DESC, "Mass 62")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M62 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M63")
+{
+    field(DESC, "Mass 63")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M63 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M64")
+{
+    field(DESC, "Mass 64")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M64 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M65")
+{
+    field(DESC, "Mass 65")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M65 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M66")
+{
+    field(DESC, "Mass 66")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M66 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M67")
+{
+    field(DESC, "Mass 67")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M67 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M68")
+{
+    field(DESC, "Mass 68")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M68 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):LOG:M69")
+{
+    field(DESC, "CF3/C5H9")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M69 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+    field(ADEL, "0.025")
+}
+record(calc, "$(device):LOG:M70")
+{
+    field(DESC, "Mass 70")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M70 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M71")
+{
+    field(DESC, "Mass 71")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M71 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M72")
+{
+    field(DESC, "Mass 72")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M72 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M73")
+{
+    field(DESC, "Mass 73")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M73 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M74")
+{
+    field(DESC, "Mass 74")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M74 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M75")
+{
+    field(DESC, "Mass 75")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M75 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M76")
+{
+    field(DESC, "Mass 76")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M76 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M77")
+{
+    field(DESC, "Mass 77")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M77 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M78")
+{
+    field(DESC, "Mass 78")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M78 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M79")
+{
+    field(DESC, "Mass 79")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M79 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M80")
+{
+    field(DESC, "Mass 80")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M80 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M81")
+{
+    field(DESC, "Mass 81")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M81 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M82")
+{
+    field(DESC, "Mass 82")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M82 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M83")
+{
+    field(DESC, "Mass 83")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M83 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M84")
+{
+    field(DESC, "Mass 84")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M84 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M85")
+{
+    field(DESC, "Mass 85")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M85 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M86")
+{
+    field(DESC, "Mass 86")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M86 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M87")
+{
+    field(DESC, "Mass 87")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M87 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M88")
+{
+    field(DESC, "Mass 88")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M88 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M89")
+{
+    field(DESC, "Mass 89")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M89 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M90")
+{
+    field(DESC, "Mass 90")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M90 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M91")
+{
+    field(DESC, "Mass 91")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M91 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M92")
+{
+    field(DESC, "Mass 92")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M92 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M93")
+{
+    field(DESC, "Mass 93")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M93 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M94")
+{
+    field(DESC, "Mass 94")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M94 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M95")
+{
+    field(DESC, "Mass 95")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M95 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M96")
+{
+    field(DESC, "Mass 96")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M96 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M97")
+{
+    field(DESC, "Mass 97")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M97 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M98")
+{
+    field(DESC, "Mass 98")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M98 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M99")
+{
+    field(DESC, "Mass 99")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M99 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M100")
+{
+    field(DESC, "Mass 100")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M100 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M101")
+{
+    field(DESC, "Mass 101")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M101 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M102")
+{
+    field(DESC, "Mass 102")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M102 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M103")
+{
+    field(DESC, "Mass 103")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M103 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M104")
+{
+    field(DESC, "Mass 104")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M104 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M105")
+{
+    field(DESC, "Mass 105")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M105 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M106")
+{
+    field(DESC, "Mass 106")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M106 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M107")
+{
+    field(DESC, "Mass 107")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M107 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M108")
+{
+    field(DESC, "Mass 108")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M108 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M109")
+{
+    field(DESC, "Mass 109")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M109 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M110")
+{
+    field(DESC, "Mass 110")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M110 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M111")
+{
+    field(DESC, "Mass 111")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M111 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M112")
+{
+    field(DESC, "Mass 112")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M112 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M113")
+{
+    field(DESC, "Mass 113")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M113 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M114")
+{
+    field(DESC, "Mass 114")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M114 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M115")
+{
+    field(DESC, "Mass 115")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M115 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M116")
+{
+    field(DESC, "Mass 116")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M116 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M117")
+{
+    field(DESC, "Mass 117")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M117 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M118")
+{
+    field(DESC, "Mass 118")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M118 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M119")
+{
+    field(DESC, "Mass 119")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M119 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M120")
+{
+    field(DESC, "Mass 120")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M120 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M121")
+{
+    field(DESC, "Mass 121")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M121 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M122")
+{
+    field(DESC, "Mass 122")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M122 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M123")
+{
+    field(DESC, "Mass 123")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M123 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M124")
+{
+    field(DESC, "Mass 124")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M124 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M125")
+{
+    field(DESC, "Mass 125")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M125 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M126")
+{
+    field(DESC, "Mass 126")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M126 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M127")
+{
+    field(DESC, "Mass 127")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M127 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M128")
+{
+    field(DESC, "Mass 128")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M128 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M129")
+{
+    field(DESC, "Mass 129")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M129 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M130")
+{
+    field(DESC, "Mass 130")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M130 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M131")
+{
+    field(DESC, "Mass 131")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M131 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M132")
+{
+    field(DESC, "Mass 132")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M132 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M133")
+{
+    field(DESC, "Mass 133")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M133 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M134")
+{
+    field(DESC, "Mass 134")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M134 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M135")
+{
+    field(DESC, "Mass 135")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M135 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M136")
+{
+    field(DESC, "Mass 136")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M136 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M137")
+{
+    field(DESC, "Mass 137")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M137 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M138")
+{
+    field(DESC, "Mass 138")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M138 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M139")
+{
+    field(DESC, "Mass 139")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M139 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M140")
+{
+    field(DESC, "Mass 140")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M140 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M141")
+{
+    field(DESC, "Mass 141")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M141 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M142")
+{
+    field(DESC, "Mass 142")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M142 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M143")
+{
+    field(DESC, "Mass 143")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M143 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M144")
+{
+    field(DESC, "Mass 144")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M144 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M145")
+{
+    field(DESC, "Mass 145")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M145 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M146")
+{
+    field(DESC, "Mass 146")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M146 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M147")
+{
+    field(DESC, "Mass 147")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M147 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M148")
+{
+    field(DESC, "Mass 148")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M148 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M149")
+{
+    field(DESC, "Mass 149")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M149 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M150")
+{
+    field(DESC, "Mass 150")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M150 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M151")
+{
+    field(DESC, "Mass 151")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M151 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M152")
+{
+    field(DESC, "Mass 152")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M152 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M153")
+{
+    field(DESC, "Mass 153")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M153 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M154")
+{
+    field(DESC, "Mass 154")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M154 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M155")
+{
+    field(DESC, "Mass 155")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M155 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M156")
+{
+    field(DESC, "Mass 156")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M156 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M157")
+{
+    field(DESC, "Mass 157")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M157 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M158")
+{
+    field(DESC, "Mass 158")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M158 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M159")
+{
+    field(DESC, "Mass 159")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M159 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M160")
+{
+    field(DESC, "Mass 160")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M160 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M161")
+{
+    field(DESC, "Mass 161")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M161 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M162")
+{
+    field(DESC, "Mass 162")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M162 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M163")
+{
+    field(DESC, "Mass 163")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M163 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M164")
+{
+    field(DESC, "Mass 164")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M164 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M165")
+{
+    field(DESC, "Mass 165")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M165 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M166")
+{
+    field(DESC, "Mass 166")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M166 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M167")
+{
+    field(DESC, "Mass 167")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M167 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M168")
+{
+    field(DESC, "Mass 168")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M168 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M169")
+{
+    field(DESC, "Mass 169")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M169 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M170")
+{
+    field(DESC, "Mass 170")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M170 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M171")
+{
+    field(DESC, "Mass 171")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M171 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M172")
+{
+    field(DESC, "Mass 172")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M172 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M173")
+{
+    field(DESC, "Mass 173")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M173 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M174")
+{
+    field(DESC, "Mass 174")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M174 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M175")
+{
+    field(DESC, "Mass 175")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M175 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M176")
+{
+    field(DESC, "Mass 176")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M176 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M177")
+{
+    field(DESC, "Mass 177")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M177 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M178")
+{
+    field(DESC, "Mass 178")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M178 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M179")
+{
+    field(DESC, "Mass 179")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M179 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M180")
+{
+    field(DESC, "Mass 180")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M180 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M181")
+{
+    field(DESC, "Mass 181")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M181 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M182")
+{
+    field(DESC, "Mass 182")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M182 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M183")
+{
+    field(DESC, "Mass 183")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M183 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M184")
+{
+    field(DESC, "Mass 184")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M184 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M185")
+{
+    field(DESC, "Mass 185")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M185 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M186")
+{
+    field(DESC, "Mass 186")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M186 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M187")
+{
+    field(DESC, "Mass 187")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M187 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M188")
+{
+    field(DESC, "Mass 188")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M188 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M189")
+{
+    field(DESC, "Mass 189")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M189 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M190")
+{
+    field(DESC, "Mass 190")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M190 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M191")
+{
+    field(DESC, "Mass 191")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M191 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M192")
+{
+    field(DESC, "Mass 192")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M192 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M193")
+{
+    field(DESC, "Mass 193")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M193 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M194")
+{
+    field(DESC, "Mass 194")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M194 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M195")
+{
+    field(DESC, "Mass 195")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M195 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M196")
+{
+    field(DESC, "Mass 196")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M196 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M197")
+{
+    field(DESC, "Mass 197")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M197 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M198")
+{
+    field(DESC, "Mass 198")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M198 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M199")
+{
+    field(DESC, "Mass 199")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M199 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+record(calc, "$(device):LOG:M200")
+{
+    field(DESC, "Mass 200")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):BAR:M200 MS")
+    field(HOPR, "-2")
+    field(LOPR, "-11")
+}
+################################################################################
+
+#
+# Standard bar chart masses (nominally up to 11)
+record(mbbi, "$(device):MASSMAP") 
+{
+  field(DTYP, "Soft Channel")
+  field(DESC, "Chart mass allocation")
+  field(PINI, "YES")
+  field(ZRST, "$(mm00_label=H2)")
+  field(ONST, "$(mm01_label=He)")
+  field(TWST, "$(mm02_label=CH2/N2++)")
+  field(THST, "$(mm03_label=CH3)")
+  field(FRST, "$(mm04_label=CH4)")
+  field(FVST, "$(mm05_label=H2O)")
+  field(SXST, "$(mm06_label=N2/CO)")
+  field(SVST, "$(mm07_label=O2)")
+  field(EIST, "$(mm08_label=Ar)")
+  field(NIST, "$(mm09_label=CO2)")
+  field(TEST, "$(mm10_label=CF3/C5H9)")
+  field(ELST, "$(mm11_label=unused)")
+  field(TVST, "$(mm12_label=unused)")
+  field(TTST, "$(mm13_label=unused)")
+  field(FTST, "$(mm14_label=unused)")
+  field(FFST, "$(mm015_label=unused)")
+  field(ZRVL, "$(mm00_mass=2)")
+  field(ONVL, "$(mm01_mass=4)")
+  field(TWVL, "$(mm02_mass=14)")
+  field(THVL, "$(mm03_mass=15)")
+  field(FRVL, "$(mm04_mass=16)")
+  field(FVVL, "$(mm05_mass=18)")
+  field(SXVL, "$(mm06_mass=28)")
+  field(SVVL, "$(mm07_mass=32)")
+  field(EIVL, "$(mm08_mass=40)")
+  field(NIVL, "$(mm09_mass=44)")
+  field(TEVL, "$(mm10_mass=69)")
+  field(ELVL, "$(mm11_mass=0)")
+  field(TVVL, "$(mm12_mass=0)")
+  field(TTVL, "$(mm13_mass=0)")
+  field(FTVL, "$(mm14_mass=0)")
+  field(FFVL, "$(mm15_mass=0)")
+}
+
+# Peak Jump Masses (nominally up to 12)
+#
+record(mbbi, "$(device):PJMASSMAP") 
+{
+  field(DTYP, "Soft Channel")
+  field(DESC, "Peak Jump masses")
+  field(PINI, "YES")
+  field(ZRST, "$(pjmm00_label=H2)")
+  field(ONST, "$(pjmm01_label=unused)")
+  field(TWST, "$(pjmm02_label=unused)")
+  field(THST, "$(pjmm03_label=unused)")
+  field(FRST, "$(pjmm04_label=unused)")
+  field(FVST, "$(pjmm05_label=unused)")
+  field(SXST, "$(pjmm06_label=unused)")
+  field(SVST, "$(pjmm07_label=unused)")
+  field(EIST, "$(pjmm08_label=unused)")
+  field(NIST, "$(pjmm09_label=unused)")
+  field(TEST, "$(pjmm10_label=unused)")
+  field(ELST, "$(pjmm11_label=unused)")
+  field(TVST, "$(pjmm12_label=unused)")
+  field(TTST, "$(pjmm13_label=unused)")
+  field(FTST, "$(pjmm14_label=unused)")
+  field(FFST, "$(pjmm015_label=unused)")
+  field(ZRVL, "$(pjmm00_mass=2)")
+  field(ONVL, "$(pjmm01_mass=0)")
+  field(TWVL, "$(pjmm02_mass=0)")
+  field(THVL, "$(pjmm03_mass=0)")
+  field(FRVL, "$(pjmm04_mass=0)")
+  field(FVVL, "$(pjmm05_mass=0)")
+  field(SXVL, "$(pjmm06_mass=0)")
+  field(SVVL, "$(pjmm07_mass=0)")
+  field(EIVL, "$(pjmm08_mass=0)")
+  field(NIVL, "$(pjmm09_mass=0)")
+  field(TEVL, "$(pjmm10_mass=0)")
+  field(ELVL, "$(pjmm11_mass=0)")
+  field(TVVL, "$(pjmm12_mass=0)")
+  field(TTVL, "$(pjmm13_mass=0)")
+  field(FTVL, "$(pjmm14_mass=0)")
+  field(FFVL, "$(pjmm15_mass=0)")
+}
+
+## The INP field to this PV has been "2;4" for
+## over two years and just picked up on caSnooper.
+## Making it 24 for now until the correct value is determined.
+## IJG: 19 Dec 14
+##
+record(stringin, "$(device):PJMASSSTR") 
+{
+  field(DESC, "Peak Jump masses")
+  field(PINI, "YES")
+  field(INP, "24")
+}
+
+record(waveform, "$(device):SPECTRUM")
+{
+    #field(DTYP, "Waveform")
+    field(FTVL, "DOUBLE")
+    field(NELM, "6400")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN1")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ1")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN2")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ2")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN3")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ3")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN4")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ4")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN5")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ5")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN6")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ6")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN7")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ7")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN8")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ8")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN9")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ9")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN10")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ10")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN11")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ11")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}
+
+#
+#% archiver 10 Monitor
+#
+record(ai, "$(device):PJ:BIN12")
+{
+    field(DESC, "0")
+    field(DTYP, "stream")
+    field(INP,  "@rga.protocol pjpress_indirect($(channel)) $(port) 0")
+    field(SCAN, "5 second")
+    field(SDIS, "$(device):DISPJ12")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "0.01")
+    field(LOPR, "0")
+}

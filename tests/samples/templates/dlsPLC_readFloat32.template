@@ -1,0 +1,30 @@
+
+
+# % macro, __doc__, Read the Float32 value stored in 2 DM variables in a PLC
+# % macro, P, device prefix
+# % macro, Q, device suffix
+# % macro, port, asyn port name of FINS driver
+# % macro, timeout, Timeout in seconds for the FINS protocol reads/writes
+# % macro, addr, DM variable of the LOWERer address of the float32
+# % macro, name, Object name and gui association name
+#% macro, SCAN, Scan rate of read record
+#
+# This associates an edm screen with the template
+# % gui, $(name=), edmembed, dlsPLC_readSingle.edl, P=$(P),Q=$(Q)
+# This makes the component icon reflect the severity
+# % gui, $(name=), sevr
+# % archiver 0.1 Monitor
+record(ai, "$(P)$(Q)") {
+  field(INP, "$(P)$(Q):GET CP MS")
+  field(PREC, "3")
+}
+
+record(waveform, "$(P)$(Q):GET") {
+  field(DESC, "Read 1 float word")
+  field(SCAN, "$(SCAN=1 second)")
+  field(DTYP, "asynFloat32ArrayIn")
+  field(INP, "@asyn($(port), $(addr), $(timeout=0)) FINS_DM_READ_32")
+  field(NELM, "1")
+  field(FTVL, "FLOAT")
+  field(PRIO, "MEDIUM")
+}

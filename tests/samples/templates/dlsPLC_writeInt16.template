@@ -1,0 +1,21 @@
+
+
+# % macro, __doc__, Write an int32 value into a PLC DM variable
+# % macro, P, device prefix
+# % macro, Q, device suffix
+# % macro, port, asyn port name of FINS driver
+# % macro, timeout, Timeout in seconds for the FINS protocol reads/writes
+# % macro, addr, DM variable of the LOWERer address of the float32
+# % macro, name, Object name and gui association name
+# 
+# This associates an edm screen with the template
+# % gui, $(name=), edmembed, dlsPLC_writeSingle.edl, P=$(P),Q=$(Q)
+# This makes the component icon reflect the severity
+# % gui, $(name=), sevr
+# % archiver 10 Monitor
+record(ao, "$(P)$(Q)") {
+  field(DESC, "Control")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(port), $(addr), $(timeout=0)) FINS_DM_WRITE")
+  field(PRIO, "HIGH")
+}

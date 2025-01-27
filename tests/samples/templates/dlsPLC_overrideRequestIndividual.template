@@ -1,0 +1,58 @@
+
+
+template() {
+
+    }
+# % macro, __doc__, Template allowing override of individual interlock bits
+# % macro, P, device prefix
+# % macro, DESC, Description (e.g. DCM piezo override)
+# % macro, PRESSURE1, Pressure in mbar that needs to be over setpoint to allow override
+# % macro, PRESSURE2, Pressure in mbar that needs to be over setpoint to allow override
+# % macro, OVERRIDE, P of overrideRequestMain instance
+# % macro, BIT, Bit of overrideRequestMain instance to use (0-8)
+# % macro, SETPOINT, Setpoint in mbar that both pressures need to be higher than to allow override
+# % macro, name, Object name and gui association name
+# This associates an edm screen with the template
+# % gui, $(name=), edm, override.edl, P=$(P)
+# % gui, $(name=), edmembed, override-embed.edl, P=$(P)
+record(bo, "$(P):REQUEST") {
+  field(DESC, "$(DESC)")
+  field(DTYP, "Soft Channel")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+}
+
+# Output is correct number for calc.
+# e.g. 1 or 2 for bit 0
+# 4 or 8 for bit 1
+record(calcout, "$(P):OVERRIDE") {
+  field(DESC, "Override-request state")
+  field(DTYP, "Soft Channel")
+  field(CALC, "((A=1)&(B>D)&(C>D))")
+  field(INPA, "$(P):REQUEST CP")
+  field(INPB, "$(PRESSURE1) CP")
+  field(OOPT, "On Change")
+  field(OUT, "$(OVERRIDE):OUTPUT.B$(BIT) PP")
+  field(INPC, "$(PRESSURE2) CP")
+  field(INPD, "$(P):SETPOINT CP")
+  field(DOPT, "Use OCAL")
+  field(OCAL, "((A=1)&(B>D)&(C>D))?4^$(BIT):2*4^$(BIT)")
+}
+
+record(calcout, "$(P):REMOVEREQUEST") {
+  field(DESC, "Remove request on low P")
+  field(DTYP, "Soft Channel")
+  field(CALC, "(B>D)&&(C>D)")
+  field(INPA, "$(OVERRIDE):INTERLOCKS.B$(BIT) CP")
+  field(OUT, "$(P):REQUEST.VAL PP")
+  field(OOPT, "When Zero")
+  field(INPB, "$(PRESSURE1) CP")
+  field(INPC, "$(PRESSURE2) CP")
+  field(INPD, "$(P):SETPOINT CP")
+}
+
+record(ao, "$(P):SETPOINT") {
+  field(DESC, "Cutoff press. for override")
+  field(DTYP, "Soft Channel")
+  field(VAL, "$(SETPOINT)")
+}
