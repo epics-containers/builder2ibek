@@ -2,10 +2,12 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# https://regex101.com/r/M5dmVh/1
 # extract record type, name and fields from an EPICS database file
-regex_record = re.compile(r'record *\( *([^,]*), *"?([^"]*)"? *\)[\s\S]*?{([\s\S]*?)}')
-regex_field = re.compile(r'field *\( *([^,]*), *"?([^"]*)"? *\)')
+regex_record = re.compile(
+    r"(#)* *record *\( *([^,]*), *\"?([^\"]*)\"? *\)[\s\S]*?{([\s\S]*?)}"
+)
+# extract field name and value from the fields section of the above
+regex_field = re.compile(r'(#)* *field *\( *([^,]*), *"?([^"]*)"? *\)')
 
 
 @dataclass
@@ -20,7 +22,14 @@ def normalize_float_records(s: set[str]) -> set[str]:
     normalised = set()
     for item in s:
         try:
-            name, value = item.split(maxsplit=1)
+            parts = item.split(maxsplit=1)
+            if len(parts) == 1:
+                # blank fields are the same as absent fields
+                continue
+            name, value = parts
+            # default values can be ignored
+            if name == "SCAN" and value == "Passive":
+                continue
             normalised.add(f"{name} {float(value)}")
         except (ValueError, IndexError):
             normalised.add(item)
@@ -42,11 +51,19 @@ def compare_dbs(
     for db in [old, new]:
         db.text = db.path.read_text()
         for record in regex_record.finditer(db.text):
-            rec_str = f"{record.group(1)} {record.group(2)}"
-            db.records.add(rec_str)
-            db.fields[rec_str] = set()
-            for rec_field in regex_field.finditer(record.group(3)):
-                db.fields[rec_str].add(f"{rec_field.group(1)} {rec_field.group(2)}")
+            if record.group(1) is not None:
+                # skip commented out records
+                continue
+            rec_str = f"{record.group(2)} {record.group(3)}"
+            # throw away duplicates in the old db
+            if rec_str not in db.fields or db == new:
+                db.records.add(rec_str)
+                db.fields[rec_str] = set()
+                for rec_field in regex_field.finditer(record.group(4)):
+                    if rec_field.group(1) is not None:
+                        # skip commented out fields
+                        continue
+                    db.fields[rec_str].add(f"{rec_field.group(2)} {rec_field.group(3)}")
 
     old_only = sorted(old.records - new.records)
     new_only = sorted(new.records - old.records)
