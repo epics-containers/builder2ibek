@@ -20,11 +20,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     XML to YAML specialist convertor function for the pvlogging support module
     """
 
-    if entity_type == "Hy8002":
-        vec = add_interrupt_vector()
-        entity.add_entity(vec)
-        entity.interrupt_vector = vec.name
-
     if entity_type == "Hy8001":
         vec = add_interrupt_vector()
         entity.add_entity(vec)
