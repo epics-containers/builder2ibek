@@ -80,13 +80,22 @@ def db_compare(
     ignore: list[str] = typer.Option(
         [], help="List of record name sub strings to ignore"
     ),
+    remove_duplicates: bool = typer.Option(
+        False, help="Remove duplicate records in the original DB"
+    ),
     output: Optional[Path] = typer.Option(None, help="Output file"),
 ):
     """
     Compare two DB files and output the differences
     """
 
-    compare_dbs(original, new, ignore, output)
+    compare_dbs(
+        original,
+        new,
+        ignore=ignore,
+        remove_duplicates=remove_duplicates,
+        output=output,
+    )
 
 
 if __name__ == "__main__":

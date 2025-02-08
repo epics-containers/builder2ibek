@@ -51,7 +51,11 @@ def check_ignore_list(ignore: list[str], string: str) -> bool:
 
 
 def compare_dbs(
-    old_path: Path, new_path: Path, ignore: list[str], output: Path | None = None
+    old_path: Path,
+    new_path: Path,
+    ignore: list[str],
+    remove_duplicates: bool = False,
+    output: Path | None = None,
 ):
     """
     validate that two DBs have the same set of records
@@ -67,7 +71,7 @@ def compare_dbs(
         for record in regex_record.finditer(db.text):
             rec_str = f"{record.group(1)} {record.group(2)}"
             # throw away duplicates in the old db
-            if rec_str in db.fields and db == old:
+            if rec_str in db.fields and db == old and remove_duplicates:
                 continue
             # throw away records that match the ignore list
             if check_ignore_list(ignore, rec_str):
