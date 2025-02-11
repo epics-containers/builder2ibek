@@ -26,66 +26,58 @@ entities:
   - type: mrfTiming.EventReceiverPMC
     cardid: 1
 
-  - type: epics.InterruptVectorVME
-    name: Vec2
-
   - type: ipac.Hy8002
-    interrupt_vector: Vec2
     name: CARD4
     slot: 4
 
-  - type: epics.InterruptVectorVME
-    name: Vec3
-
   - type: ipac.Hy8002
-    interrupt_vector: Vec3
     name: CARD5
     slot: 5
 
   - type: epics.InterruptVectorVME
-    name: Vec4
+    name: Vec2
 
   - type: ipac.Hy8001
     direction: Input
     intLevel: 2
-    interrupt_vector: Vec4
+    interrupt_vector: Vec2
     invertin: true
     invertout: true
     scan: 100
     slot: 6
 
   - type: epics.InterruptVectorVME
-    name: Vec5
+    name: Vec3
 
   - type: Hy8401ip.Hy8401
     carrier: CARD5
-    interrupt_vector: Vec5
+    interrupt_vector: Vec3
     ipslot: 0
 
   - type: epics.InterruptVectorVME
-    name: Vec6
+    name: Vec4
 
   - type: DLS8515.DLS8515
     carrier: CARD4
-    interrupt_vector: Vec6
+    interrupt_vector: Vec4
     ipslot: 0
     name: CARD40
 
   - type: epics.InterruptVectorVME
-    name: Vec7
+    name: Vec5
 
   - type: DLS8515.DLS8515
     carrier: CARD4
-    interrupt_vector: Vec7
+    interrupt_vector: Vec5
     ipslot: 1
     name: CARD41
 
   - type: epics.InterruptVectorVME
-    name: Vec8
+    name: Vec6
 
   - type: DLS8515.DLS8516
     carrier: CARD4
-    interrupt_vector: Vec8
+    interrupt_vector: Vec6
     ipslot: 2
     name: CARD42
 
