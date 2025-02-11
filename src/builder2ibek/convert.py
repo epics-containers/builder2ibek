@@ -58,7 +58,8 @@ def dispatch(builder: Builder, filename) -> Generic_IOC:
         entities=[
             {"type": "epics.EpicsEnvSet", "name": "EPICS_TS_MIN_WEST", "value": "0"},
             # # TODO - much better if we could mount the root folder as /epics, how?
-            # {"type": "epics.EpicsEnvSet", "name": "STREAM_PROTOCOL_PATH", "value": "/iocs/{{  _global.get_env('IOC_NAME') }}/runtime/protocol/"},
+            # {"type": "epics.EpicsEnvSet", "name": "STREAM_PROTOCOL_PATH", "value":
+            # "/iocs/{{  _global.get_env('IOC_NAME') }}/runtime/protocol/"},
             {"type": "devIocStats.iocAdminSoft", "IOC": "{{ ioc_name | upper }}"},
         ],
         source_file=filename,
