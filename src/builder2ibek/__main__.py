@@ -51,12 +51,8 @@ def beamline2yaml(
     output: Path = typer.Argument(..., help="Output root folder"),
 ):
     """
-    <<<<<<< HEAD
-        Convert whole beamline's IOCs from builder to ibek (TODO)
-    =======
-        Convert all IOCs in a BLXXI-SUPPORT project into a set of ibek services
-        folders (TODO)
-    >>>>>>> 4af36b9 (add db compare)
+    TODO: Convert all IOCs in a BLXXI-SUPPORT project into a set of ibek services
+    folders (not yet implemented)
     """
     typer.echo("Not implemented yet")
     raise typer.Exit(code=1)
@@ -84,13 +80,22 @@ def db_compare(
     ignore: list[str] = typer.Option(
         [], help="List of record name sub strings to ignore"
     ),
+    remove_duplicates: bool = typer.Option(
+        False, help="Remove duplicate records in the original DB"
+    ),
     output: Optional[Path] = typer.Option(None, help="Output file"),
 ):
     """
     Compare two DB files and output the differences
     """
 
-    compare_dbs(original, new, ignore, output)
+    compare_dbs(
+        original,
+        new,
+        ignore=ignore,
+        remove_duplicates=remove_duplicates,
+        output=output,
+    )
 
 
 if __name__ == "__main__":

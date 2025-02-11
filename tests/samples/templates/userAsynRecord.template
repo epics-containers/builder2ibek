@@ -1,0 +1,18 @@
+# Generic asyn record - can be used for serial channels on user patch panels for example
+
+# % macro, P, Device Prefix
+# % macro, R, Device Suffix
+# % macro, PORT, Asyn Port
+# % macro, ADDR, Asyn Address
+# % macro, OMAX, Max length of output buffer
+# % macro, IMAX, Max length of input buffer
+
+#% autosave 1 BAUD DBIT SBIT PRTY FCTL OEOS IEOS AOUT OFMT IFMT TMOT TMOD SCAN
+record(asyn,"$(P)$(R)")
+{
+    field(DTYP,"asynRecordDevice")
+    field(PORT,"$(PORT)")
+    field(ADDR,"$(ADDR)")
+    field(OMAX,"$(OMAX)")
+    field(IMAX,"$(IMAX)")
+}

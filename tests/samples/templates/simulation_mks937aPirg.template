@@ -1,0 +1,250 @@
+# simulation_mks937aPirg.db
+# Template database for a simulated pirani guage 
+# Pete Owens - 5/1/04
+#
+# This file is the same as mks937a-pirg.db with DTYP fields commented out
+# Records with subsystem :SIM: are to simulate the hardware
+#
+# substitutions:
+# device  - device name
+# port    - serial port (steam device code ie /ty/0/1 => ty_0_1)
+# channel - MKS 937A channel number (1-4)
+#
+# The above are macros that must be set and if left undefined will produce
+# unexpanded macro error messages.  The following are optional and will
+# default to an appropriate hardwired value if no value is passed for
+# expansion. They are provided to allow the default set points to be changed.
+# Once the set point needs to be changed it may be necessary to alter 
+# various other fields defining the range of allowed values.
+# For the majority of applications the defaults should be used.  The levels
+# should only be changed at the request of the vacuum group for non-standard
+# vacuum systems.
+#
+# rlysp_level = the desired relay setpoint value for the PIRG device.
+# rlysp_drvh  = the DRVH field on control setpoint records 
+#              (limits max value of relay setpoint)
+# rlysp_drvl  = the DRVL field on relay setpoint records.
+#              (limits min value of relay setpoint)
+# rlysp_hopr  = the HOPR field on relay setpoint records
+#              (high operator value - helps display set correct range).
+# rlysp_lopr  = the LOPR field on relay setpoint records
+#              (low operator value - helps display set correct range).
+# rlysp_hihi  = the HIHI alarm field on the relay setpoint record.
+# rlysp_lolo  = the LOLO alarm field on the relay setpoint record.
+# rlysp_high  = the HIGH alarm field on the relay setpoint record.
+# rlysp_low   = the LOW alarm field on the relay setpoint record.
+# rlysp_desc  = the DESC field on the relay setpoint records
+#		(appears as a label on the Pirg EDM screen).
+#
+#################################################################################
+# Simulate staus
+# put on a slowish scan to simulate sluggish response
+#
+record(calc, "$(device):SIM:STA")
+{
+    field(DESC, "Simulated Status")
+    field(CALC, "C>0?3:(C<-10?8:0)")
+    field(SCAN, "2 second")
+    field(INPA, "$(device):CCHV")
+    field(INPB, "$(device):STA")
+    field(INPC, "$(device):PLOG")
+}
+################################################################################
+# Simulate random flutuating pressure
+# 
+record(sub,"$(device):SIM:P") 
+{
+    field(INAM, "pressRanInit")
+    field(SNAM, "pressRanProcess")
+    field(INPA, "-10")
+    field(INPB, "-3")
+}
+################################################################################
+# Status
+#
+#% archiver 10 Monitor
+#% controldesk Pressure smon
+#
+record(mbbi, "$(device):STA")
+{
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol status($(channel)) $(port) 0")
+    field(INP,  "$(device):SIM:STA")
+    field(DESC, "Status")
+    field(SCAN, "1 second")
+    field(FLNK, "$(device):INP")
+    field(ZRST, "OK")
+    field(ONST, "OK")
+    field(TWST, "Above Range")
+    field(THST, "At Atmosphere")
+    field(FRST, "Low Emission")
+    field(FVST, "Filament Off")
+    field(SXST, "HV Off")
+    field(SVST, "Startup Delay")
+    field(EIST, "Below Range")
+    field(NIST, "Controlled")
+    field(TEST, "Protected State")
+    field(ELST, "No Gauge")
+    field(TVST, "Not Connected")
+    field(TTST, "Wrong Gauge")
+    field(FTST, "Bad Command")
+    field(FFST, "Locked Out")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "MINOR")
+    field(THSV, "MINOR")
+    field(FRSV, "MAJOR")
+    field(FVSV, "MAJOR")
+    field(SXSV, "MAJOR")
+    field(SVSV, "MINOR")
+    field(EISV, "NO_ALARM")
+    field(NISV, "MINOR")
+    field(TESV, "MINOR")
+    field(ELSV, "MAJOR")
+    field(TVSV, "MAJOR")
+    field(TTSV, "MAJOR")
+    field(FTSV, "MAJOR")
+    field(FFSV, "MAJOR")
+}
+################################################################################
+# Pressure
+#
+record(ai, "$(device):INP")
+{
+    field(DESC, "Input Pressure")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol pressure($(channel)) $(port) 0")
+    field(INP,  "$(device):SIM:P PP")
+    field(FLNK, "$(device):P")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "1000")
+    field(LOPR, "0.001")
+}
+#
+#% archiver 1 Monitor
+#% controldesk Pressure readback
+#
+record(calc, "$(device):P")
+{
+    field(DESC, "Pressure")
+    field(FLNK, "$(device):PLOG")
+    field(CALC, "A<2?B:(A=8?C:D)")
+    field(INPA, "$(device):STA")
+    field(INPB, "$(device):INP")
+    field(INPC, "0.001")
+    field(INPD, "1000")
+    field(EGU,  "mbar")
+    field(PREC, "3")
+    field(HOPR, "1000")
+    field(LOPR, "0.001")
+}
+record(calcout, "$(device):ADEL")
+{
+    field(DESC, "deadband")
+    field(CALC, "A/B")
+    field(OUT,  "$(device):P.ADEL")
+    field(INPA, "$(device):P")
+    field(INPB, "20")
+    field(SCAN, "10 second")
+}
+#
+#% archiver 1 Monitor
+#
+record(calc, "$(device):PLOG")
+{
+    field(DESC, "log Pressure")
+    field(EGU,  "log")
+    field(CALC, "LOG(A)")
+    field(INPA, "$(device):P MS")
+    field(HOPR, "3")
+    field(LOPR, "-3")
+    field(ADEL, "0.025")
+}
+################################################################################
+# Relay - Ion Pump Interlock
+#
+#% archiver 10 Monitor
+#
+record(ao, "$(device):RLY:SETSP")
+{
+    field(DESC, "$(rlysp_desc=Ion Pump I/L)")
+    field(FLNK, "$(device):RLY:SEQ")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "$(rlysp_hopr=1.2e2)")
+    field(LOPR, "$(rlysp_lopr=2.7e-3)")
+    field(DRVH, "$(rlysp_drvh=1.2e2)")
+    field(DRVL, "$(rlysp_drvl=2.7e-3)")
+    field(DOL , "$(rlysp_level=1.0e-2)")
+}
+#
+#% archiver 10 Monitor
+#
+record(mbbo, "$(device):RLY:ENABLE")
+{
+    field(DESC, "Enable Relay Setpoint")
+    field(FLNK, "$(device):RLY:SEQ")
+    field(ZRST, "Force On I/L")
+    field(ONST, "I/L Operating")
+    field(ZRVL, "1")
+    field(ONVL, "2")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(DOL , "1")
+    field(PINI, "YES")
+}
+record(seq, "$(device):RLY:SEQ")
+{
+    field(DESC, "Sequence Relay Setpoint")
+    field(SELM, "Specified")
+    field(SELL, "$(device):RLY:ENABLE.RVAL")
+    field(DOL1, "0")
+    field(LNK1, "$(device):RLY:DIS PP")
+    field(DOL2, "$(device):RLY:SETSP")
+    field(LNK2, "$(device):RLY:OUTSP PP")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Ion Pump Interlock readback
+#
+record(calc, "$(device):RLY:SP")
+{
+    field(DESC, "$(rlysp_desc=Ion Pump I/L)")
+    field(CALC, "B=1?A:0")
+    field(INPA, "$(device):RLY:SETSP")
+    field(INPB, "$(device):RLY:ENABLE")
+#record(ai, "$(device):RLY:SP")
+#
+#{
+#    field(DESC, "Read Relay Setpoint")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol getsp($(channel),RLY) $(port) 0")
+    field(SCAN, "1 second")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "$(rlysp_hopr=1.2e2)")
+    field(LOPR, "$(rlysp_lopr=2.7e-3)")
+    field(HIHI, "$(rlysp_hihi=1.0e3)")
+    field(LOLO, "$(rlysp_lolo=2.6e-3)")
+    field(HIGH, "$(rlysp_high=1.1e-2)")
+    field(LOW,  "$(rlysp_low=9.0e-3)")
+    field(HHSV, "MAJOR")
+    field(LLSV, "MAJOR")
+    field(HSV,  "MINOR")
+    field(LSV,  "MINOR")
+}
+record(ao, "$(device):RLY:OUTSP")
+{
+    field(DESC, "Output Relay Setpoint")
+#    field(DTYP, "stream")
+#    field(OUT,  "@mks937a.protocol setsp($(channel),RLY) $(port) 0")
+}
+record(bo, "$(device):RLY:DIS")
+{
+    field(DESC, "Disable Relay Setpoint")
+#    field(DTYP, "stream")
+#    field(OUT,  "@mks937a.protocol dissp($(channel),RLY) $(port) 0")
+}
+################################################################################

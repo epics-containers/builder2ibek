@@ -1,0 +1,205 @@
+
+
+# NX102_vacValveBistable.vdb is expanded to NX102_vacValveBistable.template by flatdb.
+#
+#% macro, __doc__, Template database for a bistable vacuum valve without debounce or raw air records.  It has different interlocks for opening and closing it.
+#% macro, device, device name
+#% macro, port, EtherIP Port Name
+#% macro, tag, NX PLC tag string e.g. V (from V.Control[1])
+#% macro, tagidx, NX PLC tag index number e.g. 1 (from V.Control[1])
+#% macro, allowpv, If specified, then only write an open command when this is non-zero. MUST have CP at the end of it. (Optional - defaults to "")
+#% macro, whylocked, String to output to EDM synoptic as to precisely why the device is locked and by whom (Optional.  Defaults to "Open command not allowed")
+#% macro, con_label0, Label string for control value 0 (Optional - defaults to Open)
+#% macro, con_label1, Label string for control value 1 (Optional - defaults to Close)
+#% macro, con_label2, Label string for control value 2 (Optional - defaults to Reset)
+#% macro, con_label3, Label string for control value 3 (Optional - defaults to Close Enable)
+#% macro, con_label4, Label string for control value 4 (Optional - defaults to "")
+#% macro, con_label5, Label string for control value 5 (Optional - defaults to "")
+#% macro, con_label6, Label string for control value 6 (Optional - defaults to "")
+#% macro, con_label7, Label string for control value 7 (Optional - defaults to "")
+#
+#% macro, sta_label0, Label string for status value 0 (Optional - defaults to Fault)
+#% macro, sta_label1, Label string for status value 1 (Optional - defaults to Open)
+#% macro, sta_label2, Label string for status value 2 (Optional - defaults to Opening)
+#% macro, sta_label3, Label string for status value 3 (Optional - defaults to Closed)
+#% macro, sta_label4, Label string for status value 4 (Optional - defaults to Closing)
+#% macro, sta_label5, Label string for status value 5 (Optional - defaults to "")
+#% macro, sta_label6, Label string for status value 6 (Optional - defaults to "")
+#% macro, sta_label7, Label string for status value 7 (Optional - defaults to "")
+#
+#% macro, sta_sv0, Alarm severity for status value 0 (Optional - defaults to MAJOR)
+#% macro, sta_sv1, Alarm severity for status value 1 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv2, Alarm severity for status value 2 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv3, Alarm severity for status value 3 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv4, Alarm severity for status value 4 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv5, Alarm severity for status value 5 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv6, Alarm severity for status value 6 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv7, Alarm severity for status value 7 (Optional - defaults to NO_ALARM)
+#
+#% macro, ilksta_label0, Label string for status value 0 (Optional - defaults to Failed)
+#% macro, ilksta_label1, Label string for status value 1 (Optional - defaults to Open Disabled)
+#% macro, ilksta_label2, Label string for status value 2 (Optional - defaults to Closed, Open Available)
+#% macro, ilksta_label3, Label string for status value 3 (Optional - defaults to Open)
+#% macro, ilksta_label4, Label string for status value 4 (Optional - defaults to Close Disabled)
+#% macro, ilksta_label5, Label string for status value 5 (Optional - defaults to Open, Close Available)
+#% macro, ilksta_label6, Label string for status value 6 (Optional - defaults to Closed)
+#% macro, ilksta_label7, Label string for status value 7 (Optional - defaults to "")
+#
+#% macro, ilksta_sv0, Alarm severity for interlock status value 0 (Optional - defaults to MAJOR)
+#% macro, ilksta_sv1, Alarm severity for interlock status value 1 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv2, Alarm severity for interlock status value 2 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv3, Alarm severity for interlock status value 3 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv4, Alarm severity for interlock status value 4 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv5, Alarm severity for interlock status value 5 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv6, Alarm severity for interlock status value 6 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv7, Alarm severity for interlock status value 7 (Optional - defaults to NO_ALARM)
+#
+#% macro, mode1, name of remote operational mode (:MODE.ZNAM) (Optional - defaults to Operational)
+#% macro, mode2, name of local operational mode (:MODE.ONAM)  (Optional - defaults to Service)
+#% macro, DIRILK1, Part of ILK1 PV name (dollar(device):dollar(DIRILK1)ILK), named for "direction" of operation controlled by ILK1, e.g. set to OPEN for Bistable valve (Optional - defaults to OPEN)
+#% macro, DIRILK1_label, Label string for the interlock 1 "direction".  (Optional - defaults to Open)
+#% macro, DIRILK2, Part of ILK2 PV name (dollar(device):dollar(DIRILK2)ILK), named for "direction" of operation controlled by ILK2, e.g. set to CLOSE for Bistable valves (Optional - defaults to CLOSE)
+#% macro, DIRILK2_label, Label string for the interlock 2 "direction".  (Optional - defaults to Close)
+#% macro, ILKNUM, Part of Gauge PLC tag (Gauge.PIRG[dollar(ILKNUM)])
+#
+#% macro, name, Object name and associated gui name    	 (Optional - defaults to "")
+#% macro, desc, Box label for gui                        (Optional - defaults to value of device macro)
+#% macro, valvetype, Type of valve for the gui.          (Optional - defaults to valve).
+#
+# This associates an edm screen with the template
+# % gui, $(name=), edm, NX102_vacuumValveBistable.edl, device=$(device), DIRILK1=$(DIRILK1=OPEN), DIRILK2=$(DIRILK2=CLOSE), Open=$(DIRILK1_label=Open), Close=$(DIRILK2_label=Close)
+# % gui, $(name=), edmembed, NX102_vacuumValveBistable-embed.edl, device=$(device), DIRILK1=$(DIRILK1=OPEN), DIRILK2=$(DIRILK2=CLOSE), Open=$(DIRILK1_label=Open), Close=$(DIRILK2_label=Close), box-label=$(desc=$(device))
+#
+# This associates BOY screens with the template
+# % gui, $(name=), boydetail, dlsPLCApp_opi/NX102_vacValve_detail.opi, device=$(device), DESC=$(device), valvetype=valve
+# % gui, $(name=), boyembed, dlsPLCApp_opi/vacValveBistable_embed_box.opi, device=$(device), DESC=$(device), name=$(name=), valvetype=$(valvetype=valve)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/vacValveBistable_embed.opi, device=$(device), DESC=$(device), name=$(name=), valvetype=$(valvetype=valve)
+#
+# This tells the gui that we don't have debounce records
+record(ai, "$(device):HASDEBOUNCE") {
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+
+# The label macros are the string fields on mbbi or mbbo records.
+# These fields under EPICS R3.14.12.7 are limited to 25 characters.
+#
+# There are several further macros defined in the template which
+# do not have an entry in the expand command and they are passed
+# through untouched, notably device and allowpv.
+#
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_con_label0=$(con_label0=Open)"
+substitute "_con_label1=$(con_label1=Close)"
+substitute "_con_label2=$(con_label2=Reset)"
+substitute "_con_label3=$(con_label3=Close Enable)"
+substitute "_con_label4=$(con_label4=)"
+substitute "_con_label5=$(con_label5=)"
+substitute "_con_label6=$(con_label6=)"
+substitute "_con_label7=$(con_label7=)"
+substitute "_sta_label0=$(sta_label0=Fault)"
+substitute "_sta_label1=$(sta_label1=Open)"
+substitute "_sta_label2=$(sta_label2=Opening)"
+substitute "_sta_label3=$(sta_label3=Closed)"
+substitute "_sta_label4=$(sta_label4=Closing)"
+substitute "_sta_label5=$(sta_label5=)"
+substitute "_sta_label6=$(sta_label6=)"
+substitute "_sta_label7=$(sta_label7=)"
+substitute "_sta_sv0=$(sta_sv0=MAJOR)"
+substitute "_sta_sv1=$(sta_sv1=NO_ALARM)"
+substitute "_sta_sv2=$(sta_sv2=NO_ALARM)"
+substitute "_sta_sv3=$(sta_sv3=NO_ALARM)"
+substitute "_sta_sv4=$(sta_sv4=NO_ALARM)"
+substitute "_sta_sv5=$(sta_sv5=NO_ALARM)"
+substitute "_sta_sv6=$(sta_sv6=NO_ALARM)"
+substitute "_sta_sv7=$(sta_sv7=NO_ALARM)"
+substitute "_ilksta_label0=$(ilksta_label0=Failed)"
+substitute "_ilksta_label1=$(ilksta_label1=Open Disabled)"
+substitute "_ilksta_label2=$(ilksta_label2=Closed, Open Available)"
+substitute "_ilksta_label3=$(ilksta_label3=Open)"
+substitute "_ilksta_label4=$(ilksta_label4=Close Disabled)"
+substitute "_ilksta_label5=$(ilksta_label5=Open, Close Available)"
+substitute "_ilksta_label6=$(ilksta_label6=Closed)"
+substitute "_ilksta_label7=$(ilksta_label7=)"
+substitute "_ilksta_sv0=$(ilksta_sv0=MAJOR)"
+substitute "_ilksta_sv1=$(ilksta_sv1=NO_ALARM)"
+substitute "_ilksta_sv2=$(ilksta_sv2=NO_ALARM)"
+substitute "_ilksta_sv3=$(ilksta_sv3=NO_ALARM)"
+substitute "_ilksta_sv4=$(ilksta_sv4=NO_ALARM)"
+substitute "_ilksta_sv5=$(ilksta_sv5=NO_ALARM)"
+substitute "_ilksta_sv6=$(ilksta_sv6=NO_ALARM)"
+substitute "_ilksta_sv7=$(ilksta_sv7=NO_ALARM)"
+substitute "_donecalc=((A=D)&(((A*2+1)=B)|A=2|C=0))?0:1"
+substitute "_whylocked=$(whylocked=Open command not allowed)"
+
+include "NX102_valveCtrl.template"
+
+
+# Get $(tag).ILK1_ (i.e. V.ILK1_...[n])
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_TAGPREFIX=ILK1_"
+substitute "_typeprefix=:"
+substitute "_DIR=$(DIRILK1=OPEN)"
+substitute "_device=$(device)=HELLO"
+
+include "NX102_valveIlk.template"
+
+
+# Following gets the second set of valve interlocks V[n].ILK2 which are only really relevent for bistable valves.
+# Get $(tag).ILK2_  (i.e. V.ILK2_...[n])
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_TAGPREFIX=ILK2_"
+substitute "_typeprefix=:"
+substitute "_DIR=$(DIRILK2=CLOSE)"
+substitute "_device=$(device)=HELLO"
+
+include "NX102_valveIlk.template"
+
+
+
+include "NX102_valveGilk.template"
+
+
+# Operational/Service Mode
+#% archiver 10 Monitor
+#% controldesk Mode smon
+#
+record(bi, "$(device):MODE") {
+  field(DESC, "Mode")
+  field(INP, "$(device):MODSTA.B0 CP MS")
+  field(ZNAM, "$(mode1=Operational)")
+  field(ONAM, "$(mode2=Service)")
+}
+
+record(ao, "$(device):SETPRESSURE") {
+  field(DESC, "Butterfly valve set pressure")
+  field(DTYP, "EtherIP")
+  field(SCAN, ".2 second")
+  field(OUT, "@$(port) $(tag).User_Set_Pressure[$(tagidx)] FORCE")
+  field(PREC, "2")
+}
+
+record(ao, "$(device):SETPOSITION") {
+  field(DESC, "Butterfly valve set position")
+  field(DTYP, "EtherIP")
+  field(SCAN, ".2 second")
+  field(OUT, "@$(port) $(tag).User_Set_Position[$(tagidx)] FORCE")
+  field(PREC, "1")
+}
+
+# % archiver 10 Monitor
+record(ai, "$(device):POSITION") {
+  field(DESC, "Butterfly valve position or Pressure")
+  field(DTYP, "EtherIP")
+  field(SCAN, ".2 second")
+  field(INP, "@$(port) $(tag).Position[$(tagidx)]")
+  field(EGU, "%")
+  field(ADEL, "0.1")
+  field(PREC, "1")
+}

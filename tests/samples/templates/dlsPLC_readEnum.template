@@ -1,0 +1,79 @@
+
+
+# % macro, __doc__, Read the Enum value stored in a DM variable in a PLC
+# % macro, P, device prefix
+# % macro, Q, device suffix
+# % macro, vlvcc, PLC control crate device prefix
+# % macro, addr, DM variable of the int
+# % macro, name, Object name and gui association name
+# % macro, VAL0, Value for state 0
+# % macro, VAL1, Value for state 1
+# % macro, VAL2, Value for state 2
+# % macro, VAL3, Value for state 3
+# % macro, VAL4, Value for state 4
+# % macro, VAL5, Value for state 5
+# % macro, VAL6, Value for state 6
+# % macro, VAL7, Value for state 7
+# % macro, STR0, String Value for state 0
+# % macro, STR1, String Value for state 1
+# % macro, STR2, String Value for state 2
+# % macro, STR3, String Value for state 3
+# % macro, STR4, String Value for state 4
+# % macro, STR5, String Value for state 5
+# % macro, STR6, String Value for state 6
+# % macro, STR7, String Value for state 7
+# 
+# 
+# This associates an edm screen with the template
+# % gui, $(name=), edmembed, dlsPLC_readSingle.edl, P=$(P),Q=$(Q)
+record(calcout, "$(P)$(Q):INDX") {
+  field(CALC, "$(addr)%100")
+  field(OUT, "$(P)$(Q):GET.INDX PP")
+  field(PINI, "YES")
+}
+
+# value is in DM$(addr). Calc the inp link to the 
+# century record. Needs to be done after PINI, so note
+# the flnk
+record(scalcout, "$(P)$(Q):INP") {
+  field(CALC, "PRINTF(AA,FLOOR($(addr)/100))")
+  field(AA, "$(vlvcc):DM%dXX CP MS")
+  field(OUT, "$(P)$(Q):GET.INP CA")
+  field(FLNK, "$(P)$(Q):INPDIS")
+  field(SCAN, "1 second")
+}
+
+# Disable the scalcout record so we don't keep writing values
+record(ao, "$(P)$(Q):INPDIS") {
+  field(VAL, "1")
+  field(OUT, "$(P)$(Q):INP.DISA")
+}
+
+record(subArray, "$(P)$(Q):GET") {
+  field(DESC, "Get control readback")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P)$(Q)")
+  field(FTVL, "USHORT")
+  field(MALM, "100")
+}
+
+# % archiver 10 Monitor
+record(mbbi, "$(P)$(Q)") {
+  field(INP, "$(P)$(Q):GET MS")
+  field(ZRVL, "$(VAL0=0)")
+  field(ONVL, "$(VAL1=1)")
+  field(TWVL, "$(VAL2=2)")
+  field(THVL, "$(VAL3=3)")
+  field(FRVL, "$(VAL4=4)")
+  field(FVVL, "$(VAL5=5)")
+  field(SXVL, "$(VAL6=6)")
+  field(SVVL, "$(VAL7=7)")
+  field(ZRST, "$(STR0=)")
+  field(ONST, "$(STR1=)")
+  field(TWST, "$(STR2=)")
+  field(THST, "$(STR3=)")
+  field(FRST, "$(STR4=)")
+  field(FVST, "$(STR5=)")
+  field(SXST, "$(STR6=)")
+  field(SVST, "$(STR7=)")
+}

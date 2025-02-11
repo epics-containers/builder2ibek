@@ -1,0 +1,372 @@
+# space.template
+#%, macro, __doc__, Template database for a vacuum space 
+# Consists of just 1 pump, 1 gauge and 1 valve (or more likely groups of these)
+# Pete Owens - 10/6/05
+#
+# substitutions:
+#% macro, device, device name
+#% macro, name, Object name and gui association name
+#% macro, ionp, ion pump
+#% macro, gauge, combination gauge
+#% macro, img, IMG
+#% macro, pirg, Pirani gauge
+#% macro, valve, Vacuum valve  
+################################################################################
+
+# This associates an edm screen with the template
+# % gui, $(name=), edm, space.edl, device=$(device)
+
+# This associates a BOY screen with the template
+# % gui, $(name=), boydetail, vacuumSpaceApp_opi/space_detail.opi, device=$(device), desc=$(device), name=$(name=)
+# % gui, $(name=), boyembed, vacuumSpaceApp_opi/space_embed_box.opi, device=$(device), desc=$(device), name=$(name=)
+# % gui, $(name=), boyembed, vacuumSpaceApp_opi/space_embed.opi, device=$(device), desc=$(device), name=$(name=)
+
+# Pressure (maximum value from all spaces)
+#
+#% archiver 1 Monitor
+#
+record(ai, "$(device):PLOG")
+{
+    field(DESC, "log Pressure")
+    field(SCAN, "1 second")
+    field(EGU,  "log")
+    field(INP,  "$(gauge):PLOG")
+    field(HOPR, "3")
+    field(LOPR, "-11")
+    field(HIGH, "-7")
+    field(HSV,  "MINOR")
+    field(ADEL, "0.025")
+}
+#
+#% archiver 10
+#% controldesk Pressure readback
+#
+record(ai, "$(device):P")
+{
+    field(DESC, "Pressure")
+    field(SCAN, "1 second")
+    field(EGU,  "mbar")
+    field(INP,  "$(gauge):P")
+    field(HIGH, "1.0e-7")
+    field(HSV,  "MINOR")
+}
+################################################################################
+# Status
+# B0 Gauge not OK
+# B1 Ion Pump not swiched on
+# B2 Valve not open
+# B3 Pressure
+#
+#% archiver 10 Monitor
+#% controldesk Status smon
+#
+record(mbbiDirect,"$(device):STA") 
+{
+    field(DESC,"Status")
+    field(SCAN,"1 second")
+    field(INP, "$(device):CALSTA PP MS")
+}
+record(calc, "$(device):CALSTA")
+{
+    field(DESC, "Calculate Status")
+    field(CALC, "A|B|C|D")
+    field(INPA, "$(device):IMGSTA PP MS")
+    field(INPB, "$(device):IONPSTA PP MS")
+    field(INPC, "$(device):VALVESTA PP MS")
+    field(INPD, "$(device):PSTA PP MS")
+}
+record(calc, "$(device):IMGSTA")
+{
+    field(DESC, "IMGs Status")
+    field(CALC, "(A<2||A=8)?0:1")
+    field(INPA, "$(img):STA")
+    field(HIGH, "1.5")
+    field(HSV,  "MINOR")
+#    field(INPA, "$(img):STA MS")
+#    field(HIHI, "1.5")
+#    field(HHSV, "MAJOR")
+}
+record(calc, "$(device):IONPSTA")
+{
+    field(DESC, "Pumps Status")
+    field(CALC, "(A=4)?0:2")
+    field(INPA, "$(ionp):STA")
+    field(HIGH, "0.5")
+    field(HSV,  "MINOR")
+#    field(INPA, "$(ionp):STA MS")
+#    field(HIHI, "0.5")
+#    field(HHSV, "MAJOR")
+}
+record(calc, "$(device):VALVESTA")
+{
+    field(DESC, "Valves Status")
+    field(CALC, "(A=1)?0:4")
+    field(INPA, "$(valve):STA MS")
+    field(HIHI, "3.5")
+    field(HHSV, "MAJOR")
+}
+record(calc, "$(device):PSTA")
+{
+    field(DESC, "Pressure Status")
+    field(CALC, "(A<B)?0:8")
+    field(INPA, "$(device):P MS")
+    field(INPB, "1.0e-7")
+    field(HIGH, "7.5")
+    field(HSV,  "MINOR")
+}
+#################################################################################
+# Control Pumps
+#
+#% controldesk Pumps scon
+#
+record(bo,"$(device):START") 
+{
+    field(DESC, "Control Pumps")
+    field(OUT,  "$(ionp):START PP")
+    field(ZNAM, "Stop")
+    field(ONAM, "Start")
+}
+#
+#% controldesk Pumps smon
+#
+record(bi,"$(device):STARTING")
+{
+    field(DESC, "Starting Pumps")
+    field(SCAN, "1 second")
+    field(INP,  "$(ionp):STARTING")
+    field(ZNAM, "")
+    field(ONAM, "Starting")
+}
+#################################################################################
+# Control Valves
+#
+#% controldesk Valves scon
+#
+record(mbbo,"$(device):CON") 
+{
+    field(DESC, "Control Valves")
+    field(OUT,  "$(valve):CON PP")
+    field(ZRST, "Open")
+    field(ONST, "Close")
+    field(TWST, "Reset")
+}
+#
+#% controldesk Valves smon
+#
+record(bi,"$(device):OPENING")
+{
+    field(DESC, "Opening Valves")
+    field(SCAN, "1 second")
+    field(INP,  "$(valve):OPENING")
+    field(ZNAM, "")
+    field(ONAM, "Opening")
+}
+#################################################################################
+# Cold Cathode Enable
+#
+#% controldesk Gauges scon
+#
+record(bo, "$(device):CCHV")
+{
+    field(DESC, "Cold Cathode Enable")
+    field(OUT,  "$(img):CCHV PP")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+}
+#
+#% controldesk Gauges smon
+#
+record(bi,"$(device):SWITCHING")
+{
+    field(DESC, "Switching")
+    field(SCAN, "1 second")
+    field(INP,  "$(img):SWITCHING")
+    field(ZNAM, "")
+    field(ONAM, "Switching")
+}
+#################################################################################
+# PIRG Control Interlocks - IMG Enable
+#
+record(ao, "$(device):CTL:SETSP")
+{
+    field(DESC, "IMG Enable")
+    field(OUT,  "$(pirg):CTL:SETSP PP")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "9.5e-1")
+    field(LOPR, "2.7e-3")
+    field(DRVH, "9.5e-1")
+    field(DRVL, "2.7e-3")
+    field(DOL , "1.0e-2")
+}
+record(mbbo, "$(device):CTL:ENABLE")
+{
+    field(DESC, "Enable Control Setpoint")
+    field(OUT,  "$(pirg):CTL:ENABLE PP")
+    field(ZRST, "Force On I/L")
+    field(ONST, "I/L Operating")
+    field(ZRVL, "1")
+    field(ONVL, "2")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(DOL , "1")
+    field(PINI, "YES")
+}
+record(ai, "$(device):CTL:SP")
+{
+    field(DESC, "IMG Enable")
+    field(SCAN, "1 second")
+    field(EGU,  "mbar")
+    field(INP,  "$(pirg):CTL:SP MS")
+    field(HOPR, "9.5e-1")
+    field(LOPR, "2.7e-3")
+}
+#################################################################################
+# IMG Protection Interlocks - IMG Overpressure
+#
+record(ao, "$(device):PRO:SETSP")
+{
+    field(DESC, "IMG Overpressure")
+    field(OUT,  "$(img):PRO:SETSP PP")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "1.0e-2")
+    field(LOPR, "1.3e-5")
+    field(DRVH, "1.0e-2")
+    field(DRVL, "1.3e-5")
+    field(DOL , "5.0e-4")
+}
+record(mbbo, "$(device):PRO:ENABLE")
+{
+    field(DESC, "Enable Protection Setpoint")
+    field(OUT,  "$(img):PRO:ENABLE PP")
+    field(ZRST, "Force On I/L")
+    field(ONST, "I/L Operating")
+    field(ZRVL, "1")
+    field(ONVL, "2")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(DOL , "1")
+    field(PINI, "YES")
+}
+record(ai, "$(device):PRO:SP")
+{
+    field(DESC, "IMG Overpressure")
+    field(SCAN, "1 second")
+    field(EGU,  "mbar")
+    field(INP,  "$(img):PRO:SP MS")
+    field(HOPR, "1.0e-2")
+    field(LOPR, "1.3e-5")
+}
+#################################################################################
+# IMG Relay Interlocks - Valve Interlock
+#
+record(ao, "$(device):RLY:SETSP")
+{
+    field(DESC, "Valve I/L")
+    field(OUT,  "$(img):RLY:SETSP PP")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "1.2e-2")
+    field(LOPR, "2.7e-10")
+    field(DRVH, "1.2e-2")
+    field(DRVL, "2.7e-10")
+    field(DOL , "1.0e-6")
+}
+record(mbbo, "$(device):RLY:ENABLE")
+{
+    field(DESC, "Enable Relay Setpoint")
+    field(OUT,  "$(img):RLY:ENABLE PP")
+    field(ZRST, "Force On I/L")
+    field(ONST, "I/L Operating")
+    field(ZRVL, "1")
+    field(ONVL, "2")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(DOL , "1")
+    field(PINI, "YES")
+}
+record(ai, "$(device):RLY:SP")
+{
+    field(DESC, "Valve I/L")
+    field(SCAN, "1 second")
+    field(EGU,  "mbar")
+    field(INP,  "$(img):RLY:SP MS")
+    field(HOPR, "1.2e-2")
+    field(LOPR, "2.7e-10")
+}
+#################################################################################
+# IMG Relay 2 (Channel A) Interlocks - MPS Interlock
+#
+record(ao, "$(device):RLA:SETSP")
+{
+    field(DESC, "MPS Interlock")
+    field(OUT,  "$(img):RLA:SETSP PP")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "1.2e-2")
+    field(LOPR, "2.7e-10")
+    field(DRVH, "1.2e-2")
+    field(DRVL, "2.7e-10")
+    field(DOL , "1.0e-7")
+}
+record(mbbo, "$(device):RLA:ENABLE")
+{
+    field(DESC, "Enable Channel A Setpoint")
+    field(OUT,  "$(img):RLA:ENABLE PP")
+    field(ZRST, "Force On I/L")
+    field(ONST, "I/L Operating")
+    field(ZRVL, "1")
+    field(ONVL, "2")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(DOL , "1")
+    field(PINI, "YES")
+}
+record(ai, "$(device):RLA:SP")
+{
+    field(DESC, "MPS Interlock")
+    field(SCAN, "1 second")
+    field(EGU,  "mbar")
+    field(INP,  "$(img):RLA:SP MS")
+    field(HOPR, "1.2e-2")
+    field(LOPR, "2.7e-10")
+}
+#################################################################################
+# Pirani Guage  Relay Interlocks - Ion Pump Interlock
+#
+record(ao, "$(device):RLB:SETSP")
+{
+    field(DESC, "Ion Pump I/L")
+    field(OUT,  "$(pirg):RLY:SETSP PP")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "1.2e2")
+    field(LOPR, "2.7e-3")
+    field(DRVH, "1.2e2")
+    field(DRVL, "2.7e-3")
+    field(DOL , "1.0e-2")
+}
+record(mbbo, "$(device):RLB:ENABLE")
+{
+    field(DESC, "Enable Pirani Setpoint")
+    field(OUT,  "$(pirg):RLY:ENABLE PP")
+    field(ZRST, "Force On I/L")
+    field(ONST, "I/L Operating")
+    field(ZRVL, "1")
+    field(ONVL, "2")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(DOL , "1")
+    field(PINI, "YES")
+}
+record(ai, "$(device):RLB:SP")
+{
+    field(DESC, "Ion Pump I/L")
+    field(SCAN, "1 second")
+    field(EGU,  "mbar")
+    field(INP,  "$(pirg):RLY:SP MS")
+    field(HOPR, "1.2e2")
+    field(LOPR, "2.7e-3")
+}
+#################################################################################

@@ -1,0 +1,44 @@
+# % macro, SYSTEM, Device prefix
+# % macro, EVNUM, Event number
+# % macro, EVNAME, Device suffix
+##########  
+
+record(aSub, $(SYSTEM):TS-$(EVNAME)) {
+  field(DESC, "Get TS of event")
+  field(SCAN, "Event")
+  field(PINI, "YES")
+  field(EVNT, "$(EVNUM)")
+  field(FLNK, "$(SYSTEM):DT-$(EVNAME)")
+  field(SNAM, "GetTimestamp")
+  field(INPA, "$(EVNUM)")
+  field(INPB, "0")
+  field(FTA, "CHAR")
+  field(FTB, "CHAR")
+  field(OUTA, "$(SYSTEM):DT-$(EVNAME).VAL")
+  field(FTVA, "DOUBLE")
+  field(FTVB, "LONG")
+  field(FTVC, "LONG")
+  field(FTVD, "STRING")
+  field(FTVE, "STRING")
+  field(FTVF, "STRING")
+  field(FTVG, "STRING")
+}
+
+#% archiver 10 Monitor
+record(ao, $(SYSTEM):DT-$(EVNAME)) {
+  field(DESC, "Time since last event")
+  field(SCAN, "Passive")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(SYSTEM):EC-$(EVNAME)")
+  field(OMSL, "supervisory")
+  field(PREC, "6")
+  field(ADEL, "0.150")
+}
+
+record(calc, $(SYSTEM):EC-$(EVNAME)) {
+  field(DESC, "Event counter")
+  field(SCAN, "Passive")
+  field(CALC, "A+1")
+  field(INPA, "$(SYSTEM):EC-$(EVNAME).VAL")
+  field(DESC, "Increment on event")
+}

@@ -1,0 +1,161 @@
+# simulation_digitelMpc.db
+# Template database for digitel MPC - Controller
+# Pete Owens - 31/3/04
+#
+# This file is the same as digitelMpc.db with DTYP fields commented out
+# Records with subsystem :SIM: are to simulate the hardware
+#
+# substitutions:
+# device  - device name
+# port    - seral port number (from device manager table)
+# unit    - unit number for multi-drop serial (5 by default)
+################################################################################
+# Get Model Number
+#
+#% controldesk Model Number readback
+#
+record(stringin, "$(device):MODEL") 
+{
+    field(DESC, "Model Number")
+    field(VAL,  "DIGITEL MPC")
+#   field(DTYP, "ornlSerial")
+#   field(INP,  "@digitel mpc model u=$(port) m=$(unit)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Get Version
+#
+#% controldesk Firmware Revision readback
+#
+record(stringin, "$(device):VERSION") 
+{
+    field(DESC, "Firmware Revision")
+    field(VAL,  "FIRMWARE VERSION: 2.0C")
+#   field(DTYP, "ornlSerial")
+#   field(INP,  "@digitel mpc version u=$(port) m=$(unit)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Get Line Voltage - and inform the firmware
+#
+#% controldesk Line Voltage readback
+#
+record(longin, "$(device):V") 
+{
+    field(DESC, "Line Voltage")
+    field(VAL,  "240")
+#   field(DTYP, "ornlSerial")
+#   field(INP,  "@digitel mpc linev u=$(port) m=$(unit)")
+#    field(FLNK, "$(device):OUTV")
+    field(SCAN, "10 second")
+    field(EGU,  "V")
+    field(LOPR, "160")
+    field(HOPR, "240")
+    field(HIHI, "260")
+    field(HIGH, "241")
+    field(LOW,  "239")
+    field(LOLO, "220")
+    field(HHSV, "MAJOR")
+    field(HSV,  "MINOR")
+    field(LSV,  "MINOR")
+    field(LLSV, "MAJOR")
+}
+#
+# Pete Owens 25-5-04 cannot use longout as OUT field gets garbled 
+#
+record(ao, "$(device):OUTV") 
+{
+    field(DESC, "Line Voltage")
+#   field(DTYP, "ornlSerial")
+#   field(OUT,  "@digitel mpc linev u=$(port) m=$(unit)")
+#    field(OMSL, "closed_loop")
+#    field(DOL,  "$(device):V")
+    field(DOL,  "240")
+    field(PINI, "YES")
+    field(DRVL, "160")
+    field(DRVH, "240")
+    field(EGU,  "V")
+    field(LOPR, "160")
+    field(HOPR, "240")
+}
+################################################################################
+# Get Line Frequency
+#
+#% controldesk Line Frequency readback
+#
+record(longin, "$(device):F") 
+{
+    field(DESC, "Line Frequency")
+    field(VAL,  "50")
+#   field(DTYP, "ornlSerial")
+#   field(INP,  "@digitel mpc linef u=$(port) m=$(unit)")
+    field(SCAN, "10 second")
+    field(EGU,  "Hz")
+    field(LOPR, "50")
+    field(HOPR, "60")
+    field(HIHI, "52")
+    field(HIGH, "51")
+    field(LOW,  "49")
+    field(LOLO, "48")
+    field(HHSV, "MAJOR")
+    field(HSV,  "MINOR")
+    field(LSV,  "MINOR")
+    field(LLSV, "MAJOR")
+}
+################################################################################
+# Fan
+#
+#% controldesk Fan smon
+#
+record(bo, "$(device):SETFAN")
+{
+    field(DESC, "Fan")
+#   field(DTYP, "ornlSerial")
+#   field(OUT,  "@digitel mpc fan p=1 u=$(port) m=$(unit)")
+    field(ZNAM, "Off")
+    field(ONAM, "On")
+    field(DOL,  "1")
+    field(PINI, "YES")
+}
+################################################################################
+# Automatically Restart on power up
+#
+record(bo, "$(device):SETAUTOST")
+{
+    field(DESC, "Auto Restart")
+#   field(DTYP, "ornlSerial")
+#   field(OUT,  "@digitel mpc autost p=1 u=$(port) m=$(unit)")
+    field(FLNK, "$(device):AUTOST")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+    field(DOL,  "0")
+    field(PINI, "YES")
+}
+#
+#% controldesk Auto Restart smon
+#
+record(bi, "$(device):AUTOST")
+{
+    field(DESC, "Auto Restart")
+#   field(DTYP, "ornlSerial")
+#   field(INP,  "@digitel mpc autost u=$(port) m=$(unit)")
+field (INP, "$(device):SETAUTOST")
+    field(SCAN, "10 second")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+}
+################################################################################
+# Reset Software
+#
+#% archiver 10 Monitor
+#% controldesk Reset Software scon
+#
+record(bo, "$(device):RESET")
+{
+    field(DESC, "Reset Software")
+#    field(DTYP, "ornlSerial")
+#    field(OUT,  "@digitel mpc reset p=1 u=$(port) m=$(unit)")
+    field(ZNAM, "Reset")
+    field(ONAM, "Reset")
+}
+################################################################################

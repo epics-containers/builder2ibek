@@ -1,0 +1,176 @@
+# simulation_mks937a.db
+# Template database for an MKS937A Multi-Sensor System
+# Pete Owens - 9/3/04
+#
+# This file is the same as mks937a.db with DTYP fields commented out
+# Records with subsystem :SIM: are to simulate the hardware
+#
+# substitutions:
+# device  - device name
+# port    - serial port (steam device code ie /ty/0/1 => ty_0_1)
+################################################################################
+# Line Frequency
+#
+#% controldesk Line Frequency readback
+record(ai, "$(device):F")
+{
+    field(DESC, "Line Frequency")
+    field(VAL, "50")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol freq $(port) 0")
+    field(SCAN, "10 second")
+    field(EGU,  "Hz")
+    field(PREC, "0")
+    field(HOPR, "50")
+    field(LOPR, "60")
+}
+################################################################################
+# Pressure Unit
+#
+#% controldesk Pressure Unit readback
+record(stringin, "$(device):UNIT")
+{
+    field(DESC, "Pressure Unit")
+    field(VAL, "mbar")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol unit $(port) 0")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Controller Version
+#
+#% controldesk Controller Version readback
+record(ai, "$(device):CTLV")
+{
+    field(DESC, "Controller Version")
+    field(VAL, "1.23")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol ctlv $(port) 0")
+    field(SCAN, "10 second")
+    field(PREC, "2")
+}
+################################################################################
+# Communications Module Version
+#
+#% controldesk Communications Version readback
+record(ai, "$(device):COMV")
+{
+    field(DESC, "Communications Version")
+    field(VAL, "4.56")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol comv $(port) 0")
+    field(SCAN, "10 second")
+    field(PREC, "2")
+}
+################################################################################
+# Module in Slot CC
+#
+#% controldesk Slot CC smon
+record(mbbi, "$(device):MCC")
+{
+    field(DESC, "Slot CC")
+    field(VAL, "1")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol modcc $(port) 0")
+    field(SCAN, "10 second")
+    field(ZRST, "Hot Cathode")
+    field(ONST, "Cold Cathode")
+    field(TWST, "Dual Pirani")
+    field(THST, "Dual Cnv Pirani")
+    field(FRST, "Dual Thermocpl")
+    field(FVST, "Dual Cap Manmtr")
+    field(SXST, "Sngl Pirani")
+    field(SVST, "Sngl Cnv Pirani")
+    field(EIST, "Sngl Thrmcpl")
+    field(NIST, "Sngl Cap Manmtr")
+    field(TEST, "No Module")
+    field(ELST, "Wrong Module")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "NO_ALARM")
+    field(FVSV, "NO_ALARM")
+    field(SXSV, "NO_ALARM")
+    field(SVSV, "NO_ALARM")
+    field(EISV, "NO_ALARM")
+    field(NISV, "NO_ALARM")
+    field(TESV, "NO_ALARM")
+    field(ELSV, "MAJOR")
+}
+################################################################################
+# Module in Slot A
+#
+#% controldesk Slot A smon
+record(mbbi, "$(device):MA")
+{
+    field(DESC, "Slot A")
+    field(VAL, "1")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol moda $(port) 0")
+    field(SCAN, "10 second")
+    field(ZRST, "Hot Cathode")
+    field(ONST, "Cold Cathode")
+    field(TWST, "Dual Pirani")
+    field(THST, "Dual Cnv Pirani")
+    field(FRST, "Dual Thermocpl")
+    field(FVST, "Dual Cap Manmtr")
+    field(SXST, "Sngl Pirani")
+    field(SVST, "Sngl Cnv Pirani")
+    field(EIST, "Sngl Thrmcpl")
+    field(NIST, "Sngl Cap Manmtr")
+    field(TEST, "No Module")
+    field(ELST, "Wrong Module")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "NO_ALARM")
+    field(FVSV, "NO_ALARM")
+    field(SXSV, "NO_ALARM")
+    field(SVSV, "NO_ALARM")
+    field(EISV, "NO_ALARM")
+    field(NISV, "NO_ALARM")
+    field(TESV, "NO_ALARM")
+    field(ELSV, "MAJOR")
+}
+################################################################################
+# Module in Slot B
+#
+#% controldesk Slot B smon
+record(mbbi, "$(device):MB")
+{
+    field(DESC, "Slot B")
+    field(VAL, "3")
+#    field(DTYP, "stream")
+#    field(INP,  "@mks937a.protocol modb $(port) 0")
+    field(SCAN, "10 second")
+    field(ZRST, "Hot Cathode")
+    field(ONST, "Cold Cathode")
+    field(TWST, "Dual Pirani")
+    field(THST, "Dual Cnv Pirani")
+    field(FRST, "Dual Thermocpl")
+    field(FVST, "Dual Cap Manmtr")
+    field(SXST, "Sngl Pirani")
+    field(SVST, "Sngl Cnv Pirani")
+    field(EIST, "Sngl Thrmcpl")
+    field(NIST, "Sngl Cap Manmtr")
+    field(TEST, "No Module")
+    field(ELST, "Wrong Module")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "NO_ALARM")
+    field(FVSV, "NO_ALARM")
+    field(SXSV, "NO_ALARM")
+    field(SVSV, "NO_ALARM")
+    field(EISV, "NO_ALARM")
+    field(NISV, "NO_ALARM")
+    field(TESV, "NO_ALARM")
+    field(ELSV, "MAJOR")
+}
+################################################################################

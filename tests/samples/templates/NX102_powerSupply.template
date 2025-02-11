@@ -1,0 +1,102 @@
+
+
+# % macro, __doc__, Template showing the status of the power supply from the ether IP readings
+# % macro, device, device prefix
+# % macro, port, port name of ether_ip driver
+# % macro, tag, NX PLC tag string e.g. PSU (from PSU.Voltage[1]) 
+# % macro, tagidx, NX PLC tag index number e.g. 1 (from PSU.Voltage[1])
+#% macro, name, Object name and associated gui name
+#
+
+# This associates BOY screens with the template
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_powerSupply_standalone.opi, device=$(device)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_powerSupply_embed_box.opi, device=$(device)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_powerSupply_embed.opi, device=$(device)
+
+# This associates an edm screen with the template
+# % gui, $(name=), edm, NX102_powerSupply.edl, device=$(device)
+#% archiver 1 monitor
+record(ai, "$(device):PSU:VOLTAGE") {
+    field(DESC, "EtherIP Power Supply Voltage")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Voltage[$(tagidx)]")
+    field(EGU, "V")    
+    field(ASLO, "0.01")    
+    field(PREC, "2")    
+}
+
+#record(mbbiDirect, "$(device):PSU:STATUS") {
+#    field(DESC, "EtherIP Power Supply Status")
+#    field(SCAN, "1 second")
+#    field(DTYP, "EtherIP")
+#    field(NOBT, "16")
+#    field(INP, "@$(port) $(tag=PSU).Status.W[0]")
+#}
+
+#% archiver 1 monitor
+record(ai, "$(device):PSU:CURRENT") {
+    field(DESC, "EtherIP Power Supply Current")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Current[$(tagidx)]")
+    field(EGU, "A")    
+    field(ASLO, "0.01")    
+    field(PREC, "2")    
+}
+
+record(ai, "$(device):PSU:YEARS:LEFT") {
+    field(DESC, "EtherIP Power Supply Years Left")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Years_Left[$(tagidx)]")
+    field(EGU, "Yrs")    
+    field(ASLO, "0.1")    
+    field(PREC, "1")    
+}
+
+record(ai, "$(device):PSU:PERCENT:LEFT") {
+    field(DESC, "EtherIP Power Supply Percent Left")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Percent_Left[$(tagidx)]")
+    field(EGU, "%")    
+    field(ASLO, "0.1")    
+    field(PREC, "1")    
+}
+
+record(ai, "$(device):PSU:PCURRENT") {
+    field(DESC, "EtherIP Power Supply Peak Current")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Peak_Current[$(tagidx)]")
+    field(EGU, "A")    
+    field(ASLO, "0.01")    
+    field(PREC, "2")    
+}
+
+record(ai, "$(device):PSU:TOTAL:RUNTIME") {
+    field(DESC, "EtherIP Power Supply Total Run Time")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Total_Run_Time[$(tagidx)]")
+    field(EGU, "hrs")    
+}
+
+record(ai, "$(device):PSU:CONT:RUNTIME") {
+    field(DESC, "EtherIP Power Supply Continuous Runtime")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Continuous_Run_Time[$(tagidx)]")
+    field(EGU, "mins")    
+}
+
+#% archiver 60 Scan
+record(ai, "$(device):PSU:TEMPERATURE") {
+    field(DESC, "EtherIP Power Supply Temperature")
+    field(SCAN, "1 second")
+    field(DTYP, "EtherIP")
+    field(INP, "@$(port) $(tag=PSU).Temperature[$(tagidx)]")
+    field(ASLO, "0.1")    
+    field(PREC, "1")    
+}

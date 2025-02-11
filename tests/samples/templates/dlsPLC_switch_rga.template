@@ -1,0 +1,89 @@
+
+
+#% macro, __doc__, Switch on or off an RGA where the PLC code has been setup to switch when 1 is written to a particular DM variable
+#% macro, device, device name
+#% macro, addr_read, DM address to read for rga switch status
+#% macro, addr_write, DM address to write to switch rga
+#% macro, vlvcc, device name of valve control crate (prefix of device name), NOTE: make sure there is a read100 component whose century (0 means 0-99) includes the object address
+#% macro, port, asyn port name of FINS driver
+#% macro, port, asyn port name of FINS driver
+#% macro, timeout, Timeout in seconds for the FINS protocol
+#% macro, name, Object name and associated gui name
+# % gui, $(name=), edm, reboot_rga.edl, device=$(device)
+
+
+
+## Send the request down to the PLC
+#record(mbbo, "$(device):REMOTE:WRITEONOFF")
+#{
+#  field(DTYP, "asynInt32")
+#  field(ZRST, "On")
+#  field(ONST, "Off")
+#  field(OUT, "@asyn($(port), $(addr_write), $(timeout=0)) FINS_DM_WRITE")
+#}
+
+record(ao, "$(device):REMOTE:WRITEONOFF")
+{
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(port), $(addr_write), $(timeout=0)) FINS_DM_WRITE")
+}
+
+
+record(bo, "$(device):REMOTE:SETONOFF")
+    {
+    field(ZNAM, "On")
+    field(ONAM, "Off")
+    field(OUT, "$(device):REMOTE:WRITEONOFF PP")
+    }
+
+
+
+record(mbbi, "$(device):REMOTE:ONOFF")
+{
+  field(DESC, "RGA Switch Status")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "On")
+  field(ONST, "Off")
+  field(INP, "$(device):REMOTE:GETONOFF.VAL MS")
+}
+
+record(subArray, "$(device):REMOTE:GETONOFF")
+{
+  field(DESC, "Get rga ONOFF status")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(device):REMOTE:ONOFF")
+  field(FTVL, "USHORT")
+  field(MALM, "100")
+}
+
+
+## This is a bit of wizardry to establish the INP and INDX fields at run-time.
+##
+
+# rga switch status is in DM$(addr_read)+2. Calc the index into the
+# century record
+record(calcout, "$(device):REMOTE:GETONOFFINDX")
+{
+  field(CALC, "$(addr_read)%100+0")
+  field(OUT, "$(device):REMOTE:GETONOFF.INDX PP")
+  field(PINI, "YES")
+}
+
+# REMOTE:GETONOFF is in DM$(addr_read). Calc the inp link to the
+# century record. Needs to be done after PINI, so note
+# the flnk
+record(scalcout, "$(device):REMOTE:GETONOFFINP")
+{
+  field(CALC, "PRINTF(AA,FLOOR($(addr_read)/100))")
+  field(AA, "$(vlvcc):DM%dXX CP MS")
+  field(OUT, "$(device):REMOTE:GETONOFF.INP CA")
+  field(FLNK, "$(device):REMOTE:GETONOFFINPDIS")
+  field(SCAN, "1 second")
+}
+
+# Disable the scalcout record so we don't keep writing values
+record(ao, "$(device):REMOTE:GETONOFFINPDIS")
+{
+  field(VAL, "1")
+  field(OUT, "$(device):REMOTE:GETONOFFINP.DISA")
+}

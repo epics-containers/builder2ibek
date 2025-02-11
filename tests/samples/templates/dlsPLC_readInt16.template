@@ -1,0 +1,49 @@
+
+
+# % macro, __doc__, Read the Int16 value stored in 1 DM variables in a PLC
+# % macro, P, device prefix
+# % macro, Q, device suffix
+# % macro, vlvcc, PLC control crate device prefix
+# % macro, addr, DM variable of the int
+# % macro, name, Object name and gui association name
+# % macro, ftvl, Type of data in subArray
+#
+# This associates an edm screen with the template
+# % gui, $(name=), edmembed, dlsPLC_readSingle.edl, P=$(P),Q=$(Q)
+record(calcout, "$(P)$(Q):INDX") {
+  field(CALC, "$(addr)%100")
+  field(OUT, "$(P)$(Q):GET.INDX PP")
+  field(PINI, "YES")
+}
+
+# value is in DM$(addr). Calc the inp link to the 
+# century record. Needs to be done after PINI, so note
+# the flnk
+record(scalcout, "$(P)$(Q):INP") {
+  field(CALC, "PRINTF(AA,FLOOR($(addr)/100))")
+  field(AA, "$(vlvcc):DM%dXX CP MS")
+  field(OUT, "$(P)$(Q):GET.INP CA")
+  field(FLNK, "$(P)$(Q):INPDIS")
+  field(SCAN, "1 second")
+}
+
+# Disable the scalcout record so we don't keep writing values
+record(ao, "$(P)$(Q):INPDIS") {
+  field(VAL, "1")
+  field(OUT, "$(P)$(Q):INP.DISA")
+}
+
+record(subArray, "$(P)$(Q):GET") {
+  field(DESC, "Get control readback")
+  field(DTYP, "Soft Channel")
+  field(FLNK, "$(P)$(Q)")
+  field(FTVL, "$(ftvl=USHORT)")
+  field(MALM, "100")
+}
+
+# This makes the component icon reflect the severity
+# % gui, $(name=), sevr
+# % archiver 0.1 Monitor
+record(longin, "$(P)$(Q)") {
+  field(INP, "$(P)$(Q):GET MS")
+}

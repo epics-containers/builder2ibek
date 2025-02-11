@@ -57,6 +57,9 @@ def dispatch(builder: Builder, filename) -> Generic_IOC:
         # some default entities for all IOC instances
         entities=[
             {"type": "epics.EpicsEnvSet", "name": "EPICS_TS_MIN_WEST", "value": "0"},
+            # # TODO - much better if we could mount the root folder as /epics, how?
+            # {"type": "epics.EpicsEnvSet", "name": "STREAM_PROTOCOL_PATH", "value":
+            # "/iocs/{{  _global.get_env('IOC_NAME') }}/runtime/protocol/"},
             {"type": "devIocStats.iocAdminSoft", "IOC": "{{ ioc_name | upper }}"},
         ],
         source_file=filename,
@@ -96,6 +99,17 @@ def do_one_element(element: Element, ioc: Generic_IOC):
 
     entity.type = f"{info.yaml_component}.{element.name}"
     new_xml = info.handler(entity, element.name, ioc)
+    # if the handler added some new entities add them into the IOC
+    extras = entity.get_extra_entities()
+    if extras:
+        for extra_entity in extras:
+            ioc.entities.append(extra_entity)
+        # move the new entity to after these extras at it is likely to depend on them
+        ioc.entities.remove(entity)
+        ioc.entities.append(entity)
+
+    # if the handler returns a new XML string, parse it and dispatch the
+    # new entities it defines to the correct handler
     if new_xml:
         new_builder = Builder()
         new_builder.load_string(new_xml)

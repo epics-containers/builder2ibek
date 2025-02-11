@@ -1,0 +1,60 @@
+
+## ^ Not really - I had to lie to it to get it to flatten this hand-crafted file!
+
+# dlsPLC_radmonreset.template
+#% macro, __doc__, Template database for a vacuum valve
+# Ian Gillingham October 2012
+# 
+# substitutions:
+#% macro, device, device name
+#% macro, port, asyn port name
+#% macro, radmon_device, full PV name of RAD MON :RESET:OK
+
+################################################################################
+# Ian's additions to handle the radmon 4 hour reset signal
+# Simon has asked for D109 to be rewritten with a suitable timer count
+# periodically (whilst the FE IOC sees valid resets from KARB's PV).
+# If a reset is missed, then KARB's PV will indicate this and the FE
+# IOC should the cease sending timer updates to the PLC. The PLC will, after reaching
+# a countdown of zero, inhibit opening of the FE absorber.
+# The nominal countdown timer is 30s (300 x 0.1s)
+#
+
+#
+# :RADMONRESET periodically issues a command to instruct the PLC to reset its
+# countdown timer to 30 seconds. Note the use of FINS_DM_WRITE_NOREAD instead
+# of FINS_DM_WRITE, this is to prevent the FINS asyn driver from overwriting
+# the desired VAL with zero (because the original content of D109 would be zero).
+#
+#% archiver 10 Monitor
+#
+record(ao, "$(device):RADMONRESET") 
+  {
+  field(SCAN, "10 second")
+  field(DESC, "RADMON Reset Signal")
+  field(DTYP, "asynInt32")
+  field(OUT, "@asyn($(port), 109, $(fins_timeout=0)) FINS_DM_WRITE_NOREAD")
+  field(SDIS, "$(device):TIMERRESETDISA")
+  field(VAL, "300")
+  }
+
+#
+#% archiver 10 Monitor
+#
+record(calc, "$(device):TIMERRESETDISA")
+    {
+    field(DESC, "Disable PLC Reset Timer")
+    field(SCAN, "10 second")
+    field(CALC, "(A=0)&&(B=0)?1:0")
+    field(INPA, "$(radmon_device)")
+    field(INPB, "$(device):RADMONOVERRIDE")
+    }
+
+record(bo, "$(device):RADMONOVERRIDE")
+    {
+    field(DESC, "Reset DISA Override")
+    field(VAL,  "0")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+    }
+    

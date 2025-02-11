@@ -1,0 +1,538 @@
+# AcsChannel.template
+# ACS channel information
+# % macro, P,    Record name prefix
+# % macro, R,    Record name suffix
+# % macro, CHAN, Channel number
+# % macro, HOST, SNMP server host name
+# % macro, name, object and GUI association name
+
+# % gui, $(name=), boyembed, terminalServerApp_opi/terminalServerChannel.opi, P=$(P), CHAN=$(CHAN), name=$(name=)
+
+# Process this record to poll all the infrequent changing parameters
+
+record(seq, "$(P)$(R):$(CHAN):POLL")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):$(CHAN):APPLICATION.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):$(CHAN):PORT.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):$(CHAN):ALIAS.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):$(CHAN):BAUDRATE.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):$(CHAN):DATABITSRD.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):$(CHAN):STOPBITSRD.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):$(CHAN):PARITY.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(R):$(CHAN):FLOWCONTROL.PROC")
+}
+
+# Configuration controls
+
+record(sseq, "$(P)$(R):$(CHAN):DOWRITE")
+{
+  field(SELM, "All")
+  field(DOL1, "$(P)$(R):$(CHAN):ALIASCFG")
+  field(LNK1, "$(P)$(R):$(CHAN):ALIASWR CA")
+  field(WAIT1, "Wait")
+  field(DOL2, "$(P)$(R):$(CHAN):BAUDRATECFG.RVAL")
+  field(LNK2, "$(P)$(R):$(CHAN):BAUDRATEWR CA")
+  field(WAIT2, "Wait")
+  field(DOL3, "$(P)$(R):$(CHAN):DATABITSCFG.RVAL")
+  field(LNK3, "$(P)$(R):$(CHAN):DATABITSWR CA")
+  field(WAIT3, "Wait")
+  field(DOL4, "$(P)$(R):$(CHAN):STOPBITSCFG.RVAL")
+  field(LNK4, "$(P)$(R):$(CHAN):STOPBITSWR CA")
+  field(WAIT4, "Wait")
+  field(DOL5, "$(P)$(R):$(CHAN):PARITYWRV")
+  field(LNK5, "$(P)$(R):$(CHAN):PARITYWR CA")
+  field(WAIT5, "Wait")
+  field(DOL6, "$(P)$(R):$(CHAN):FLOWCONTROLWRV")
+  field(LNK6, "$(P)$(R):$(CHAN):FLOWCONTROLWR CA")
+  field(WAIT6, "Wait")
+  field(DOL7, "$(P)$(R):$(CHAN):APPLICATIONWRV")
+  field(LNK7, "$(P)$(R):$(CHAN):APPLICATIONWR CA")
+  field(WAIT7, "Wait")
+  field(DOL8, "$(P)$(R):$(CHAN):PORTWRV")
+  field(LNK8, "$(P)$(R):$(CHAN):PORTWR CA")
+  field(WAIT8, "Wait")
+  field(FLNK, "$(P)$(R):$(CHAN):DOWRITE2")
+}
+record(sseq, "$(P)$(R):$(CHAN):DOWRITE2")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):SNMPBUSY PP")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):DOSAVE CA")
+  field(WAIT2, "Wait")
+  field(DLY3, "5")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):DORESTART CA")
+  field(WAIT3, "Wait")
+  field(DLY4, "5")
+  field(DOL4, "0")
+  field(LNK4, "$(P)$(R):SNMPBUSY PP")
+  field(FLNK, "$(P)$(R):$(CHAN):POLL")
+}
+record(sseq, "$(P)$(R):$(CHAN):DOREAD")
+{
+  field(SELM, "All")
+  field(DOL1, "$(P)$(R):$(CHAN):ALIAS")
+  field(LNK1, "$(P)$(R):$(CHAN):ALIASCFG PP")
+  field(DOL2, "$(P)$(R):$(CHAN):BAUDRATE")
+  field(LNK2, "$(P)$(R):$(CHAN):BAUDRATECFG PP")
+  field(DOL3, "$(P)$(R):$(CHAN):DATABITS")
+  field(LNK3, "$(P)$(R):$(CHAN):DATABITSCFG PP")
+  field(DOL4, "$(P)$(R):$(CHAN):STOPBITS")
+  field(LNK4, "$(P)$(R):$(CHAN):STOPBITSCFG PP")
+  field(DOL5, "$(P)$(R):$(CHAN):PARITY")
+  field(LNK5, "$(P)$(R):$(CHAN):PARITYCFG PP")
+  field(DOL6, "$(P)$(R):$(CHAN):FLOWCONTROL")
+  field(LNK6, "$(P)$(R):$(CHAN):FLOWCONTROLCFG PP")
+  field(DOL7, "$(P)$(R):$(CHAN):APPLICATION")
+  field(LNK7, "$(P)$(R):$(CHAN):APPLICATIONCFG PP")
+  field(DOL8, "$(P)$(R):$(CHAN):PORT")
+  field(LNK8, "$(P)$(R):$(CHAN):PORTCFG PP")
+}
+
+# Config matches device contents?
+record(scalcout, "$(P)$(R):$(CHAN):MATCH")
+{
+  field(INPA, "$(P)$(R):$(CHAN):APPLICATIONMATCH")
+  field(INPB, "$(P)$(R):$(CHAN):PORTMATCH")
+  field(INPC, "$(P)$(R):$(CHAN):ALIASMATCH")
+  field(INPD, "$(P)$(R):$(CHAN):BAUDRATEMATCH")
+  field(INPE, "$(P)$(R):$(CHAN):DATABITSMATCH")
+  field(INPF, "$(P)$(R):$(CHAN):STOPBITSMATCH")
+  field(INPG, "$(P)$(R):$(CHAN):PARITYMATCH")
+  field(INPH, "$(P)$(R):$(CHAN):FLOWCONTROLMATCH")
+  field(CALC, "A&B&C&D&E&F&G&H")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+}
+
+# Main port mode
+
+#% autosave 2 VAL
+record(mbbo, "$(P)$(R):$(CHAN):APPLICATIONCFG")
+{
+  field(DESC, "Port parity")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(TWVL, "3")
+  field(ZRST, "raw_data")
+  field(ONST, "socket_server")
+  field(TWST, "socket_ssh")
+  field(FLNK, "$(P)$(R):$(CHAN):APPLICATIONCFG2")
+}
+record(sseq, "$(P)$(R):$(CHAN):APPLICATIONCFG2")
+{
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(R):$(CHAN):APPLICATIONCFG.RVAL")
+  field(STR1, "raw_data")
+  field(LNK1, "$(P)$(R):$(CHAN):APPLICATIONWRV PP")
+  field(STR2, "socket_server")
+  field(LNK2, "$(P)$(R):$(CHAN):APPLICATIONWRV PP")
+  field(STR3, "socket_ssh")
+  field(LNK3, "$(P)$(R):$(CHAN):APPLICATIONWRV PP")
+}
+record(stringout, "$(P)$(R):$(CHAN):APPLICATIONWRV")
+{
+  field(FLNK, "$(P)$(R):$(CHAN):APPLICATIONMATCH")
+}
+record(stringout, "$(P)$(R):$(CHAN):APPLICATIONWR")
+{
+  field(DESC, "Port application")
+  field(DTYP, "Snmp")
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.24.$(CHAN)")
+}
+#% archiver 60 monitor
+record(stringin, "$(P)$(R):$(CHAN):APPLICATION")
+{
+  field(DESC, "Port application")
+  field(DTYP, "Snmp")
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.24.$(CHAN)")
+  field(FLNK, "$(P)$(R):$(CHAN):APPLICATIONMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):APPLICATIONMATCH")
+{
+  field(INAA, "$(P)$(R):$(CHAN):APPLICATIONWRV")
+  field(INBB, "$(P)$(R):$(CHAN):APPLICATION")
+  field(CALC, "AA=BB")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+# TCP socket
+
+#% autosave 2 VAL
+record(longout, "$(P)$(R):$(CHAN):PORTCFG")
+{
+  field(DESC, "Port number" )
+  field(FLNK, "$(P)$(R):$(CHAN):PORTWRV")
+}
+record(scalcout, "$(P)$(R):$(CHAN):PORTWRV")
+{
+  field(INPA, "$(P)$(R):$(CHAN):PORTCFG")
+  field(CALC, "PRINTF('%d',A)")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):PORTMATCH")
+}
+record(stringout, "$(P)$(R):$(CHAN):PORTWR")
+{
+  field(DESC, "Port number" )
+  field(DTYP, "Snmp" )
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.26.$(CHAN)" )
+}
+#% archiver 60 monitor
+record(longin, "$(P)$(R):$(CHAN):PORT")
+{
+  field(DESC, "Port number" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.26.$(CHAN)" )
+  field(FLNK, "$(P)$(R):$(CHAN):PORTMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):PORTMATCH")
+{
+  field(INPA, "$(P)$(R):$(CHAN):PORTCFG")
+  field(INPB, "$(P)$(R):$(CHAN):PORT")
+  field(CALC, "A=B")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+# Communication parameters
+
+#% autosave 2 VAL
+record(stringout, "$(P)$(R):$(CHAN):ALIASCFG")
+{
+  field(DESC, "Port alias" )
+  field(FLNK, "$(P)$(R):$(CHAN):ALIASMATCH")
+}
+record(stringout, "$(P)$(R):$(CHAN):ALIASWR")
+{
+  field(DESC, "Port alias" )
+  field(DTYP, "Snmp" )
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.3.$(CHAN)" )
+}
+#% archiver 60 monitor
+record(stringin, "$(P)$(R):$(CHAN):ALIAS")
+{
+  field(DESC, "Port alias" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.3.$(CHAN)" )
+  field(FLNK, "$(P)$(R):$(CHAN):ALIASMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):ALIASMATCH")
+{
+  field(INAA, "$(P)$(R):$(CHAN):ALIASCFG")
+  field(INBB, "$(P)$(R):$(CHAN):ALIAS")
+  field(CALC, "AA=BB")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+#% autosave 2 VAL
+record(mbbo, "$(P)$(R):$(CHAN):BAUDRATECFG")
+{
+  field(DESC, "Port baud rate")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRST, "110")
+  field(ONST, "300")
+  field(TWST, "600")
+  field(THST, "1200")
+  field(FRST, "1800")
+  field(FVST, "2400")
+  field(SXST, "4800")
+  field(SVST, "9600")
+  field(EIST, "14400")
+  field(NIST, "19200")
+  field(TEST, "28800")
+  field(ELST, "38400")
+  field(TVST, "57600")
+  field(TTST, "115200")
+  field(FTST, "230400")
+  field(FFST, "460800")
+  field(ZRVL, "110")
+  field(ONVL, "300")
+  field(TWVL, "600")
+  field(THVL, "1200")
+  field(FRVL, "1800")
+  field(FVVL, "2400")
+  field(SXVL, "4800")
+  field(SVVL, "9600")
+  field(EIVL, "14400")
+  field(NIVL, "19200")
+  field(TEVL, "28800")
+  field(ELVL, "38400")
+  field(TVVL, "57600")
+  field(TTVL, "115200")
+  field(FTVL, "230400")
+  field(FFVL, "460800")
+  field(FLNK, "$(P)$(R):$(CHAN):BAUDRATEMATCH")
+}
+record(longout, "$(P)$(R):$(CHAN):BAUDRATEWR")
+{
+  field(DESC, "Port baud rate" )
+  field(DTYP, "Snmp" )
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.4.$(CHAN)" )
+}
+#% archiver 60 monitor
+record(longin, "$(P)$(R):$(CHAN):BAUDRATE")
+{
+  field(DESC, "Port baud rate" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.4.$(CHAN)" )
+  field(FLNK, "$(P)$(R):$(CHAN):BAUDRATEMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):BAUDRATEMATCH")
+{
+  field(INPA, "$(P)$(R):$(CHAN):BAUDRATECFG.RVAL")
+  field(INPB, "$(P)$(R):$(CHAN):BAUDRATE")
+  field(CALC, "A=B")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+#% autosave 2 VAL
+record(mbbo, "$(P)$(R):$(CHAN):DATABITSCFG")
+{
+  field(DESC, "Port data bits")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "5")
+  field(ONVL, "6")
+  field(TWVL, "7")
+  field(THVL, "8")
+  field(ZRST, "5 bits")
+  field(ONST, "6 bits")
+  field(TWST, "7 bits")
+  field(THST, "8 bits")
+  field(FLNK, "$(P)$(R):$(CHAN):DATABITSMATCH")
+}
+record(longout, "$(P)$(R):$(CHAN):DATABITSWR")
+{
+  field(DESC, "Port data bits" )
+  field(DTYP, "Snmp" )
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.5.$(CHAN)" )
+}
+record(longin, "$(P)$(R):$(CHAN):DATABITSRD")
+{
+  field(DESC, "Port data bits" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.5.$(CHAN)" )
+  field(FLNK, "$(P)$(R):$(CHAN):DATABITS")
+}
+#% archiver 60 monitor
+record(mbbi, "$(P)$(R):$(CHAN):DATABITS")
+{
+  field(DESC, "Port data bits")
+  field(DTYP, "Raw Soft Channel")
+  field(INP,  "$(P)$(R):$(CHAN):DATABITSRD")
+  field(ZRVL, "5")
+  field(ONVL, "6")
+  field(TWVL, "7")
+  field(THVL, "8")
+  field(ZRST, "5 bits")
+  field(ONST, "6 bits")
+  field(TWST, "7 bits")
+  field(THST, "8 bits")
+  field(FLNK, "$(P)$(R):$(CHAN):DATABITSMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):DATABITSMATCH")
+{
+  field(INPA, "$(P)$(R):$(CHAN):DATABITSCFG.RVAL")
+  field(INPB, "$(P)$(R):$(CHAN):DATABITS.RVAL")
+  field(CALC, "A=B")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+#% autosave 2 VAL
+record(mbbo, "$(P)$(R):$(CHAN):STOPBITSCFG")
+{
+  field(DESC, "Port stop bits")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(ZRST, "1 bit")
+  field(ONST, "2 bits")
+  field(FLNK, "$(P)$(R):$(CHAN):STOPBITSMATCH")
+}
+record(longout, "$(P)$(R):$(CHAN):STOPBITSWR")
+{
+  field(DESC, "Port stop bits" )
+  field(DTYP, "Snmp" )
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.6.$(CHAN)" )
+}
+record(longin, "$(P)$(R):$(CHAN):STOPBITSRD")
+{
+  field(DESC, "Port stop bits" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.6.$(CHAN)" )
+  field(FLNK, "$(P)$(R):$(CHAN):STOPBITS")
+}
+#% archiver 60 monitor
+record(mbbi, "$(P)$(R):$(CHAN):STOPBITS")
+{
+  field(DESC, "Port stop bits")
+  field(DTYP, "Raw Soft Channel")
+  field(INP,  "$(P)$(R):$(CHAN):STOPBITSRD")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(ZRST, "1 bit")
+  field(ONST, "2 bits")
+  field(FLNK, "$(P)$(R):$(CHAN):STOPBITSMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):STOPBITSMATCH")
+{
+  field(INPA, "$(P)$(R):$(CHAN):STOPBITSCFG.RVAL")
+  field(INPB, "$(P)$(R):$(CHAN):STOPBITS.RVAL")
+  field(CALC, "A=B")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+#% autosave 2 VAL
+record(mbbo, "$(P)$(R):$(CHAN):PARITYCFG")
+{
+  field(DESC, "Port parity")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(TWVL, "3")
+  field(ZRST, "odd")
+  field(ONST, "even")
+  field(TWST, "none")
+  field(FLNK, "$(P)$(R):$(CHAN):PARITYCFG2")
+}
+record(sseq, "$(P)$(R):$(CHAN):PARITYCFG2")
+{
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(R):$(CHAN):PARITYCFG.RVAL")
+  field(STR1, "odd")
+  field(LNK1, "$(P)$(R):$(CHAN):PARITYWRV PP")
+  field(STR2, "even")
+  field(LNK2, "$(P)$(R):$(CHAN):PARITYWRV PP")
+  field(STR3, "none")
+  field(LNK3, "$(P)$(R):$(CHAN):PARITYWRV PP")
+}
+record(stringout, "$(P)$(R):$(CHAN):PARITYWRV")
+{
+  field(FLNK, "$(P)$(R):$(CHAN):PARITYMATCH")
+}
+record(stringout, "$(P)$(R):$(CHAN):PARITYWR")
+{
+  field(DESC, "Port parity" )
+  field(DTYP, "Snmp" )
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.7.$(CHAN)" )
+}
+#% archiver 60 monitor
+record(stringin, "$(P)$(R):$(CHAN):PARITY")
+{
+  field(DESC, "Port parity" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.7.$(CHAN)" )
+  field(FLNK, "$(P)$(R):$(CHAN):PARITYMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):PARITYMATCH")
+{
+  field(INAA, "$(P)$(R):$(CHAN):PARITYWRV")
+  field(INBB, "$(P)$(R):$(CHAN):PARITY")
+  field(CALC, "AA=BB")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+#% autosave 2 VAL
+record(mbbo, "$(P)$(R):$(CHAN):FLOWCONTROLCFG")
+{
+  field(DESC, "Flow control")
+  field(DTYP, "Raw Soft Channel")
+  field(ZRVL, "1")
+  field(ONVL, "2")
+  field(TWVL, "3")
+  field(ZRST, "hard")
+  field(ONST, "soft")
+  field(TWST, "none")
+  field(FLNK, "$(P)$(R):$(CHAN):FLOWCONTROLCFG2")
+}
+record(sseq, "$(P)$(R):$(CHAN):FLOWCONTROLCFG2")
+{
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(R):$(CHAN):FLOWCONTROLCFG.RVAL")
+  field(STR1, "hard")
+  field(LNK1, "$(P)$(R):$(CHAN):FLOWCONTROLWRV PP")
+  field(STR2, "soft")
+  field(LNK2, "$(P)$(R):$(CHAN):FLOWCONTROLWRV PP")
+  field(STR3, "none")
+  field(LNK3, "$(P)$(R):$(CHAN):FLOWCONTROLWRV PP")
+}
+record(stringout, "$(P)$(R):$(CHAN):FLOWCONTROLWRV")
+{
+  field(FLNK, "$(P)$(R):$(CHAN):FLOWCONTROLMATCH")
+}
+record(stringout, "$(P)$(R):$(CHAN):FLOWCONTROLWR")
+{
+  field(DESC, "Port flow control" )
+  field(DTYP, "Snmp" )
+  field(OUT,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.8.$(CHAN)" )
+}
+#% archiver 60 monitor
+record(stringin, "$(P)$(R):$(CHAN):FLOWCONTROL")
+{
+  field(DESC, "Port flow control" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.2.6.2.1.1.8.$(CHAN)" )
+  field(FLNK, "$(P)$(R):$(CHAN):FLOWCONTROLMATCH")
+}
+record(scalcout, "$(P)$(R):$(CHAN):FLOWCONTROLMATCH")
+{
+  field(INAA, "$(P)$(R):$(CHAN):FLOWCONTROLWRV")
+  field(INBB, "$(P)$(R):$(CHAN):FLOWCONTROL")
+  field(CALC, "AA=BB")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(FLNK, "$(P)$(R):$(CHAN):MATCH")
+}
+
+# Monitoring
+
+record(stringout, "$(P)$(R):$(CHAN):REMOTEIP")
+{
+  field(DESC, "Remote IP" )
+  field(VAL,  "Not Available")
+}
+
+record(longin, "$(P)$(R):$(CHAN):TXTOTALCOUNT")
+{
+  field(DESC, "Transmit counter" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.3.1.1.5.$(CHAN)" )
+  field(SCAN, "5 second")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):SNMPBUSY")
+}
+
+record(longin, "$(P)$(R):$(CHAN):RXTOTALCOUNT")
+{
+  field(DESC, "Receive counter" )
+  field(DTYP, "Snmp" )
+  field(INP,  "@$(HOST):161 private 1.3.6.1.4.1.2925.4.3.1.1.6.$(CHAN)" )
+  field(SCAN, "5 second")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):SNMPBUSY")
+}

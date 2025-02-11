@@ -19,6 +19,12 @@ class Entity(dict[str, Any]):
     in the convertors package easier to type and read
     """
 
+    _extra_entities: list["Entity"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        Entity._extra_entities = []
+
     def __getattr__(self, __name: str) -> Any:
         if __name in self:
             return self[__name]
@@ -35,6 +41,12 @@ class Entity(dict[str, Any]):
         if attr in self:
             self[new] = self[attr]
             del self[attr]
+
+    def add_entity(self, entity: "Entity"):
+        self._extra_entities.append(entity)
+
+    def get_extra_entities(self):
+        return self._extra_entities
 
     def delete_me(self):
         self.__command__ = "delete"

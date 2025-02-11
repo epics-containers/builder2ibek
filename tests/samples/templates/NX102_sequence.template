@@ -1,0 +1,488 @@
+
+# NX102_sequence.vdb is expanded to NX102_sequence.template with flatdb
+#
+#% macro, __doc__, Template database for control and interlock of a non-specific device.
+#
+#% macro, device, device name
+#% macro, port, port name of ether_ip driver
+#% macro, tag, NX PLC tag string e.g. S (from S.Interfc[1])
+#% macro, tagidx, NX PLC tag index number e.g. 1 (from S.Interfc[1])
+#% macro, allowpv, If specified, then only write an open command when this is non-zero. MUST have CP at the end of it (Optional - defaults to "")
+#% macro, whylocked, String to output to EDM synoptic as to precisely why the device is locked and by whom (Optional.  Defaults to "Open command not allowed")
+#% macro, stastrSCAN, Scan rate for :STASTR PV string read in seconds, may be 10,5,2 or 1. Use to reduce network traffic if comms problems (Optional - defaults to 1)
+
+#% macro, con_label0, Label string for control value 0 (Optional - defaults to Start)
+#% macro, con_label1, Label string for control value 1 (Optional - defaults to Abort)
+#% macro, con_label2, Label string for control value 2 (Optional - defaults to Reset)
+#% macro, con_label3, Label string for control value 3 (Optional - defaults to "")
+#% macro, con_label4, Label string for control value 4 (Optional - defaults to "")
+#% macro, con_label5, Label string for control value 5 (Optional - defaults to "")
+#% macro, con_label6, Label string for control value 6 (Optional - defaults to "")
+#% macro, con_label7, Label string for control value 7 (Optional - defaults to "")
+#
+#% macro, sta_label0, Label string for status value 0 (Optional - defaults to Not running)
+#% macro, sta_label1, Label string for status value 1 (Optional - defaults to Running)
+#% macro, sta_label2, Label string for status value 2 (Optional - defaults to Fault)
+#% macro, sta_label3, Label string for status value 3 (Optional - defaults to Aborted)
+#% macro, sta_label4, Label string for status value 4 (Optional - defaults to "")
+#% macro, sta_label5, Label string for status value 5 (Optional - defaults to "")
+#% macro, sta_label6, Label string for status value 6 (Optional - defaults to "")
+#% macro, sta_label7, Label string for status value 7 (Optional - defaults to "")
+#
+#% macro, sta_sv0, Alarm severity for status value 0 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv1, Alarm severity for status value 1 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv2, Alarm severity for status value 2 (Optional - defaults to MAJOR)
+#% macro, sta_sv3, Alarm severity for status value 3 (Optional - defaults to MINOR)
+#% macro, sta_sv4, Alarm severity for status value 4 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv5, Alarm severity for status value 5 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv6, Alarm severity for status value 6 (Optional - defaults to NO_ALARM)
+#% macro, sta_sv7, Alarm severity for status value 7 (Optional - defaults to NO_ALARM)
+#
+#% macro, ilksta_label0, Label string for status value 0 (Optional - defaults to Failed)
+#% macro, ilksta_label1, Label string for status value 1 (Optional - defaults to Run Ilks Ok)
+#% macro, ilksta_label2, Label string for status value 2 (Optional - defaults to OK)
+#% macro, ilksta_label3, Label string for status value 3 (Optional - defaults to "")
+#% macro, ilksta_label4, Label string for status value 4 (Optional - defaults to "")
+#% macro, ilksta_label5, Label string for status value 5 (Optional - defaults to "")
+#% macro, ilksta_label6, Label string for status value 6 (Optional - defaults to "")
+#% macro, ilksta_label7, Label string for status value 7 (Optional - defaults to "")
+#
+#% macro, ilksta_sv0, Alarm severity for interlock status value 0 (Optional - defaults to MAJOR)
+#% macro, ilksta_sv1, Alarm severity for interlock status value 1 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv2, Alarm severity for interlock status value 2 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv3, Alarm severity for interlock status value 3 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv4, Alarm severity for interlock status value 4 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv5, Alarm severity for interlock status value 5 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv6, Alarm severity for interlock status value 6 (Optional - defaults to NO_ALARM)
+#% macro, ilksta_sv7, Alarm severity for interlock status value 7 (Optional - defaults to NO_ALARM)
+#
+#% macro, p1_desc, Label string for parameter 1 (Optional - defaults to "Param1")
+#% macro, p1_isEnum, Display as enum(1) or number(0) (Optional - defaults to 1)
+#% macro, p1_prec, Precision of p1 number (Optional - defaults to 0)
+#% macro, p1_LOPR, LOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+#% macro, p1_HOPR, HOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+#% macro, p1_label0, Label string for enum value 0 (Optional - defaults to "unused")
+#% macro, p1_label1, Label string for enum value 1 (Optional - defaults to "")
+#% macro, p1_label2, Label string for enum value 2 (Optional - defaults to "")
+#% macro, p1_label3, Label string for enum value 3 (Optional - defaults to "")
+#% macro, p1_label4, Label string for enum value 4 (Optional - defaults to "")
+#% macro, p1_label5, Label string for enum value 5 (Optional - defaults to "")
+#% macro, p1_label6, Label string for enum value 6 (Optional - defaults to "")
+#% macro, p1_label7, Label string for enum value 7 (Optional - defaults to "")
+#% macro, p1_label8, Label string for enum value 8 (Optional - defaults to "")
+#% macro, p1_label9, Label string for enum value 9 (Optional - defaults to "")
+#% macro, p1_label10, Label string for enum value 10 (Optional - defaults to "")
+#% macro, p1_label11, Label string for enum value 11 (Optional - defaults to "")
+#% macro, p1_label12, Label string for enum value 12 (Optional - defaults to "")
+#% macro, p1_label13, Label string for enum value 13 (Optional - defaults to "")
+#% macro, p1_label14, Label string for enum value 14 (Optional - defaults to "")
+#% macro, p1_label15, Label string for enum value 15 (Optional - defaults to "")
+#
+#% macro, p2_desc, Label string for parameter 2 (Optional - defaults to "Param2")
+#% macro, p2_isEnum, Display as enum(1) or number(0) (Optional - defaults to 1)
+#% macro, p2_prec, Precision of p2 number (Optional - defaults to 0)
+#% macro, p2_LOPR, LOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+#% macro, p2_HOPR, HOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+#% macro, p2_label0, Label string for enum value 0 (Optional - defaults to "unused")
+#% macro, p2_label1, Label string for enum value 1 (Optional - defaults to "")
+#% macro, p2_label2, Label string for enum value 2 (Optional - defaults to "")
+#% macro, p2_label3, Label string for enum value 3 (Optional - defaults to "")
+#% macro, p2_label4, Label string for enum value 4 (Optional - defaults to "")
+#% macro, p2_label5, Label string for enum value 5 (Optional - defaults to "")
+#% macro, p2_label6, Label string for enum value 6 (Optional - defaults to "")
+#% macro, p2_label7, Label string for enum value 7 (Optional - defaults to "")
+#% macro, p2_label8, Label string for enum value 8 (Optional - defaults to "")
+#% macro, p2_label9, Label string for enum value 9 (Optional - defaults to "")
+#% macro, p2_label10, Label string for enum value 10 (Optional - defaults to "")
+#% macro, p2_label11, Label string for enum value 11 (Optional - defaults to "")
+#% macro, p2_label12, Label string for enum value 12 (Optional - defaults to "")
+#% macro, p2_label13, Label string for enum value 13 (Optional - defaults to "")
+#% macro, p2_label14, Label string for enum value 14 (Optional - defaults to "")
+#% macro, p2_label15, Label string for enum value 15 (Optional - defaults to "")
+#
+#% macro, p3_desc, Label string for parameter 3 (Optional - defaults to "Param3")
+#% macro, p3_isEnum, Display as enum(1) or number(0) (Optional - defaults to 1)
+#% macro, p3_prec, Precision of p3 number (Optional - defaults to 0)
+#% macro, p3_LOPR, LOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+#% macro, p3_HOPR, HOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+#% macro, p3_label0, Label string for enum value 0 (Optional - defaults to "unused")
+#% macro, p3_label1, Label string for enum value 1 (Optional - defaults to "")
+#% macro, p3_label2, Label string for enum value 2 (Optional - defaults to "")
+#% macro, p3_label3, Label string for enum value 3 (Optional - defaults to "")
+#% macro, p3_label4, Label string for enum value 4 (Optional - defaults to "")
+#% macro, p3_label5, Label string for enum value 5 (Optional - defaults to "")
+#% macro, p3_label6, Label string for enum value 6 (Optional - defaults to "")
+#% macro, p3_label7, Label string for enum value 7 (Optional - defaults to "")
+#% macro, p3_label8, Label string for enum value 8 (Optional - defaults to "")
+#% macro, p3_label9, Label string for enum value 9 (Optional - defaults to "")
+#% macro, p3_label10, Label string for enum value 10 (Optional - defaults to "")
+#% macro, p3_label11, Label string for enum value 11 (Optional - defaults to "")
+#% macro, p3_label12, Label string for enum value 12 (Optional - defaults to "")
+#% macro, p3_label13, Label string for enum value 13 (Optional - defaults to "")
+#% macro, p3_label14, Label string for enum value 14 (Optional - defaults to "")
+#% macro, p3_label15, Label string for enum value 15 (Optional - defaults to "")
+#
+#% macro, mode1, name of remote operational mode (:MODE) (Optional - defaults to Operational)
+#% macro, mode2, name of local operational mode (:MODE)  (Optional - defaults to Service)
+#
+#% macro, name, Object name and associated gui name      (Optional - defaults to "")
+#
+# This associates an edm screen with the template
+# % gui, $(name=), edm, NX102_sequence.edl, device=$(device)
+# This associates BOY screens with the template
+# % gui, $(name=), boydetail, dlsPLCApp_opi/NX102_genericDevice_detail.opi, device=$(device), interlock=""", name=$(name=)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_genericDevice_wide_embed_box.opi, device=$(device), interlock="", name=$(name=)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_genericDevice_wide_embed.opi, device=$(device), interlock="", name=$(name=)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_genericDevice_embed_box.opi, device=$(device), interlock="", name=$(name=)
+# % gui, $(name=), boyembed, dlsPLCApp_opi/NX102_genericDevice_embed.opi, device=$(device), interlock="", name=$(name=)
+#
+# This tells the gui that we don't have debounce records
+record(ai, "$(device):HASDEBOUNCE") {
+  field(VAL, "0")
+  field(PINI, "YES")
+}
+
+# The label macros are the string fields on mbbi or mbbo records.
+# These fields under EPICS R3.14.12.7 are limited to 25 characters.
+#
+# There are further macros defined in the template which
+# do not have an entry in the expand command and they are passed
+# through untouched, notably device and allowpv.
+#
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_con_label0=$(con_label0=Start)"
+substitute "_con_label1=$(con_label1=Abort)"
+substitute "_con_label2=$(con_label2=Reset)"
+substitute "_con_label3=$(con_label3=)"
+substitute "_con_label4=$(con_label4=)"
+substitute "_con_label5=$(con_label5=)"
+substitute "_con_label6=$(con_label6=)"
+substitute "_con_label7=$(con_label7=)"
+substitute "_sta_label0=$(sta_label0=Not running)"
+substitute "_sta_label1=$(sta_label1=Running)"
+substitute "_sta_label2=$(sta_label2=Fault)"
+substitute "_sta_label3=$(sta_label3=Aborted)"
+substitute "_sta_label4=$(sta_label4=)"
+substitute "_sta_label5=$(sta_label5=)"
+substitute "_sta_label6=$(sta_label6=)"
+substitute "_sta_label7=$(sta_label7=)"
+substitute "_sta_sv0=$(sta_sv0=NO_ALARM)"
+substitute "_sta_sv1=$(sta_sv1=NO_ALARM)"
+substitute "_sta_sv2=$(sta_sv2=MAJOR)"
+substitute "_sta_sv3=$(sta_sv3=MINOR)"
+substitute "_sta_sv4=$(sta_sv4=NO_ALARM)"
+substitute "_sta_sv5=$(sta_sv5=NO_ALARM)"
+substitute "_sta_sv6=$(sta_sv6=NO_ALARM)"
+substitute "_sta_sv7=$(sta_sv7=NO_ALARM)"
+substitute "_ilksta_label0=$(ilksta_label0=Failed)"
+substitute "_ilksta_label1=$(ilksta_label1=Run Ilks Ok)"
+substitute "_ilksta_label2=$(ilksta_label2=OK)"
+substitute "_ilksta_label3=$(ilksta_label3=)"
+substitute "_ilksta_label4=$(ilksta_label4=)"
+substitute "_ilksta_label5=$(ilksta_label5=)"
+substitute "_ilksta_label6=$(ilksta_label6=)"
+substitute "_ilksta_label7=$(ilksta_label7=)"
+substitute "_ilksta_sv0=$(ilksta_sv0=MAJOR)"
+substitute "_ilksta_sv1=$(ilksta_sv1=NO_ALARM)"
+substitute "_ilksta_sv2=$(ilksta_sv2=NO_ALARM)"
+substitute "_ilksta_sv3=$(ilksta_sv3=NO_ALARM)"
+substitute "_ilksta_sv4=$(ilksta_sv4=NO_ALARM)"
+substitute "_ilksta_sv5=$(ilksta_sv5=NO_ALARM)"
+substitute "_ilksta_sv6=$(ilksta_sv6=NO_ALARM)"
+substitute "_ilksta_sv7=$(ilksta_sv7=NO_ALARM)"
+substitute "_donecalc=(A=2|C=0)?0:1"
+substitute "_whylocked=$(whylocked=Start command not allowed)"
+
+include "NX102_valveCtrl.template"
+
+
+substitute "_PORT=$(port)"
+substitute "_TAG=$(tag)"
+substitute "_TAGIDX=$(tagidx)"
+substitute "_TAGPREFIX=ILK1_"
+substitute "_typeprefix=:"
+substitute "_DIR="
+substitute "_device=$(device)=HELLO"
+
+include "NX102_valveIlk.template"
+
+
+# Operational/Service Mode
+#% archiver 10 Monitor
+#% controldesk Mode smon
+#
+record(bi, "$(device):MODE") {
+  field(DESC, "Mode")
+  field(INP, "$(device):MODSTA.B0 CP MS")
+  field(ZNAM, "$(mode1=Operational)")
+  field(ONAM, "$(mode2=Service)")
+}
+
+# This is in addition to the 'donecalc' in the NX102_valveCtrl.vdb
+# This detects :STA transitioning from sequence running to an idle or fault state
+record(calcout, "$(device):DONECALC2") {
+  field(INPA, "$(device):CON MS")
+  field(INPB, "$(device):STA CPP MS")
+  field(INPC, "$(device):ILKSTA CPP MS")
+  field(INPD, "$(device):LASTCON CPP MS")
+  field(CALC, "(B=1)?1:0")
+  field(OOPT, "Transition To Zero")
+  field(DOPT, "Use CALC")
+  field(OUT, "$(device):BUSY CA NMS")
+}
+
+record(mbbo, "$(device):PARAM1") {
+  field(DESC, "$(p1_desc=Param1)")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(p1_label0=unused)")
+  field(ONST, "$(p1_label1=)")
+  field(TWST, "$(p1_label2=)")
+  field(THST, "$(p1_label3=)")
+  field(FRST, "$(p1_label4=)")
+  field(FVST, "$(p1_label5=)")
+  field(SXST, "$(p1_label6=)")
+  field(SVST, "$(p1_label7=)")
+  field(EIST, "$(p1_label8=)")
+  field(NIST, "$(p1_label9=)")
+  field(TEST, "$(p1_label10=)")
+  field(ELST, "$(p1_label11=)")
+  field(TVST, "$(p1_label12=)")
+  field(TTST, "$(p1_label13=)")
+  field(FTST, "$(p1_label14=)")
+  field(FFST, "$(p1_label15=)")
+  field(VAL, "0")
+  field(OUT, "$(device):PARAM1:WR PP")
+}
+
+record(ao, "$(device):PARAM1:WR") {
+    field(DESC, "Write Seq parameter1")
+    field(DTYP, "EtherIP")
+    field(OUT, "@$(port) $(tag).Parameter1[$(tagidx)] S .2")
+    field(PREC, "$(p1_prec=0)")
+    field(PINI, "YES")
+    field(HOPR, "$(p1_HOPR=)")
+    field(LOPR, "$(p1_LOPR=)")
+}
+
+record(bo, "$(device):PARAM1:ISENUM") {
+  field(DESC, "display as enum or number?")
+  field(VAL, "$(p1_isEnum=1)")
+  field(PINI, "YES")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+record(ai, "$(device):PARAM1:RD") {
+  field(DESC, "Read Seq parameter1")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Parameter1_RB[$(tagidx)]")
+  field(SCAN, ".2 second")
+  field(FLNK, "$(device):PARAM1:RBV")
+}
+
+record(mbbi, "$(device):PARAM1:RBV") {
+  field(DESC, "$(p1_desc=Param1)")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(p1_label0=unused)")
+  field(ONST, "$(p1_label1=)")
+  field(TWST, "$(p1_label2=)")
+  field(THST, "$(p1_label3=)")
+  field(FRST, "$(p1_label4=)")
+  field(FVST, "$(p1_label5=)")
+  field(SXST, "$(p1_label6=)")
+  field(SVST, "$(p1_label7=)")
+  field(EIST, "$(p1_label8=)")
+  field(NIST, "$(p1_label9=)")
+  field(TEST, "$(p1_label10=)")
+  field(ELST, "$(p1_label11=)")
+  field(TVST, "$(p1_label12=)")
+  field(TTST, "$(p1_label13=)")
+  field(FTST, "$(p1_label14=)")
+  field(FFST, "$(p1_label15=)")
+  field(INP, "$(device):PARAM1:RD")
+}
+
+record(mbbo, "$(device):PARAM2") {
+  field(DESC, "$(p2_desc=Param2)")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(p2_label0=unused)")
+  field(ONST, "$(p2_label1=)")
+  field(TWST, "$(p2_label2=)")
+  field(THST, "$(p2_label3=)")
+  field(FRST, "$(p2_label4=)")
+  field(FVST, "$(p2_label5=)")
+  field(SXST, "$(p2_label6=)")
+  field(SVST, "$(p2_label7=)")
+  field(EIST, "$(p2_label8=)")
+  field(NIST, "$(p2_label9=)")
+  field(TEST, "$(p2_label10=)")
+  field(ELST, "$(p2_label11=)")
+  field(TVST, "$(p2_label12=)")
+  field(TTST, "$(p2_label13=)")
+  field(FTST, "$(p2_label14=)")
+  field(FFST, "$(p2_label15=)")
+  field(VAL, "0")
+  field(OUT, "$(device):PARAM2:WR PP")
+}
+
+record(ao, "$(device):PARAM2:WR") {
+    field(DESC, "Write Seq parameter2")
+    field(DTYP, "EtherIP")
+    field(OUT, "@$(port) $(tag).Parameter2[$(tagidx)] S .2")
+    field(PREC, "$(p2_prec=0)")
+    field(PINI, "YES")
+    field(HOPR, "$(p2_HOPR=)")
+    field(LOPR, "$(p2_LOPR=)")
+}
+
+record(bo, "$(device):PARAM2:ISENUM") {
+  field(DESC, "display as enum or number?")
+  field(VAL, "$(p2_isEnum=1)")
+  field(PINI, "YES")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+record(ai, "$(device):PARAM2:RD") {
+  field(DESC, "Read Seq parameter2")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Parameter2_RB[$(tagidx)]")
+  field(SCAN, ".2 second")
+  field(FLNK, "$(device):PARAM2:RBV")
+}
+
+record(mbbi, "$(device):PARAM2:RBV") {
+  field(DESC, "$(p2_desc=Param2)")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(p2_label0=unused)")
+  field(ONST, "$(p2_label1=)")
+  field(TWST, "$(p2_label2=)")
+  field(THST, "$(p2_label3=)")
+  field(FRST, "$(p2_label4=)")
+  field(FVST, "$(p2_label5=)")
+  field(SXST, "$(p2_label6=)")
+  field(SVST, "$(p2_label7=)")
+  field(EIST, "$(p2_label8=)")
+  field(NIST, "$(p2_label9=)")
+  field(TEST, "$(p2_label10=)")
+  field(ELST, "$(p2_label11=)")
+  field(TVST, "$(p2_label12=)")
+  field(TTST, "$(p2_label13=)")
+  field(FTST, "$(p2_label14=)")
+  field(FFST, "$(p2_label15=)")
+  field(INP, "$(device):PARAM2:RD")
+}
+
+record(mbbo, "$(device):PARAM3") {
+  field(DESC, "$(p3_desc=Param3)")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(p3_label0=unused)")
+  field(ONST, "$(p3_label1=)")
+  field(TWST, "$(p3_label2=)")
+  field(THST, "$(p3_label3=)")
+  field(FRST, "$(p3_label4=)")
+  field(FVST, "$(p3_label5=)")
+  field(SXST, "$(p3_label6=)")
+  field(SVST, "$(p3_label7=)")
+  field(EIST, "$(p3_label8=)")
+  field(NIST, "$(p3_label9=)")
+  field(TEST, "$(p3_label10=)")
+  field(ELST, "$(p3_label11=)")
+  field(TVST, "$(p3_label12=)")
+  field(TTST, "$(p3_label13=)")
+  field(FTST, "$(p3_label14=)")
+  field(FFST, "$(p3_label15=)")
+  field(VAL, "0")
+  field(OUT, "$(device):PARAM3:WR PP")
+}
+
+record(ao, "$(device):PARAM3:WR") {
+    field(DESC, "Write Seq parameter3")
+    field(DTYP, "EtherIP")
+    field(OUT, "@$(port) $(tag).Parameter3[$(tagidx)] S .2")
+    field(PREC, "$(p3_prec=0)")
+    field(PINI, "YES")
+    field(HOPR, "$(p3_HOPR=)")
+    field(LOPR, "$(p3_LOPR=)")
+}
+
+record(bo, "$(device):PARAM3:ISENUM") {
+  field(DESC, "display as enum or number?")
+  field(VAL, "$(p3_isEnum=1)")
+  field(PINI, "YES")
+  field(ZNAM, "False")
+  field(ONAM, "True")
+}
+
+record(ai, "$(device):PARAM3:RD") {
+  field(DESC, "Read Seq parameter3")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Parameter3_RB[$(tagidx)]")
+  field(SCAN, ".2 second")
+  field(FLNK, "$(device):PARAM3:RBV")
+}
+
+record(mbbi, "$(device):PARAM3:RBV") {
+  field(DESC, "$(p3_desc=Param3)")
+  field(DTYP, "Soft Channel")
+  field(ZRST, "$(p3_label0=unused)")
+  field(ONST, "$(p3_label1=)")
+  field(TWST, "$(p3_label2=)")
+  field(THST, "$(p3_label3=)")
+  field(FRST, "$(p3_label4=)")
+  field(FVST, "$(p3_label5=)")
+  field(SXST, "$(p3_label6=)")
+  field(SVST, "$(p3_label7=)")
+  field(EIST, "$(p3_label8=)")
+  field(NIST, "$(p3_label9=)")
+  field(TEST, "$(p3_label10=)")
+  field(ELST, "$(p3_label11=)")
+  field(TVST, "$(p3_label12=)")
+  field(TTST, "$(p3_label13=)")
+  field(FTST, "$(p3_label14=)")
+  field(FFST, "$(p3_label15=)")
+  field(INP, "$(device):PARAM3:RD")
+}
+
+record(stringin, "$(device):STASTR") {
+  field(DESC, "Desc of current seq step")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Status_String[$(tagidx)] S $(stastrSCAN=1) E")
+}
+
+record(stringin, "$(device):DESC") {
+  field(DESC, "sequence name")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).Desc[$(tagidx)] S 0 E")
+}
+
+record(ai, "$(device):STATE") {
+  field(DESC, "Current seq state number")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).State[$(tagidx)]")
+  field(SCAN, "1 second")
+  field(FLNK, "$(device):PROGRESS")
+}
+
+record(ai, "$(device):STATEMAX") {
+  field(DESC, "Last state in sequence")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(tag).StateMax[$(tagidx)]")
+  field(SCAN, "10 second")
+}
+
+record(calcout, "$(device):PROGRESS") {
+  field(DESC, "Percent progress")
+  field(INPA, "$(device):STATE MS")
+  field(INPB, "$(device):STATEMAX MS")
+  field(CALC, "(B>0)?((A/B)*100):0")
+  field(EGU, "%")
+  field(HOPR, "100")
+  field(LOPR, "0")
+}

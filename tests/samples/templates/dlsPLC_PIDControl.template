@@ -1,0 +1,135 @@
+# This file is used for gui association, Archiver, and calc records.
+# Remaining records are generated in builder.py
+
+# % macro, name, Object name and gui association name
+# % macro, P, device prefix
+# % macro, Q, device suffix
+# % macro, UNITS, common units
+# % macro, PREC, decimal precision for SetPoint and Proportional Constant
+# % macro, desc, Description
+# % gui, $(name), edm, PIDControl.edl, name=$(name),P=$(P),Q=$(Q),desc=$(desc)
+
+#OPI screens
+##includex "PIDControl_detail.template"
+
+## This associates a BOY screen with the template
+# % gui, $(name), boyembed, dlsPLCApp_opi/PIDControl_embed.opi, P=$(P), Q=$(Q), DESC=$(desc)
+# % gui, $(name), boyembed, dlsPLCApp_opi/PIDControl_embed_box.opi, P=$(P), Q=$(Q), DESC=$(desc)
+# % gui, $(name), boydetail, dlsPLCApp_opi/PIDControl_detail.opi, P=$(P), Q=$(Q), DESC=$(desc)
+## Gui tag style is as follows:
+## # % gui, <name>, <typ>, <screen_filename>[, <pv>, <macros>, <labels>]
+## PVs which could not be matched to section
+# % gui, $(name), demand,  SetPoint, $(P)$(Q):SP
+# % gui, $(name), readback,  SetPoint , $(P)$(Q):SP:RBV
+# % gui, $(name), enum,  Demand , $(P)$(Q):CTRL
+# % gui, $(name), readback,  Demand , $(P)$(Q):CTRL:RBV
+# % gui, $(name), readback,  Status , $(P)$(Q):CTRL:STATUS
+# % gui, $(name), demand,  PG , $(P)$(Q):PG
+# % gui, $(name), readback,  PG , $(P)$(Q):PG:RBV
+# % gui, $(name), demand,  IG , $(P)$(Q):IG
+# % gui, $(name), readback,  IG , $(P)$(Q):IG:RBV
+# % gui, $(name), demand,  DG , $(P)$(Q):DG
+# % gui, $(name), readback,  DG , $(P)$(Q):DG:RBV
+# % gui, $(name), readback,  OUTP , $(P)$(Q):OUTP
+
+# #% archiver 10 Monitor
+record(calc, "$(P)$(Q):OUTP") {
+  field(DESC, "PID loop output")
+  field(INPA, "$(P)$(Q):OUTP:RAW CP MS")
+  #field(CALC, "A/10.0")
+  field(CALC, "A/(10**$(PREC=0))")
+  field(EGU, "$(UNITS)")
+  field(PREC, "$(PREC=0)")  
+}
+
+record(ao, "$(P)$(Q):SP") {
+  field(DESC, "Set Point")
+  field(FLNK, "$(P)$(Q):SP:CALC")
+  field(EGU, "$(UNITS)")
+  field(PREC, "$(PREC=0)")  
+}
+
+record(calcout, "$(P)$(Q):SP:CALC") {
+  field(DESC, "SP to raw calc")
+  field(INPA, "$(P)$(Q):SP")
+  #field(CALC, "A*10")
+  field(CALC, "A*(10**$(PREC=0))")
+  field(OUT, "$(P)$(Q):SP:RAW PP")
+}
+
+#% archiver 10 Monitor
+record(calc, "$(P)$(Q):SP:RBV") {
+  field(DESC, "raw to SP readback")
+  field(INPA, "$(P)$(Q):SP:RBV:RAW CP MS")
+  #field(CALC, "A/10.0")
+  field(CALC, "A/(10**$(PREC=0))")
+  field(EGU, "$(UNITS)")
+  field(PREC, "$(PREC=0)")
+}
+
+record(mbbo, "$(P)$(Q):CTRL") {
+  field(DESC, "Control setting")
+  field(FLNK, "$(P)$(Q):CTRL:RBV PP")
+}
+
+record(mbbi, "$(P)$(Q):CTRL:RBV") {
+  field(DESC, "Control readback")
+  field(FLNK, "$(P)$(Q):CTRL:STATUS PP")
+}
+
+# Note that logic is inverted: 0=Loop ON
+record(bi, "$(P)$(Q):CTRL:STATUS") {
+  field(DESC, "Loop status")
+  field(DTYP, "Raw Soft Channel")
+  field(INP,  "$(P)$(Q):CTRL:RBV.VAL CP MS")
+  field(ZNAM, "On")
+  field(ONAM, "Off")
+}
+
+#PID values
+#==========
+record(ao, "$(P)$(Q):PG") {
+  field(DESC, "Set Prop")
+  field(FLNK, "$(P)$(Q):PG:CALC")
+  field(EGU, "$(UNITS)")
+  field(PREC, "$(PREC=0)")  
+}
+record(calcout, "$(P)$(Q):PG:CALC") {
+  field(DESC, "PG to raw readback")
+  field(INPA, "$(P)$(Q):PG")
+  #field(CALC, "A*10")
+  field(CALC, "A*(10**$(PREC=0))")
+  field(OUT, "$(P)$(Q):PG:RAW PP")
+}
+
+# % archiver 10 Monitor
+record(calc, "$(P)$(Q):PG:RBV") {
+  field(DESC, "Prop gain")
+  field(INPA, "$(P)$(Q):PG:RBV:RAW CP MS")
+  #field(CALC, "A/10.0")
+  field(CALC, "A/(10**$(PREC=0))")
+  field(EGU, "$(UNITS)")
+  field(PREC, "$(PREC=0)")   
+}
+
+record(ao, "$(P)$(Q):IG") {
+  field(DESC, "Set Integr")
+  field(DRVL, "1")
+  field(DRVH, "8191")
+  field(PREC, "0")
+}
+# % archiver 10 Monitor
+record(longin, "$(P)$(Q):IG:RBV") {
+  field(DESC, "Integr gain")
+}
+
+record(ao, "$(P)$(Q):DG") {
+  field(DESC, "Set Deriv")
+  field(DRVL, "1")
+  field(DRVH, "8191")
+  field(PREC, "0")
+}
+# % archiver 10 Monitor
+record(longin, "$(P)$(Q):DG:RBV") {
+  field(DESC, "Deriv gain")
+}

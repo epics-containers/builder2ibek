@@ -1,0 +1,94 @@
+
+
+# dlsPLC_vacValveTcloseValve.template
+
+#% macro, __doc__, Template database for a vacuum valve TCLOSE metrics
+#% macro, device, device name
+#% macro, vlvcc, device name of valve control crate
+# % macro, port, asyn port name of FINS driver
+#% macro, century, DM<century>XX (e.g. DM11XX would be century = 11)
+#% macro, index, DM<century>XX (e.g. DM1111 would be century = 11 and index = 11)
+#% macro, tclose_high, HIGH alarm level for TCLOSE record (Optional - defaults to 0)
+#% macro, tclose_hihi, HIHI alarm level for TCLOSE record (Optional - defaults to 0)
+#% macro, tclose_hsv,  HSV  HIGH severity level for TCLOSE record (Optional - defaults to NO_ALARM)
+#% macro, tclose_hhsv, HHSV HIHI severity level for TCLOSE record (Optional - defaults to NO_ALARM)
+
+record(longin, "$(device):INPTCLOSE")
+  {
+  field(INP, "$(device):GETINPTCLOSE PP MS")
+  }
+
+record(subArray, "$(device):GETINPTCLOSE")
+  {
+  field(DTYP, "Soft Channel")
+  field(FTVL, "USHORT")
+  field(INP, "$(vlvcc):DM$(century)XX CP MS")
+  field(INDX, "$(index)")
+  field(MALM, "100")
+  }
+
+#
+#% archiver 10 Monitor
+#% controldesk Current Close Time readback
+#% alh $SEVRCOMMAND UP_ANY dls-alh-handler.py $(device):TCLOSE
+#% alh $SEVRCOMMAND UP_ANY dls-sendsms-alarm.py $(device):TCLOSE
+#
+record(calc, "$(device):TCLOSE")
+  {
+  field(DESC, "Close Time")
+  field(CALC, "A/10.0")
+  field(INPA, "$(device):INPTCLOSE PP MS")
+  field(EGU, "s")
+  field(PREC, "1")
+  field(SCAN, "1 second")
+  field(HOPR, "10")
+  field(LOPR, "2")
+  field(HIGH, "$(tclose_high=0)")
+  field(HIHI, "$(tclose_hihi=0)")
+  field(HSV, "$(tclose_hsv=NO_ALARM)")
+  field(HHSV, "$(tclose_hhsv=NO_ALARM)")
+  }
+
+# Addition records to read the time between the commanded actuation and the start of movement
+# This is present at tclose + 4
+
+record(longin, "$(device):INPTRESP")
+  {
+  field(INP, "$(device):GETINPTRESP PP MS")
+  }
+
+record(subArray, "$(device):GETINPTRESP")
+  {
+  field(DTYP, "Soft Channel")
+  field(FTVL, "USHORT")
+  field(INP, "$(vlvcc):DM$(century)XX CP MS")
+  field(MALM, "100")
+  }
+
+record(calcout, "$(device):GETINPTRESP_INDX") {
+    field(CALC, "$(index)+4")
+    field(OUT,  "$(device):GETINPTRESP.INDX PP")
+    field(PINI, "YES")
+}
+
+#
+#% archiver 10 Monitor
+#% controldesk Current Close Time readback
+#% alh $SEVRCOMMAND UP_ANY dls-alh-handler.py $(device):TRESP
+#% alh $SEVRCOMMAND UP_ANY dls-sendsms-alarm.py $(device):TRESP
+#
+record(calc, "$(device):TRESP")
+  {
+  field(DESC, "Close Time")
+  field(CALC, "A/10.0")
+  field(INPA, "$(device):INPTRESP PP MS")
+  field(EGU, "s")
+  field(PREC, "1")
+  field(SCAN, "1 second")
+  field(HOPR, "10")
+  field(LOPR, "2")
+  field(HIGH, "$(tclose_high=0)")
+  field(HIHI, "$(tclose_hihi=0)")
+  field(HSV, "$(tclose_hsv=NO_ALARM)")
+  field(HHSV, "$(tclose_hhsv=NO_ALARM)")
+  }

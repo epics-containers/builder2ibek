@@ -1,0 +1,683 @@
+# % macro, device, Device prefix
+# % macro, card, EPICS Card number supplied to ErConfigurexxx
+#
+# MAP0		PDP0	Short Gate	FP0		SR-PRE-INJ
+# MAP12/MAP13	LVL6	Long Gate	FP1		TOPUP-ON, TOPUP-OFF
+# MAP1		PDP1	SR INJ		FP2*		SR-INJ
+# MAP2		PDP2	Front Panel	FP2*		EXTE
+# 		DB4	1 MHz		---
+# 		DB5	BR Clk		---
+# 		DB6	SR Clk		FP2
+# 		DB7	CoInc Clk	---
+#		---	RF Clk		FP7
+
+# Short gate and SR-INJ outputs have a maximum width and delay of 1.0 second (event rate is 5 Hz)
+# External output has a maximum width and delay of 34.0 seconds (maximum with a fixed prescaler)
+
+record(er, "$(device):SET-ER")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "YES")
+	field(PINI, "YES")
+	field(SCAN, "Passive")
+
+# single event cycle trigger enables
+
+	field(TRG0, "Disabled")
+	field(TRG1, "Disabled")
+	field(TRG2, "Disabled")
+	field(TRG3, "Disabled")
+	field(TRG4, "Disabled")
+	field(TRG5, "Disabled")
+	field(TRG6, "Disabled")
+
+# output level enables
+
+	field(OTL0, "Disabled")	# MAP0 used by PDP0, MAP1 used by PDP1
+	field(OTL1, "Disabled")
+	field(OTL2, "Disabled")
+	field(OTL3, "Disabled")
+	field(OTL4, "Disabled")
+	field(OTL5, "Disabled")
+	field(OTL6, "Enabled")	# Top-Up Long Pulse
+
+# one time pulse enables
+
+	field(OTP0, "Disabled")	# MAP0 used by PDP0
+	field(OTP1, "Disabled")	# MAP1 used by PDP1
+	field(OTP2, "Disabled") # MAP2 used by PDP2
+	field(OTP3, "Disabled")
+	field(OTP4, "Disabled")
+	field(OTP5, "Disabled")
+	field(OTP6, "Disabled")
+	field(OTP7, "Disabled")
+	field(OTP8, "Disabled")
+	field(OTP9, "Disabled")
+	field(OTPA, "Disabled")
+	field(OTPB, "Disabled")
+	field(OTPC, "Disabled")	# MAP12 used by LVL6
+	field(OTPD, "Disabled")	# MAP13 used by LVL6
+
+# one time pulse width
+  
+	field(OT0W, "0")
+	field(OT1W, "0")
+	field(OT2W, "0")
+	field(OT3W, "0")
+	field(OT4W, "0")
+	field(OT5W, "0")
+	field(OT6W, "0")
+	field(OT7W, "0")
+	field(OT8W, "0")
+	field(OT9W, "0")
+	field(OTAW, "0")
+	field(OTBW, "0")
+	field(OTCW, "0")
+	field(OTDW, "0")
+
+# one time pulse delay
+
+	field(OT0D, "0")
+	field(OT1D, "0")
+	field(OT3D, "0")
+	field(OT2D, "0")
+	field(OT4D, "0")
+	field(OT5D, "0")
+	field(OT6D, "0")
+	field(OT7D, "0")
+	field(OT8D, "0")
+	field(OT9D, "0")
+	field(OTCD, "0")
+	field(OTDD, "0")
+
+# one time pulse polarity
+
+	field(OT0P, "Normal")
+	field(OT1P, "Normal")
+	field(OT2P, "Normal")
+	field(OT3P, "Normal")
+	field(OT4P, "Normal")
+	field(OT5P, "Normal")
+	field(OT6P, "Normal")
+	field(OT7P, "Normal")
+	field(OT8P, "Normal")
+	field(OT9P, "Normal")
+	field(OTAP, "Normal")
+	field(OTBP, "Normal")
+	field(OTCP, "Normal")
+	field(OTDP, "Normal")
+
+# one time pulse distibuted bus enable
+
+	field(OT0B, "Disabled")
+	field(OT1B, "Disabled")
+	field(OT2B, "Disabled")
+	field(OT3B, "Disabled")
+	field(OT4B, "Disabled")		# 1 MHz
+	field(OT5B, "Disabled")		# BR Clk	RF / 4 /   66 =  1.8 MHz
+	field(OT6B, "Enabled")		# SR Clk	RF / 4 /  234 =  533 kHz
+	field(OT7B, "Disabled")		# Coinc Clk	RF / 4 / 2574 = 48.5 kHz
+
+# delayed pulse enables
+
+                                # Rad mon reset in RS4Hour
+	field(DG1E, "Enabled")		# SR INJ event
+	field(DG2E, "Enabled")		# Top-Up Short Pulse (SR-PRE-INJ)
+
+# delayed pulse delay
+
+	                 		# Rad mon reset in RS4Hour
+	field(DG1D, "0")		# SR INJ event
+	field(DG2D, "0")		# Top-Up Short Pulse delay (SR-PRE-INJ)
+
+# delayed pulse width
+
+	                		# Rad mon reset in RS4Hour
+	field(DG1W, "1")		# SR INJ event
+	field(DG2W, "1")		# Top-Up Short Pulse width (SR-PRE-INJ)
+
+# delayed pulse pre-scaler
+
+	                		# Rad mon reset in RS4Hour
+	field(DG1C, "1")		# SR INJ event
+	field(DG2C, "1")		# Top-Up Short Pulse prescaler (SR-PRE-INJ)
+
+# delayed pulse polarity
+
+	                		    # Rad mon reset in RS4Hour
+	field(DG1P, "Normal")		# SR INJ event
+	field(DG2P, "Normal")		# Top-Up Short Pulse polarity (SR-PRE-INJ)
+
+# front panel select
+
+# PDP 0-3	0x00 - 0x03 # # # #
+# TEV 0-6	0x04 - 0x0A # # # # # # #
+# OPT 0-13	0x0B - 0x18 # # # # # # # # # # # # # #
+# LVL 0-6	0x19 - 0x1F # # # # # # #
+# BUS 0-7	0x20 - 0x27 # # # # # # # #
+# PRE 0-2	0x28 - 0x2A # # #
+
+	                		# Rad mon reset in RS4Hour
+	field(FPS1, "0x1F")		# TTL long gate (LVL6)
+	field(FPS2, "0x02")		# TTL short gate (PDP2)
+}
+
+# configure ER to decode these events ##########################################
+
+record(erevent, "$(device):SR-PRE-INJ")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x32")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+
+	field(VME,  "Enabled")
+	field(OUT2, "Enabled")		# PDP0 (short gate)
+}
+
+record(erevent, "$(device):TOPUPON")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x53")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+
+	field(VME,  "Enabled")
+	field(OUTD, "Enabled")		# LVL6 On (long gate)
+}
+
+record(erevent, "$(device):TOPUPOFF")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x54")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+
+	field(VME,  "Enabled")
+	field(OUTC, "Enabled")		# LVL6 Off (long gate)
+}
+
+################################################################################
+
+record(event, "$(device):TOPUPON:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(INP,  "#C$(card) S83 @")
+	field(SCAN, "I/O Intr")
+	field(VAL,  "83")
+	field(PRIO, "LOW")
+	field(TSE,  "83")
+}
+
+record(stringin, "$(device):TOPUPON:TS")
+{
+	field(SCAN, "Event")
+	field(EVNT, "83")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSEL, "$(device):TOPUPON:S")
+}
+
+record(event, "$(device):TOPUPOFF:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(INP,  "#C$(card) S84 @")
+	field(SCAN, "I/O Intr")
+	field(VAL,  "84")
+	field(PRIO, "LOW")
+	field(TSE,  "84")
+}
+
+record(stringin, "$(device):TOPUPOFF:TS")
+{
+	field(SCAN, "Event")
+	field(EVNT, "84")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSEL, "$(device):TOPUPOFF:S")
+}
+
+record(event, "$(device):SR-PRE-INJ:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(INP,  "#C$(card) S50 @")
+	field(SCAN, "I/O Intr")
+	field(VAL,  "50")
+	field(PRIO, "LOW")
+	field(TSE,  "50")
+}
+
+record(stringin, "$(device):SR-PRE-INJ:TS")
+{
+	field(SCAN, "Event")
+	field(EVNT, "50")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSEL, "$(device):SR-PRE-INJ:S")
+}
+
+################################################################################
+
+record(erevent, "$(device):SR-INJ")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x3C")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+
+	field(OUT1, "Enabled")		# PDP1 (SR INJ)
+}
+
+# assumes that the default event code is 0x76 (118)
+
+record(erevent, "$(device):FRONT")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x76")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+
+	field(VME,  "Enabled")
+	field(OUT2, "Enabled")		# PDP1 (Front Panel Input trigger)
+}
+
+record(event, "$(device):FRONT:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(INP,  "#C$(card) S118 @")
+	field(SCAN, "I/O Intr")
+	field(VAL,  "118")
+	field(PRIO, "LOW")
+	field(TSE,  "118")
+}
+
+record(stringin, "$(device):FRONT:TS")
+{
+	field(SCAN, "Event")
+	field(EVNT, "118")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSEL, "$(device):FRONT:S")
+}
+
+# show state of long gate ######################################################
+
+record(bo, "$(device):TOPUP-GATE")
+{
+	field(DTYP, "GateTS")
+	field(ONAM, "Gate On")
+	field(ZNAM, "Gate Off")
+
+# epicsTimeEventDeviceTime
+	field(TSE,  "-2")
+}
+
+record(bo, "$(device):TOPUP-GATE-ON")
+{
+	field(SCAN, "Event")
+	field(EVNT, "83")
+	field(OMSL, "closed_loop")
+	field(DOL,  "1")
+	field(OUT,  "$(device):TOPUP-GATE PP")
+}
+
+record(bo, "$(device):TOPUP-GATE-OFF")
+{
+	field(SCAN, "Event")
+	field(EVNT, "84")
+	field(OMSL, "closed_loop")
+	field(DOL,  "0")
+	field(OUT,  "$(device):TOPUP-GATE PP")
+}
+
+################################################################################
+
+record(fanout, "$(device):FAN")
+{
+	field(SCAN, "2 second")
+	field(LNK1, "$(device):SHORT-GATE-WIDTH")
+	field(LNK2, "$(device):SHORT-GATE-DELAY")
+	field(LNK3, "$(device):SR-INJ-WIDTH")
+	field(LNK4, "$(device):SR-INJ-DELAY")
+}
+
+### PDP2 #######################################################################
+
+# set width in seconds
+
+record(ao, "$(device):SHORT-GATE-WIDTH:SET")
+{
+	field(DRVL, "10e-9")
+	field(DRVH, "1.0")
+	field(PREC, "6")
+	field(EGU,  "s")
+	field(FLNK, "$(device):SHORT-GATE-WIDTH-TICK")
+
+	field(PINI, "YES")
+	field(VAL,  "10e-3")
+}
+
+# calculate width value DG2W in ticks
+
+record(calcout, "$(device):SHORT-GATE-WIDTH-TICK")
+{
+	field(CALC, "A * (B / 4.0) / MAX(C,1)")
+	field(INPA, "$(device):SHORT-GATE-WIDTH:SET")	# width (seconds)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG2C")		# prescaler
+	field(OUT,  "$(device):SET-ER.DG2W PP")
+	field(PREC, "0")
+	field(FLNK, "$(device):SHORT-GATE-WIDTH")
+}
+
+# calculate actual width in seconds
+
+record(calc, "$(device):SHORT-GATE-WIDTH")
+{
+	field(CALC, "A / (B / 4.0) * MAX(C,1)")
+	field(INPA, "$(device):SET-ER.DG2W")		# width (ticks)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG2C")		# prescaler
+	field(PREC, "9")
+	field(EGU,  "s")
+}
+
+# set delay in seconds
+
+record(ao, "$(device):SHORT-GATE-DELAY:SET")
+{
+	field(DRVL, "0.0")
+	field(DRVH, "1.0")
+	field(PREC, "6")
+	field(EGU,  "s")
+	field(FLNK, "$(device):SHORT-GATE-DELAY-TICK")
+
+	field(PINI, "YES")
+	field(VAL,  "0.0")
+}
+
+# calculate delay value DG2D in ticks
+
+record(calcout, "$(device):SHORT-GATE-DELAY-TICK")
+{
+	field(CALC, "A * (B / 4.0) / MAX(C,1)")
+	field(INPA, "$(device):SHORT-GATE-DELAY:SET")	# delay (seconds)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG2C")		# prescaler
+	field(OUT,  "$(device):SET-ER.DG2D PP")
+	field(PREC, "0")
+	field(FLNK, "$(device):SHORT-GATE-DELAY")
+}
+
+# calculate actual delay in seconds
+
+record(calc, "$(device):SHORT-GATE-DELAY")
+{
+	field(CALC, "A / (B / 4.0) * MAX(C,1)")
+	field(INPA, "$(device):SET-ER.DG2D")		# delay (ticks)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG2C")		# prescaler
+	field(PREC, "9")
+	field(EGU,  "s")
+}
+
+record(mbbo, "$(device):SHORT-GATE-POLARITY:SET")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(OUT,  "$(device):SET-ER.DG2P PP")
+
+	field(ZRST, "Normal")
+	field(ZRVL, "0")
+
+	field(ONST, "Inverted")
+	field(ONVL, "1")
+
+	field(PINI, "YES")
+}
+
+record(mbbi, "$(device):SHORT-GATE-POLARITY")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SET-ER.DG2P CP")
+
+	field(ZRST, "Normal")
+	field(ZRVL, "0")
+
+	field(ONST, "Inverted")
+	field(ONVL, "1")
+}
+
+record(mbbo, "$(device):SHORT-GATE-ENABLE:SET")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(OUT,  "$(device):SET-ER.DG2E PP")
+
+	field(ZRST, "Disabled")
+	field(ZRVL, "0")
+
+	field(ONST, "Enabled")
+	field(ONVL, "1")
+}
+
+record(mbbi, "$(device):SHORT-GATE-ENABLE")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SET-ER.DG2E CP")
+
+	field(ZRST, "Disabled")
+	field(ZRVL, "0")
+
+	field(ONST, "Enabled")
+	field(ONVL, "1")
+}
+
+record(ao, "$(device):SHORT-GATE-ENABLE-PINI")
+{
+	field(PINI, "YES")
+	field(VAL,  "1")
+	field(OUT,  "$(device):SHORT-GATE-ENABLE:SET PP")
+}
+
+### PDP1 #######################################################################
+
+# set width in seconds
+
+record(ao, "$(device):SR-INJ-WIDTH:SET")
+{
+	field(DRVL, "10e-9")
+	field(DRVH, "1.0")
+	field(PREC, "6")
+	field(EGU,  "s")
+	field(FLNK, "$(device):SR-INJ-WIDTH-TICK")
+
+	field(PINI, "YES")
+	field(VAL,  "1e-3")
+}
+
+# calculate width value DG1W in ticks
+
+record(calcout, "$(device):SR-INJ-WIDTH-TICK")
+{
+	field(CALC, "A * (B / 4.0) / MAX(C,1)")
+	field(INPA, "$(device):SR-INJ-WIDTH:SET")	# width (seconds)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG1C")		# prescaler
+	field(OUT,  "$(device):SET-ER.DG1W PP")
+	field(PREC, "0")
+	field(FLNK, "$(device):SR-INJ-WIDTH")
+}
+
+# calculate actual width in seconds
+
+record(calc, "$(device):SR-INJ-WIDTH")
+{
+	field(CALC, "A / (B / 4.0) * MAX(C,1)")
+	field(INPA, "$(device):SET-ER.DG1W")		# width (ticks)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG1C")		# prescaler
+	field(PREC, "9")
+	field(EGU,  "s")
+}
+
+# set delay in seconds
+
+record(ao, "$(device):SR-INJ-DELAY:SET")
+{
+	field(DRVL, "0.0")
+	field(DRVH, "1.0")
+	field(PREC, "6")
+	field(EGU,  "s")
+	field(FLNK, "$(device):SR-INJ-DELAY-TICK")
+
+	field(PINI, "YES")
+	field(VAL,  "0.0")
+}
+
+# calculate delay value DG1D in ticks
+
+record(calcout, "$(device):SR-INJ-DELAY-TICK")
+{
+	field(CALC, "A * (B / 4.0) / MAX(C,1)")
+	field(INPA, "$(device):SR-INJ-DELAY:SET")	# delay (seconds)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG1C")		# prescaler
+	field(OUT,  "$(device):SET-ER.DG1D PP")
+	field(PREC, "0")
+	field(FLNK, "$(device):SR-INJ-DELAY")
+}
+
+# calculate actual delay in seconds
+
+record(calc, "$(device):SR-INJ-DELAY")
+{
+	field(CALC, "A / (B / 4.0) * MAX(C,1)")
+	field(INPA, "$(device):SET-ER.DG1D")		# delay (ticks)
+	field(INPB, "499.654e6")			# RF clock
+	field(INPC, "$(device):SET-ER.DG1C")		# prescaler
+	field(PREC, "9")
+	field(EGU,  "s")
+}
+
+record(mbbo, "$(device):SR-INJ-POLARITY:SET")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(OUT,  "$(device):SET-ER.DG1P PP")
+
+	field(ZRST, "Normal")
+	field(ZRVL, "0")
+
+	field(ONST, "Inverted")
+	field(ONVL, "1")
+
+	field(PINI, "YES")
+}
+
+record(mbbi, "$(device):SR-INJ-POLARITY")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SET-ER.DG1P CP")
+
+	field(ZRST, "Normal")
+	field(ZRVL, "0")
+
+	field(ONST, "Inverted")
+	field(ONVL, "1")
+}
+
+record(mbbo, "$(device):SR-INJ-ENABLE:SET")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(OUT,  "$(device):SET-ER.DG1E PP")
+
+	field(ZRST, "Disabled")
+	field(ZRVL, "0")
+
+	field(ONST, "Enabled")
+	field(ONVL, "1")
+}
+
+record(mbbi, "$(device):SR-INJ-ENABLE")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SET-ER.DG1E CP")
+
+	field(ZRST, "Disabled")
+	field(ZRVL, "0")
+
+	field(ONST, "Enabled")
+	field(ONVL, "1")
+}
+
+record(ao, "$(device):SR-INJ-ENABLE-PINI")
+{
+	field(PINI, "YES")
+	field(VAL,  "0")
+	field(OUT,  "$(device):SR-INJ-ENABLE:SET PP")
+}
+
+#-------------------------------------------------------------------------------
+
+record(bo, "$(device):SR-PRE-INJ-GATE-ON")
+{
+	field(SCAN, "Event")
+	field(EVNT, "50")
+	field(OMSL, "closed_loop")
+	field(DOL,  "1")
+	field(OUT,  "$(device):SR-PRE-INJ-GATE PP")
+}
+
+record(bo, "$(device):SR-PRE-INJ-GATE")
+{
+	field(ONAM, "Gate On")
+	field(ZNAM, "Gate Off")
+	field(HIGH, "0.1")
+	field(TSEL, "$(device):SR-PRE-INJ:S")
+}
+
+
+record(mbbo, "$(device):LONG-GATE-ENABLE:SET")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(OUT,  "$(device):SET-ER.OTL6 PP")
+
+	field(ZRST, "Disabled")
+	field(ZRVL, "0")
+
+	field(ONST, "Enabled")
+	field(ONVL, "1")
+}
+
+record(mbbi, "$(device):LONG-GATE-ENABLE")
+{
+	field(DTYP, "Raw Soft Channel")
+	field(INP,  "$(device):SET-ER.OTL6 CP")
+
+	field(ZRST, "Disabled")
+	field(ZRVL, "0")
+
+	field(ONST, "Enabled")
+	field(ONVL, "1")
+}
+
+record(ao, "$(device):LONG-GATE-ENABLE-PINI")
+{
+	field(PINI, "YES")
+	field(VAL,  "1")
+	field(OUT,  "$(device):LONG-GATE-ENABLE:SET PP")
+}

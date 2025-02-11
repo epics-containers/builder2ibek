@@ -1,0 +1,45 @@
+
+
+# NX102_flowMeter.template
+
+#% macro, __doc__, Template database for a machine flow meter
+#% macro, device, device name
+#% macro, port, asyn port name of etherip driver
+#% macro, tag, etherip tag
+#% macro, tagidx, etherip tag index
+#% macro, egu, EGU
+#% macro, prec, PREC
+#% macro, hopr, HOPR
+#% macro, lopr, LOPR
+#% macro, hihi, HIHI
+#% macro, lolo, LOLO
+#% macro, high, HIGH
+#% macro, adel, ADEL
+#% macro, mdel, MDEL
+#% macro, low, LOW
+
+
+#
+#% archiver 1 Monitor
+#% controldesk Current Close Time readback
+#
+record(ai, "$(device):RATE") {
+  field(DESC, "$(desc)")
+  field(DTYP, "EtherIP")
+  field(SCAN, "1 second")
+  field(INP,  "@$(port) $(tag=FlowRate)[$(tagidx)]")
+  field(EGU, "$(egu=Litres / Hour)")
+  field(PREC, "$(prec=1)")
+  field(HOPR, "$(hopr=300)")
+  field(LOPR, "$(lopr=0.0)")
+  field(HIHI, "$(hihi=295)")
+  field(LOLO, "$(lolo=100)")
+  field(HIGH, "$(high=275)")
+  field(ADEL, "$(adel=50)")
+  field(MDEL, "$(mdel=10)")
+  field(LOW,  "$(low=120)")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(HSV,  "MINOR")
+  field(LSV,  "MINOR")
+}

@@ -1,0 +1,27 @@
+#  dlsPLC_CommsStatus.vdb
+#  Maintains a view of the valve control crate status, so that problems can be quickly identified by a user.
+# % macro, __doc__, Template that reads the overall status of the valve control crate PLC
+# % macro, device, Device prefix
+# % macro, field (optional), Device PV field to monitor. Defaults to DM0XX
+
+# PINI set to ensure the record is initialised with TIMEOUT status,
+# which will only change to OK once communication starts.
+record(mbbi, "$(device):COMMS")
+    {
+    field(DESC, "Communication Status")
+    field(DTYP, "Soft Channel")
+    field(SCAN, "Passive")
+    field(ZRST, "TIMEOUT")
+    field(ONST, "OK")
+    field(INP, "0")
+    field(PINI, "YES")
+    }
+
+record(scalcout, "$(device):COMMSMATCH")
+    {
+    field(INAA, "$(device):$(field=DM0XX).STAT MS CP")
+    field(CALC, "printf('%d',AA!='READ'?1:0)"
+    field(OOPT, "Every Time")
+    field(DOPT, "Use CALC")
+    field(OUT, "$(device):COMMS PP MS")
+    }

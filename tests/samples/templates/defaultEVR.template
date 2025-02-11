@@ -1,0 +1,382 @@
+# % macro, __doc__, A simple template to configure the PMC/VME EVR when using the MRF driver
+#
+# Macros:
+# % macro, device, EPICS device name
+# % macro, card,   EPICS card number
+#
+# Event Codes:
+#
+# 0x76	118	Enabled	Front panel input
+# 0x5E	94	Enabled	MPS beam dump
+# 0x25	37	Enabled	Linac Heart Beat
+# 0x7D	125	Disabled	One second pulse
+# 0x70	112	Disabled	Timestamp '0'
+# 0x71	113	Disabled	Timestamp '1'
+# 0x53	83	Disabled	TopUp On
+# 0x54	84	Disabled	TopUp Off
+
+record(er, "$(device):$(er=SET-ER)")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "YES")
+	field(PINI, "YES")
+	field(SCAN, "Passive")
+}
+
+#-------------------------------------------------------------------------------
+
+# Front panel
+
+record(erevent, "$(device):EVNT118")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x76")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX76")
+}
+
+# Front panel event
+
+record(event, "$(device):EVNT118:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(DESC, "Front panel event")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S118 @")
+	field(VAL,  "118")
+	field(PRIO, "LOW")
+	field(TSE,  "118")
+
+	alias("$(device):EVNTX76:S")
+}
+
+record(stringin, "$(device):EVNT118:TS")
+{
+	field(DESC, "Event 0x76 timestamp")
+	field(SCAN, "Event")
+	field(EVNT, "118")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSE,  "118")
+
+	alias("$(device):EVNTX76:TS")
+}
+
+#-------------------------------------------------------------------------------
+
+# MPS beam dump
+
+record(erevent, "$(device):EVNT94")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x5E")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX5E")
+}
+
+record(event, "$(device):EVNT94:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(DESC, "MPS event")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S94 @")
+	field(VAL,  "94")
+	field(PRIO, "LOW")
+	field(TSE,  "94")
+
+	alias("$(device):EVNTX5E:S")
+}
+
+record(stringin, "$(device):EVNT94:TS")
+{
+	field(DESC, "Event 0x5E timestamp")
+	field(SCAN, "Event")
+	field(EVNT, "94")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSE,  "94")
+
+	alias("$(device):EVNTX5E:TS")
+}
+
+#-------------------------------------------------------------------------------
+
+# Linac heart beat
+
+record(erevent, "$(device):EVNT37")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Enabled")
+	field(ENM,  "0x25")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX25")
+}
+
+record(event, "$(device):EVNT37:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S37 @")
+	field(VAL,  "37")
+	field(PRIO, "LOW")
+	field(TSE,  "37")
+
+	alias("$(device):EVNTX25:S")
+}
+
+#-------------------------------------------------------------------------------
+
+# 1 second pulse
+
+record(erevent, "$(device):EVNT125")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Disabled")
+	field(ENM,  "0x7D")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX7D")
+}
+
+record(event, "$(device):EVNT125:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S125 @")
+	field(VAL,  "125")
+	field(PRIO, "LOW")
+	field(TSE,  "125")
+
+	alias("$(device):EVNTX7D:S")
+}
+
+record(stringin, "$(device):EVNT125:TS")
+{
+	field(DESC, "Event 0x7D timestamp")
+	field(SCAN, "Event")
+	field(EVNT, "125")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSE,  "125")
+
+	alias("$(device):EVNTX7D:TS")
+}
+
+#-------------------------------------------------------------------------------
+
+# Timestamp '0'
+
+record(erevent, "$(device):EVNT112")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Disabled")
+	field(ENM,  "0x70")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX70")
+}
+
+record(event, "$(device):EVNT112:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S112 @")
+	field(VAL,  "112")
+	field(PRIO, "LOW")
+	field(TSE,  "112")
+
+	alias("$(device):EVNTX70:S")
+}
+
+#-------------------------------------------------------------------------------
+
+# Timestamp '1'
+
+record(erevent, "$(device):EVNT113")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Disabled")
+	field(ENM,  "0x71")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX71")
+}
+
+record(event, "$(device):EVNT113:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S113 @")
+	field(VAL,  "113")
+	field(PRIO, "LOW")
+	field(TSE,  "113")
+
+	alias("$(device):EVNTX71:S")
+}
+
+#-------------------------------------------------------------------------------
+
+# Topup On
+
+record(erevent, "$(device):EVNT83")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Disabled")
+	field(ENM,  "0x53")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX53")
+}
+
+record(event, "$(device):EVNT83:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S83 @")
+	field(VAL,  "83")
+	field(PRIO, "LOW")
+	field(TSE,  "83")
+
+	alias("$(device):EVNTX53:S")
+}
+
+record(stringin, "$(device):EVNT83:TS")
+{
+	field(DESC, "Event 0x53 timestamp")
+	field(SCAN, "Event")
+	field(EVNT, "83")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSE,  "83")
+
+	alias("$(device):EVNTX53:TS")
+}
+
+#-------------------------------------------------------------------------------
+
+# Topup Off
+
+record(erevent, "$(device):EVNT84")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(OUT,  "#C$(card) S0 @")
+	field(ENAB, "Disabled")
+	field(ENM,  "0x54")
+	field(PINI, "YES")
+	field(PRIO, "LOW")
+	field(SCAN, "Passive")
+	field(VME,  "Enabled")
+
+	alias("$(device):EVNTX54")
+}
+
+record(event, "$(device):EVNT84:S")
+{
+	field(DTYP, "MRF Event Receiver")
+	field(SCAN, "I/O Intr")
+	field(INP,  "#C$(card) S84 @")
+	field(VAL,  "84")
+	field(PRIO, "LOW")
+	field(TSE,  "84")
+
+	alias("$(device):EVNTX54:S")
+}
+
+record(stringin, "$(device):EVNT84:TS")
+{
+	field(DESC, "Event 0x54 timestamp")
+	field(SCAN, "Event")
+	field(EVNT, "84")
+	field(DTYP, "Soft Timestamp")
+	field(INP,  "@%d/%m/%y %H:%M:%S.%06f")
+	field(TSE,  "84")
+
+	alias("$(device):EVNTX54:TS")
+}
+
+#-------------------------------------------------------------------------------
+
+record(longin, "$(device):LINKSTAT")
+{
+	field(DESC, "Link Status")
+	field(DTYP, "MRF Event Receiver")
+	field(INP,  "#C$(card) S0 @")
+	field(PRIO, "LOW")
+#	field(SCAN, "I/O Intr")
+	field(PINI, "YES")
+	field(SCAN, "1 second")
+	
+	field(LOLO, "0")
+	field(LLSV, "MAJOR")
+}
+
+#% archiver 10 monitor
+
+record(longin, "$(device):RXERR")
+{
+	field(DESC, "Receiver Error Count")
+	field(DTYP, "MRF Event Receiver")
+	field(INP,  "#C$(card) S1 @")
+	field(PRIO, "LOW")
+#	field(SCAN, "I/O Intr")
+	field(PINI, "YES")
+	field(SCAN, "10 second")
+}
+
+#-------------------------------------------------------------------------------
+
+# decrement the event counter at a constant rate
+
+record(calcout, "$(device):HBT-CHECK")
+{
+	field(SCAN, ".5 second")
+	field(CALC, "(VAL>0)?VAL-1:0")
+
+	field(LOLO, "1")
+	field(LLSV, "MAJOR")
+}
+
+# reset our event counter each time we receive the Linac heart beat event
+
+record(calcout, "$(device):HBT-COUNT")
+{
+	field(SCAN, "Event")
+	field(EVNT, "37")
+	
+	field(CALC, "5")
+	field(OUT,  "$(device):HBT-CHECK")
+}

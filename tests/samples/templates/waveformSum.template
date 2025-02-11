@@ -1,0 +1,11 @@
+# Template to sum the 4 waveform channels of a QBPM
+
+record(acalcout, "$(P)$(R)") {
+	field(CALC, "AA+BB+CC+DD")
+	field(INAA, "$(INAA) CP")
+	field(INBB, "$(INBB) CA")
+	field(INCC, "$(INCC) CA")
+	field(INDD, "$(INDD) CA")
+	field(NELM, "$(NELM)")
+	field(DESC, "$(DESC=Array Sum)")
+}

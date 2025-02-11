@@ -1,0 +1,103 @@
+# A template to convert EVR front panel selector codes to strings
+#
+# macros:
+# device	EVR device name
+# record	EVR record name, defaults to SET-ER
+# fps0		record name, defaults to FPS0:DESC
+# fps1		record name, defaults to FPS1:DESC
+# fps2		record name, defaults to FPS2:DESC
+# fps3		record name, defaults to FPS3:DESC
+# fps4		record name, defaults to FPS4:DESC
+# fps5		record name, defaults to FPS5:DESC
+# fps6		record name, defaults to FPS6:DESC
+
+record(aSub, "$(device):$(fps0=FPS0:DESC)")
+{
+	field(INAM, "fpsdescInit")
+	field(SNAM, "fpsdesc")
+	
+	field(INPA, "$(device):$(record=SET-ER).FPS0 CP")
+	field(NOA,  "1")
+	field(FTA,  "USHORT")
+	
+	field(NOVA, "1")
+	field(FTVA, "STRING")
+}
+
+record(aSub, "$(device):$(fps1=FPS1:DESC)")
+{
+	field(INAM, "fpsdescInit")
+	field(SNAM, "fpsdesc")
+	
+	field(INPA, "$(device):$(record=SET-ER).FPS1 CP")
+	field(NOA,  "1")
+	field(FTA,  "USHORT")
+	
+	field(NOVA, "1")
+	field(FTVA, "STRING")
+}
+
+record(aSub, "$(device):$(fps2=FPS2:DESC)")
+{
+	field(INAM, "fpsdescInit")
+	field(SNAM, "fpsdesc")
+	
+	field(INPA, "$(device):$(record=SET-ER).FPS2 CP")
+	field(NOA,  "1")
+	field(FTA,  "USHORT")
+	
+	field(NOVA, "1")
+	field(FTVA, "STRING")
+}
+
+record(aSub, "$(device):$(fps3=FPS3:DESC)")
+{
+	field(INAM, "fpsdescInit")
+	field(SNAM, "fpsdesc")
+	
+	field(INPA, "$(device):$(record=SET-ER).FPS3 CP")
+	field(NOA,  "1")
+	field(FTA,  "USHORT")
+	
+	field(NOVA, "1")
+	field(FTVA, "STRING")
+}
+
+record(aSub, "$(device):$(fps4=FPS4:DESC)")
+{
+	field(INAM, "fpsdescInit")
+	field(SNAM, "fpsdesc")
+	
+	field(INPA, "$(device):$(record=SET-ER).FPS4 CP")
+	field(NOA,  "1")
+	field(FTA,  "USHORT")
+	
+	field(NOVA, "1")
+	field(FTVA, "STRING")
+}
+
+record(aSub, "$(device):$(fps5=FPS5:DESC)")
+{
+	field(INAM, "fpsdescInit")
+	field(SNAM, "fpsdesc")
+	
+	field(INPA, "$(device):$(record=SET-ER).FPS5 CP")
+	field(NOA,  "1")
+	field(FTA,  "USHORT")
+	
+	field(NOVA, "1")
+	field(FTVA, "STRING")
+}
+
+record(aSub, "$(device):$(fps6=FPS6:DESC)")
+{
+	field(INAM, "fpsdescInit")
+	field(SNAM, "fpsdesc")
+	
+	field(INPA, "$(device):$(record=SET-ER).FPS6 CP")
+	field(NOA,  "1")
+	field(FTA,  "USHORT")
+	
+	field(NOVA, "1")
+	field(FTVA, "STRING")
+}

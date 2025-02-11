@@ -1,0 +1,521 @@
+# TerminalServer32.template
+# Common terminal server template
+# % macro, P,      Record name prefix
+# % macro, R,      Record name suffix
+# % macro, name, object and gui association name
+# % gui, $(name), edm, thirtyTwoChannel.edl, P=$(P)$(R)
+
+# Poll all the infrequently changing status occasionally
+record(seq, "$(P)$(R):WHICHPORT")
+{
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(R):WHICHPOLL")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):POLL.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):1:POLL.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):2:POLL.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):3:POLL.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):4:POLL.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):5:POLL.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):6:POLL.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(R):7:POLL.PROC")
+  field(DOL9, "1")
+  field(LNK9, "$(P)$(R):8:POLL.PROC")
+  field(DOLA, "1")
+  field(LNKA, "$(P)$(R):9:POLL.PROC")
+  field(FLNK, "$(P)$(R):WHICHPORT2")
+}
+record(seq, "$(P)$(R):WHICHPORT2")
+{
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(R):WHICHPOLL2")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):10:POLL.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):11:POLL.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):12:POLL.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):13:POLL.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):14:POLL.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):15:POLL.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):16:POLL.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(R):17:POLL.PROC")
+  field(DOL9, "1")
+  field(LNK9, "$(P)$(R):18:POLL.PROC")
+  field(DOLA, "1")
+  field(LNKA, "$(P)$(R):19:POLL.PROC")
+  field(FLNK, "$(P)$(R):WHICHPORT3")
+}
+record(seq, "$(P)$(R):WHICHPORT3")
+{
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(R):WHICHPOLL3")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):20:POLL.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):21:POLL.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):22:POLL.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):23:POLL.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):24:POLL.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):25:POLL.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):26:POLL.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(R):27:POLL.PROC")
+  field(DOL9, "1")
+  field(LNK9, "$(P)$(R):28:POLL.PROC")
+  field(DOLA, "1")
+  field(LNKA, "$(P)$(R):29:POLL.PROC")
+  field(FLNK, "$(P)$(R):WHICHPORT4")
+}
+record(seq, "$(P)$(R):WHICHPORT4")
+{
+  field(SELM, "Specified")
+  field(SELL, "$(P)$(R):WHICHPOLL4")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):30:POLL.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):31:POLL.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):32:POLL.PROC")
+}
+record(longout, "$(P)$(R):WHICHPOLL")
+{
+  field(VAL,  "1")
+  field(FLNK, "$(P)$(R):WHICHPOLL2")
+}
+record(calc, "$(P)$(R):WHICHPOLL2")
+{
+  field(INPA, "$(P)$(R):WHICHPOLL")
+  field(CALC, "A-10")
+  field(FLNK, "$(P)$(R):WHICHPOLL3")
+}
+record(calc, "$(P)$(R):WHICHPOLL3")
+{
+  field(INPA, "$(P)$(R):WHICHPOLL")
+  field(CALC, "A-20")
+  field(FLNK, "$(P)$(R):WHICHPOLL4")
+}
+record(calc, "$(P)$(R):WHICHPOLL4")
+{
+  field(INPA, "$(P)$(R):WHICHPOLL")
+  field(CALC, "A-30")
+  field(FLNK, "$(P)$(R):WHICHPORT")
+}
+record(calcout, "$(P)$(R):NEXTPOLL")
+{
+  field(SCAN, "5 second")
+  field(INPA, "$(P)$(R):WHICHPOLL")
+  field(CALC, "A<=32?A+1:1")
+  field(OOPT, "Every Time")
+  field(DOPT, "Use CALC")
+  field(OUT,  "$(P)$(R):WHICHPOLL.VAL PP")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):SNMPBUSY")
+}
+
+record(seq, "$(P)$(R):1:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):2:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):3:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):4:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):5:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):6:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):7:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):8:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):9:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):10:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):11:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):12:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):13:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):14:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):15:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):16:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):17:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):18:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):19:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):20:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):21:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):22:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):23:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):24:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):25:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):26:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):27:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):28:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):29:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):30:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):31:POLL")
+{
+  field(SELM, "All")
+}
+record(seq, "$(P)$(R):32:POLL")
+{
+  field(SELM, "All")
+}
+
+# Process this record to poll all the infrequent changing parameters
+
+record(seq, "$(P)$(R):POLL")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):MODELNAME.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):SERIALNUMBER.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):FWVERSION.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):IPADDRESS.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):SERVERNAME.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):SERVERLOC.PROC")
+}
+
+# Store and restart command.
+
+record(sseq, "$(P)$(R):SAVEANDRESTART")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):SNMPBUSY PP")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):DOSAVE CA")
+  field(WAIT2, "Wait")
+  field(DLY3, "5")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):DORESTART CA")
+  field(WAIT3, "Wait")
+  field(DLY4, "5")
+  field(DOL4, "0")
+  field(LNK4, "$(P)$(R):SNMPBUSY PP")
+  field(DISV, "1")
+  field(SDIS, "$(P)$(R):SNMPBUSY")
+}
+
+record(bo, "$(P)$(R):SNMPBUSY")
+{
+  field(DESC, "Indicates that SNMP is busy")
+  field(ZNAM, "Ready")
+  field(ONAM, "Busy")
+}
+
+# Global upload
+
+record(seq, "$(P)$(R):DOREAD")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):1:DOREAD.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):2:DOREAD.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):3:DOREAD.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):4:DOREAD.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):5:DOREAD.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):6:DOREAD.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):7:DOREAD.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(R):8:DOREAD.PROC")
+  field(DOL9, "1")
+  field(LNK9, "$(P)$(R):9:DOREAD.PROC")
+  field(DOLA, "1")
+  field(LNKA, "$(P)$(R):10:DOREAD.PROC")
+  field(FLNK, "$(P)$(R):DOREAD2")
+}
+record(seq, "$(P)$(R):DOREAD2")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):11:DOREAD.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):12:DOREAD.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):13:DOREAD.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):14:DOREAD.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):15:DOREAD.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):16:DOREAD.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):17:DOREAD.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(R):18:DOREAD.PROC")
+  field(DOL9, "1")
+  field(LNK9, "$(P)$(R):19:DOREAD.PROC")
+  field(DOLA, "1")
+  field(LNKA, "$(P)$(R):20:DOREAD.PROC")
+  field(FLNK, "$(P)$(R):DOREAD3")
+}
+record(seq, "$(P)$(R):DOREAD3")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):21:DOREAD.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):22:DOREAD.PROC")
+  field(DOL3, "1")
+  field(LNK3, "$(P)$(R):23:DOREAD.PROC")
+  field(DOL4, "1")
+  field(LNK4, "$(P)$(R):24:DOREAD.PROC")
+  field(DOL5, "1")
+  field(LNK5, "$(P)$(R):25:DOREAD.PROC")
+  field(DOL6, "1")
+  field(LNK6, "$(P)$(R):26:DOREAD.PROC")
+  field(DOL7, "1")
+  field(LNK7, "$(P)$(R):27:DOREAD.PROC")
+  field(DOL8, "1")
+  field(LNK8, "$(P)$(R):28:DOREAD.PROC")
+  field(DOL9, "1")
+  field(LNK9, "$(P)$(R):29:DOREAD.PROC")
+  field(DOLA, "1")
+  field(LNKA, "$(P)$(R):30:DOREAD.PROC")
+  field(FLNK, "$(P)$(R):DOREAD4")
+}
+record(seq, "$(P)$(R):DOREAD4")
+{
+  field(SELM, "All")
+  field(DOL1, "1")
+  field(LNK1, "$(P)$(R):31:DOREAD.PROC")
+  field(DOL2, "1")
+  field(LNK2, "$(P)$(R):32:DOREAD.PROC")
+}
+record(sseq, "$(P)$(R):1:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):2:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):3:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):4:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):5:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):6:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):7:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):8:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):9:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):10:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):11:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):12:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):13:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):14:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):15:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):16:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):17:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):18:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):19:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):20:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):21:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):22:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):23:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):24:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):25:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):26:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):27:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):28:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):29:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):30:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):31:DOREAD")
+{
+  field(SELM, "All")
+}
+record(sseq, "$(P)$(R):32:DOREAD")
+{
+  field(SELM, "All")
+}

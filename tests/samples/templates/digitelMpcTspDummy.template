@@ -1,0 +1,1050 @@
+# digitelMpcTspDummy.template
+#% macro, __doc__, Template dummy records for digitel MPC - Titanium Sublimation Pump
+# Ian Gillingham - 04/02/16
+#
+# This provides a static record for an essentially non-existant or uninstalled TSP.
+# It is useful for showing as disconnected on a synoptic, rather than a real record
+# which would go horribly white and produce CA requests to non-existent PVs.
+#
+# substitutions:
+#% macro, device, device name
+################################################################################
+# Status
+#
+#
+record(mbbi, "$(device):STA")
+{
+    field(DESC, "Status")
+    field(ZRST, "Unknown")
+    field(ONST, "Off")
+    field(TWST, "Ramping")
+    field(THST, "Firing")
+    field(FRST, "Armed")
+    field(FVST, "Pressure Intlk")
+    field(SXST, "No Interlock")
+    field(SVST, "Degas")
+    field(EIST, "Auto Config")
+    field(NIST, "Re-Sync")
+    field(TEST, "Disconnected")
+    field(ELST, "Invalid")
+    field(TVST, "Invalid")
+    field(TTST, "Invalid")
+    field(FTST, "Invalid")
+    field(FFST, "Invalid")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "NO_ALARM")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "NO_ALARM")
+    field(FVSV, "MINOR")
+    field(SXSV, "MINOR")
+    field(SVSV, "NO_ALARM")
+    field(EISV, "NO_ALARM")
+    field(NISV, "NO_ALARM")
+    field(TESV, "MAJOR")
+    field(ELSV, "MAJOR")
+    field(TVSV, "MAJOR")
+    field(TTSV, "MAJOR")
+    field(FTSV, "MAJOR")
+    field(FFSV, "MAJOR")
+}
+record(calcout, "$(device):CALSTA")
+{
+    field(DESC, "Calculate Status")
+    field(CALC, "A-1")
+    field(OUT,  "$(device):STA PP MS")
+    field(INPA, "$(device):RAWSTA MS")
+}
+record(mbbi, "$(device):RAWSTA")
+{
+    field(DESC, "Raw Status")
+    field(DTYP, "Soft Channel")
+    field(INP,  "11")
+    field(SCAN, "1 second")
+    field(FLNK, "$(device):CALSTA")
+}
+################################################################################
+# Filament Status
+#
+#% archiver 10 Monitor
+#% controldesk Filament 1 Status smon
+#
+record(mbbi, "$(device):FIL1:STA")
+{
+    field(DESC, "Filament 1 Status")
+    field(DTYP, "Soft Channel")
+    field(INP,  "0")
+    field(SCAN, "1 second")
+    field(ZRST, "Not Installed")
+    field(ONST, "Inactive")
+    field(TWST, "Next Active")
+    field(THST, "Active Firing")
+    field(FRST, "Open")
+    field(FVST, "Low Level")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "MAJOR")
+    field(FVSV, "MINOR")
+    field(SXSV, "MAJOR")
+    field(SVSV, "MAJOR")
+    field(EISV, "MAJOR")
+    field(NISV, "MAJOR")
+    field(TESV, "MAJOR")
+    field(ELSV, "MAJOR")
+    field(TVSV, "MAJOR")
+    field(TTSV, "MAJOR")
+    field(FTSV, "MAJOR")
+    field(FFSV, "MAJOR")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Filament 2 Status smon
+#
+record(mbbi, "$(device):FIL2:STA")
+{
+    field(DESC, "Filament 2 Status")
+    field(DTYP, "Soft Channel")
+    field(INP,  "0")
+    field(SCAN, "1 second")
+    field(ZRST, "Not Installed")
+    field(ONST, "Inactive")
+    field(TWST, "Next Active")
+    field(THST, "Active Firing")
+    field(FRST, "Open")
+    field(FVST, "Low Level")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "MAJOR")
+    field(FVSV, "MINOR")
+    field(SXSV, "MAJOR")
+    field(SVSV, "MAJOR")
+    field(EISV, "MAJOR")
+    field(NISV, "MAJOR")
+    field(TESV, "MAJOR")
+    field(ELSV, "MAJOR")
+    field(TVSV, "MAJOR")
+    field(TTSV, "MAJOR")
+    field(FTSV, "MAJOR")
+    field(FFSV, "MAJOR")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Filament 3 Status smon
+#
+record(mbbi, "$(device):FIL3:STA")
+{
+    field(DESC, "Filament 3 Status")
+    field(DTYP, "Soft Channel")
+    field(INP,  "0")
+    field(SCAN, "1 second")
+    field(ZRST, "Not Installed")
+    field(ONST, "Inactive")
+    field(TWST, "Next Active")
+    field(THST, "Active Firing")
+    field(FRST, "Open")
+    field(FVST, "Low Level")
+    field(UNSV, "MAJOR")
+    field(ZRSV, "MAJOR")
+    field(ONSV, "NO_ALARM")
+    field(TWSV, "NO_ALARM")
+    field(THSV, "NO_ALARM")
+    field(FRSV, "MAJOR")
+    field(FVSV, "MINOR")
+    field(SXSV, "MAJOR")
+    field(SVSV, "MAJOR")
+    field(EISV, "MAJOR")
+    field(NISV, "MAJOR")
+    field(TESV, "MAJOR")
+    field(ELSV, "MAJOR")
+    field(TVSV, "MAJOR")
+    field(TTSV, "MAJOR")
+    field(FTSV, "MAJOR")
+    field(FFSV, "MAJOR")
+}
+################################################################################
+# Power
+#
+#% archiver 1 Monitor
+#% controldesk Power smon
+#
+record(ai, "$(device):POWER")
+{
+    field(DESC, "Power")
+    field(DTYP, "Soft Channel")
+    field(INP,  "0")
+    field(SCAN, "1 second")
+    field(EGU,  "W")
+    field(LOPR, "0.0")
+    field(HOPR, "250.0")
+    field(PREC, "1")
+}
+record(ao, "$(device):SETPOWER") 
+{
+    field(DESC, "Power")
+    field(VAL,  "190")
+    field(EGU,  "W")
+    field(DRVL, "0")
+    field(DRVH, "250")
+    field(LOPR, "0")
+    field(HOPR, "250")
+    field(PREC, "0")
+}
+record(ao, "$(device):OUTPOWER") 
+{
+    field(DESC, "Power")
+    field(DTYP, "Soft Channel")
+    field(OUT,  "0")
+    field(EGU,  "W")
+    field(DRVL, "0")
+    field(DRVH, "250")
+    field(LOPR, "0")
+    field(HOPR, "250")
+    field(PREC, "0")
+}
+record(bo, "$(device):TSPOFF")
+{
+    field(DESC, "Switch TSP Off")
+    field(DTYP, "Soft Channel")
+    field(OUT,  "0")
+    field(ZNAM, "Off")
+    field(ONAM, "Off")
+}
+record(ao, "$(device):RAMPRATE") 
+{
+    field(DESC, "Power Ramp Rate")
+    field(VAL,  "25")
+    field(EGU,  "W/s")
+    field(DRVL, "10")
+#    field(DRVH, "50")
+    field(LOPR, "10")
+#    field(HOPR, "50")
+    field(PREC, "0")
+}
+record(ai, "$(device):TGTPOWER") 
+{
+    field(DESC, "Target Power")
+    field(VAL,  "0")
+    field(EGU,  "W")
+    field(LOPR, "0")
+    field(HOPR, "250")
+    field(PREC, "0")
+}
+record(calc, "$(device):RMPPOWER") 
+{
+    field(DESC, "Ramp Power")
+#    field(SCAN, "1 second")
+    field(CALC, "(A>(B+C))?(B+C):A")
+#    field(OUT,  "$(device):SEQPOWER PP")
+    field(INPA, "$(device):TGTPOWER")
+    field(INPB, "$(device):POWER")
+    field(INPC, "$(device):RAMPRATE") 
+}
+record(calc, "$(device):TSPON") 
+{
+    field(DESC, "Power On")
+    field(SCAN, "1 second")
+    field(CALC, "(A>1)?1:2")
+    field(INPA, "$(device):RMPPOWER PP")
+}
+record(seq, "$(device):SEQPOWER") 
+{
+    field(DESC, "Ramp Power")
+    field(SELM, "Specified")
+    field(SELL, "$(device):TSPON PP")
+    field(SCAN, "1 second")
+    field(DOL1, "$(device):RMPPOWER")
+    field(LNK1, "$(device):OUTPOWER PP")
+#    field(DOL2, "0") 
+#    field(LNK2, "$(device):TSPOFF PP")
+    field(DOL2, "0") 
+    field(LNK2, "$(device):SEQOFF PP")
+}
+
+#
+# Don't issue the TSPOFF command if already off
+# by checking :STA 
+#
+record(seq, "$(device):SEQOFF") 
+{
+    field(DESC, "Power off TSP sequence")
+    field(SELM, "Specified")
+    field(SELL, "$(device):STA")
+    field(DOL2, "0")
+    field(LNK2, "$(device):TSPOFF PP")
+    field(DOL3, "0") 
+    field(LNK3, "$(device):TSPOFF PP")
+    field(DOL4, "0") 
+    field(LNK4, "$(device):TSPOFF PP")
+}
+################################################################################
+# TSP operating mode
+#
+#% archiver 10 Monitor
+#% controldesk Operating Mode smon
+#
+record(mbbi, "$(device):MODE")
+{
+    field(DESC, "Operating Mode")
+    field(VAL,  "0")
+    field(ZRST, "Off")
+    field(ONST, "Timed")
+    field(TWST, "Continuous")
+    field(THST, "Degas")
+}
+#
+#% controldesk Operating Mode scon
+#
+record(mbbo, "$(device):SETMODE")
+{
+    field(DESC, "Operating Mode")
+    field(FLNK, "$(device):SEQMODE")
+    field(ZRVL, "1")
+    field(ONVL, "2")
+    field(TWVL, "3")
+    field(THVL, "4")
+    field(ZRST, "Off")
+    field(ONST, "Timed")
+    field(TWST, "Continuous")
+    field(THST, "Degas")
+    field(DOL,  "0")
+    field(PINI, "YES")
+}
+record(seq, "$(device):SEQMODE")
+{
+    field(DESC, "Sequence Mode")
+    field(SELM, "Specified")
+    field(SELL, "$(device):SETMODE.RVAL")
+    field(LNK1, "$(device):OFFMODE PP")
+    field(LNK2, "$(device):TIMMODE PP")
+    field(LNK3, "$(device):CNTMODE PP")
+    field(LNK4, "$(device):DGSMODE PP")
+}
+################################################################################
+# TSP operating mode - Off
+#
+record(seq, "$(device):OFFMODE")
+{
+    field(DESC, "Off Mode")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(device):MODE PP")
+    field(DOL2, "0")
+    field(LNK2, "$(device):TIMCOUNT PP")
+    field(DOL3, "0")
+    field(LNK3, "$(device):TIMCOUNT1")
+    field(DOL4, "0")
+    field(LNK4, "$(device):TIMCOUNT2")
+    field(DOL5, "0")
+    field(LNK5, "$(device):CNTCOUNT")
+    field(DOL6, "0")
+    field(LNK6, "$(device):DGSCOUNT1")
+    field(DOL7, "0")
+    field(LNK7, "$(device):DGSCOUNT2")
+    field(DOL8, "0")
+    field(LNK8, "$(device):AUTOOFF.PROC")
+    field(DOL9, "0")
+    field(LNK9, "$(device):TGTPOWER")
+}
+################################################################################
+# TSP operating mode - Timed
+#
+record(seq, "$(device):TIMMODE")
+{
+    field(DESC, "Timed Mode")
+    field(SELM, "All")
+    field(DOL1, "1")
+    field(LNK1, "$(device):OFFMODE.PROC")
+    field(DLY2, "1.0")
+    field(DOL2, "$(device):TIMCYCLES")
+    field(LNK2, "$(device):TIMCOUNT")
+    field(DOL3, "1")
+    field(LNK3, "$(device):TIMCYCLE.PROC")
+    field(DOL4, "1")
+    field(LNK4, "$(device):MODE PP")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Timed Mode On Time setpoint
+#
+record(ao, "$(device):TIMONTIME")
+{
+    field(DESC, "Timed On Time")
+    field(EGU,  "s")
+    field(DRVL, "10")
+    field(DRVH, "120")
+    field(LOPR, "10")
+    field(HOPR, "120")
+    field(PREC, "0")
+    field(DOL,  "60")
+    field(PINI, "YES")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Timed Mode Off Time setpoint
+#
+record(ao, "$(device):TIMOFFTIME") 
+{
+    field(DESC, "Timed Off Time")
+    field(EGU,  "min")
+    field(DRVL, "1")
+    field(DRVH, "600")
+    field(LOPR, "1")
+    field(HOPR, "600")
+    field(PREC, "0")
+    field(DOL,  "60")
+    field(PINI, "YES")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Timed Mode Cycles setpoint
+#
+record(ao, "$(device):TIMCYCLES") 
+{
+    field(DESC, "Timed Cycles")
+    field(DRVL, "1")
+    field(DRVH, "20")
+    field(LOPR, "1")
+    field(HOPR, "20")
+    field(PREC, "0")
+    field(DOL,  "10")
+    field(PINI, "YES")
+}
+record(seq, "$(device):TIMCYCLE")
+{
+    field(DESC, "next cycle")
+    field(SELM, "All")
+    field(DOL1, "$(device):TIMCALC1 PP")
+    field(LNK1, "$(device):TIMCOUNT1")
+    field(DOL2, "$(device):TIMCALC2 PP")
+    field(LNK2, "$(device):TIMCOUNT2")
+    field(DOL3, "$(device):SETPOWER")
+    field(LNK3, "$(device):TGTPOWER")
+}
+record(calcout, "$(device):TIMCALC") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A")
+    field(OOPT, "When Non-zero")
+    field(OUT,  "$(device):TIMCYCLE PP")
+    field(INPA, "$(device):TIMCOUNT PP") 
+}
+record(calcout, "$(device):TIMCOUNT") 
+{
+    field(DESC, "Counter")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):SETMODE PP")
+    field(INPA, "$(device):TIMCOUNT.VAL") 
+}
+record(calc, "$(device):TIMCALC1") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A/B+C")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):RAMPRATE") 
+    field(INPC, "$(device):TIMONTIME") 
+}
+record(calcout, "$(device):TIMCOUNT1") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):TGTPOWER PP")
+    field(INPA, "$(device):TIMCOUNT1.VAL") 
+}
+record(calc, "$(device):TIMCALC2") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A+(B*60)")
+    field(INPA, "$(device):TIMCALC1 PP") 
+    field(INPB, "$(device):TIMOFFTIME") 
+}
+record(calcout, "$(device):TIMCOUNT2") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):TIMCALC.PROC")
+    field(INPA, "$(device):TIMCOUNT2.VAL") 
+}
+################################################################################
+# TSP operating mode - Continuous
+#
+record(seq, "$(device):CNTMODE")
+{
+    field(DESC, "Continuous Mode")
+    field(SELM, "All")
+    field(DOL1, "1")
+    field(LNK1, "$(device):OFFMODE.PROC")
+    field(DLY2, "1.0")
+    field(DOL2, "$(device):CNTCALC PP")
+    field(LNK2, "$(device):CNTCOUNT")
+    field(DOL3, "$(device):SETPOWER")
+    field(LNK3, "$(device):TGTPOWER")
+    field(DOL4, "2")
+    field(LNK4, "$(device):MODE PP")
+}
+record(calc, "$(device):CNTCALC") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A/B+C")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):RAMPRATE") 
+    field(INPC, "120") 
+}
+record(calcout, "$(device):CNTCOUNT") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):SETMODE PP")
+    field(INPA, "$(device):CNTCOUNT.VAL") 
+}
+################################################################################
+# TSP operating mode - Degas
+#
+record(seq, "$(device):DGSMODE")
+{
+    field(DESC, "Sequence Mode")
+    field(SELM, "Specified")
+    field(SELL, "$(device):CALAUTO PP")
+    field(LNK1, "$(device):DGS PP")
+    field(LNK2, "$(device):AUTODGS PP")
+}
+record(calc, "$(device):CALAUTO")
+{
+    field(CALC, "A+1")
+    field(INPA, "$(device):SETAUTOFIL")
+}
+record(seq, "$(device):DGS")
+{
+    field(DESC, "Degas Mode")
+    field(SELM, "All")
+    field(DOL1, "1")
+    field(LNK1, "$(device):OFFMODE.PROC")
+    field(DLY2, "1.0")
+    field(DOL2, "$(device):DGSCALC1 PP")
+    field(LNK2, "$(device):DGSCOUNT1")
+    field(DOL3, "$(device):DGSCALC2 PP")
+    field(LNK3, "$(device):DGSCOUNT2")
+    field(DOL4, "$(device):DGSPOWER1 PP")
+    field(LNK4, "$(device):TGTPOWER")
+    field(DOL5, "3")
+    field(LNK5, "$(device):MODE PP")
+}
+#
+# archiver 10 Monitor
+# controldesk Degas Mode On Time setpoint
+#
+record(ao, "$(device):DGSONTIME")
+{
+    field(DESC, "Degas On Time")
+    field(EGU,  "s")
+    field(DRVL, "10")
+    field(DRVH, "180")
+    field(LOPR, "10")
+    field(HOPR, "180")
+    field(PREC, "0")
+    field(DOL,  "90")
+    field(PINI, "YES")
+}
+record(calc, "$(device):DGSPOWER1") 
+{
+    field(DESC, "Half power")
+    field(CALC, "A/2")
+    field(INPA, "$(device):SETPOWER") 
+}
+record(calcout, "$(device):DGSPOWER2") 
+{
+    field(DESC, "Full power")
+    field(CALC, "(B=3)?A:0")
+    field(OUT,  "$(device):TGTPOWER")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):MODE") 
+}
+record(calc, "$(device):DGSCALC1") 
+{
+    field(DESC, "Counter")
+    field(CALC, "(A/B+C)/2")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):RAMPRATE") 
+    field(INPC, "$(device):DGSONTIME") 
+}
+record(calcout, "$(device):DGSCOUNT1") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):DGSPOWER2 PP")
+    field(INPA, "$(device):DGSCOUNT1.VAL") 
+}
+record(calc, "$(device):DGSCALC2") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A/B+C")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):RAMPRATE") 
+    field(INPC, "$(device):DGSONTIME") 
+}
+record(calcout, "$(device):DGSCOUNT2") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):SETMODE PP")
+    field(INPA, "$(device):DGSCOUNT2.VAL") 
+}
+################################################################################
+# Degas mode with automatic advance of filaments
+#
+record(seq, "$(device):AUTODGS")
+{
+    field(DESC, "Degas Mode")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(device):SETFIL PP")
+    field(DOL2, "1")
+    field(LNK2, "$(device):OFFMODE.PROC")
+    field(DLY3, "1.0")
+    field(DOL3, "$(device):AUTOCALC1 PP")
+    field(LNK3, "$(device):AUTOCOUNT1")
+    field(DOL4, "$(device):AUTOCALC2 PP")
+    field(LNK4, "$(device):AUTOCOUNT2")
+    field(DOL5, "$(device):AUTOCALC3 PP")
+    field(LNK5, "$(device):AUTOCOUNT3")
+    field(DOL6, "$(device):AUTOCALC4 PP")
+    field(LNK6, "$(device):AUTOCOUNT4")
+    field(DOL7, "$(device):AUTOCALC5 PP")
+    field(LNK7, "$(device):AUTOCOUNT5")
+    field(DOL8, "$(device):AUTOCALC6 PP")
+    field(LNK8, "$(device):AUTOCOUNT6")
+    field(DOL9, "3")
+    field(LNK9, "$(device):MODE PP")
+    field(DOLA, "0")
+    field(LNKA, "$(device):AUTOPOWER1.PROC")
+}
+record(seq, "$(device):AUTOOFF")
+{
+    field(DESC, "Off")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(device):AUTOCOUNT1")
+    field(DOL2, "0")
+    field(LNK2, "$(device):AUTOCOUNT2")
+    field(DOL3, "0")
+    field(LNK3, "$(device):AUTOCOUNT3")
+    field(DOL4, "0")
+    field(LNK4, "$(device):AUTOCOUNT4")
+    field(DOL5, "0")
+    field(LNK5, "$(device):AUTOCOUNT5")
+    field(DOL6, "0")
+    field(LNK7, "$(device):AUTOCOUNT6")
+}
+record(ai, "$(device):AUTODLY") 
+{
+    field(DESC, "delay")
+    field(VAL,  "15")
+    field(EGU,  "s")
+}
+record(seq, "$(device):AUTOSEQ2")
+{
+    field(DESC, "Degas Sequence")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(device):TGTPOWER PP")
+    field(DLY2, "15")
+    field(DOL2, "1")
+    field(LNK2, "$(device):SETFIL PP")
+    field(DOL3, "0")
+    field(LNK3, "$(device):AUTOPOWER1.PROC")
+}
+record(seq, "$(device):AUTOSEQ4")
+{
+    field(DESC, "Degas Sequence")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(device):TGTPOWER PP")
+    field(DLY2, "15")
+    field(DOL2, "2")
+    field(LNK2, "$(device):SETFIL PP")
+    field(DOL3, "0")
+    field(LNK3, "$(device):AUTOPOWER1.PROC")
+}
+record(seq, "$(device):AUTOSEQ6")
+{
+    field(DESC, "Degas Sequence")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(device):TGTPOWER PP")
+    field(DOL2, "0")
+    field(LNK2, "$(device):SETMODE PP")
+    field(DLY3, "3")
+    field(DOL3, "0")
+    field(LNK3, "$(device):SETFIL PP")
+}
+record(calcout, "$(device):AUTOPOWER1") 
+{
+    field(DESC, "Half power")
+    field(CALC, "(B=3)?(A/2):0")
+    field(OUT,  "$(device):TGTPOWER")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):MODE") 
+}
+record(calcout, "$(device):AUTOPOWER2") 
+{
+    field(DESC, "Full power")
+    field(CALC, "(B=3)?A:0")
+    field(OUT,  "$(device):TGTPOWER")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):MODE") 
+}
+record(calc, "$(device):AUTOCALC1") 
+{
+    field(DESC, "Counter")
+    field(CALC, "(A/B+C)/2")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):RAMPRATE") 
+    field(INPC, "$(device):DGSONTIME") 
+}
+record(calc, "$(device):AUTOCALC2") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A/B+C")
+    field(INPA, "$(device):SETPOWER") 
+    field(INPB, "$(device):RAMPRATE") 
+    field(INPC, "$(device):DGSONTIME") 
+}
+record(calc, "$(device):AUTOCALC3") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A+B+C")
+    field(INPA, "$(device):AUTOCALC1 PP") 
+    field(INPB, "$(device):AUTOCALC2 PP") 
+    field(INPC, "$(device):AUTODLY") 
+}
+record(calc, "$(device):AUTOCALC4") 
+{
+    field(DESC, "Counter")
+    field(CALC, "(A*2)+B")
+    field(INPA, "$(device):AUTOCALC2 PP") 
+    field(INPB, "$(device):AUTODLY") 
+}
+record(calc, "$(device):AUTOCALC5") 
+{
+    field(DESC, "Counter")
+    field(CALC, "A+B+C")
+    field(INPA, "$(device):AUTOCALC1 PP") 
+    field(INPB, "$(device):AUTOCALC4 PP") 
+    field(INPC, "$(device):AUTODLY") 
+}
+record(calc, "$(device):AUTOCALC6") 
+{
+    field(DESC, "Counter")
+    field(CALC, "(A*3)+(B*2)")
+    field(INPA, "$(device):AUTOCALC2 PP") 
+    field(INPB, "$(device):AUTODLY") 
+}
+record(calcout, "$(device):AUTOCOUNT1") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):AUTOPOWER2.PROC")
+    field(INPA, "$(device):AUTOCOUNT1.VAL") 
+}
+record(calcout, "$(device):AUTOCOUNT2") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):AUTOSEQ2.PROC")
+    field(INPA, "$(device):AUTOCOUNT2.VAL") 
+}
+record(calcout, "$(device):AUTOCOUNT3") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):AUTOPOWER2.PROC")
+    field(INPA, "$(device):AUTOCOUNT3.VAL") 
+}
+record(calcout, "$(device):AUTOCOUNT4") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):AUTOSEQ4.PROC")
+    field(INPA, "$(device):AUTOCOUNT4.VAL") 
+}
+record(calcout, "$(device):AUTOCOUNT5") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):AUTOPOWER2.PROC")
+    field(INPA, "$(device):AUTOCOUNT5.VAL") 
+}
+record(calcout, "$(device):AUTOCOUNT6") 
+{
+    field(DESC, "Counter")
+    field(SCAN, "1 second")
+    field(CALC, "(A>0)?(A-1):0")
+    field(OOPT, "Transition To Zero")
+    field(OUT,  "$(device):AUTOSEQ6.PROC")
+    field(INPA, "$(device):AUTOCOUNT6.VAL") 
+}
+################################################################################
+# Filament active (for timed mode)
+#
+#% archiver 10 Monitor
+#% controldesk Active Filament smon
+#
+record(mbbi, "$(device):FIL")
+{
+    field(DESC, "Filament Active")
+    field(DTYP, "Soft Channel")
+    field(INP,  "0")
+    field(SCAN, "1 second")
+    field(ZRST, "Filament 1")
+    field(ONST, "Filament 2")
+    field(TWST, "Filament 3")
+#    field(THST, "Filament 4")
+    field(FRST, "Error - IND")
+}
+#
+#% controldesk Active Filament scon
+#
+record(mbbo, "$(device):SETFIL")
+{
+    field(DESC, "Filament Active")
+    field(DTYP, "Soft Channel")
+    field(OUT,  "0")
+    field(ZRST, "Filament 1")
+    field(ONST, "Filament 2")
+    field(TWST, "Filament 3")
+#    field(THST, "Filament 4")
+}
+################################################################################
+# TSP status
+#
+#% archiver 10 Monitor
+#% controldesk Cycles Left readback
+#
+record(longin, "$(device):LEFT")
+{
+    field(DESC, "Cycles Left")
+    field(DTYP, "Soft Channel")
+    field(INP,  "0")
+    field(SCAN, "10 second")
+    field(LOPR, "0")
+    field(HOPR, "999")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Filament 1 Minutes Used readback
+#
+record(longin, "$(device):FIL1:USED")
+{
+    field(DESC, "Minutes used")
+    field(EGU,  "min")
+    field(LOPR, "0")
+    field(HOPR, "9999")
+    field(HIHI, "9999")
+    field(HHSV, "MAJOR")
+}
+record(calcout, "$(device):FIL1:OPEN") 
+{
+    field(DESC, "Open")
+    field(CALC, "((A=9999)&&(B=0))?0:1")
+    field(OOPT, "When Zero")
+    field(OUT,  "$(device):SETMODE PP")
+    field(INPA, "$(device):FIL1:USED PP") 
+    field(INPB, "$(device):FIL") 
+    field(SCAN, "1 second")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Filament 2 Minutes Used readback
+#
+record(longin, "$(device):FIL2:USED")
+{
+    field(DESC, "Minutes used")
+    field(EGU,  "min")
+    field(LOPR, "0")
+    field(HOPR, "9999")
+    field(HIHI, "9999")
+    field(HHSV, "MAJOR")
+}
+record(calcout, "$(device):FIL2:OPEN") 
+{
+    field(DESC, "Open")
+    field(CALC, "((A=9999)&&(B=1))?0:1")
+    field(OOPT, "When Zero")
+    field(OUT,  "$(device):SETMODE PP")
+    field(INPA, "$(device):FIL2:USED PP") 
+    field(INPB, "$(device):FIL") 
+    field(SCAN, "1 second")
+}
+#
+#% archiver 10 Monitor
+#% controldesk Filament 3 Minutes Used readback
+#
+record(longin, "$(device):FIL3:USED")
+{
+    field(DESC, "Minutes used")
+    field(EGU,  "min")
+    field(LOPR, "0")
+    field(HOPR, "9999")
+    field(HIHI, "9999")
+    field(HHSV, "MAJOR")
+}
+record(calcout, "$(device):FIL3:OPEN") 
+{
+    field(DESC, "Open")
+    field(CALC, "((A=9999)&&(B=2))?0:1")
+    field(OOPT, "When Zero")
+    field(OUT,  "$(device):SETMODE PP")
+    field(INPA, "$(device):FIL3:USED PP") 
+    field(INPB, "$(device):FIL") 
+    field(SCAN, "1 second")
+}
+record(longin, "$(device):FIL4:USED")
+{
+    field(DESC, "Minutes used")
+    field(EGU,  "min")
+    field(LOPR, "0")
+    field(HOPR, "9999")
+    field(HIHI, "9999")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Clear filaments
+#
+#% archiver 10 Monitor
+#% controldesk Clear Filaments scon
+#
+record(bo, "$(device):CLEAR")
+{
+    field(DESC, "Clear Filaments")
+    field(DTYP, "Soft Channel")
+    field(OUT,  "0")
+    field(ZNAM, "Clear")
+    field(ONAM, "Clear")
+}
+################################################################################
+# Automatically Advance Filaments
+#
+#% archiver 10 Monitor
+#% controldesk Auto Advance Filaments scon
+#
+record(bo, "$(device):SETAUTOFIL")
+{
+    field(DESC, "Auto Advance")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+    field(DOL,  "0")
+    field(PINI, "YES")
+}
+record(bo, "$(device):OUTAUTOFIL")
+{
+    field(DESC, "Auto Advance")
+    field(DTYP, "Soft Channel")
+    field(OUT,  "0")
+    field(ZNAM, "No")
+    field(ONAM, "Yes")
+    field(DOL,  "0")
+    field(PINI, "YES")
+}
+################################################################################
+# Pressure Threshhold
+#
+#% archiver 10 Monitor
+#% controldesk Control Source scon
+#
+record(mbbo, "$(device):CTLSRC")
+{
+    field(DESC, "Control Source")
+    field(DTYP, "Soft Channel")
+    field(OUT,  "0")
+    field(ZRST, "Service")
+    field(ONST, "Ion Pump 1")
+    field(TWST, "Ion Pump 2")
+    field(DOL,  "$(ctlsrc=0)")
+    field(PINI, "YES")
+}
+#% archiver 10 Monitor
+#% controldesk Pressure Threshold setpoint
+#
+record(ao, "$(device):SETPTHR") 
+{
+    field(DESC, "Pressure Threshold")
+    field(DTYP, "Soft Channel")
+    field(OUT,  "0")
+    field(EGU,  "mbar")
+    field(DRVL, "1.0e-9")
+    field(DRVH, "1.0e-5")
+    field(LOPR, "0.0")
+    field(HOPR, "1.0e-5")
+    field(PREC, "1")
+    field(DOL,  "1.0e-8")
+    field(PINI, "YES")
+}
+################################################################################
+
+
+# Get TSP Configuration
+#
+record(mbbi, "$(device):CONFIG")
+{
+    field(DESC, "Configuration mode")
+    field(DTYP, "Soft Channel")
+    field(INP,  "1")
+    field(SCAN, "10 second")
+    field(ZRST, "Fault")
+    field(ONST, "Not Installed")
+    field(TWST, "NEG")
+    field(THST, "Single 3")
+    field(FRST, "Single 4")
+    field(FVST, "Single 6")
+    field(SXST, "Single 8")
+    field(SVST, "Dual 3")
+    field(EIST, "Dual 4")
+}
+
+record(mbbo, "$(device):RELAY")
+{
+    field(DESC, "Dual mode TSP relay select")
+#    field(ZRST, "0")
+    field(ONST, "1")
+    field(TWST, "2")
+    field(DOL,  "1")
+    field(PINI, "YES")
+}
+
+record(fanout, "$(device):FANUPDATE")
+{
+    field(DESC, "Get status update dual mode")
+    field(SCAN, "Passive")
+    field(LNK1, "$(device):STA")
+    field(LNK2, "$(device):CTLSRC")
+    field(LNK3, "$(device):FIL1:STA")
+    field(LNK4, "$(device):FIL2:STA")
+    field(LNK5, "$(device):FIL3:STA")
+}

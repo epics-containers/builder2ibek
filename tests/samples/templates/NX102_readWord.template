@@ -1,0 +1,479 @@
+# Template to read a word along with the mechanism to read descriptions from the PLC
+# Assumes the following structure:
+# $(TAG).Raw[$(TAGIDX)]         -   Raw bits
+# $(TAG).B00_Desc[$(TAGIDX)]    -   String describing bit
+
+template() {
+
+  #! InputMacro(device,"",1660,20,16777215,1,false)
+  #! InputMacro(type,"",1660,40,16777215,1,false)
+  #! InputMacro(PORT,"Comms port PLC controller is on",1660,80,16777215,1,false)
+  #! InputMacro(TAG,"",1660,100,16777215,1,false)
+  #! InputMacro(TAGIDX,"",1660,120,16777215,1,false)
+  #! InputMacro(has_debounce,"",1660,120,16777215,1,false)
+}
+
+# % gui, $(name=), edm, NX102_readWord.edl, device=$(device), type=$(type), desc=$(TAG)
+
+
+record(ai, "$(device):HASDEBOUNCE") {
+  field(VAL, "$(has_debounce)")
+  field(PINI, "YES")
+}
+
+
+# Individual bits
+# The ZNAM and ONAM fields of these records are initialised
+# by PINI processing of :DESC and :FAN records.
+record(bi, "$(device):$(type)0") {
+  field(DESC, "bit 0")
+  field(INP, "$(device):RAW$(type).B0 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)1") {
+  field(DESC, "bit 1")
+  field(INP, "$(device):RAW$(type).B1 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)2") {
+  field(DESC, "bit 2")
+  field(INP, "$(device):RAW$(type).B2 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)3") {
+  field(DESC, "bit 3")
+  field(INP, "$(device):RAW$(type).B3 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)4") {
+  field(DESC, "bit 4")
+  field(INP, "$(device):RAW$(type).B4 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)5") {
+  field(DESC, "bit 5")
+  field(INP, "$(device):RAW$(type).B5 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)6") {
+  field(DESC, "bit 6")
+  field(INP, "$(device):RAW$(type).B6 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)7") {
+  field(DESC, "bit 7")
+  field(INP, "$(device):RAW$(type).B7 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)8") {
+  field(DESC, "bit 8")
+  field(INP, "$(device):RAW$(type).B8 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)9") {
+  field(DESC, "bit 9")
+  field(INP, "$(device):RAW$(type).B9 CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)10") {
+  field(DESC, "bit 10")
+  field(INP, "$(device):RAW$(type).BA CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)11") {
+  field(DESC, "bit 11")
+  field(INP, "$(device):RAW$(type).BB CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)12") {
+  field(DESC, "bit 12")
+  field(INP, "$(device):RAW$(type).BC CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)13") {
+  field(DESC, "bit 13")
+  field(INP, "$(device):RAW$(type).BD CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)14") {
+  field(DESC, "bit 14")
+  field(INP, "$(device):RAW$(type).BE CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+record(bi, "$(device):$(type)15") {
+  field(DESC, "bit 15")
+  field(INP, "$(device):RAW$(type).BF CP MS")
+  field(ZSV, "MAJOR")
+  field(OSV, "NO_ALARM")
+}
+
+
+# % archiver 10 Monitor
+# % controldesk Current bit Status smon
+record(mbbiDirect, "$(device):RAW$(type)") {
+  field(DESC, "Current Bits")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).Raw[$(TAGIDX)] B 0")
+  field(SCAN, ".5 second")
+  field(NOBT, "16")
+}
+
+#
+# This record allows scanning of all the individual interlock stringin
+# :DESC records to be disabled.  It is initialised to Enabled and does
+# NOT control the way the data is read once only at boot time.
+# It was useful during development and testing.
+#
+record(bo, "$(device):STRING_ENABLED") {
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(DTYP, "Soft Channel")
+  field(VAL, "1")
+  field(ZNAM, "Disabled")
+  field(ONAM, "Enabled")
+}
+
+# Records for reading back the bit descriptions from the PLC.
+#
+# ether_ip S Flag
+# The S 0 is the ether_ip Scan rate flag with rate time value zero,
+# meaning the value will not be polled by the ether_ip driver.  This
+# is a DLS modification to the ether_ip driver.  The data will be read
+# once only.
+#
+# ether_ip E Flag
+# The second flag is the ether_ip Element flag E, which tells the
+# driver not to amalgamate requests for the same type of data i.e. to
+# read a single element and not an array.
+#
+# The record will process once at boot time because of the PINI flag
+# and the data will be read once because of the S 0 flag.  However
+# processing the record again will NOT cause the data to be read again
+# because of the peculiarities of the ether_ip driver. The command
+# drvEtherIP_restart must be issued on the IOC console to force it to
+# be read again (or reboot the IOC).
+#
+# See under "Implemented Changes" heading on "ether_ip Support Module"
+# page in Controls Confluence space. https://confluence.diamond.ac.uk/x/DIbSBw
+#
+record(stringin, "$(device):$(type)00:DESC") {
+  field(DESC, "Description of bit 0")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B00_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)00:FAN")
+}
+
+record(stringin, "$(device):$(type)01:DESC") {
+  field(DESC, "Description of bit 1")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B01_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)01:FAN")
+}
+
+record(stringin, "$(device):$(type)02:DESC") {
+  field(DESC, "Description of bit 2")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B02_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)02:FAN")
+}
+
+record(stringin, "$(device):$(type)03:DESC") {
+  field(DESC, "Description of bit 3")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B03_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)03:FAN")
+}
+
+record(stringin, "$(device):$(type)04:DESC") {
+  field(DESC, "Description of bit 4")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B04_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)04:FAN")
+}
+
+record(stringin, "$(device):$(type)05:DESC") {
+  field(DESC, "Description of bit 5")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B05_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)05:FAN")
+}
+
+record(stringin, "$(device):$(type)06:DESC") {
+  field(DESC, "Description of bit 6")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B06_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)06:FAN")
+}
+
+record(stringin, "$(device):$(type)07:DESC") {
+  field(DESC, "Description of bit 7")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B07_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)07:FAN")
+}
+
+record(stringin, "$(device):$(type)08:DESC") {
+  field(DESC, "Description of bit 8")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B08_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)08:FAN")
+}
+
+record(stringin, "$(device):$(type)09:DESC") {
+  field(DESC, "Description of bit 9")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B09_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)09:FAN")
+}
+
+record(stringin, "$(device):$(type)10:DESC") {
+  field(DESC, "Description of bit 10")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B10_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)10:FAN")
+}
+
+record(stringin, "$(device):$(type)11:DESC") {
+  field(DESC, "Description of bit 11")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B11_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)11:FAN")
+}
+
+record(stringin, "$(device):$(type)12:DESC") {
+  field(DESC, "Description of bit 12")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B12_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)12:FAN")
+}
+
+record(stringin, "$(device):$(type)13:DESC") {
+  field(DESC, "Description of bit 13")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B13_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)13:FAN")
+}
+
+record(stringin, "$(device):$(type)14:DESC") {
+  field(DESC, "Description of bit 14")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B14_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)14:FAN")
+}
+
+record(stringin, "$(device):$(type)15:DESC") {
+  field(DESC, "Description of bit 15")
+  field(SCAN, "I/O Intr")
+  field(PINI, "YES")
+  field(DTYP, "EtherIP")
+  field(INP, "@$(port) $(TAG).B15_Desc[$(TAGIDX)] S 0 E")
+  field(SDIS, "$(device):STRING_ENABLED")
+  field(DISV, "0")
+  field(FLNK, "$(device):$(type)15:FAN")
+}
+
+# Records to fanout the value of the interlock label strings read back
+# from the PLC in the :DESC records to the labels on the individual
+# interlock records for both states.
+#
+record(sseq, "$(device):$(type)00:FAN") {
+  field(DOL1, "$(device):$(type)00:DESC")
+  field(LNK1, "$(device):$(type)0.ZNAM")
+  field(DOL2, "$(device):$(type)00:DESC")
+  field(LNK2, "$(device):$(type)0.ONAM")
+}
+
+record(sseq, "$(device):$(type)01:FAN") {
+  field(DOL1, "$(device):$(type)01:DESC")
+  field(LNK1, "$(device):$(type)1.ZNAM")
+  field(DOL2, "$(device):$(type)01:DESC")
+  field(LNK2, "$(device):$(type)1.ONAM")
+}
+
+record(sseq, "$(device):$(type)02:FAN") {
+  field(DOL1, "$(device):$(type)02:DESC")
+  field(LNK1, "$(device):$(type)2.ZNAM")
+  field(DOL2, "$(device):$(type)02:DESC")
+  field(LNK2, "$(device):$(type)2.ONAM")
+}
+
+record(sseq, "$(device):$(type)03:FAN") {
+  field(DOL1, "$(device):$(type)03:DESC")
+  field(LNK1, "$(device):$(type)3.ZNAM")
+  field(DOL2, "$(device):$(type)03:DESC")
+  field(LNK2, "$(device):$(type)3.ONAM")
+}
+
+record(sseq, "$(device):$(type)04:FAN") {
+  field(DOL1, "$(device):$(type)04:DESC")
+  field(LNK1, "$(device):$(type)4.ZNAM")
+  field(DOL2, "$(device):$(type)04:DESC")
+  field(LNK2, "$(device):$(type)4.ONAM")
+}
+
+record(sseq, "$(device):$(type)05:FAN") {
+  field(DOL1, "$(device):$(type)05:DESC")
+  field(LNK1, "$(device):$(type)5.ZNAM")
+  field(DOL2, "$(device):$(type)05:DESC")
+  field(LNK2, "$(device):$(type)5.ONAM")
+}
+
+record(sseq, "$(device):$(type)06:FAN") {
+  field(DOL1, "$(device):$(type)06:DESC")
+  field(LNK1, "$(device):$(type)6.ZNAM")
+  field(DOL2, "$(device):$(type)06:DESC")
+  field(LNK2, "$(device):$(type)6.ONAM")
+}
+
+record(sseq, "$(device):$(type)07:FAN") {
+  field(DOL1, "$(device):$(type)07:DESC")
+  field(LNK1, "$(device):$(type)7.ZNAM")
+  field(DOL2, "$(device):$(type)07:DESC")
+  field(LNK2, "$(device):$(type)7.ONAM")
+}
+
+record(sseq, "$(device):$(type)08:FAN") {
+  field(DOL1, "$(device):$(type)08:DESC")
+  field(LNK1, "$(device):$(type)8.ZNAM")
+  field(DOL2, "$(device):$(type)08:DESC")
+  field(LNK2, "$(device):$(type)8.ONAM")
+}
+
+record(sseq, "$(device):$(type)09:FAN") {
+  field(DOL1, "$(device):$(type)09:DESC")
+  field(LNK1, "$(device):$(type)9.ZNAM")
+  field(DOL2, "$(device):$(type)09:DESC")
+  field(LNK2, "$(device):$(type)9.ONAM")
+}
+
+record(sseq, "$(device):$(type)10:FAN") {
+  field(DOL1, "$(device):$(type)10:DESC")
+  field(LNK1, "$(device):$(type)10.ZNAM")
+  field(DOL2, "$(device):$(type)10:DESC")
+  field(LNK2, "$(device):$(type)10.ONAM")
+}
+
+record(sseq, "$(device):$(type)11:FAN") {
+  field(DOL1, "$(device):$(type)11:DESC")
+  field(LNK1, "$(device):$(type)11.ZNAM")
+  field(DOL2, "$(device):$(type)11:DESC")
+  field(LNK2, "$(device):$(type)11.ONAM")
+}
+
+record(sseq, "$(device):$(type)12:FAN") {
+  field(DOL1, "$(device):$(type)12:DESC")
+  field(LNK1, "$(device):$(type)12.ZNAM")
+  field(DOL2, "$(device):$(type)12:DESC")
+  field(LNK2, "$(device):$(type)12.ONAM")
+}
+
+record(sseq, "$(device):$(type)13:FAN") {
+  field(DOL1, "$(device):$(type)13:DESC")
+  field(LNK1, "$(device):$(type)13.ZNAM")
+  field(DOL2, "$(device):$(type)13:DESC")
+  field(LNK2, "$(device):$(type)13.ONAM")
+}
+
+record(sseq, "$(device):$(type)14:FAN") {
+  field(DOL1, "$(device):$(type)14:DESC")
+  field(LNK1, "$(device):$(type)14.ZNAM")
+  field(DOL2, "$(device):$(type)14:DESC")
+  field(LNK2, "$(device):$(type)14.ONAM")
+}
+
+record(sseq, "$(device):$(type)15:FAN") {
+  field(DOL1, "$(device):$(type)15:DESC")
+  field(LNK1, "$(device):$(type)15.ZNAM")
+  field(DOL2, "$(device):$(type)15:DESC")
+  field(LNK2, "$(device):$(type)15.ONAM")
+}

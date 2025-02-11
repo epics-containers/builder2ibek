@@ -1,0 +1,9 @@
+#!/bin/bash
+
+THISDIR=$(dirname $0)
+
+# set up the generic IOC-like environment for ibek
+mkdir -p /epics/ibek-defs/
+ln -srf $THISDIR/ibek-support*/*/*.ibek.support.yaml /epics/ibek-defs/
+
+ibek ioc generate-schema > /epics/ibek-defs/ioc.schema.json

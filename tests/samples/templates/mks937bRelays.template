@@ -1,0 +1,356 @@
+# mks937bRelays.db
+#% macro, __doc__, Template database for an mks937b Multi-Sensor System Relays configuration. 
+# When a relay is 'on' then the associated MPS interlock is 'good'.
+# A note on the optional macros: they default to an appropriate hard-coded 
+# value if no value is passed for expansion. 
+# They are provided to allow the default set points to be changed. 
+# Once the set point needs to be changed it may be necessary to alter  
+# various other fields defining the range of allowed values. 
+# For the majority of applications the defaults should be used.  The levels 
+# should only be changed at the request of the vacuum group for non-standard 
+# vacuum systems.
+#
+# required substitutions:
+#% macro, device,  device name
+#% macro, port,    serial port (steam device code ie /ty/0/1 => ty_0_1)
+#% macro, address, Controller address (001 .. 253)
+#
+# optional substitutions:
+#% macro, relay_number, The relay number (1..12).
+#% macro, relay_desc,   The DESC field on the relay setpoint record 
+#% macro, relay_off_desc,   The DESC field on the relay setpoint record 
+#                       (appears as a label on the Img EDM screen).
+#% macro, relay_level,  The desired relay setpoint value.
+# vv================vv  New feature request May 2012.
+#% macro, relay_off_level,  The desired relay off setpoint value.
+#% macro, relay_drvh,   The DRVH field on relay setpoint records 
+#                       (limits max value of relay setpoint)
+#% macro, relay_drvl,   The DRVL field on relay setpoint records. 
+#                       (limits min value of relay setpoint)
+#% macro, relay_hopr,   The HOPR field on relay setpoint records 
+#                       (high operator value - helps display set correct range).
+#% macro, relay_lopr,   The LOPR field on relay setpoint records 
+#                       (low operator value - helps display set correct range).
+#% macro, relay_hihi,   The HIHI alarm field on the relay setpoint record.
+#% macro, relay_lolo,   The LOLO alarm field on the relay setpoint record.
+#% macro, relay_high,   The HIGH alarm field on the relay setpoint record.
+#% macro, relay_low ,   The LOW alarm field on the relay setpoint record.
+#% macro, ilk_write_access_pv ,   Link to the interlocks setpoint global write access record.
+#
+################################################################################
+
+
+################################################################################
+# Relay - Valve Interlock
+#
+#% archiver 10 Monitor
+#
+
+# Force processing of slow PP records 
+record(fanout, "$(device):FAN10S")
+{
+    field(DESC, "Relay 10s Scan fanout")
+    field(SCAN, "10 second")
+    field(LNK1, "$(device):MODE")
+    field(LNK2, "$(device):DIR")
+    field(LNK3, "$(device):SP")
+    field(LNK4, "$(device):SPOFF")
+    field(LNK5, "$(device):HYST PP")
+    field(SELM, "All")
+}
+
+
+record(mbbo, "$(device):SETMODE") 
+{
+  field(DESC, "Relay Mode")
+  field(DTYP, "stream")
+  field(OUT, "@mks937b.protocol setrelay_mode($(address),$(relay_number)) $(port)")
+  field(ZRST, "On")
+  field(ONST, "Off")
+  field(TWST, "Active")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(ZRSV, "MAJOR")
+  field(ONSV, "NO_ALARM")
+  field(TWSV, "NO_ALARM")
+#  field(DOL, "1")
+#  field(PINI, "YES")
+  field(FLNK, "$(device):MODE PP")
+}
+
+record(mbbi, "$(device):MODE") 
+{
+  field(DTYP, "stream")
+  field(INP, "@mks937b.protocol getrelay_mode($(address),$(relay_number)) $(port)")
+  field(DESC, "Relay mode")
+  field(SCAN, "Passive")
+  field(ZRST, "On")
+  field(ONST, "Off")
+  field(TWST, "Active")
+  field(UNSV, "MAJOR")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "NO_ALARM")
+  field(TWSV, "NO_ALARM")
+}
+
+record(mbbo, "$(device):SETDIR") 
+{
+  field(DESC, "Relay Direction")
+  field(DTYP, "stream")
+  field(OUT, "@mks937b.protocol setrelay_direction($(address),$(relay_number)) $(port)")
+  field(ZRST, "Above")
+  field(ONST, "Below")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(ZRSV, "MAJOR")
+  field(ONSV, "NO_ALARM")
+  field(TWSV, "NO_ALARM")
+#  field(DOL, "1")
+#  field(PINI, "YES")
+  field(FLNK, "$(device):DIR PP")
+}
+
+record(mbbi, "$(device):DIR") 
+{
+  field(DTYP, "stream")
+  field(INP, "@mks937b.protocol getrelay_direction($(address),$(relay_number)) $(port)")
+  field(DESC, "Relay direction")
+  field(SCAN, "Passive")
+  field(ZRST, "Above")
+  field(ONST, "Below")
+  field(UNSV, "MAJOR")
+  field(ZRSV, "NO_ALARM")
+  field(ONSV, "NO_ALARM")
+  field(TWSV, "NO_ALARM")
+}
+
+#
+#% archiver 10 Monitor
+#% controldesk Valve Interlock readback
+#
+record(ai, "$(device):SP") 
+{
+  field(DESC, "$(relay_desc=Valve Interlock)")
+  field(DTYP, "stream")
+  field(INP, "@mks937b.protocol getsp($(address),$(relay_number)) $(port)")
+  field(SCAN, "Passive")
+  field(EGU, "mbar")
+  field(PREC, "1")
+  field(HOPR, "$(relay_hopr=1.2e-2)")
+  field(LOPR, "$(relay_lopr=2.7e-10)")
+  field(HIHI, "$(relay_hihi=1.3e-2)")
+  field(LOLO, "$(relay_lolo=2.6e-10)")
+  field(HIGH, "$(relay_high=1.1e-6)")
+  field(LOW, "$(relay_low=9.0e-7)")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+}
+
+# -----------------------------------------------------------------------------------------
+# These two records work together to provide one scan
+# to correctly initialise the SETSP record just once
+# at startup.
+#
+record(bo, "$(device):INITSETSPSDIS") 
+{
+  field(DTYP, "Soft Channel")
+  field(VAL, "1")
+  field(OUT, "$(device):INITSETSPFAN.DISA")
+}
+record(fanout, "$(device):INITSETSPFAN")
+{
+    field(DESC, "Relay 1s Scan fanout")
+    field(SCAN, "1 second")
+    field(LNK1, "$(device):ILKSETSP:NOWRITE")
+    field(LNK2, "$(device):SETSP")
+    field(LNK3, "$(device):INITSETSPSDIS")
+    field(SELM, "All")
+}
+
+record(ao, "$(device):SETSP") 
+{
+  field(DESC, "Output Relay Setpoint")
+  field(DTYP, "stream")
+  field(OUT, "@mks937b.protocol setsp($(address),$(relay_number)) $(port)")
+  field(PREC, "1")
+  #field(PINI, "YES")
+  field(HOPR, "$(relay_hopr=1.2e-2)")
+  field(LOPR, "$(relay_lopr=2.7e-10)")
+  field(DRVH, "$(relay_drvh=1.2e-2)")
+  field(DRVL, "$(relay_drvl=2.7e-10)")
+  field(DOL,  "$(relay_level=1.0e-6)")
+  field(SDIS, "$(device):ILKSETSP:NOWRITE")
+  field(FLNK, "$(device):SETSPFAN")
+}
+# -----------------------------------------------------------------------------------------
+
+# On setting a new interlock relay setpoint, we need to update the 
+# default hysteresis value and readback of the new setpoint from the 
+# gauge controller.
+#
+record(fanout, "$(device):SETSPFAN")
+{
+    field(DESC, "Relay Set SP fanout")
+    field(SELM, "All")
+    field(LNK1, "$(device):HYST PP")
+    field(LNK2, "$(device):SETSPOFF PP")
+    field(LNK3, "$(device):SP PP")
+    field(LNK4, "$(device):SPOFF PP")
+    field(LNK5, "$(device):SELSPOFF PP")
+}
+
+
+record(ai, "$(device):SPOFF") 
+{
+  field(DESC, "$(relay_off_desc=Relay OFF setpoint)")
+  field(DTYP, "stream")
+  field(INP, "@mks937b.protocol getrelay_hyst($(address),$(relay_number)) $(port)")
+  field(SCAN, "Passive")
+  field(EGU, "mbar")
+  field(PREC, "1")
+  field(HIHI, "$(relay_hihi=1.3e-2)")
+  field(LOLO, "$(relay_lolo=2.6e-10)")
+  field(HIGH, "$(relay_high=1.1e-6)")
+  field(LOW, "$(relay_low=9.0e-7)")
+  field(HHSV, "MAJOR")
+  field(LLSV, "MAJOR")
+  field(HSV, "MINOR")
+  field(LSV, "MINOR")
+}
+
+#
+# Set the required relay OFF setpoint (provides hysteresis)
+# The assumed value will be the higher of either the default gauge hysteresis
+# or the value given in the relay_off_level macro.
+#
+record(ao, "$(device):SPOFFWRITE") 
+{
+  field(DESC, "Relay Hysteresis Write")
+  field(DTYP, "stream")
+  field(OUT, "@mks937b.protocol setrelay_hyst($(address),$(relay_number)) $(port)")
+  field(EGU, "mbar")
+  field(SDIS, "$(device):ILKSETSP:NOWRITE")
+  field(PREC, "2")
+  field(FLNK, "$(device):SPOFF")
+  field(OMSL, "closed_loop")
+  field(DOL,  "$(device):SELSPOFF")
+}
+
+
+record(ai, "$(device):SETSPOFF") 
+{
+  field(DESC, "$(relay_off_desc=Relay OFF setpoint)")
+  field(DTYP, "Soft Channel")
+  field(INP, "$(relay_off_level=0.0)")
+#  field(PINI, "YES")
+  field(SCAN, "Passive")
+  field(EGU, "mbar")
+  field(PREC, "2")
+  field(FLNK, "$(device):SELSPOFF")
+}
+
+# The primary objective is to avoid tripping the MPS interlocks
+# unecessarily. So ensure that the higher value is adopted of either the existing SPOFF value in the gauge controller
+# or the given relay_off_level macro.
+# The lowest permissible value is 1.1 x SPON.
+record(sel, "$(device):SELSPOFF")
+{
+    field(DESC, "Relay off setpoint select")
+    field(SELM, "High Signal")
+    field(INPA, "$(device):SPOFFNOMINAL PP MS")
+    field(INPB, "$(device):SETSPOFF PP)")
+    field(EGU,  "mbar")
+    field(PREC, "1")
+    field(HOPR, "1000")
+    field(LOPR, "1e-12")
+    field(FLNK, "$(device):SPOFFWRITE")
+}
+
+# :SPOFFNOMINAL calculates the nominal OFF setpoint
+# which is simply 10% above :SP
+#
+record(calc, "$(device):SPOFFNOMINAL") 
+  {
+  field(DESC, "$(relay_off_desc=Relay OFF setpoint) nominal")
+  field(INPA, "$(device):SETSP")
+  field(CALC, "(A*1.1)")
+  }
+
+record(bo, "$(device):DIS") 
+{
+  field(DESC, "Disable Relay Setpoint")
+  field(DTYP, "stream")
+  field(OUT, "@mks937b.protocol dissp($(address),$(relay_number)) $(port)")
+}
+
+record(ao, "$(device):SETHYST") 
+{
+  field(DESC, "Relay Hysteresis")
+  field(DTYP, "stream")
+  field(OUT, "@mks937b.protocol setrelay_hyst($(address),$(relay_number)) $(port)")
+  field(EGU, "mbar")
+  field(SDIS, "$(device):ILKSETSP:NOWRITE")
+  field(PREC, "2")
+  field(FLNK, "$(device):HYST")
+  #field(DOL, "$(relay_level=1.0e-6)")
+}
+
+record(ai, "$(device):HYST") 
+{
+  field(DESC, "Relay Hysteresis")
+  field(DTYP, "stream")
+  field(INP, "@mks937b.protocol getrelay_hyst($(address),$(relay_number)) $(port)")
+  field(SCAN, "Passive")
+  field(EGU, "mbar")
+  field(PREC, "1")
+#  field(PINI, "YES")
+#  field(FLNK, "$(device):HYSTSEQ")
+}
+
+# When the controller hysteresis changes internally
+# set the value in the SETSPOFF text entry box accordingly
+record(seq, "$(device):HYSTSEQ") 
+{
+  field(DESC, "Hysteresis Sequence")
+  field(SELM, "All")
+  field(DOL1, "$(device):SPOFF")
+  field(LNK1, "$(device):SETSPOFF.VAL PP")
+}
+
+
+#--------------------------------------------------------------------------------
+#
+# The :CONSTZERO record allows the :ILKSETSP:NOWRITE record (below)
+# to have a PV link rather than constant zero value, which would be 
+# invalid with the "MS CP" modifiers
+#
+record(bi, "$(device):CONSTZERO")
+  {
+  field(DESC, "Constant zero value")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(INP, "0")
+  field(ZNAM, "Zero")
+  field(ONAM, "One")
+  }
+
+# Disable the writing of setpoints to hardware so the machine does not trip
+# when the IOC is rebooted with lower default interlock pressures
+# This record is local to the relay instance, but controlled by the global
+# access record - given in the macro parameters. If not supplied, it will
+# assume a zero INP link (from :CONSTZERO above) and do nothing.
+#
+record(bi, "$(device):ILKSETSP:NOWRITE")
+  {
+  field(DESC, "ILK setpoint access")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(INP, "$(ilk_write_access_pv=$(device):CONSTZERO) MS CP")
+  field(ZNAM, "Allow")
+  field(ONAM, "Inhibit")
+  }
+#--------------------------------------------------------------------------------
+  
