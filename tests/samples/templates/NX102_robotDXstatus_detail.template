@@ -1,4 +1,0 @@
-# BOY screen addition for reading and writing robot variables
-# % gui, $(name=), boydetail, dlsPLCApp_opi/NX102_robotDXstatus_detail.opi, P=$(P),Q=$(Q),desc=$(desc=)
-# These define what PVs a controller real value detail screen should contain
-# % gui, $(name=), statusbits, $(desc=),   $(P)$(Q), $(desc0=), $(desc1=), $(desc2=), $(desc3=), $(desc4=), $(desc5=), $(desc6=), $(desc7=)

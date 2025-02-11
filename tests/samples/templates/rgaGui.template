@@ -1,9 +1,0 @@
-# % macro, __doc__, template to associate the edm screen without extra records
-#
-# Macros:
-# % macro, name, gui element name
-# % macro, device, rga device prefix
-
-
-# This associates an edm screen with the template
-# % gui, $(name=), edm, rga.edl, device=$(device)

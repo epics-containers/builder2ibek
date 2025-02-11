@@ -1,8 +1,0 @@
-record(ai, "$(device)") {
-  field(DESC, "Get value $(desc=)")
-  field(DTYP, "EtherIP")
-  field(SCAN, "$(scan=1 second)")
-  field(EGU, "$(egu=)")
-  field(PREC, "$(prec=2)")
-  field(INP, "@$(port) $(tag)")
-}
