@@ -9,7 +9,7 @@ default_acf = re.compile(
 
 xml_component = "pvlogging"
 
-blacklist = []
+blacklist: list[str] = []
 filename = ""
 
 
