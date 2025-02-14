@@ -13,6 +13,9 @@ entities:
   - type: devIocStats.iocAdminSoft
     IOC: '{{ ioc_name | upper }}'
 
+  - type: pvlogging.PvLogging
+    access_file: /epics/support/pvlogging/src/access.acf
+
   - type: IOCinfo.IOCinfo
     device: BL04I-VA-IOC-01
 

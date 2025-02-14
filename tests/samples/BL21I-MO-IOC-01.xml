@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="IOCSH_PS1" name="prompt" value="BL21I-MO-IOC-01 &gt;"/>
+	<devIocStats.devIocStatsHelper ioc="BL21I-MO-IOC-01" name="BL21I-MO-IOC-01.DEVIOCSTATS"/>
+	<pvlogging.PvLogging access_file="/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf" name="MO1.PVLOGGING"/>
+	<pvlogging.BlacklistPv name="black1"/>
+    <pvlogging.BlacklistPv name="black2"/>
+    <pvlogging.BlacklistPv name="blackagain"/>
+</components>
