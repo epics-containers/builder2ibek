@@ -7,8 +7,19 @@ xml_component = "ffmpegServer"
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
-    XML to YAML specialist convertor function for the pvlogging support module
+    XML to YAML specialist convertor function for the ffmpegServer support module
     """
 
-    # TODO not supporting this yet - just remove it
-    entity.delete_me()
+    if entity_type == "ffmpegFile":
+        # remove unecessary parameters
+        entity.remove("ADDR")
+        entity.remove("BUFFERS")
+        entity.remove("ENABLED")
+        entity.remove("MEMORY")
+        entity.remove("TIMEOUT")
+
+    if entity_type == "ffmpegStream":
+        # remove unecessary parameters
+        entity.remove("ADDR")
+        entity.remove("ENABLED")
+        entity.remove("TIMEOUT")
