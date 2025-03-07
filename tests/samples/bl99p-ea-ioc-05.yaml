@@ -35,3 +35,15 @@ entities:
     QUEUE: 1000
     R: ':POS:'
     TIMEOUT: 1
+
+  - type: ffmpegServer.ffmpegStream
+    BLOCK: 0
+    HTTP_PORT: 8081
+    MEMORY: -1
+    NDARRAY_ADDR: 0
+    NDARRAY_PORT: DET3.cam
+    P: BL99P-EA-DET-03
+    PORT: DET3.MJPG
+    QUALITY: 100
+    QUEUE: 2
+    R: ':MJPG:'
