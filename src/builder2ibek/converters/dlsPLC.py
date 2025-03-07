@@ -21,5 +21,20 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         "externalValve",
         "dummyValve",
         "overrideRequestMain",
+        "vacValveGroup",
     ]:
         entity.remove("name")
+    elif entity_type == "vacValve":
+        # name is not always present but is required by the auto-converted
+        # dlsPLC.ibek.support.yaml - investigate why it is creating name=id
+        # and fix the auto-conversion instead of having this workaround
+        entity.name = entity.get("name") or entity.get("device")
+
+    # remove blank interlock name fields
+    new_entity = entity.copy()
+    for key in entity.keys():
+        if "ilk" in key and entity[key] == "":
+            new_entity.pop(key)
+
+    entity.clear()
+    entity.update(new_entity)
