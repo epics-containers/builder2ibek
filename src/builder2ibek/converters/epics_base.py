@@ -52,5 +52,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             print(f"Warning: {entity} has at_end==true MOVE IT TO THE END of ioc.yaml")
         entity.remove("at_end")
 
+        if entity.command.startswith("taskDelete") or entity.command.startswith(
+            "routeAdd"
+        ):
+            entity.delete_me()
+
     elif entity_type == "dbpf":
         entity.value = str({entity.value})
