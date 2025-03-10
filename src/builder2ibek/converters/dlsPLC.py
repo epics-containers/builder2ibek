@@ -24,7 +24,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         "vacValveGroup",
     ]:
         entity.remove("name")
-    elif entity_type == "vacValve":
+    elif entity_type in ["vacValve", "vacValveDebounce"]:
         # name is not always present but is required by the auto-converted
         # dlsPLC.ibek.support.yaml - investigate why it is creating name=id
         # and fix the auto-conversion instead of having this workaround

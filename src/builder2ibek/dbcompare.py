@@ -27,6 +27,8 @@ def normalize_float_records(s: set[str]) -> set[str]:
     for item in s:
         item = item.replace(" MS", "")
         item = item.replace(" PP", "")
+        # in dlsPLC bi name "" is replaced with default "unused"
+        item = item.replace("NAM unused", "NAM ")
         try:
             parts = item.split(maxsplit=1)
             if len(parts) == 1:
