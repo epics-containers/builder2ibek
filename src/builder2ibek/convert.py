@@ -60,7 +60,7 @@ def dispatch(builder: Builder, filename) -> Generic_IOC:
             {
                 "type": "epics.EpicsEnvSet",
                 "name": "STREAM_PROTOCOL_PATH",
-                "value": "/iocs/{{  _global.get_env('IOC_NAME') }}/runtime/protocol/",
+                "value": "/epics/runtime/protocol/",
             },
             {"type": "devIocStats.iocAdminSoft", "IOC": "{{ ioc_name | upper }}"},
         ],
