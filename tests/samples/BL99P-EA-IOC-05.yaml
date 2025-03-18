@@ -10,6 +10,10 @@ entities:
     name: EPICS_TS_MIN_WEST
     value: '0'
 
+  - type: epics.EpicsEnvSet
+    name: STREAM_PROTOCOL_PATH
+    value: /epics/runtime/protocol/
+
   - type: devIocStats.iocAdminSoft
     IOC: '{{ ioc_name | upper }}'
 
