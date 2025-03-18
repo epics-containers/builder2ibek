@@ -10,6 +10,10 @@ entities:
     name: EPICS_TS_MIN_WEST
     value: '0'
 
+  - type: epics.EpicsEnvSet
+    name: STREAM_PROTOCOL_PATH
+    value: /epics/runtime/protocol/
+
   - type: devIocStats.iocAdminSoft
     IOC: '{{ ioc_name | upper }}'
 
@@ -91,71 +95,71 @@ entities:
 
   - type: asyn.AsynSerial
     name: ty_40_0
-    port: /ty/40/0
+    port: /dev/tty400
 
   - type: asyn.AsynSerial
     name: ty_40_1
-    port: /ty/40/1
+    port: /dev/tty401
 
   - type: asyn.AsynSerial
     name: ty_40_2
-    port: /ty/40/2
+    port: /dev/tty402
 
   - type: asyn.AsynSerial
     name: ty_40_3
-    port: /ty/40/3
+    port: /dev/tty403
 
   - type: asyn.AsynSerial
     name: ty_40_4
-    port: /ty/40/4
+    port: /dev/tty404
 
   - type: asyn.AsynSerial
     name: ty_40_5
-    port: /ty/40/5
+    port: /dev/tty405
 
   - type: asyn.AsynSerial
     name: ty_40_6
-    port: /ty/40/6
+    port: /dev/tty406
 
   - type: asyn.AsynSerial
     name: ty_40_7
-    port: /ty/40/7
+    port: /dev/tty407
 
   - type: asyn.AsynSerial
     name: ty_41_0
-    port: /ty/41/0
+    port: /dev/tty410
 
   - type: asyn.AsynSerial
     name: ty_41_1
-    port: /ty/41/1
+    port: /dev/tty411
 
   - type: asyn.AsynSerial
     name: ty_41_2
-    port: /ty/41/2
+    port: /dev/tty412
 
   - type: asyn.AsynSerial
     name: ty_41_3
-    port: /ty/41/3
+    port: /dev/tty413
 
   - type: asyn.AsynSerial
     name: ty_41_4
-    port: /ty/41/4
+    port: /dev/tty414
 
   - type: asyn.AsynSerial
     name: ty_41_5
-    port: /ty/41/5
+    port: /dev/tty415
 
   - type: asyn.AsynSerial
     name: ty_41_6
-    port: /ty/41/6
+    port: /dev/tty416
 
   - type: asyn.AsynSerial
     name: ty_41_7
-    port: /ty/41/7
+    port: /dev/tty417
 
   - type: asyn.AsynSerial
     name: ty_42_0
-    port: /ty/42/0
+    port: /dev/tty420
 
   - type: DLS8515.DLS8515channel
     baud: 57600
@@ -261,9 +265,6 @@ entities:
     channel: 0
     fullduplex: true
 
-  - type: epics.InterruptVectorVME
-    name: Vec7
-
   - type: mrfTiming.EventReceiverPMC
     cardid: 1
     name: EventReceiverPMC
@@ -277,12 +278,10 @@ entities:
 
   - type: cmsIon.RS4hour
     device: BL16I-VA-EVR-01
-    name: BL16I-VA-EVR-01
 
   - type: cmsIon.cmsIon_CheckReset
     device: BL16I-RS-RDMON-01
     evr: BL16I-VA-EVR-01
-    name: RDMON.EVR
 
   - type: mks937a.mks937a
     device: BL16I-VA-GCTLR-02

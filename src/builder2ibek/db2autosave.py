@@ -38,6 +38,8 @@ def parse_templates(out_folder: Path, db_list: list[Path]):
                 this_set.add(f"{result.group(2)} {result.group(1)}")
 
         req_file = out_folder / f"{db.stem}_positions.req"
-        req_file.write_text("\n".join(positions) + "\n")
+        if positions:
+            req_file.write_text("\n".join(positions) + "\n")
         req_file = out_folder / f"{db.stem}_settings.req"
-        req_file.write_text("\n".join(settings) + "\n")
+        if settings:
+            req_file.write_text("\n".join(settings) + "\n")
