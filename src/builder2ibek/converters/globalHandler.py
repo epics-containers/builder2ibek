@@ -8,6 +8,15 @@ def handler(entity, entity_type, ioc, realHandler=None):
     entity.remove("gda_name")
     entity.remove("gda_desc")
 
+    # Convert special string values with known correct types
+    for key, value in entity.items():
+        if value == "False":
+            entity[key] = False
+        elif value == "True":
+            entity[key] = True
+        elif value == "":
+            entity[key] = None
+
     if realHandler:
         return realHandler(entity, entity_type, ioc)
     else:
