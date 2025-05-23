@@ -122,6 +122,11 @@ def do_one_element(element: Element, ioc: Generic_IOC):
     else:
         add_defaults(entity, info.defaults)
 
+    # remove fields that have None value
+    for key in list(entity.keys()):
+        if entity[key] is None:
+            del entity[key]
+
 
 def add_defaults(entity: dict[str, Any], defaults: dict[str, dict[str, Any]]):
     this_entity_defaults = defaults.get(entity["type"])
