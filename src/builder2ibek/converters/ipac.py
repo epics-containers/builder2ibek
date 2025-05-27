@@ -44,10 +44,13 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.add_entity(vec)
         entity.interrupt_vector = vec.name
         entity.direction = Direction(entity.direction).name
-        entity.remove("name")
         for key in ["invertin", "invertout", "ip_support"]:
             if key in entity:
                 entity[key] = make_bool(entity[key])
+    elif entity_type == "Hy8005":
+        vec = add_interrupt_vector()
+        entity.add_entity(vec)
+        entity.interrupt_vector = vec.name
     elif entity_type == "Hy8005_Channel":
         entity.ipslot = ipslot_str[entity.ipslot or 0]
         entity.debrate = debrate_8005[entity.debrate or 0]
