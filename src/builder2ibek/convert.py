@@ -71,8 +71,9 @@ def dispatch(builder: Builder, filename) -> Generic_IOC:
 
 
 def do_dispatch(builder: Builder, ioc: Generic_IOC):
-    for element in builder.elements:
-        do_one_element(element, ioc)
+    convert_generic(builder, ioc)
+    for element_index, element in enumerate(builder.elements):
+        do_one_element(element, element_index, ioc)
 
     sorted_entities: list[Entity] = []
     for entity in ioc.entities:  # type: ignore
@@ -86,9 +87,10 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
     return ioc
 
 
-def do_one_element(element: Element, ioc: Generic_IOC):
-    # first do default conversion to entity
-    entity = convert_generic(element, ioc)
+def do_one_element(element: Element, element_index: int, ioc: Generic_IOC):
+    # first retrieve generic entity for the element
+    entity = ioc.raw_entities[element_index]
+    ioc.entities.append(entity)
 
     # then dispatch to a specific handler if there is one
     assert isinstance(element, Element)
@@ -157,7 +159,7 @@ def make_entity(element: Element) -> Entity:
     return entity
 
 
-def convert_generic(element: Element, ioc: Generic_IOC) -> Entity:
-    entity = make_entity(element)
-    ioc.entities.append(entity)
-    return entity
+def convert_generic(builder: Builder, ioc: Generic_IOC) -> Entity:
+    for element in builder.elements:
+        entity = make_entity(element)
+        ioc.raw_entities.append(entity)
