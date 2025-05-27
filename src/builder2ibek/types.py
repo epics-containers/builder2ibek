@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 # Generic YAML classes #######################################################
 
@@ -62,6 +62,7 @@ class Generic_IOC(BaseModel):
     ioc_name: str
     description: str
     entities: list[dict[str, Any]]
+    raw_entities: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
     source_file: Path
 
 
