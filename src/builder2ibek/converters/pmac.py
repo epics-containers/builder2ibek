@@ -48,8 +48,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.DIR = "Neg"
         else:
             entity.DIR = "Pos"
-        if entity.VMAX is not None:
-            entity.VMAX = str(entity.VMAX)
         # convert to enum
         if entity.UEIP == 1:
             entity.UEIP = "Yes"
@@ -63,8 +61,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type == "auto_translated_motor":
         # remove GUI only parameters
         entity.remove("name")
-        if entity.VMAX is not None:
-            entity.VMAX = str(entity.VMAX)
 
     elif entity_type == "GeoBrick":
         entity.rename("Port", "pmacAsynPort")

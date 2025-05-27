@@ -63,7 +63,7 @@ entities:
     TWV: 1
     UEIP: No
     VELO: 90
-    VMAX: '1080'
+    VMAX: 1080
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
@@ -83,7 +83,7 @@ entities:
     TWV: 1
     UEIP: No
     VELO: 90
-    VMAX: '1080'
+    VMAX: 1080
 
   - type: pmac.dls_pmac_asyn_motor
     ADDR: 4
