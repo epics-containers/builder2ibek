@@ -1193,7 +1193,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-BS-01:X
     PLC: 10
-    PmacController: BRICK_1
+    PmacController: GeoBrick_1
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1209,7 +1209,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-MAPT-01:XZ
     PLC: 11
-    PmacController: BRICK_1
+    PmacController: GeoBrick_1
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1225,7 +1225,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-SCAT-01
     PLC: 12
-    PmacController: BRICK_1
+    PmacController: GeoBrick_1
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1241,7 +1241,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-GONIO-01:PLATE
     PLC: 13
-    PmacController: BRICK_1
+    PmacController: GeoBrick_1
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1257,7 +1257,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-SCIN-01
     PLC: 10
-    PmacController: BRICK_2
+    PmacController: GeoBrick_2
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1273,7 +1273,7 @@ entities:
     GRP7: ''
     P: BL04I-AL-SLITS-04
     PLC: 11
-    PmacController: BRICK_2
+    PmacController: GeoBrick_2
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1289,7 +1289,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-MAPT-01:Y
     PLC: 12
-    PmacController: BRICK_2
+    PmacController: GeoBrick_2
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1305,7 +1305,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-BS-01:YZ
     PLC: 10
-    PmacController: BRICK_3
+    PmacController: GeoBrick_3
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1321,7 +1321,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-GONIO-01:SAMP
     PLC: 11
-    PmacController: BRICK_3
+    PmacController: GeoBrick_3
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1337,7 +1337,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-GONIO-01:KAPPA
     PLC: 12
-    PmacController: BRICK_3
+    PmacController: GeoBrick_3
     STATE11: ''
     STATE12: ''
     STATE13: ''
@@ -1353,7 +1353,7 @@ entities:
     GRP7: ''
     P: BL04I-MO-FSWT-01
     PLC: 10
-    PmacController: BRICK_4
+    PmacController: GeoBrick_4
     STATE11: ''
     STATE12: ''
     STATE13: ''
