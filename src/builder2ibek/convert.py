@@ -71,6 +71,8 @@ def dispatch(builder: Builder, filename) -> Generic_IOC:
 
 
 def do_dispatch(builder: Builder, ioc: Generic_IOC):
+    # Generate complete generic list of entities for referencing in plugins.
+    ioc.raw_entities = [make_entity(element) for element in builder.elements]
     for element in builder.elements:
         do_one_element(element, ioc)
 
