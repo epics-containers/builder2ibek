@@ -16,6 +16,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.delete_me()
     elif entity_type == "statPlugins":
         entity.type = "quadEM.Plugins"
+        entity.PORTPREFIX = entity.PORTPREFIX.replace(".STATS", "")
         entity.remove("P")
     elif entity_type == "quadEM_TimeSeries":
         entity.remove("P")
