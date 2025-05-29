@@ -30,6 +30,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     entity.remove("PMAC")
     if entity_type == "pmacStatus":
         entity.delete_me()
+    elif entity_type == "autohome":
+        for check_entity in ioc.raw_entities:
+            check_entity = Entity(**check_entity)
+            if check_entity.type.endswith("GeoBrick"):
+                if check_entity.Port == entity.PORT:
+                    entity.PORT = check_entity.name
 
     # conversions are identical to pmac from this point
     pmacHandler(entity, entity_type, ioc)
