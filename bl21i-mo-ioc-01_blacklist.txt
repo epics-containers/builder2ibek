@@ -1,0 +1,6 @@
+# Rename to 'pvlogging_excl.txt' and move to IOC config directory.
+
+# The following PVs will be excluded from pvlogging
+black1
+black2
+blackagain
