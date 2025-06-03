@@ -113,7 +113,6 @@ entities:
     DIR: Pos
     DLLM: -10000000
     EGU: deg
-    ERES: ''
     FOFF: Variable
     HOMEVIS: 0
     HOMEVISSTR: Absolute Encoder

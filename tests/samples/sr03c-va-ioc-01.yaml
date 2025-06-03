@@ -1071,12 +1071,10 @@ entities:
     HOST: 192.168.3.11
     NCHANS: 16
     P: SR03C-VA-TSERV-01
-    R: ''
     name: TSERV1
 
   - type: terminalServer.Moxa16
     HOST: 192.168.3.12
     NCHANS: 16
     P: SR03C-VA-TSERV-02
-    R: ''
     name: TSERV2

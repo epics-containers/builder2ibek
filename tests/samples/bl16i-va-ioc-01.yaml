@@ -606,7 +606,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 2
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -622,7 +621,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 3
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -638,7 +636,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 4
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -670,7 +667,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 6
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -686,7 +682,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 7
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -702,7 +697,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 8
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -1853,7 +1847,6 @@ entities:
     DESC: Attn/Diag Water flow
     LOLO: BL16I-VA-VLVCC-01:INT1:ILK3
     P: BL16I-HO-FLOW-01
-    Q: ''
     S: 19
     name: A2.FLOW
 
@@ -1862,7 +1855,6 @@ entities:
     DESC: FS/GBC2 Water flow
     LOLO: BL16I-VA-VLVCC-01:INT1:ILK4
     P: BL16I-HO-FLOW-02
-    Q: ''
     S: 20
     name: GBC2.FLOW
 

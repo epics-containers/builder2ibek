@@ -75,7 +75,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :UPSTREAMX
     MRES: 5e-05
@@ -110,7 +109,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :DOWNSTREAMX
     MRES: 5e-05
@@ -145,7 +143,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :UPSTREAMY
     MRES: 5e-05
@@ -180,7 +177,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :DOWNSTREAMY
     MRES: 5e-05
@@ -215,7 +211,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :X
     MRES: 0.0001
@@ -250,7 +245,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:Y
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Y
     MRES: 0.0004
@@ -285,7 +279,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Z
     MRES: 0.0001
@@ -320,7 +313,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :X
     MRES: 0.0001
@@ -355,7 +347,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Y
     MRES: 0.0001
@@ -390,7 +381,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :X
     MRES: 1.00625e-05
@@ -425,7 +415,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :XGAP
     MRES: 2.540625e-05
@@ -460,7 +449,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Y
     MRES: 1.00625e-05
@@ -495,7 +483,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :YGAP
     MRES: 2.540625e-05
@@ -530,7 +517,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :CENTREY
     MRES: 8.4375e-06
@@ -565,7 +551,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :CENTREZ
     MRES: 8.4375e-06
@@ -600,7 +585,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :PLATEY
     MRES: 0.0001
@@ -635,7 +619,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :PLATEZ
     MRES: 0.0001
@@ -668,9 +651,7 @@ entities:
     ERES: 0.00219727
     FOFF: Variable
     HLSV: NO_ALARM
-    HOME: ''
     HOMEVIS: 0
-    INIT: ''
     JAR: 30
     M: :PHI
     MRES: 0.00219727
@@ -705,7 +686,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:KAPPA
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :KAPPA
     MRES: 0.00054932
@@ -740,7 +720,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Y
     MRES: 0.0003125
@@ -775,7 +754,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Z
     MRES: 0.0003125
@@ -810,7 +788,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:X
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :X
     MRES: 0.0001
@@ -845,7 +822,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Y
     MRES: 0.0004
@@ -880,7 +856,6 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
-    INIT: ''
     JAR: 1
     M: :Z
     MRES: 0.0004
@@ -1184,180 +1159,80 @@ entities:
     Controller: GeoBrick_4
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: X Translation
-    GRP3: ''
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-BS-01:X
     PLC: 10
     PmacController: GeoBrick_1
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: X Translation
     GRP3: Z Translation
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-MAPT-01:XZ
     PLC: 11
     PmacController: GeoBrick_1
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: X Translation
     GRP3: Y Translation
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-SCAT-01
     PLC: 12
     PmacController: GeoBrick_1
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: Y Translation
     GRP3: Z Translation
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-GONIO-01:PLATE
     PLC: 13
     PmacController: GeoBrick_1
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: Y Translation
     GRP3: Z Translation
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-SCIN-01
     PLC: 10
     PmacController: GeoBrick_2
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: X Translation
     GRP3: X Gap
     GRP4: Y Translation
     GRP5: Y Gap
-    GRP6: ''
-    GRP7: ''
     P: BL04I-AL-SLITS-04
     PLC: 11
     PmacController: GeoBrick_2
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: Y Translation
-    GRP3: ''
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-MAPT-01:Y
     PLC: 12
     PmacController: GeoBrick_2
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: Y Translation
     GRP3: Z Translation
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-BS-01:YZ
     PLC: 10
     PmacController: GeoBrick_3
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: Y Centering
     GRP3: Z Centering
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-GONIO-01:SAMP
     PLC: 11
     PmacController: GeoBrick_3
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: Kappa
-    GRP3: ''
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-GONIO-01:KAPPA
     PLC: 12
     PmacController: GeoBrick_3
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: pmac.autohome
-    GRP1: ''
     GRP2: X Translation
     GRP3: Y Translation
-    GRP4: ''
-    GRP5: ''
-    GRP6: ''
-    GRP7: ''
     P: BL04I-MO-FSWT-01
     PLC: 10
     PmacController: GeoBrick_4
-    STATE11: ''
-    STATE12: ''
-    STATE13: ''
-    STATE14: ''
 
   - type: autosave.Autosave
     P: 'BL04I-MO-IOC-03:'
@@ -1393,12 +1268,12 @@ entities:
     SUFFIX: PITCH
     name: FSWT.OB2
 
-  - type: mxEH.auto_Cryojet_Retraction
+  - type: mxEH.Cryojet_Retraction
     BRICK1PORT: BRICK_1
     RETRACT_REQ_IP: M12
     dom: BL04I
 
-  - type: mxEH.auto_Flu_Det_Protection
+  - type: mxEH.Flu_Det_Protection
     BRICK1PORT: BRICK_1
     BRICK3PORT: BRICK_3
     dom: BL04I
@@ -1429,14 +1304,12 @@ entities:
     PLC_MASK: 24
     PLC_OUT: 21
     PORT: BRICK_4
-    Q: ''
     ROCKER: 6
     TRANSLATION: 5
     name: TRANS
 
   - type: transfocator.BL04I_beamsizeCalc
     P: BL04I-MO-FSWT-01
-    Q: ''
     name: TRANS_CALC
 
   - type: pvlogging.PvLogging
