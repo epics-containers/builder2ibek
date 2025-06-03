@@ -54,4 +54,4 @@ class Builder:
                 new_element = Element(element_name, module_name, attributes)
                 self.elements.append(new_element)
 
-            element = element.nextSibling
+            element = element.nextSibling  # type: ignore

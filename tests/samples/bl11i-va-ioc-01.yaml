@@ -48,6 +48,7 @@ entities:
     interrupt_vector: Vec1
     invertin: true
     invertout: true
+    name: CARD6
     scan: 100
     slot: 6
 

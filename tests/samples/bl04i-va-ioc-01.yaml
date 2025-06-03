@@ -50,6 +50,7 @@ entities:
     invertin: true
     invertout: true
     ip_support: true
+    name: BL04I-VA-IOC-01.Slot6
     scan: 100
     slot: 6
 
@@ -528,7 +529,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 2
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -545,7 +545,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 3
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -562,7 +561,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 4
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -596,7 +594,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 6
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -613,7 +610,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 7
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -630,7 +626,6 @@ entities:
     relay_lopr: 2.7e-10
     relay_low: 9e-07
     relay_number: 8
-    relay_off_desc: ''
     relay_off_level: 0
 
   - type: mks937b.mks937bRelays
@@ -843,20 +838,10 @@ entities:
     device: BL04I-VA-VALVE-01
     gilk0: GAUGE-01
     gilk1: GAUGE-02
-    gilk10: ''
-    gilk11: ''
-    gilk12: ''
-    gilk13: ''
-    gilk14: ''
-    gilk15: ''
     gilk2: GAUGE-03
     gilk3: GAUGE-04
     gilk4: GAUGE-05
     gilk5: GAUGE-06
-    gilk6: ''
-    gilk7: ''
-    gilk8: ''
-    gilk9: ''
     ilk0: Air Healthy
     ilk1: IMG 03 Healthy
     ilk10: Unused
@@ -882,20 +867,10 @@ entities:
     device: BL04I-VA-VALVE-02
     gilk0: GAUGE-01
     gilk1: GAUGE-02
-    gilk10: ''
-    gilk11: ''
-    gilk12: ''
-    gilk13: ''
-    gilk14: ''
-    gilk15: ''
     gilk2: GAUGE-03
     gilk3: GAUGE-04
     gilk4: GAUGE-05
     gilk5: GAUGE-06
-    gilk6: ''
-    gilk7: ''
-    gilk8: ''
-    gilk9: ''
     ilk0: Air Healthy
     ilk1: IMG 04 Healthy
     ilk10: Unused
@@ -921,20 +896,10 @@ entities:
     device: BL04I-VA-VALVE-03
     gilk0: GAUGE-01
     gilk1: GAUGE-02
-    gilk10: ''
-    gilk11: ''
-    gilk12: ''
-    gilk13: ''
-    gilk14: ''
-    gilk15: ''
     gilk2: GAUGE-03
     gilk3: GAUGE-04
     gilk4: GAUGE-05
     gilk5: GAUGE-06
-    gilk6: ''
-    gilk7: ''
-    gilk8: ''
-    gilk9: ''
     ilk0: Air Healthy
     ilk1: IMG 05 Healthy
     ilk10: Unused
@@ -960,20 +925,10 @@ entities:
     device: BL04I-VA-VALVE-11
     gilk0: GAUGE-01
     gilk1: GAUGE-02
-    gilk10: ''
-    gilk11: ''
-    gilk12: ''
-    gilk13: ''
-    gilk14: ''
-    gilk15: ''
     gilk2: GAUGE-03
     gilk3: GAUGE-04
     gilk4: GAUGE-05
     gilk5: GAUGE-06
-    gilk6: ''
-    gilk7: ''
-    gilk8: ''
-    gilk9: ''
     ilk0: Air Healthy
     ilk1: IMG 01/V11 Ope & Run
     ilk10: QBPM3 Out/V11 Open
@@ -997,22 +952,6 @@ entities:
   - type: dlsPLC.vacValve
     addr: 40
     device: BL04I-PS-SHTR-01
-    gilk0: ''
-    gilk1: ''
-    gilk10: ''
-    gilk11: ''
-    gilk12: ''
-    gilk13: ''
-    gilk14: ''
-    gilk15: ''
-    gilk2: ''
-    gilk3: ''
-    gilk4: ''
-    gilk5: ''
-    gilk6: ''
-    gilk7: ''
-    gilk8: ''
-    gilk9: ''
     ilk0: Air Healthy
     ilk1: Guardline A
     ilk10: Unused
