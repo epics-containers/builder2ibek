@@ -7,6 +7,23 @@ regex_autosave = [
 ]
 
 
+def write_req_file(f: Path, record_set: set[str]):
+    print(f"writing file {f}")
+
+    fields = ""
+    for record in record_set:
+        record_fields = record.split()
+
+        record = record_fields[0]
+        if len(record_fields) == 1:
+            fields += record
+        else:
+            fields_list = [f"{record}.{field}" for field in record_fields[1:]]
+            fields += "\n".join(fields_list)
+
+    f.write_text(fields)
+
+
 def parse_templates(out_folder: Path, db_list: list[Path]):
     """
     DLS has 3 autosave levels
@@ -28,6 +45,7 @@ def parse_templates(out_folder: Path, db_list: list[Path]):
 
         positions: set[str] = set()
         settings: set[str] = set()
+        this_set: set = set()
         for n in range(3):
             match n:
                 case 0:
@@ -37,9 +55,9 @@ def parse_templates(out_folder: Path, db_list: list[Path]):
             for result in regex_autosave[n].finditer(text):
                 this_set.add(f"{result.group(2)} {result.group(1)}")
 
-        req_file = out_folder / f"{db.stem}_positions.req"
         if positions:
-            req_file.write_text("\n".join(positions) + "\n")
-        req_file = out_folder / f"{db.stem}_settings.req"
+            req_file = out_folder / f"{db.stem}_positions.req"
+            write_req_file(req_file, positions)
         if settings:
-            req_file.write_text("\n".join(settings) + "\n")
+            req_file = out_folder / f"{db.stem}_settings.req"
+            write_req_file(req_file, settings)
