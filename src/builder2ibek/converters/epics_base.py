@@ -47,6 +47,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         else:
             entity.type = "epics.StartupCommand"
         entity.remove("post_init")
+        entity.remove("name")
         if entity.at_end in ["true", "True"]:
             # TODO get the converter to do this for us
             print(f"Warning: {entity} has at_end==true MOVE IT TO THE END of ioc.yaml")
