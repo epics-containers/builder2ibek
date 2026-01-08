@@ -110,10 +110,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         motors = [
             e
             for e in ioc.entities
-            if e.type == "dls_pmac_asyn_motor" and e.name == entity.motor
+            if e["type"] == "dls_pmac_asyn_motor" and e["name"] == entity.motor
         ]
         assert len(motors) == 1
         motor = motors[0]
-        motor_pv = motor.P + motor.M
+        motor_pv = motor["P"] + motor["M"]
         entity.motor = motor_pv
-        entity.EGU = motor.EGU
+        entity.EGU = motor["EGU"]
