@@ -1,6 +1,6 @@
 [submodule "ibek-support-dls"]
 	path = ibek-support-dls
-	url = https://gitlab.diamond.ac.uk/controls/containers/utils/ibek-support-dls.git
+	url = https://gitlab.diamond.ac.uk/controls/containers/utils/ibek-support-dls
 [submodule "ibek-support"]
 	path = ibek-support
 	url = https://github.com/epics-containers/ibek-support
