@@ -30,8 +30,18 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             )
             and e.get("name") == entity.motor
         ]
-        assert len(motors) == 1
+
+        if len(motors) != 1:
+            raise ValueError(
+                f"Expected one motor with name '{entity.motor}', found {len(motors)}"
+            )
+
         motor = motors[0]
-        motor_pv = motor["P"] + motor["M"]
+        try:
+            motor_pv = motor["P"] + motor["M"]
+        except KeyError as ex:
+            raise ValueError(
+                f"Motor '{motor['name']}' missing required attribute {ex!s}"
+            )
         entity.motor = motor_pv
-        entity.EGU = motor["EGU"]
+        entity.EGU = motor.get("EGU", "")
