@@ -42,6 +42,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         except KeyError as ex:
             raise ValueError(
                 f"Motor '{motor['name']}' missing required attribute {ex!s}"
-            )
+            ) from ex
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
