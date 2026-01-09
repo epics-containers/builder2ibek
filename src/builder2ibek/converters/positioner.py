@@ -16,18 +16,17 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.DEADBAND = str(entity.DEADBAND)
 
     elif entity_type == "motorpositioner":
-        # find the motor whose name = original motorpositioner.motor
-        # the motor is of type "dls_pmac_asyn_motor" or "dls_pmac_cs_asyn_motor"
-        # get the motor's PV and EGU
-        # the motor's PV is claculated by concatenating its P and M params
-        # set motorpositioner.motor = motor's PV
-        # set motorpositioner.EGU = motor's PV
+        # Find the dls_pmac_asyn_motor whose name = original motorpositioner.motor.
+        # There is also dls_pmac_cs_asyn_motor but I don't need it for B21 IOCs,
+        # so leave it out of the search for now.
+        # Get the motor's PV and EGU, the motor's PV is claculated by concatenating
+        # its P and M params.
+        # Set motorpositioner.motor = motor's PV.
+        # Set motorpositioner.EGU = motor's EGU.
         motors = [
             e
             for e in ioc.raw_entities
-            if e.get("type", "").endswith(
-                ("dls_pmac_asyn_motor", "dls_pmac_cs_asyn_motor")
-            )
+            if e.get("type", "").endswith("dls_pmac_asyn_motor")
             and e.get("name") == entity.motor
         ]
 
