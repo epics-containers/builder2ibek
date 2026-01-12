@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<tpmac.pmacAsynIPPort IP="172.23.104.168" name="BRICK_2"/>
+	<tpmac.GeoBrick Port="BRICK_2" name="GeoBrick_2"/>
+	<pmacUtil.dls_pmac_asyn_motor ACCL="0.1" ADDR="7" ADEL="0" BACC="0.1" BDST="0" BVEL="0" DESC="Mini Beam Apertures Y" DHLM="50" DIR="1" DLLM="-50.2" DTYP="asynMotor" EGU="mm" ERES="0.0004" FOFF="0" HLSV="MAJOR" HOME="BL04I-MO-MAPT-01:Y" HOMEVIS="0" INIT="" JAR="1" M=":Y" MRES="0.0004" OFF="0" P="BL04I-MO-MAPT-01" PMAC="BL04I-MO-STEP-02" PORT="GeoBrick_2" PREC="4" RDBD="0.0001" RRES="0" SPORT="BRICK_2" SREV="200" TWV="1" UEIP="0" VBAS="0" VELO="20" VMAX="20" gda_desc="Mini Beam Apertures Mini Beam Apertures Y" gda_name="MAPT.Y" name="MAPT.Y"/>
+	<positioner.motorpositioner DESC="Mini Aperture Y" MP="MAPT.OB2" PREC="5" Q=":Y:P" VALA="41.81" VALB="45.2448" VALC="41.8096" VALD="24.9" VALE="-48.9496" motor="MAPT.Y" name="MAPT.YP"/>
+</components>
