@@ -7,28 +7,27 @@ name = "builder2ibek"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 description = "Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml"
 dependencies = ["ibek"] # Add project dependencies here, e.g. ["click", "numpy"]
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "copier",
     "mypy",
-    "pipdeptree",
     "pre-commit",
     "pytest",
     "pytest-cov",
     "pytest-mock",
     "ruff",
-    "tox-direct",
+    "tox-uv",
     "types-mock",
 ]
 
@@ -41,7 +40,6 @@ GitHub = "https://github.com/epics-containers/builder2ibek"
 [[project.authors]] # Further authors may be added by duplicating this section
 email = "giles.knap@diamond.ac.uk"
 name = "Giles Knap"
-
 
 [tool.setuptools_scm]
 version_file = "src/builder2ibek/_version.py"
@@ -60,32 +58,61 @@ filterwarnings = "error"
 testpaths = "docs src tests"
 
 [tool.coverage.run]
+patch = ["subprocess"]
 data_file = "/tmp/builder2ibek.coverage"
 
 [tool.coverage.paths]
 # Tests are run from installed location, map back to the src directory
 source = ["src", "**/site-packages/"]
 
-# tox must currently be configured via an embedded ini string
-# See: https://github.com/tox-dev/tox/issues/999
 [tool.tox]
-legacy_tox_ini = """
-[tox]
-skipsdist=True
+skipsdist = true
+# envs to runs automatically with tox -p
+env_list = ["pre-commit", "type-checking", "tests"]
 
-[testenv:{pre-commit,type-checking,tests}]
-# Don't create a virtualenv for the command, requires tox-direct plugin
-direct = True
-passenv = *
-allowlist_externals =
-    pytest
-    pre-commit
-    mypy
-commands =
-    pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
-    type-checking: mypy src tests {posargs}
-    tests: pytest --cov=builder2ibek --cov-report term --cov-report xml:cov.xml {posargs}
-"""
+[tool.tox.env_run_base]
+# Pass all environment variables to the test environments
+passenv = ["*"]
+
+[tool.tox.env.pre-commit]
+description = "Run pre-commit on all files"
+commands = [
+    [
+        "pre-commit",
+        "run",
+        "--all-files",
+        "--show-diff-on-failure",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.type-checking]
+description = "Run mypy"
+commands = [
+    [
+        "mypy",
+        "src",
+        "tests",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.tests]
+description = "Run tests with coverage"
+commands = [
+    [
+        "pytest",
+        "--cov=builder2ibek",
+        "--cov-report",
+        "term",
+        "--cov-report",
+        "xml:cov.xml",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+]
 
 [tool.ruff]
 src = ["src", "tests"]
@@ -100,6 +127,7 @@ lint.select = [
     "C4",  # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
     "E",   # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
     "F",   # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "N",   # pep8-naming - https://docs.astral.sh/ruff/rules/#pep8-naming-n
     "W",   # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
     "I",   # isort - https://docs.astral.sh/ruff/rules/#isort-i
     "UP",  # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
