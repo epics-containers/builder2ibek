@@ -1005,15 +1005,17 @@ entities:
 
   - type: positioner.motorpositioner
     DESC: Mini Aperture X
+    EGU: mm
     MP: MAPT.OB1
     PREC: 5
     Q: :X:P
     VALF: 0
-    motor: MAPT.X
+    motor: BL04I-MO-MAPT-01:X
     name: MAPT.XP
 
   - type: positioner.motorpositioner
     DESC: Mini Aperture Y
+    EGU: mm
     MP: MAPT.OB2
     PREC: 5
     Q: :Y:P
@@ -1022,11 +1024,12 @@ entities:
     VALC: 41.8096
     VALD: 24.9
     VALE: -48.9496
-    motor: MAPT.Y
+    motor: BL04I-MO-MAPT-01:Y
     name: MAPT.YP
 
   - type: positioner.motorpositioner
     DESC: Mini Aperture Z
+    EGU: mm
     MP: MAPT.OB3
     PREC: 5
     Q: :Z:P
@@ -1035,33 +1038,36 @@ entities:
     VALC: 16.8999
     VALD: 16.9
     VALE: -12.0002
-    motor: MAPT.Z
+    motor: BL04I-MO-MAPT-01:Z
     name: MAPT.ZP
 
   - type: positioner.motorpositioner
     DESC: Scintillator Y
+    EGU: mm
     MP: SCIN.OB1
     PREC: 5
     Q: :Y:P
     VALA: -0.09937
     VALB: 97.25063
     VALC: 0
-    motor: SCIN.Y
+    motor: BL04I-MO-SCIN-01:Y
     name: SCIN.YP
 
   - type: positioner.motorpositioner
     DESC: Scintillator Z
+    EGU: mm
     MP: SCIN.OB2
     PREC: 5
     Q: :Z:P
     VALA: 0.20063
     VALB: 93.87063
     VALC: 0
-    motor: SCIN.Z
+    motor: BL04I-MO-SCIN-01:Z
     name: SCIN.ZP
 
   - type: positioner.motorpositioner
     DESC: Beamstop X
+    EGU: mm
     MP: BS.OB1
     PREC: 5
     Q: :X:P
@@ -1070,11 +1076,12 @@ entities:
     VALC: -2.7001
     VALD: -2.7001
     VALE: 4.4801
-    motor: BS.X
+    motor: BL04I-MO-BS-01:X
     name: BS.XP
 
   - type: positioner.motorpositioner
     DESC: Beamstop Y
+    EGU: mm
     MP: BS.OB2
     PREC: 5
     Q: :Y:P
@@ -1083,11 +1090,12 @@ entities:
     VALC: 45.7588
     VALD: 45.7588
     VALE: -49.1
-    motor: BS.Y
+    motor: BL04I-MO-BS-01:Y
     name: BS.YP
 
   - type: positioner.motorpositioner
     DESC: Beamstop Z
+    EGU: mm
     MP: BS.OB3
     PREC: 5
     Q: :Z:P
@@ -1096,11 +1104,12 @@ entities:
     VALC: 25.0004
     VALD: 49.1496
     VALE: -49.3016
-    motor: BS.Z
+    motor: BL04I-MO-BS-01:Z
     name: BS.ZP
 
   - type: positioner.motorpositioner
     DESC: Scatter Guard X
+    EGU: mm
     MP: SCAT.OB1
     PREC: 5
     Q: :X:P
@@ -1108,18 +1117,19 @@ entities:
     VALB: 4.7802
     VALC: -3
     VALD: 0
-    motor: SCAT.X
+    motor: BL04I-MO-SCAT-01:X
     name: SCAT.XP
 
   - type: positioner.motorpositioner
     DESC: Scatter Guard Y
+    EGU: mm
     MP: SCAT.OB2
     PREC: 5
     Q: :Y:P
     VALA: 4.6369
     VALB: 4.6369
     VALC: -4.4001
-    motor: SCAT.Y
+    motor: BL04I-MO-SCAT-01:Y
     name: SCAT.YP
 
   - type: pmac.pmacDisableLimitsCheck
