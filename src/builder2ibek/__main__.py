@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import typer
 
@@ -19,7 +18,7 @@ def version_callback(value: bool):
 
 @cli.callback()
 def main(
-    version: Optional[bool] = typer.Option(
+    version: bool | None = typer.Option(
         None,
         "--version",
         callback=version_callback,
@@ -33,7 +32,7 @@ def main(
 @cli.command()
 def xml2yaml(
     xml: Path = typer.Argument(..., help="Filename of the builder XML file"),
-    yaml: Optional[Path] = typer.Option(..., help="Output file"),
+    yaml: Path | None = typer.Option(..., help="Output file"),
     schema: str = typer.Option(
         "/epics/ibek-defs/ioc.schema.json",
         help="Generic IOC schema (added to top of the yaml output)",
@@ -83,7 +82,7 @@ def db_compare(
     remove_duplicates: bool = typer.Option(
         False, help="Remove duplicate records in the original DB"
     ),
-    output: Optional[Path] = typer.Option(None, help="Output file"),
+    output: Path | None = typer.Option(None, help="Output file"),
 ):
     """
     Compare two DB files and output the differences

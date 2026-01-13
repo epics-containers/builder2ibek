@@ -120,6 +120,14 @@ lint.ignore = [
     "C408",  # Unnecessary collection call - e.g. list(...) instead of [...]
     "UP007", # Do not complain about Optional[] (TODO: remove once typer is patched)
     "B008",  # Do not perform function call `typer.Argument` in argument defaults;
+    # this project uses Support module names for python modules etc. so we are lax
+    # on python naming conventions by design.
+    "N999", # Invalid module name:
+    "N816", # global scope variable names
+    "N801", # naming conventions
+    "N802", # naming conventions
+    "N803", # naming conventions
+    "N812", # naming conventions
 ]
 line-length = 88
 lint.select = [
