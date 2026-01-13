@@ -19,10 +19,13 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # Find the dls_pmac_asyn_motor whose name = original motorpositioner.motor.
         # There is also dls_pmac_cs_asyn_motor but I don't need it for B21 IOCs,
         # so leave it out of the search for now.
-        # Get the motor's PV and EGU, the motor's PV is claculated by concatenating
+        # Get the motor's PV and EGU, the motor's PV is calculated by concatenating
         # its P and M params.
         # Set motorpositioner.motor = motor's PV.
         # Set motorpositioner.EGU = motor's EGU.
+        # If the motorpositioner doesn't have a name then set to
+        # the motor's name concatenated with "P". This is because the template
+        # requires this param.
         motors = [
             e
             for e in ioc.raw_entities
@@ -44,3 +47,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             ) from ex
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
+        entity.name = entity.get("name") or motor["name"] + "P"
