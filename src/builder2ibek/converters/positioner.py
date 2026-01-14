@@ -29,9 +29,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # its P and M params.
         # Set motorpositioner.motor = motor's PV.
         # Set motorpositioner.EGU = motor's EGU.
-        # If the motorpositioner doesn't have a name then set to
-        # the motor's name concatenated with "P". This is because the template
-        # requires this param.
         motors = [
             e
             for e in ioc.raw_entities
