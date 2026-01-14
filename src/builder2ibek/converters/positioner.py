@@ -15,7 +15,13 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "positioner":
         entity.DEADBAND = str(entity.DEADBAND)
 
+    # Don't remove multipositioner's name because motorpostioner references it
+    elif entity_type == "positioner":
+        entity.remove("name")
+
     elif entity_type == "motorpositioner":
+        entity.remove("name")
+
         # Find the dls_pmac_asyn_motor whose name = original motorpositioner.motor.
         # There is also dls_pmac_cs_asyn_motor but I don't need it for B21 IOCs,
         # so leave it out of the search for now.
@@ -47,4 +53,3 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             ) from ex
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
-        entity.name = entity.get("name") or motor["name"] + "P"
