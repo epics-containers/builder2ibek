@@ -1011,7 +1011,6 @@ entities:
     Q: :X:P
     VALF: 0
     motor: BL04I-MO-MAPT-01:X
-    name: MAPT.XP
 
   - type: positioner.motorpositioner
     DESC: Mini Aperture Y
@@ -1025,7 +1024,6 @@ entities:
     VALD: 24.9
     VALE: -48.9496
     motor: BL04I-MO-MAPT-01:Y
-    name: MAPT.YP
 
   - type: positioner.motorpositioner
     DESC: Mini Aperture Z
@@ -1039,7 +1037,6 @@ entities:
     VALD: 16.9
     VALE: -12.0002
     motor: BL04I-MO-MAPT-01:Z
-    name: MAPT.ZP
 
   - type: positioner.motorpositioner
     DESC: Scintillator Y
@@ -1051,7 +1048,6 @@ entities:
     VALB: 97.25063
     VALC: 0
     motor: BL04I-MO-SCIN-01:Y
-    name: SCIN.YP
 
   - type: positioner.motorpositioner
     DESC: Scintillator Z
@@ -1063,7 +1059,6 @@ entities:
     VALB: 93.87063
     VALC: 0
     motor: BL04I-MO-SCIN-01:Z
-    name: SCIN.ZP
 
   - type: positioner.motorpositioner
     DESC: Beamstop X
@@ -1077,7 +1072,6 @@ entities:
     VALD: -2.7001
     VALE: 4.4801
     motor: BL04I-MO-BS-01:X
-    name: BS.XP
 
   - type: positioner.motorpositioner
     DESC: Beamstop Y
@@ -1091,7 +1085,6 @@ entities:
     VALD: 45.7588
     VALE: -49.1
     motor: BL04I-MO-BS-01:Y
-    name: BS.YP
 
   - type: positioner.motorpositioner
     DESC: Beamstop Z
@@ -1105,7 +1098,6 @@ entities:
     VALD: 49.1496
     VALE: -49.3016
     motor: BL04I-MO-BS-01:Z
-    name: BS.ZP
 
   - type: positioner.motorpositioner
     DESC: Scatter Guard X
@@ -1118,7 +1110,6 @@ entities:
     VALC: -3
     VALD: 0
     motor: BL04I-MO-SCAT-01:X
-    name: SCAT.XP
 
   - type: positioner.motorpositioner
     DESC: Scatter Guard Y
@@ -1130,7 +1121,6 @@ entities:
     VALB: 4.6369
     VALC: -4.4001
     motor: BL04I-MO-SCAT-01:Y
-    name: SCAT.YP
 
   - type: pmac.pmacDisableLimitsCheck
     Axis: 1
