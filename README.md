@@ -44,3 +44,7 @@ Once you have done this you can iterate on converting your XML:
 - rebuild the global ioc yaml schema with `./update-schema`
 - Inspect your generated YAML in `tests/samples` and look for schema validation issues (make sure you have the RedHat YAML extension installed in VSCode)
 - NOTE: sometimes the YAML extension does not notice changes to the schema. If you are seeing errors that you think are incorrect, opening the exttension settings and toggling the `Yaml: Validate` off and on again can help - it's the last option.
+
+<!-- README only content. Anything below this line won't be included in index.md -->
+
+See https://epics-containers.github.io/builder2ibek for more detailed documentation.

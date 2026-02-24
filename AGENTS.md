@@ -125,6 +125,40 @@ ibek-support-dls/    # submodule: DLS entity models
 
 ---
 
+## Verifying a converted IOC (devcontainer + db-compare)
+
+Full guide: [docs/how-to/verify-with-devcontainer.md](docs/how-to/verify-with-devcontainer.md)
+
+Quick reference:
+```bash
+# 1. inside the Generic IOC devcontainer, point at your instance
+ibek dev instance /workspaces/<project>/iocs/<ioc-name>
+
+# 2. generate runtime assets (st.cmd + ioc.db) without launching the IOC
+ibek runtime generate2 /epics/ioc/config
+
+# 3. compare record-for-record against the original builder DB
+uv run builder2ibek db-compare \
+    /dls_sw/work/R3.14.12.7/support/BL11I-BUILDER/iocs/BL11I-CS-IOC-09/db/BL11I-CS-IOC-09_expanded.db \
+    /epics/runtime/ioc.db \
+    --output compare.diff
+```
+
+The output reports:
+- Records in original but not in new (missing entity models or databases.args)
+- Records in new but not in original (extra records, usually benign)
+- Records present in both but with different field values
+
+Use `--ignore "PATTERN"` to suppress known-acceptable differences.
+Use `--remove-duplicates` if the original DB has duplicate record definitions.
+
+To hot-reload a support module YAML without rebuilding the full container:
+```bash
+ibek dev support /epics/generic-source/ibek-support-dls/<module>
+```
+
+---
+
 ## Adding a new converter
 
 If a module has no converter, its XML elements are passed through unchanged. To

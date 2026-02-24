@@ -129,7 +129,24 @@ corresponding `.yaml` files.  Review the diff, then commit both.
 
 ---
 
-## 5. Updating the schema
+## 5. Verify with db-compare
+
+Once you have converted an IOC, the definitive verification is to generate the
+EPICS database inside the devcontainer and compare it record-by-record against
+the original builder `_expanded.db`.  See
+[Verify with devcontainer and db-compare](verify-with-devcontainer.md) for the
+full workflow.  In brief:
+
+```bash
+# inside the devcontainer
+ibek dev instance /workspaces/my-project/iocs/my-ioc
+ibek runtime generate2 /epics/ioc/config
+uv run builder2ibek db-compare \
+    /dls_sw/.../MY-IOC_expanded.db \
+    /epics/runtime/ioc.db
+```
+
+## 6. Updating the schema
 
 If you have added new entity models to `ibek-support-dls`, regenerate the
 global schema that VSCode uses for validation:
