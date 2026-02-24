@@ -31,14 +31,14 @@ would need:
 
 ```
 my-work-folder/
-└── ioc-hidenrga
+├── ioc-hidenrga
 └── i11-services
-  └── services
-    └── bl11i-cs-ioc-09
-      └── config/
-          └── ioc.yaml        ← your converted ioc.yaml goes here
-      values.yaml
-      templates
+    └── services
+        └── bl11i-cs-ioc-09
+            ├── config/
+            │   └── ioc.yaml        ← your converted ioc.yaml goes here
+            ├── values.yaml
+            └── templates
 ```
 
 

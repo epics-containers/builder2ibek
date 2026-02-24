@@ -1,4 +1,4 @@
-# Advanced: ibek support YAML for a complex builder.py module (open-source)
+# Advanced: ibek support YAML for a complex builder.py
 
 This tutorial extends the
 [basic tutorial](create-support-yaml.md) to cover patterns that arise in
@@ -12,11 +12,9 @@ open-source at
 and its ibek support YAML lives in
 [epics-containers/ibek-support](https://github.com/epics-containers/ibek-support).
 
-After completing this tutorial you will have created:
-- `ibek-support/ffmpegServer/ffmpegServer.ibek.support.yaml`
-- `ibek-support/ffmpegServer/ffmpegServer.install.yml`
-
-and opened a pull request to the community `ibek-support` repository.
+By the end of this tutorial you will understand how:
+- `ibek-support/ffmpegServer/ffmpegServer.ibek.support.yaml` was written
+- `ibek-support/ffmpegServer/ffmpegServer.install.yml` was written
 
 ---
 
@@ -26,7 +24,7 @@ and opened a pull request to the community `ibek-support` repository.
   [basic tutorial](create-support-yaml.md)
 - A GitHub account and fork of
   [epics-containers/ibek-support](https://github.com/epics-containers/ibek-support)
-- The module source published on GitHub
+- Access to the [ffmpegServer module source](https://github.com/DiamondLightSource/ffmpegServer) published on GitHub
 
 ---
 
@@ -124,7 +122,8 @@ In builder XML, `NDARRAY_PORT` is an `Ident` argument that references another
 `AsynPort` instance by its `PORT` name:
 
 ```xml
-<ffmpegServer.ffmpegStream PORT="C1.MJPG" NDARRAY_PORT="C1.CAM" .../>
+<ffmpegServer.ffmpegStream PORT="C1.MJPG" NDARRAY_PORT="C1.CAM"
+    P="BLxxI-DI-PHDGN-01" R=":MJPG:" HTTP_PORT="8081" ADDR="0"/>
 ```
 
 In ibek `type: object` expresses a reference to another entity's `id`:
@@ -437,27 +436,10 @@ patch_lines:
 
 ---
 
-## 8. Open-source contribution workflow
+## 8. Test in the devcontainer
 
-### Fork and branch
-
-```bash
-# In your Generic IOC repo
-git submodule set-url ibek-support https://github.com/<your-fork>/ibek-support
-git submodule update --remote ibek-support
-cd ibek-support
-git checkout -b add-ffmpegServer
-```
-
-Configure git to use SSH for pushes while keeping the HTTPS URL for CI:
-
-```ini
-# ~/.gitconfig
-[url "ssh://git@github.com/"]
-    insteadOf = https://github.com/
-```
-
-### Test in the devcontainer
+With the files written into `ibek-support/ffmpegServer/`, install and verify
+inside the Generic IOC devcontainer:
 
 ```bash
 ansible.sh ffmpegServer
@@ -471,25 +453,6 @@ Convert a real IOC XML that uses ffmpegServer and verify with db-compare:
 uvx builder2ibek xml2yaml example.xml --yaml /tmp/test.yaml
 # then verify with ibek dev instance + db-compare
 # see verify-with-devcontainer.md
-```
-
-### Push and open a pull request
-
-```bash
-cd ibek-support
-git add ffmpegServer/
-git commit -m "add ffmpegServer support module"
-git push -u origin add-ffmpegServer
-```
-
-Open a PR against `epics-containers/ibek-support`.  The maintainers will
-check for general utility, no site-specific paths, and schema validity.
-
-Once merged, point your submodule back at `origin/main`:
-
-```bash
-git submodule set-url ibek-support https://github.com/epics-containers/ibek-support
-git submodule update --remote ibek-support
 ```
 
 ---
