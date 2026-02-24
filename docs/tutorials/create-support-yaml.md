@@ -18,8 +18,9 @@ temperature controller as an example:
 
 [epics-containers: Creating a Generic IOC — Lakeshore 340](https://epics-containers.github.io/main/tutorials/generic_ioc.html#lakeshore-340-temperature-controller)
 
-For a how-to covering the open-source workflow see
-[Create open-source ibek support YAML](../how-to/create-opensource-support-yaml.md).
+For a tutorial covering a more complex module and the full open-source
+contribution workflow, see
+[Advanced: ibek support YAML for a complex builder.py module](create-support-yaml-advanced.md).
 :::
 
 ## Prerequisites

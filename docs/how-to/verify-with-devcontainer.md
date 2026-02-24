@@ -23,25 +23,32 @@ rather than cosmetic ones.
 ## 1. Prepare the IOC instance config
 
 The devcontainer expects the instance configuration in a folder containing
-`ioc.yaml`.  Create a config folder alongside or within your ioc instance
-working directory:
+`ioc.yaml`. Make sure your services repository is cloned next to your
+generic IOC folder e.g.
+
+For example, to test `BL11I-CS-IOC-09` which is a ioc-hidenrga based IOC we
+would need:
 
 ```
-my-instance/
-└── config/
-    └── ioc.yaml        ← your converted ioc.yaml goes here
+my-work-folder/
+└── ioc-hidenrga
+└── i11-services
+  └── services
+    └── bl11i-cs-ioc-09
+      └── config/
+          └── ioc.yaml        ← your converted ioc.yaml goes here
+      values.yaml
+      templates
 ```
 
-For example, to test `BL11I-CS-IOC-09`:
 
-```bash
-mkdir -p /workspaces/bl11i/iocs/bl11i-cs-ioc-09/config
-cp bl11i-cs-ioc-09.yaml /workspaces/bl11i/iocs/bl11i-cs-ioc-09/config/ioc.yaml
-```
 
 ---
 
 ## 2. Open the Generic IOC in the devcontainer
+
+First make sure the `ibek-support*` submodules are present
+  - `git submodule update --init`
 
 Open the Generic IOC repository in VSCode and choose
 **"Reopen in Container"**. This builds the developer image, compiles all
@@ -63,12 +70,12 @@ Inside the devcontainer terminal, use `ibek dev instance` to symlink your
 instance config folder to `/epics/ioc/config`:
 
 ```bash
-ibek dev instance /workspaces/bl11i/iocs/bl11i-cs-ioc-09
+ibek dev instance /workspaces/i11-services/services/bl11i-cs-ioc-09
 ```
 
 This creates:
 ```
-/epics/ioc/config -> /workspaces/bl11i/iocs/bl11i-cs-ioc-09/config
+/epics/ioc/config -> /workspaces/i11-services/services/bl11i-cs-ioc-09/config
 ```
 
 Because it is a symlink any edits to `ioc.yaml` on the host are immediately
