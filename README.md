@@ -10,6 +10,7 @@ A tool suite for converting DLS XML builder projects to epics-containers ibek.
 Source          | <https://github.com/epics-containers/builder2ibek>
 :---:           | :---:
 PyPI            | `pip install builder2ibek`
+Documentation   | <https://epics-containers.github.io/builder2ibek>
 Releases        | <https://github.com/epics-containers/builder2ibek/releases>
 
 <pre><font color="#AAAAAA">╭─ Commands ───────────────────────────────────────────────────────────────────╮</font>
