@@ -151,7 +151,7 @@ For schema validation to work your `ioc.yaml` should have the following header:
 ## 4. Add to the test suite
 
 If your IOC is using support modules that are not currently covered in the
-builder2ibek tests then in could be worth updating the tests as follows.
+builder2ibek tests then it could be worth updating the tests as follows.
 
 To prevent regressions, copy the XML into `tests/samples/` and regenerate:
 

@@ -26,7 +26,7 @@ by hand.  The goal is to make `xml2yaml` produce **correct output directly**,
 so that:
 
 - The original builder XML remains the source of truth.  While a beamline
-  is being converted it may still ocasionally require updates to its
+  is being converted it may still occasionally require updates to its
   traditional builder XML, then you can re-run `xml2yaml` and get
   a correct `ioc.yaml` without manual patching.
 - Every IOC that uses the same support module benefits from the same fix.

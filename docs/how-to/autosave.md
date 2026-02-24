@@ -195,7 +195,7 @@ directly by the EPICS autosave module.
 
 :::{tip}
 If you are not using a DLS support module, but are switching to using the upstream
-module and it has no .req files then you have 2 options:
+module and it has no .req files then you have two options:
 
 1. add the req files as above and submit a PR to upstream (not always possible)
 2. drop the generated req files into the ibek-support folder alongside
