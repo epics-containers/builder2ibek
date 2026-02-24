@@ -5,7 +5,8 @@
 
 # builder2ibek
 
-A tool suite for converting DLS XML builder projects to epics-containers ibek.
+A tool suite for converting DLS XMLbuilder IOC projects to
+[epics-containers](https://github.com/epics-containers) ibek.
 
 Source          | <https://github.com/epics-containers/builder2ibek>
 :---:           | :---:
@@ -24,27 +25,32 @@ Releases        | <https://github.com/epics-containers/builder2ibek/releases>
 <font color="#AAAAAA">╰──────────────────────────────────────────────────────────────────────────────╯</font>
 </pre>
 
-## How to use the devcontainer
+## Where to start
 
-This repo includes a devcontainer for testing and developing converters.
+**Converting an existing DLS IOC XML to ibek YAML**
+→ [Convert a builder XML IOC instance](https://epics-containers.github.io/builder2ibek/how-to/convert-ioc-instance.html)
 
-To use this re-open in container.
+**Verifying the converted IOC against the original builder database**
+→ [Verify with devcontainer and db-compare](https://epics-containers.github.io/builder2ibek/how-to/verify-with-devcontainer.html)
 
-- First make sure you have the submodules
-  - git submodule update --init
-- This adds ibek-support and ibek-support-dls meaning that we can validate converted projects against a global ibek schema that include all support modules currently defined in ibek-support*.
-- To add a new IOC to the tests simply copy its XML definition into `tests/samples`. Then run `./tests/samples/make_samples.sh` to convert the XML to YAML and create a test for it.
-- important: this will re-convert all of the sample XML files in the samples folder. Always check the diff before committing.
+**Creating ibek support YAML for a DLS-internal module (new to ibek)**
+→ [Tutorial: Creating ibek support YAML from a builder.py module](https://epics-containers.github.io/builder2ibek/tutorials/create-support-yaml.html)
 
-Once you have done this you can iterate on converting your XML:
+**Creating ibek support YAML for a complex or open-source module**
+→ [Advanced: ibek support YAML for a complex builder.py module](https://epics-containers.github.io/builder2ibek/tutorials/create-support-yaml-advanced.html)
 
-- make changes to the ibek support yaml in `ibek-support-dls` and `ibek-support`
-- make changes/additions to src/builder2ibek/converters/*.py
-- re-convert your XML with `./tests/samples/make_samples.sh`
-- rebuild the global ioc yaml schema with `./update-schema`
-- Inspect your generated YAML in `tests/samples` and look for schema validation issues (make sure you have the RedHat YAML extension installed in VSCode)
-- NOTE: sometimes the YAML extension does not notice changes to the schema. If you are seeing errors that you think are incorrect, opening the exttension settings and toggling the `Yaml: Validate` off and on again can help - it's the last option.
+**xml2yaml output is wrong for a particular module — fixing the converter**
+→ [Create a builder2ibek converter](https://epics-containers.github.io/builder2ibek/how-to/create-converter.html)
+
+**Generating autosave request files from DLS DB templates**
+→ [Generate autosave req files](https://epics-containers.github.io/builder2ibek/how-to/autosave.html)
+
+**Migrating old vacuum/interlock modules to dlsPLC**
+→ [dlsPLC migration reference](https://epics-containers.github.io/builder2ibek/reference/dlsplc-migration.html)
+
+**Setting up a new Generic IOC repository**
+→ [Create a Generic IOC repo](https://epics-containers.github.io/builder2ibek/how-to/create-generic-ioc-repo.html)
 
 <!-- README only content. Anything below this line won't be included in index.md -->
 
-See https://epics-containers.github.io/builder2ibek for more detailed documentation.
+See <https://epics-containers.github.io/builder2ibek> for full documentation.

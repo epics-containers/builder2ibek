@@ -220,12 +220,35 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
 ---
 
+## Development iteration loop
+
+Open the `builder2ibek` repository in the devcontainer (first run
+`git submodule update --init` to check out `ibek-support` and
+`ibek-support-dls`).  The typical inner loop is:
+
+1. Edit `src/builder2ibek/converters/<module>.py`
+2. Optionally edit the ibek support YAML in `ibek-support-dls/` or
+   `ibek-support/` if the entity model also needs updating
+3. Re-convert all sample XML files and update expected outputs:
+   ```bash
+   cd tests/samples && ./make_samples.sh
+   ```
+4. Rebuild the global IOC YAML schema so VSCode validation reflects any
+   support YAML changes:
+   ```bash
+   ./update-schema
+   ```
+5. Open the generated `.yaml` files in `tests/samples/` in VSCode and check
+   for schema validation errors (requires the Red Hat YAML extension).
+   If the extension does not pick up schema changes immediately, toggle
+   **Yaml: Validate** off and on in the extension settings.
+6. Once the output looks correct, commit both the converter and the updated
+   sample files.
+
 ## Adding a test
 
-Once your converter produces correct output, add a sample XML and the
-expected YAML to `tests/samples/` so the CI will catch regressions.
-
-Use the provided helper script to regenerate all expected outputs:
+Add a sample XML and the expected YAML to `tests/samples/` so the CI will
+catch regressions.
 
 ```bash
 cp MY-IOC.xml tests/samples/
