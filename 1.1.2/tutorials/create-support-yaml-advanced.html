@@ -1,0 +1,1094 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Advanced: ibek support YAML for a complex builder.py &#8212; builder2ibek 1.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=6f037312"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/create-support-yaml-advanced';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.1.2';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Creating ibek support YAML from a builder.py module" href="create-support-yaml.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.1.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="create-support-yaml.html">Creating ibek support YAML from a builder.py module</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Advanced: ibek support YAML for a complex builder.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Advanced: ibek support YAML for a complex builder.py</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="advanced-ibek-support-yaml-for-a-complex-builder-py">
+<h1>Advanced: ibek support YAML for a complex builder.py<a class="headerlink" href="#advanced-ibek-support-yaml-for-a-complex-builder-py" title="Link to this heading">#</a></h1>
+<p>This tutorial extends the
+<a class="reference internal" href="create-support-yaml.html"><span class="std std-doc">basic tutorial</span></a> to cover patterns that arise in
+more complex modules: <code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code>, cross-referencing other entities as
+<code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code>, templates that include shared base templates, and <code class="docutils literal notranslate"><span class="pre">install.yml</span></code>
+fields for system package dependencies and Makefile patching.</p>
+<p>We use the <strong><code class="docutils literal notranslate"><span class="pre">ffmpegServer</span></code></strong> support module as the concrete example.  It is
+open-source at
+<a class="reference external" href="https://github.com/DiamondLightSource/ffmpegServer">DiamondLightSource/ffmpegServer</a>
+and its ibek support YAML lives in
+<a class="reference external" href="https://github.com/epics-containers/ibek-support">epics-containers/ibek-support</a>.</p>
+<p>By the end of this tutorial you will understand how:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support/ffmpegServer/ffmpegServer.ibek.support.yaml</span></code> was written</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support/ffmpegServer/ffmpegServer.install.yml</span></code> was written</p></li>
+</ul>
+<hr class="docutils" />
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Completed (or familiar with) the
+<a class="reference internal" href="create-support-yaml.html"><span class="std std-doc">basic tutorial</span></a></p></li>
+<li><p>A GitHub account and fork of
+<a class="reference external" href="https://github.com/epics-containers/ibek-support">epics-containers/ibek-support</a></p></li>
+<li><p>Access to the <a class="reference external" href="https://github.com/DiamondLightSource/ffmpegServer">ffmpegServer module source</a> published on GitHub</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="read-builder-py">
+<h2>1. Read builder.py<a class="headerlink" href="#read-builder-py" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">/dls_sw/prod/R3.14.12.7/support/ffmpegServer/3-1dls17/etc/builder.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FFmpegServer</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Library dependencies for ffmpeg&#39;&#39;&#39;</span>
+    <span class="n">Dependencies</span> <span class="o">=</span> <span class="p">(</span><span class="n">ADCore</span><span class="p">,)</span>
+    <span class="n">LibFileList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;swresample&#39;</span><span class="p">,</span> <span class="s1">&#39;swscale&#39;</span><span class="p">,</span> <span class="s1">&#39;avutil&#39;</span><span class="p">,</span> <span class="s1">&#39;avcodec&#39;</span><span class="p">,</span> <span class="s1">&#39;avformat&#39;</span><span class="p">,</span> <span class="s1">&#39;avdevice&#39;</span><span class="p">,</span> <span class="s1">&#39;ffmpegServer&#39;</span><span class="p">]</span>
+    <span class="n">DbdFileList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ffmpegServer&#39;</span><span class="p">]</span>
+    <span class="n">AutoInstantiate</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="nd">@includesTemplates</span><span class="p">(</span><span class="n">NDPluginBaseTemplate</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ffmpegStream</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">):</span>
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;ffmpegStream.template&#39;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ffmpegStream</span><span class="p">(</span><span class="n">AsynPort</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;This plugin provides an http server that produces an mjpeg stream&#39;&#39;&#39;</span>
+    <span class="n">Dependencies</span> <span class="o">=</span> <span class="p">(</span><span class="n">FFmpegServer</span><span class="p">,)</span>
+    <span class="n">UniqueName</span> <span class="o">=</span> <span class="s2">&quot;PORT&quot;</span>
+    <span class="n">_SpecificTemplate</span> <span class="o">=</span> <span class="n">_ffmpegStream</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PORT</span><span class="p">,</span> <span class="n">NDARRAY_PORT</span><span class="p">,</span> <span class="n">QUEUE</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">HTTP_PORT</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span>
+                 <span class="n">BLOCK</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">NDARRAY_ADDR</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">MEMORY</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ENABLED</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">InitialiseOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ffmpegServerConfigure(</span><span class="si">%(HTTP_PORT)d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">Initialise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ffmpegStreamConfigure(&#39;</span>
+              <span class="s1">&#39;&quot;</span><span class="si">%(PORT)s</span><span class="s1">&quot;, </span><span class="si">%(QUEUE)d</span><span class="s1">, </span><span class="si">%(BLOCK)d</span><span class="s1">, &quot;</span><span class="si">%(NDARRAY_PORT)s</span><span class="s1">&quot;, &#39;</span>
+              <span class="s1">&#39;&quot;</span><span class="si">%(NDARRAY_ADDR)s</span><span class="s1">&quot;, </span><span class="si">%(MEMORY)d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ffmpegFile</span><span class="p">(</span><span class="n">AsynPort</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Initialise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ffmpegFileConfigure(&#39;</span>
+              <span class="s1">&#39;&quot;</span><span class="si">%(PORT)s</span><span class="s1">&quot;, </span><span class="si">%(QUEUE)d</span><span class="s1">, </span><span class="si">%(BLOCK)d</span><span class="s1">, &quot;</span><span class="si">%(NDARRAY_PORT)s</span><span class="s1">&quot;, &#39;</span>
+              <span class="s1">&#39;</span><span class="si">%(NDARRAY_ADDR)s</span><span class="s1">, </span><span class="si">%(BUFFERS)d</span><span class="s1">, </span><span class="si">%(MEMORY)d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="key-observations">
+<h3>Key observations<a class="headerlink" href="#key-observations" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation</p></th>
+<th class="head"><p>Implication</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FFmpegServer</span></code> has <code class="docutils literal notranslate"><span class="pre">AutoInstantiate</span> <span class="pre">=</span> <span class="pre">True</span></code></p></td>
+<td><p>It is loaded automatically by xmlbuilder; it does <strong>not</strong> become a user-facing entity model</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code> and <code class="docutils literal notranslate"><span class="pre">ffmpegFile</span></code> are <code class="docutils literal notranslate"><span class="pre">AsynPort</span></code> subclasses</p></td>
+<td><p>Each becomes one <code class="docutils literal notranslate"><span class="pre">entity_model</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">UniqueName</span> <span class="pre">=</span> <span class="pre">&quot;PORT&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code> is the unique identifier per instance, maps to <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code> in ibek</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">_ffmpegStream</span></code> uses <code class="docutils literal notranslate"><span class="pre">&#64;includesTemplates(NDPluginBaseTemplate)</span></code></p></td>
+<td><p>Macros from the base template (<code class="docutils literal notranslate"><span class="pre">SCANRATE</span></code>, <code class="docutils literal notranslate"><span class="pre">PRIORITY</span></code>, <code class="docutils literal notranslate"><span class="pre">STACKSIZE</span></code>) are also runtime parameters</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code> on <code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ffmpegServerConfigure()</span></code> runs <strong>once per IOC</strong> regardless of how many streams are configured — maps to <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">NDARRAY_PORT</span></code> is declared <code class="docutils literal notranslate"><span class="pre">Ident('...',</span> <span class="pre">AsynPort)</span></code></p></td>
+<td><p>It is a reference to another entity’s port — maps to <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="autoinstantiate-classes-no-entity-model-needed">
+<h2>2. <code class="docutils literal notranslate"><span class="pre">AutoInstantiate</span></code> classes — no entity model needed<a class="headerlink" href="#autoinstantiate-classes-no-entity-model-needed" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">FFmpegServer</span></code> only carries library/dbd dependencies.  In ibek these are
+expressed in <code class="docutils literal notranslate"><span class="pre">install.yml</span></code> (<code class="docutils literal notranslate"><span class="pre">libs</span></code>, <code class="docutils literal notranslate"><span class="pre">dbds</span></code>), not in <code class="docutils literal notranslate"><span class="pre">ibek.support.yaml</span></code>.
+<strong>Do not create an entity model for it.</strong></p>
+</section>
+<hr class="docutils" />
+<section id="initialiseonce-when-first">
+<h2>3. <code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code> → <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code><a class="headerlink" href="#initialiseonce-when-first" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ffmpegServerConfigure()</span></code> call must appear exactly once in <code class="docutils literal notranslate"><span class="pre">st.cmd</span></code> even
+when multiple <code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code> instances are created.  In ibek this is expressed
+with <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code> on the <code class="docutils literal notranslate"><span class="pre">pre_init</span></code> entry:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">pre_init</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">      </span><span class="no">ffmpegServerConfigure({{HTTP_PORT}})</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">      </span><span class="no"># ffmpegStreamConfigure(portName, queueSize, blockingCallbacks,</span>
+<span class="w">      </span><span class="no">#                        NDArrayPort, NDArrayAddr, maxBuffers, maxMemory,</span>
+<span class="w">      </span><span class="no">#                        priority, stackSize)</span>
+<span class="w">      </span><span class="no">ffmpegStreamConfigure(&quot;{{PORT}}&quot;, {{QUEUE}}, {{BLOCK}},</span>
+<span class="w">          </span><span class="no">&quot;{{NDARRAY_PORT}}&quot;, {{NDARRAY_ADDR}}, {{BUFFERS}}, {{MEMORY}},</span>
+<span class="w">          </span><span class="no">{{PRIORITY}}, {{STACKSIZE}})</span>
+</pre></div>
+</div>
+<p>ibek emits the <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code> block only for the first entity of this type
+that it encounters in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="ndarray-port-cross-referencing-another-entity">
+<h2>4. <code class="docutils literal notranslate"><span class="pre">NDARRAY_PORT</span></code> — cross-referencing another entity<a class="headerlink" href="#ndarray-port-cross-referencing-another-entity" title="Link to this heading">#</a></h2>
+<p>In builder XML, <code class="docutils literal notranslate"><span class="pre">NDARRAY_PORT</span></code> is an <code class="docutils literal notranslate"><span class="pre">Ident</span></code> argument that references another
+<code class="docutils literal notranslate"><span class="pre">AsynPort</span></code> instance by its <code class="docutils literal notranslate"><span class="pre">PORT</span></code> name:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;ffmpegServer.ffmpegStream</span><span class="w"> </span><span class="na">PORT=</span><span class="s">&quot;C1.MJPG&quot;</span><span class="w"> </span><span class="na">NDARRAY_PORT=</span><span class="s">&quot;C1.CAM&quot;</span>
+<span class="w">    </span><span class="na">P=</span><span class="s">&quot;BLxxI-DI-PHDGN-01&quot;</span><span class="w"> </span><span class="na">R=</span><span class="s">&quot;:MJPG:&quot;</span><span class="w"> </span><span class="na">HTTP_PORT=</span><span class="s">&quot;8081&quot;</span><span class="w"> </span><span class="na">ADDR=</span><span class="s">&quot;0&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>In ibek <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> expresses a reference to another entity’s <code class="docutils literal notranslate"><span class="pre">id</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">NDARRAY_PORT</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Input array port</span>
+</pre></div>
+</div>
+<p>At runtime ibek renders <code class="docutils literal notranslate"><span class="pre">{{NDARRAY_PORT}}</span></code> to the string value of the
+referenced entity’s <code class="docutils literal notranslate"><span class="pre">id</span></code> field (i.e. its PORT name), so the
+<code class="docutils literal notranslate"><span class="pre">ffmpegStreamConfigure</span></code> call gets the correct port name.</p>
+<p>In <code class="docutils literal notranslate"><span class="pre">databases.args</span></code>, <code class="docutils literal notranslate"><span class="pre">NDARRAY_PORT</span></code> is passed directly to <code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code>
+so the template receives the right <code class="docutils literal notranslate"><span class="pre">$(NDARRAY_PORT)</span></code> macro:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(FFMPEGSERVER)/db/ffmpegStream.template</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">PORT</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">R</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">NDARRAY_PORT</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MAXW</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MAXH</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">QUALITY</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">SETW</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">SETH</span><span class="p">:</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="macros-from-included-base-templates">
+<h2>5. Macros from included base templates<a class="headerlink" href="#macros-from-included-base-templates" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">_ffmpegStream</span></code> is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;includesTemplates(NDPluginBaseTemplate)</span></code>.
+This merges the base template’s macro set into <code class="docutils literal notranslate"><span class="pre">_ffmpegStream.ArgInfo</span></code>.
+Macros defined in <code class="docutils literal notranslate"><span class="pre">NDPluginBaseTemplate</span></code> that are <strong>not</strong> baked in by
+substitution patterns survive as runtime macros and must also appear in the
+ibek entity parameters.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code> the relevant inherited macros are <code class="docutils literal notranslate"><span class="pre">SCANRATE</span></code>, <code class="docutils literal notranslate"><span class="pre">PRIORITY</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">STACKSIZE</span></code>, which appear in <code class="docutils literal notranslate"><span class="pre">NDPluginBase.template</span></code> records.  Add them
+to the entity model with their builder defaults:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">PRIORITY</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Thread priority if ASYN_CANBLOCK is set</span>
+<span class="w">  </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nt">SCANRATE</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enum</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Scan rate for cpu-intensive PVs</span>
+<span class="w">  </span><span class="nt">values</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Passive</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">I/O Intr</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">.1 second</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">.2 second</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">.5 second</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">1 second</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">2 second</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">5 second</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">10 second</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">Event</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">I/O Intr</span>
+<span class="nt">STACKSIZE</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Stack size if ASYN_CANBLOCK is set</span>
+<span class="w">  </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="write-the-ibek-support-yaml">
+<h2>6. Write the ibek.support.yaml<a class="headerlink" href="#write-the-ibek-support-yaml" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ibek-support/ffmpegServer/ffmpegServer.ibek.support.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json</span>
+
+<span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServer</span>
+
+<span class="nt">entity_models</span><span class="p">:</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegStream</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">      </span><span class="no">Provides an http server that returns an mjpeg stream of NDArrays over http.</span>
+<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">PORT</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Port name for the ffmpegStream areaDetector plugin</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Device Prefix</span>
+<span class="w">      </span><span class="nt">R</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Device Suffix</span>
+<span class="w">      </span><span class="nt">NDARRAY_PORT</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Input array port</span>
+<span class="w">      </span><span class="nt">HTTP_PORT</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HTTP port for the mjpeg server</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">      </span><span class="nt">QUEUE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Input array queue size</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">BLOCK</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Blocking callbacks?</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">NDARRAY_ADDR</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Input array port address</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">BUFFERS</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Max buffers to allocate</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">      </span><span class="nt">MEMORY</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Max memory to allocate</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">MAXW</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Maximum Jpeg Width</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1600</span>
+<span class="w">      </span><span class="nt">MAXH</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Maximum Jpeg Height</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1200</span>
+<span class="w">      </span><span class="nt">SETW</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set initial Jpeg Width</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">SETH</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set initial Jpeg Height</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">QUALITY</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Quality of the JPEG compression in percent</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">      </span><span class="nt">PRIORITY</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Thread priority if ASYN_CANBLOCK is set</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">SCANRATE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">enum</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Scan rate for cpu-intensive PVs</span>
+<span class="w">        </span><span class="nt">values</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">Passive</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">I/O Intr</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">.1 second</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">.2 second</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">.5 second</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">1 second</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">2 second</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">5 second</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">10 second</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">Event</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">I/O Intr</span>
+<span class="w">      </span><span class="nt">STACKSIZE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Stack size if ASYN_CANBLOCK is set</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+
+<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">ffmpegServerConfigure({{HTTP_PORT}})</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no"># ffmpegStreamConfigure(portName, queueSize, blockingCallbacks,</span>
+<span class="w">          </span><span class="no">#                        NDArrayPort, NDArrayAddr, maxBuffers, maxMemory,</span>
+<span class="w">          </span><span class="no">#                        priority, stackSize)</span>
+<span class="w">          </span><span class="no">ffmpegStreamConfigure(&quot;{{PORT}}&quot;, {{QUEUE}}, {{BLOCK}}, &quot;{{NDARRAY_PORT}}&quot;, {{NDARRAY_ADDR}}, {{BUFFERS}}, {{MEMORY}}, {{PRIORITY}}, {{STACKSIZE}})</span>
+
+<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(FFMPEGSERVER)/db/ffmpegStream.template</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">R</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">NDARRAY_PORT</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">MAXW</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">MAXH</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">QUALITY</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">SETW</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">SETH</span><span class="p">:</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegFile</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">      </span><span class="no">Compresses a stream of NDArrays to video format and writes them to file.</span>
+<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">PORT</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Port name for the ffmpegFile areaDetector plugin</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Device Prefix</span>
+<span class="w">      </span><span class="nt">R</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Device Suffix</span>
+<span class="w">      </span><span class="nt">NDARRAY_PORT</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Input array port</span>
+<span class="w">      </span><span class="nt">QUEUE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Input array queue size</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">BLOCK</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Blocking callbacks?</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">NDARRAY_ADDR</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Input array port address</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">BUFFERS</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Max buffers to allocate</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">      </span><span class="nt">MEMORY</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Max memory to allocate</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">PRIORITY</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Thread priority if ASYN_CANBLOCK is set</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">STACKSIZE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Stack size if ASYN_CANBLOCK is set</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+
+<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no"># ffmpegFileConfigure(portName, queueSize, blockingCallbacks,</span>
+<span class="w">          </span><span class="no">#                      NDArrayPort, NDArrayAddr, maxBuffers, maxMemory,</span>
+<span class="w">          </span><span class="no">#                      priority, stackSize)</span>
+<span class="w">          </span><span class="no">ffmpegFileConfigure(&quot;{{PORT}}&quot;, {{QUEUE}}, {{BLOCK}}, &quot;{{NDARRAY_PORT}}&quot;, {{NDARRAY_ADDR}}, {{BUFFERS}}, {{MEMORY}}, {{PRIORITY}}, {{STACKSIZE}})</span>
+
+<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(FFMPEGSERVER)/db/ffmpegFile.template</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">R</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">NDARRAY_PORT</span><span class="p">:</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="write-the-install-yml">
+<h2>7. Write the install.yml<a class="headerlink" href="#write-the-install-yml" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ffmpegServer</span></code> links against system ffmpeg libraries rather than building them
+from source.  The <code class="docutils literal notranslate"><span class="pre">install.yml</span></code> uses <code class="docutils literal notranslate"><span class="pre">apt_developer</span></code> and <code class="docutils literal notranslate"><span class="pre">apt_runtime</span></code> to
+declare the required system packages, and <code class="docutils literal notranslate"><span class="pre">comment_out</span></code> / <code class="docutils literal notranslate"><span class="pre">patch_lines</span></code> to
+adapt the upstream Makefile.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ibek-support/ffmpegServer/ffmpegServer.install.yml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=../../ibek-support/_scripts/support_install_variables.json</span>
+
+<span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServer</span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3d192ed</span>
+<span class="nt">organization</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/DiamondLightSource</span>
+
+<span class="nt">dbds</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServer.dbd</span>
+
+<span class="nt">libs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServer</span>
+
+<span class="nt">apt_developer</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libavcodec-dev</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libswscale-dev</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libavformat-dev</span>
+
+<span class="nt">apt_runtime</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libavcodec60</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libswscale7</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">libavformat60</span>
+
+<span class="nt">comment_out</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># skip building vendored ffmpeg libraries</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Makefile</span>
+<span class="w">    </span><span class="nt">regexp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vendor</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServerApp/src/Makefile</span>
+<span class="w">    </span><span class="nt">regexp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vendor\/ffmpeg</span>
+
+<span class="nt">patch_lines</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># link against system ffmpeg instead of vendored build</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServerApp/src/Makefile</span>
+<span class="w">    </span><span class="nt">regexp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LIB_LIBS \+= avdevice</span>
+<span class="w">    </span><span class="nt">line</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServer_SYS_LIBS += avformat avcodec swresample swscale avutil</span>
+</pre></div>
+</div>
+<section id="install-yml-advanced-fields-explained">
+<h3><code class="docutils literal notranslate"><span class="pre">install.yml</span></code> advanced fields explained<a class="headerlink" href="#install-yml-advanced-fields-explained" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">apt_developer</span></code></p></td>
+<td><p>Packages installed into the <strong>builder</strong> Docker image layer (headers, <code class="docutils literal notranslate"><span class="pre">-dev</span></code> packages needed to compile)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">apt_runtime</span></code></p></td>
+<td><p>Packages installed into the <strong>runtime</strong> Docker image layer (shared libraries needed to run the IOC)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">comment_out</span></code></p></td>
+<td><p>Lines matching <code class="docutils literal notranslate"><span class="pre">regexp</span></code> in the specified file are commented out during the Docker build</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">patch_lines</span></code></p></td>
+<td><p>Lines matching <code class="docutils literal notranslate"><span class="pre">regexp</span></code> are replaced by <code class="docutils literal notranslate"><span class="pre">line</span></code> during the Docker build; here it switches from vendored to system ffmpeg</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="test-in-the-devcontainer">
+<h2>8. Test in the devcontainer<a class="headerlink" href="#test-in-the-devcontainer" title="Link to this heading">#</a></h2>
+<p>With the files written into <code class="docutils literal notranslate"><span class="pre">ibek-support/ffmpegServer/</span></code>, install and verify
+inside the Generic IOC devcontainer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible.sh<span class="w"> </span>ffmpegServer
+<span class="nb">cd</span><span class="w"> </span>/epics/ioc<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>make
+ibek<span class="w"> </span>ioc<span class="w"> </span>generate-schema<span class="w"> </span>&gt;<span class="w"> </span>/tmp/ibek.ioc.schema.json
+</pre></div>
+</div>
+<p>Convert a real IOC XML that uses ffmpegServer and verify with db-compare:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uvx<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span>example.xml<span class="w"> </span>--yaml<span class="w"> </span>/tmp/test.yaml
+<span class="c1"># then verify with ibek dev instance + db-compare</span>
+<span class="c1"># see verify-with-devcontainer.md</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="summary-of-advanced-patterns">
+<h2>Summary of advanced patterns<a class="headerlink" href="#summary-of-advanced-patterns" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>builder.py pattern</p></th>
+<th class="head"><p>ibek mapping</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AutoInstantiate</span> <span class="pre">=</span> <span class="pre">True</span></code></p></td>
+<td><p>No entity model; handled by <code class="docutils literal notranslate"><span class="pre">libs</span></code>/<code class="docutils literal notranslate"><span class="pre">dbds</span></code> in <code class="docutils literal notranslate"><span class="pre">install.yml</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pre_init</span></code> entry with <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Ident(...)</span></code> argument</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> parameter</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">UniqueName</span> <span class="pre">=</span> <span class="pre">&quot;PORT&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code> parameter has <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;includesTemplates(Base)</span></code></p></td>
+<td><p>Add the base template’s runtime macros to the entity parameters</p></td>
+</tr>
+<tr class="row-odd"><td><p>System package dependencies</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">apt_developer</span></code> / <code class="docutils literal notranslate"><span class="pre">apt_runtime</span></code> in <code class="docutils literal notranslate"><span class="pre">install.yml</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Upstream Makefile incompatibilities</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">comment_out</span></code> / <code class="docutils literal notranslate"><span class="pre">patch_lines</span></code> in <code class="docutils literal notranslate"><span class="pre">install.yml</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="create-support-yaml.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Creating ibek support YAML from a builder.py module</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="installation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-builder-py">1. Read builder.py</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-observations">Key observations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autoinstantiate-classes-no-entity-model-needed">2. <code class="docutils literal notranslate"><span class="pre">AutoInstantiate</span></code> classes — no entity model needed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialiseonce-when-first">3. <code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code> → <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ndarray-port-cross-referencing-another-entity">4. <code class="docutils literal notranslate"><span class="pre">NDARRAY_PORT</span></code> — cross-referencing another entity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#macros-from-included-base-templates">5. Macros from included base templates</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-ibek-support-yaml">6. Write the ibek.support.yaml</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-install-yml">7. Write the install.yml</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#install-yml-advanced-fields-explained"><code class="docutils literal notranslate"><span class="pre">install.yml</span></code> advanced fields explained</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-in-the-devcontainer">8. Test in the devcontainer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-advanced-patterns">Summary of advanced patterns</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/1.1.2/docs/tutorials/create-support-yaml-advanced.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/create-support-yaml-advanced.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

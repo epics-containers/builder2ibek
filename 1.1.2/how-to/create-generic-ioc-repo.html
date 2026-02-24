@@ -1,0 +1,748 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Create a Generic IOC repository &#8212; builder2ibek 1.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=6f037312"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/create-generic-ioc-repo';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.1.2';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Convert a builder XML IOC instance to ibek YAML" href="convert-ioc-instance.html" />
+    <link rel="prev" title="How-to Guides" href="../how-to.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.1.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Create a Generic IOC repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-instance.html">Convert a builder XML IOC instance to ibek YAML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autosave.html">Generating autosave req files from DB templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="verify-with-devcontainer.html">Verify a converted IOC using db-compare</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-converter.html">Create a builder2ibek converter for a support module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to the project</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Create a Generic IOC repository</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="create-a-generic-ioc-repository">
+<h1>Create a Generic IOC repository<a class="headerlink" href="#create-a-generic-ioc-repository" title="Link to this heading">#</a></h1>
+<p>A Generic IOC is a container image (or RTEMS binary) that bundles one or more
+support modules and can be configured at runtime by ibek from an <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> file.
+This guide shows how to create the repository that produces the image.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">copier</span></code> installed (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">copier</span></code> or <code class="docutils literal notranslate"><span class="pre">uvx</span> <span class="pre">copier</span></code>)</p></li>
+<li><p>Git and access to the <code class="docutils literal notranslate"><span class="pre">epics-containers</span></code> GitHub organisation</p></li>
+<li><p>The ibek support YAML for your module already exists in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>
+(see <a class="reference internal" href="../tutorials/create-support-yaml.html"><span class="std std-doc">Creating ibek support YAML</span></a>)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="generate-from-ioc-template">
+<h2>1. Generate from ioc-template<a class="headerlink" href="#generate-from-ioc-template" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://github.com/epics-containers/ioc-template">ioc-template</a> is a copier
+template that scaffolds the Generic IOC repository.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uvx<span class="w"> </span>copier<span class="w"> </span>copy<span class="w"> </span>--trust<span class="w"> </span>gh:epics-containers/ioc-template<span class="w"> </span>ioc-&lt;module&gt;
+</pre></div>
+</div>
+<p>Answer the prompts (IOC name, description, base image, etc.). This produces a
+directory <code class="docutils literal notranslate"><span class="pre">ioc-&lt;module&gt;/</span></code> with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ioc-&lt;module&gt;/
+├── Dockerfile
+├── ioc/                   # EPICS IOC application source
+│   ├── iocApp/src/Makefile
+│   └── configure/RELEASE
+├── ibek-support/          # submodule: community support yaml
+├── ibek-support-dls/      # submodule: DLS-specific support yaml
+├── tests/
+├── requirements.txt       # pinned ibek version
+└── README.md
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="add-the-ibek-support-dls-submodule">
+<h2>2. Add the ibek-support-dls submodule<a class="headerlink" href="#add-the-ibek-support-dls-submodule" title="Link to this heading">#</a></h2>
+<p>If your module lives in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code> rather than the community
+<code class="docutils literal notranslate"><span class="pre">ibek-support</span></code>, add it as a submodule:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ioc-&lt;module&gt;
+git<span class="w"> </span>submodule<span class="w"> </span>add<span class="w"> </span>https://gitlab.diamond.ac.uk/controls/ioc/ibek-support-dls
+</pre></div>
+</div>
+<p>Or initialise the existing placeholder:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>ibek-support-dls
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="edit-the-dockerfile">
+<h2>3. Edit the Dockerfile<a class="headerlink" href="#edit-the-dockerfile" title="Link to this heading">#</a></h2>
+<p>The Dockerfile drives the container build.  Add <code class="docutils literal notranslate"><span class="pre">ansible.sh</span></code> invocations for
+each support module you want to include.</p>
+<p>Example — <code class="docutils literal notranslate"><span class="pre">ioc-hidenrga/Dockerfile</span></code>:</p>
+<div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><span class="k">ARG</span><span class="w"> </span>IMAGE_EXT
+
+<span class="k">ARG</span><span class="w"> </span><span class="nv">REGISTRY</span><span class="o">=</span>ghcr.io/epics-containers
+<span class="k">ARG</span><span class="w"> </span><span class="nv">RUNTIME</span><span class="o">=</span><span class="si">${</span><span class="nv">REGISTRY</span><span class="si">}</span>/epics-base<span class="si">${</span><span class="nv">IMAGE_EXT</span><span class="si">}</span>-runtime:7.0.10ec1
+<span class="k">ARG</span><span class="w"> </span><span class="nv">DEVELOPER</span><span class="o">=</span><span class="si">${</span><span class="nv">REGISTRY</span><span class="si">}</span>/ioc-asyn-developer:4.45ec3
+
+<span class="c">##### build stage ##############################################################</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">${DEVELOPER}</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">developer</span>
+
+<span class="k">ENV</span><span class="w"> </span><span class="nv">SOURCE_FOLDER</span><span class="o">=</span>/epics/generic-source
+<span class="k">RUN</span><span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span><span class="si">${</span><span class="nv">SOURCE_FOLDER</span><span class="si">}</span>/ioc<span class="w"> </span><span class="si">${</span><span class="nv">IOC</span><span class="si">}</span>
+
+<span class="c"># Get the current version of ibek</span>
+<span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>requirements.txt
+<span class="k">RUN</span><span class="w"> </span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">${SOURCE_FOLDER}/ibek-support</span>
+
+<span class="k">COPY</span><span class="w"> </span>ibek-support/_ansible<span class="w"> </span>_ansible
+<span class="k">ENV</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="si">${</span><span class="nv">SOURCE_FOLDER</span><span class="si">}</span>/ibek-support/_ansible
+
+<span class="c"># Community support modules (iocStats provides devIocStats.iocAdminSoft)</span>
+<span class="k">COPY</span><span class="w"> </span>ibek-support/iocStats/<span class="w"> </span>iocStats
+<span class="k">RUN</span><span class="w"> </span>ansible.sh<span class="w"> </span>iocStats
+
+<span class="k">COPY</span><span class="w"> </span>ibek-support/StreamDevice/<span class="w"> </span>StreamDevice/
+<span class="k">RUN</span><span class="w"> </span>ansible.sh<span class="w"> </span>StreamDevice
+
+<span class="c"># DLS-specific support modules</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">${SOURCE_FOLDER}/ibek-support-dls</span>
+
+<span class="k">COPY</span><span class="w"> </span>ibek-support-dls/hidenrga/<span class="w"> </span>hidenrga/
+<span class="k">RUN</span><span class="w"> </span>ansible.sh<span class="w"> </span>hidenrga
+
+<span class="c"># Build the IOC</span>
+<span class="k">COPY</span><span class="w"> </span>ioc<span class="w"> </span><span class="si">${</span><span class="nv">SOURCE_FOLDER</span><span class="si">}</span>/ioc
+<span class="k">RUN</span><span class="w"> </span>ansible.sh<span class="w"> </span>ioc
+
+<span class="c">##### runtime preparation stage ################################################</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">developer</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">runtime_prep</span>
+
+<span class="k">RUN</span><span class="w"> </span>ibek<span class="w"> </span>ioc<span class="w"> </span>extract-runtime-assets<span class="w"> </span>/assets<span class="w"> </span>/python
+
+<span class="c">##### runtime stage ############################################################</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">${RUNTIME}</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">runtime</span>
+
+<span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>runtime_prep<span class="w"> </span>/assets<span class="w"> </span>/
+<span class="k">RUN</span><span class="w"> </span>ibek<span class="w"> </span>support<span class="w"> </span>apt-install-runtime-packages
+
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;bash&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-c&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;${IOC}/start.sh&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Key points:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">DEVELOPER</span></code> base image already provides asyn, StreamDevice, and other
+common support; build on top of it rather than starting from scratch.</p></li>
+<li><p>Each <code class="docutils literal notranslate"><span class="pre">ansible.sh</span> <span class="pre">&lt;module&gt;</span></code> call reads the module’s <code class="docutils literal notranslate"><span class="pre">install.yml</span></code> and compiles
+the support.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code> modules follow the same pattern as community modules.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="verify-the-ibek-support-dls-module-name">
+<h2>4. Verify the ibek-support-dls module name<a class="headerlink" href="#verify-the-ibek-support-dls-module-name" title="Link to this heading">#</a></h2>
+<p>The folder name under <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/</span></code> must be lowercase and match the name
+used in <code class="docutils literal notranslate"><span class="pre">ansible.sh</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ibek-support-dls/
+└── hidenrga/              ← lowercase folder
+    ├── hidenRGA.ibek.support.yaml
+    └── hidenRGA.install.yml
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">module:</span></code> field inside <code class="docutils literal notranslate"><span class="pre">hidenRGA.ibek.support.yaml</span></code> must match the capitalised
+module name as used in entity type prefixes (e.g. <code class="docutils literal notranslate"><span class="pre">hidenRGA.hidenRGA_qga</span></code>).</p>
+</section>
+<hr class="docutils" />
+<section id="build-and-test-locally">
+<h2>5. Build and test locally<a class="headerlink" href="#build-and-test-locally" title="Link to this heading">#</a></h2>
+<p>With Docker (or Podman) available, test the build inside the devcontainer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open in VSCode → &quot;Reopen in Container&quot;</span>
+<span class="c1"># Or on the command line:</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>ioc-hidenrga:dev<span class="w"> </span>.
+</pre></div>
+</div>
+<p>Then run a test conversion to verify that ibek can resolve all entity types:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span>tests/samples/MY-IOC.xml<span class="w"> </span>--yaml<span class="w"> </span>/tmp/my-ioc.yaml
+ibek<span class="w"> </span>ioc<span class="w"> </span>generate<span class="w"> </span>--definitions<span class="w"> </span>/path/to/ibek-support-dls<span class="w"> </span>--ioc<span class="w"> </span>/tmp/my-ioc.yaml
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="hybrid-rtems-variant">
+<h2>6. Hybrid RTEMS variant<a class="headerlink" href="#hybrid-rtems-variant" title="Link to this heading">#</a></h2>
+<p>For RTEMS-beatnik (PowerPC) targets the approach differs slightly — a native
+EPICS Makefile build is used instead of Docker:</p>
+<ul class="simple">
+<li><p>The repo structure is a standard EPICS application (see
+<code class="docutils literal notranslate"><span class="pre">/dls_sw/work/R7.0.7/ioc/BL/bl-va-ioc-01</span></code> as reference).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support/</span></code> and <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/</span></code> are still present as submodules, but
+they are <strong>not</strong> used by <code class="docutils literal notranslate"><span class="pre">make</span></code> — they pin the ibek YAML versions that the
+<code class="docutils literal notranslate"><span class="pre">rtems-proxy</span></code> will use at runtime to generate <code class="docutils literal notranslate"><span class="pre">st.cmd</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">src/Makefile</span></code> lists DBDs and libs explicitly; <code class="docutils literal notranslate"><span class="pre">ansible.sh</span></code> is not used.</p></li>
+<li><p>See the <code class="docutils literal notranslate"><span class="pre">AGENTS.md</span></code> in that repo for RTEMS-specific gotchas (e.g.
+<code class="docutils literal notranslate"><span class="pre">utilityRTEMS.dbd</span></code> vs <code class="docutils literal notranslate"><span class="pre">utility.dbd</span></code>).</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../how-to.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">How-to Guides</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="convert-ioc-instance.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Convert a builder XML IOC instance to ibek YAML</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-from-ioc-template">1. Generate from ioc-template</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-the-ibek-support-dls-submodule">2. Add the ibek-support-dls submodule</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#edit-the-dockerfile">3. Edit the Dockerfile</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-the-ibek-support-dls-module-name">4. Verify the ibek-support-dls module name</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-test-locally">5. Build and test locally</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hybrid-rtems-variant">6. Hybrid RTEMS variant</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/1.1.2/docs/how-to/create-generic-ioc-repo.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/how-to/create-generic-ioc-repo.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

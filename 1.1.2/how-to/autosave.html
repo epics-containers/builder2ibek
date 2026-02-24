@@ -1,0 +1,833 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Generating autosave req files from DB templates &#8212; builder2ibek 1.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=6f037312"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/autosave';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.1.2';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Verify a converted IOC using db-compare" href="verify-with-devcontainer.html" />
+    <link rel="prev" title="Convert a builder XML IOC instance to ibek YAML" href="convert-ioc-instance.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.1.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="create-generic-ioc-repo.html">Create a Generic IOC repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-instance.html">Convert a builder XML IOC instance to ibek YAML</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Generating autosave req files from DB templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="verify-with-devcontainer.html">Verify a converted IOC using db-compare</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-converter.html">Create a builder2ibek converter for a support module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to the project</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Generating autosave req files from DB templates</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="generating-autosave-req-files-from-db-templates">
+<h1>Generating autosave req files from DB templates<a class="headerlink" href="#generating-autosave-req-files-from-db-templates" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">autosave</span></code> reads DLS EPICS DB template files that contain
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%</span> <span class="pre">autosave</span> <span class="pre">N</span></code> comments and writes the standard autosave <code class="docutils literal notranslate"><span class="pre">.req</span></code> files
+needed by the EPICS autosave module in a Generic IOC.</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
+<p>DLS DB templates embed autosave hints as structured comments immediately
+before <code class="docutils literal notranslate"><span class="pre">record(...)</span></code> declarations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % autosave 0 VAL</span>
+<span class="n">record</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="s2">&quot;$(device):SETPOINT&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>These comments were consumed at build time by the DLS <code class="docutils literal notranslate"><span class="pre">iocbuilder</span></code> toolchain.
+When migrating a support module to an ibek Generic IOC the same information
+must be expressed as standard autosave request files (<code class="docutils literal notranslate"><span class="pre">_positions.req</span></code> and
+<code class="docutils literal notranslate"><span class="pre">_settings.req</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">autosave</span></code> extracts all autosave hints from the template files
+and writes those request files automatically.</p>
+</section>
+<hr class="docutils" />
+<section id="autosave-comment-syntax">
+<h2>Autosave comment syntax<a class="headerlink" href="#autosave-comment-syntax" title="Link to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % autosave &lt;level&gt; [&lt;FIELD&gt; ...]</span>
+<span class="n">record</span><span class="p">(</span><span class="o">&lt;</span><span class="nb">type</span><span class="o">&gt;</span><span class="p">,</span> <span class="s2">&quot;&lt;PV_NAME&gt;&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The comment applies to the <strong>next</strong> <code class="docutils literal notranslate"><span class="pre">record(...)</span></code> declaration in the file.</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">&lt;level&gt;</span></code></strong> — <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>, or <code class="docutils literal notranslate"><span class="pre">2</span></code> (see level mapping below)</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">&lt;FIELD&gt;</span> <span class="pre">...</span></code></strong> — optional space-separated list of field names to save.
+If omitted, the entire record is saved (equivalent to writing the PV name
+without a field in the <code class="docutils literal notranslate"><span class="pre">.req</span></code> file).</p></li>
+</ul>
+<p>A record can carry <strong>multiple</strong> autosave comments at different levels:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % autosave 0 VAL</span>
+<span class="c1"># % autosave 2 ZRST ONST TWST THST FRST FVST SXST SVST</span>
+<span class="n">record</span><span class="p">(</span><span class="n">mbbo</span><span class="p">,</span> <span class="s2">&quot;$(device):$(loop_name):PID:SELECT&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="level-mapping">
+<h2>Level mapping<a class="headerlink" href="#level-mapping" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>DLS level</p></th>
+<th class="head"><p>Meaning</p></th>
+<th class="head"><p>Output file</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Save on autosave pass 0 (restore on IOC start)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;stem&gt;_positions.req</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Save on pass 0 <strong>and</strong> pass 1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;stem&gt;_settings.req</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
+<td><p>Save on pass 1 only</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&lt;stem&gt;_settings.req</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Levels 1 and 2 both map to <code class="docutils literal notranslate"><span class="pre">_settings.req</span></code> because AreaDetector and other
+community modules use this convention, and the autosave documentation notes
+that pass-1-only saves are rarely needed in practice.</p>
+</section>
+<hr class="docutils" />
+<section id="running-the-command">
+<h2>Running the command<a class="headerlink" href="#running-the-command" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>autosave<span class="w"> </span>&lt;db_template&gt;<span class="w"> </span><span class="o">[</span>&lt;db_template&gt;<span class="w"> </span>...<span class="o">]</span><span class="w"> </span>--out-folder<span class="w"> </span>&lt;path&gt;
+</pre></div>
+</div>
+<section id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DB_LIST...</span></code></p></td>
+<td><p>One or more DB template files (<code class="docutils literal notranslate"><span class="pre">.template</span></code>, <code class="docutils literal notranslate"><span class="pre">.db</span></code>) containing <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%</span> <span class="pre">autosave</span> <span class="pre">N</span></code> comments</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--out-folder</span> <span class="pre">PATH</span></code></p></td>
+<td><p>Directory to write <code class="docutils literal notranslate"><span class="pre">.req</span></code> files into (default: current directory)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="output-files">
+<h3>Output files<a class="headerlink" href="#output-files" title="Link to this heading">#</a></h3>
+<p>For each input file <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.template</span></code> the command creates:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;_positions.req</span></code> — if any level-0 entries were found</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;_settings.req</span></code> — if any level-1 or level-2 entries were found</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
+<section id="input-hiden-rga-sens-src-template">
+<h3>Input: <code class="docutils literal notranslate"><span class="pre">hiden_rga_sens_src.template</span></code><a class="headerlink" href="#input-hiden-rga-sens-src-template" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % autosave 2</span>
+<span class="n">record</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="s2">&quot;$(P)$(Q):M$(M):SENS_SP&quot;</span><span class="p">)</span> <span class="p">{</span>
+  <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="command">
+<h3>Command<a class="headerlink" href="#command" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>autosave<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>hidenRGAApp/Db/hiden_rga_sens_src.template<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--out-folder<span class="w"> </span>hidenRGAApp/Db/
+</pre></div>
+</div>
+</section>
+<section id="output-hiden-rga-sens-src-settings-req">
+<h3>Output: <code class="docutils literal notranslate"><span class="pre">hiden_rga_sens_src_settings.req</span></code><a class="headerlink" href="#output-hiden-rga-sens-src-settings-req" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$(P)$(Q):M$(M):SENS_SP
+</pre></div>
+</div>
+<p>(No <code class="docutils literal notranslate"><span class="pre">_positions.req</span></code> is written because there are no level-0 entries.)</p>
+</section>
+<hr class="docutils" />
+<section id="example-with-field-level-saves">
+<h3>Example with field-level saves<a class="headerlink" href="#example-with-field-level-saves" title="Link to this heading">#</a></h3>
+<section id="input-eurothermlooppidselect-template-excerpt">
+<h4>Input: <code class="docutils literal notranslate"><span class="pre">eurothermLoopPIDselect.template</span></code> (excerpt)<a class="headerlink" href="#input-eurothermlooppidselect-template-excerpt" title="Link to this heading">#</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % autosave 0 VAL</span>
+<span class="n">record</span><span class="p">(</span><span class="n">ao</span><span class="p">,</span> <span class="s2">&quot;$(device):$(loop_name):PID:SETVALUE1&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+
+<span class="c1"># % autosave 0 VAL</span>
+<span class="c1"># % autosave 2 ZRST ONST TWST THST FRST FVST SXST SVST</span>
+<span class="n">record</span><span class="p">(</span><span class="n">mbbo</span><span class="p">,</span> <span class="s2">&quot;$(device):$(loop_name):PID:SELECT&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="output-eurothermlooppidselect-positions-req">
+<h4>Output: <code class="docutils literal notranslate"><span class="pre">eurothermLoopPIDselect_positions.req</span></code><a class="headerlink" href="#output-eurothermlooppidselect-positions-req" title="Link to this heading">#</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$(device):$(loop_name):PID:SETVALUE1.VAL
+$(device):$(loop_name):PID:SELECT.VAL
+</pre></div>
+</div>
+</section>
+<section id="output-eurothermlooppidselect-settings-req">
+<h4>Output: <code class="docutils literal notranslate"><span class="pre">eurothermLoopPIDselect_settings.req</span></code><a class="headerlink" href="#output-eurothermlooppidselect-settings-req" title="Link to this heading">#</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$(device):$(loop_name):PID:SELECT.ZRST
+$(device):$(loop_name):PID:SELECT.ONST
+$(device):$(loop_name):PID:SELECT.TWST
+$(device):$(loop_name):PID:SELECT.THST
+$(device):$(loop_name):PID:SELECT.FRST
+$(device):$(loop_name):PID:SELECT.FVST
+$(device):$(loop_name):PID:SELECT.SXST
+$(device):$(loop_name):PID:SELECT.SVST
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="processing-multiple-templates-at-once">
+<h2>Processing multiple templates at once<a class="headerlink" href="#processing-multiple-templates-at-once" title="Link to this heading">#</a></h2>
+<p>Pass all template files as positional arguments to generate all <code class="docutils literal notranslate"><span class="pre">.req</span></code> files
+in one invocation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>autosave<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>hidenRGAApp/Db/hiden_generic.db<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>hidenRGAApp/Db/hiden_rga_sens_src.template<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>hidenRGAApp/Db/hiden_rga_mid_mass.template<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--out-folder<span class="w"> </span>hidenRGAApp/Db/
+</pre></div>
+</div>
+<p>Or use shell globbing:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>autosave<span class="w"> </span>hidenRGAApp/Db/*.template<span class="w"> </span>--out-folder<span class="w"> </span>hidenRGAApp/Db/
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="where-to-place-the-generated-files">
+<h2>Where to place the generated files<a class="headerlink" href="#where-to-place-the-generated-files" title="Link to this heading">#</a></h2>
+<p>Place the <code class="docutils literal notranslate"><span class="pre">.req</span></code> files alongside the DB templates inside the support module
+source tree, typically in <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;App/Db/</span></code>.  Commit them to version control
+so that the Generic IOC Docker build includes them without needing to run
+<code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">autosave</span></code> at build time.</p>
+<p>At runtime, ibek’s <code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">runtime</span> <span class="pre">generate2</span></code> command scans all entities in
+<code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> and assembles the aggregate <code class="docutils literal notranslate"><span class="pre">autosave_positions.req</span></code> and
+<code class="docutils literal notranslate"><span class="pre">autosave_settings.req</span></code> files in <code class="docutils literal notranslate"><span class="pre">/epics/runtime/</span></code>.  The <code class="docutils literal notranslate"><span class="pre">autosave.Autosave</span></code>
+entity then loads these via <code class="docutils literal notranslate"><span class="pre">create_monitor_set</span></code> in the startup script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># from autosave.ibek.support.yaml</span>
+<span class="n">set_requestfile_path</span><span class="p">(</span><span class="s2">&quot;/epics&quot;</span><span class="p">,</span> <span class="s2">&quot;runtime&quot;</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">create_monitor_set</span> <span class="n">autosave_positions</span><span class="o">.</span><span class="n">req</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+<span class="n">create_monitor_set</span> <span class="n">autosave_settings</span><span class="o">.</span><span class="n">req</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<p>This means the per-module <code class="docutils literal notranslate"><span class="pre">.req</span></code> files generated by <code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">autosave</span></code>
+feed into the ibek runtime generation pipeline rather than being loaded
+directly by the EPICS autosave module.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you are not using a DLS support module, but are switching to using the upstream
+module and it has no .req files then you have two options:</p>
+<ol class="arabic simple">
+<li><p>add the req files as above and submit a PR to upstream (not always possible)</p></li>
+<li><p>drop the generated req files into the ibek-support folder alongside
+xxx.ibek.support.yaml. These will be used at runtime by ibek startup.</p></li>
+</ol>
+</div>
+</section>
+<hr class="docutils" />
+<section id="integration-with-the-conversion-workflow">
+<h2>Integration with the conversion workflow<a class="headerlink" href="#integration-with-the-conversion-workflow" title="Link to this heading">#</a></h2>
+<p>If you are converting an existing DLS IOC support module to ibek, generate
+the autosave request files as part of the initial migration:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="../tutorials/create-support-yaml.html"><span class="std std-doc">Create the ibek support YAML</span></a></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">autosave</span></code> on all DB templates that carry <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%</span> <span class="pre">autosave</span></code>
+comments</p></li>
+<li><p>Commit the generated <code class="docutils literal notranslate"><span class="pre">.req</span></code> files into the support module’s <code class="docutils literal notranslate"><span class="pre">Db/</span></code> directory</p></li>
+<li><p>Add an <code class="docutils literal notranslate"><span class="pre">autosave.Autosave</span></code> entity to your <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> (this is usually
+already present in converted IOCs — see
+<a class="reference internal" href="convert-ioc-instance.html"><span class="std std-doc">Convert an IOC instance</span></a>)</p></li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="convert-ioc-instance.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Convert a builder XML IOC instance to ibek YAML</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="verify-with-devcontainer.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Verify a converted IOC using db-compare</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autosave-comment-syntax">Autosave comment syntax</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#level-mapping">Level mapping</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-command">Running the command</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arguments">Arguments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-files">Output files</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-hiden-rga-sens-src-template">Input: <code class="docutils literal notranslate"><span class="pre">hiden_rga_sens_src.template</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#command">Command</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-hiden-rga-sens-src-settings-req">Output: <code class="docutils literal notranslate"><span class="pre">hiden_rga_sens_src_settings.req</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-with-field-level-saves">Example with field-level saves</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#input-eurothermlooppidselect-template-excerpt">Input: <code class="docutils literal notranslate"><span class="pre">eurothermLoopPIDselect.template</span></code> (excerpt)</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#output-eurothermlooppidselect-positions-req">Output: <code class="docutils literal notranslate"><span class="pre">eurothermLoopPIDselect_positions.req</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#output-eurothermlooppidselect-settings-req">Output: <code class="docutils literal notranslate"><span class="pre">eurothermLoopPIDselect_settings.req</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-multiple-templates-at-once">Processing multiple templates at once</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-place-the-generated-files">Where to place the generated files</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integration-with-the-conversion-workflow">Integration with the conversion workflow</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/1.1.2/docs/how-to/autosave.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/how-to/autosave.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

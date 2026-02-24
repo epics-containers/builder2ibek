@@ -1,0 +1,1069 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 1.1.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=6f037312"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/create-support-yaml';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.1.2';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Advanced: ibek support YAML for a complex builder.py" href="create-support-yaml-advanced.html" />
+    <link rel="prev" title="Tutorials" href="../tutorials.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.1.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating ibek support YAML from a builder.py module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-support-yaml-advanced.html">Advanced: ibek support YAML for a complex builder.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Creating ibek support YAML from a builder.py module</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="creating-ibek-support-yaml-from-a-builder-py-module">
+<h1>Creating ibek support YAML from a builder.py module<a class="headerlink" href="#creating-ibek-support-yaml-from-a-builder-py-module" title="Link to this heading">#</a></h1>
+<p>This tutorial walks you through converting a DLS EPICS support module that uses
+the old XMLbuilder (<code class="docutils literal notranslate"><span class="pre">builder.py</span></code>) format into the ibek YAML files needed for a
+Generic IOC. We use the <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> support module as a concrete example.</p>
+<p>After completing this tutorial you will have created:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support-dls/&lt;module&gt;/&lt;module&gt;.ibek.support.yaml</span></code> — entity model definitions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support-dls/&lt;module&gt;/&lt;module&gt;.install.yml</span></code> — build dependencies and assets</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>This tutorial targets <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>, the DLS-internal support
+repository.</strong>  If your module could be useful to other facilities, it is
+strongly recommended to open-source it and contribute the support YAML to the
+community <code class="docutils literal notranslate"><span class="pre">ibek-support</span></code> repository on GitHub instead.  The epics-containers
+project provides a full tutorial for this approach, using the Lakeshore 340
+temperature controller as an example:</p>
+<p><a class="reference external" href="https://epics-containers.github.io/main/tutorials/generic_ioc.html#lakeshore-340-temperature-controller">epics-containers: Creating a Generic IOC — Lakeshore 340</a></p>
+<p>For a tutorial covering a more complex module and the full open-source
+contribution workflow, see
+<a class="reference internal" href="create-support-yaml-advanced.html"><span class="std std-doc">Advanced: ibek support YAML for a complex builder.py module</span></a>.</p>
+</div>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Access to the module source at its DLS prod or work path</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code> repository (or submodule) to write the files into</p></li>
+<li><p>Familiarity with EPICS asyn/StreamDevice concepts</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="read-builder-py">
+<h2>1. Read builder.py<a class="headerlink" href="#read-builder-py" title="Link to this heading">#</a></h2>
+<p>Find <code class="docutils literal notranslate"><span class="pre">etc/builder.py</span></code> in the module. Each Python class becomes one <code class="docutils literal notranslate"><span class="pre">entity_model</span></code>
+in the support YAML.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> at <code class="docutils literal notranslate"><span class="pre">/dls_sw/prod/R3.14.12.7/support/hidenRGA/1-12/etc/builder.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.streamDevice</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoProtocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">Device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.arginfo</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.seq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Seq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.asyn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Asyn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.calc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Calc</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Generic Hiden RGA module&#39;&#39;&#39;</span>
+
+    <span class="n">Dependencies</span> <span class="o">=</span> <span class="p">(</span><span class="n">Seq</span><span class="p">,</span> <span class="n">Asyn</span><span class="p">,</span> <span class="n">Calc</span><span class="p">)</span>
+    <span class="n">WarnMacros</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_generic.db&#39;</span>
+    <span class="n">ProtocolFiles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hiden_rga.proto&#39;</span><span class="p">]</span>
+    <span class="n">LibFileList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hidenRGA&#39;</span><span class="p">]</span>
+    <span class="n">DbdFileList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hidenRGASupport&#39;</span><span class="p">,</span> <span class="s1">&#39;sncHidenRGA&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">PostIocInitialise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="s1">&#39;seq(sncDegas, &quot;P=</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA_hpr20</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Hiden High Pressure Gas Analyser. Specialised for the Diamond High</span>
+<span class="sd">    Pressure Sample Environment project.&#39;&#39;&#39;</span>
+    <span class="o">...</span>
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_hpr20.db&#39;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA_qga</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Hiden Quad Gas Analyser&#39;&#39;&#39;</span>
+    <span class="o">...</span>
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_qga.db&#39;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA_HMT</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Hiden HMT RC RGA module&#39;&#39;&#39;</span>
+    <span class="o">...</span>
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_HMT.db&#39;</span>
+</pre></div>
+</div>
+<p>Key information extracted:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Classes / entity models</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_HMT</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_hpr20</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Template files</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hiden_generic.db</span></code>, <code class="docutils literal notranslate"><span class="pre">hiden_HMT.db</span></code>, <code class="docutils literal notranslate"><span class="pre">hiden_hpr20.db</span></code>, <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Lib</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>DBDs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hidenRGASupport</span></code>, <code class="docutils literal notranslate"><span class="pre">sncHidenRGA</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Protocol file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hiden_rga.proto</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PostIocInitialise</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">seq(sncDegas,</span> <span class="pre">&quot;P=&lt;P&gt;&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Dependencies</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Seq</span></code>, <code class="docutils literal notranslate"><span class="pre">Asyn</span></code>, <code class="docutils literal notranslate"><span class="pre">Calc</span></code> (implies asyn IP port is configured separately)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="determine-runtime-vs-baked-in-macros">
+<h2>2. Determine runtime vs baked-in macros<a class="headerlink" href="#determine-runtime-vs-baked-in-macros" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">AutoSubstitution</span></code> classes derive their parameters from the template’s
+substitution file. Macros that appear <strong>in the pattern rows</strong> are expanded by MSI
+at build time and do not survive into the compiled <code class="docutils literal notranslate"><span class="pre">.db</span></code>. Only macros <strong>absent
+from patterns</strong> remain as <code class="docutils literal notranslate"><span class="pre">$(MACRO)</span></code> references at runtime.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> the relevant substitution file is
+<code class="docutils literal notranslate"><span class="pre">hidenRGAApp/Db/hiden_qga.substitutions</span></code> (same logic applies to all four variants):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">file</span> <span class="n">hiden_rga_global</span><span class="o">.</span><span class="n">template</span>
+<span class="p">{</span>
+<span class="n">pattern</span> <span class="p">{</span><span class="n">MASS_RANGE</span><span class="p">}</span>
+ <span class="p">{</span><span class="mi">200</span><span class="p">}</span>
+<span class="p">}</span>
+<span class="o">...</span>
+<span class="n">file</span> <span class="n">hiden_rga_mid_mass</span><span class="o">.</span><span class="n">template</span>
+<span class="p">{</span>
+<span class="n">pattern</span> <span class="p">{</span><span class="n">NAME</span><span class="p">,</span> <span class="n">ROW</span><span class="p">,</span> <span class="n">MASS</span><span class="p">,</span> <span class="n">MASS_RANGE</span><span class="p">,</span> <span class="n">DETECTOR</span><span class="p">,</span> <span class="n">VARIABLE</span><span class="p">,</span> <span class="n">DWELL</span><span class="p">,</span> <span class="n">SETTLE</span><span class="p">,</span> <span class="n">EGU</span><span class="p">,</span> <span class="n">PREC</span><span class="p">,</span> <span class="n">ADEL</span><span class="p">,</span> <span class="n">EGUCAL</span><span class="p">,</span> <span class="n">ENABLE</span><span class="p">,</span> <span class="n">DISP</span><span class="p">}</span>
+ <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">Torr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1e-11</span><span class="p">,</span> <span class="n">mbar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">}</span>
+ <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code> appears in every pattern row — it is baked in.</p>
+<p>The macros <strong>not</strong> present in any pattern row — <code class="docutils literal notranslate"><span class="pre">P</span></code>, <code class="docutils literal notranslate"><span class="pre">Q</span></code>, <code class="docutils literal notranslate"><span class="pre">PORT</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code> — survive as <code class="docutils literal notranslate"><span class="pre">$(P)</span></code>, <code class="docutils literal notranslate"><span class="pre">$(Q)</span></code>, <code class="docutils literal notranslate"><span class="pre">$(PORT)</span></code>, <code class="docutils literal notranslate"><span class="pre">$(BUFFER_SIZE)</span></code> in the
+compiled <code class="docutils literal notranslate"><span class="pre">.db</span></code> and <strong>must</strong> be passed at <code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code> time.</p>
+</section>
+<hr class="docutils" />
+<section id="map-builder-arguments-to-ibek-parameters">
+<h2>3. Map builder arguments to ibek parameters<a class="headerlink" href="#map-builder-arguments-to-ibek-parameters" title="Link to this heading">#</a></h2>
+<p>In builder XML, <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> appeared like this:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hidenRGA.hidenRGA_qga</span><span class="w"> </span><span class="na">BUFFER_SIZE=</span><span class="s">&quot;100&quot;</span><span class="w"> </span><span class="na">P=</span><span class="s">&quot;BL11I-EA-RGA-01&quot;</span><span class="w"> </span><span class="na">PORT=</span><span class="s">&quot;rgaPort&quot;</span><span class="w"> </span><span class="na">Q=</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ENV.RGA&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>The XML attributes become ibek parameter names.  The asyn port (<code class="docutils literal notranslate"><span class="pre">PORT</span></code>) was
+previously provided by a separate <code class="docutils literal notranslate"><span class="pre">&lt;asyn.AsynIP&gt;</span></code> element; in ibek we keep this
+separation: the <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter becomes the asyn port identifier, and <code class="docutils literal notranslate"><span class="pre">PORT</span></code> in
+<code class="docutils literal notranslate"><span class="pre">databases.args</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;{{name}}&quot;</span></code>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>XML attribute</p></th>
+<th class="head"><p>ibek parameter</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>asyn port name, unique per instance</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>PV prefix</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>PV suffix, default <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code></p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>not a parameter; set to <code class="docutils literal notranslate"><span class="pre">{{name}}</span></code> in databases.args</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>default 1000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>An additional <code class="docutils literal notranslate"><span class="pre">ip</span></code> parameter (str) is added to specify the network address — this
+has no XML equivalent but is required for <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> in <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="check-the-example-boot-script">
+<h2>4. Check the example boot script<a class="headerlink" href="#check-the-example-boot-script" title="Link to this heading">#</a></h2>
+<p>The compiled example at
+<code class="docutils literal notranslate"><span class="pre">iocs/example/iocBoot/iocexample/O.linux-x86_64/stexample.boot</span></code> confirms the
+runtime initialisation sequence:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">drvAsynIPPortConfigure</span><span class="p">(</span><span class="s2">&quot;rgaPort&quot;</span><span class="p">,</span> <span class="s2">&quot;10.76.5.10:5025&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">epicsEnvSet</span> <span class="s2">&quot;STREAM_PROTOCOL_PATH&quot;</span><span class="p">,</span> <span class="s2">&quot;$(HIDENRGA)/data&quot;</span>
+
+<span class="n">dbLoadRecords</span> <span class="s1">&#39;db/example_expanded.db&#39;</span>
+
+<span class="n">iocInit</span>
+
+<span class="n">seq</span><span class="p">(</span><span class="n">sncDegas</span><span class="p">,</span> <span class="s2">&quot;P=hidenExample&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This gives us the exact <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, <code class="docutils literal notranslate"><span class="pre">databases</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> content needed.</p>
+</section>
+<hr class="docutils" />
+<section id="write-the-install-yml">
+<h2>5. Write the install.yml<a class="headerlink" href="#write-the-install-yml" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">.install.yml</span></code> (note: <code class="docutils literal notranslate"><span class="pre">.yml</span></code> not <code class="docutils literal notranslate"><span class="pre">.yaml</span></code>) captures build-time dependencies.</p>
+<p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.install.yml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=../../ibek-support/_scripts/support_install_variables.json</span>
+
+<span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1-12</span>
+
+<span class="nt">dbds</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGASupport.dbd</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sncHidenRGA.dbd</span>
+
+<span class="nt">libs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
+
+<span class="nt">organization</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://gitlab.diamond.ac.uk/controls/support</span>
+
+<span class="nt">protocol_files</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGAApp/protocol/hiden_rga.proto</span>
+</pre></div>
+</div>
+<p>Fields map directly from builder.py:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dbds</span></code> ← <code class="docutils literal notranslate"><span class="pre">DbdFileList</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libs</span></code> ← <code class="docutils literal notranslate"><span class="pre">LibFileList</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">protocol_files</span></code> ← <code class="docutils literal notranslate"><span class="pre">ProtocolFiles</span></code> (use the source path within the repo)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="write-the-ibek-support-yaml">
+<h2>6. Write the ibek.support.yaml<a class="headerlink" href="#write-the-ibek-support-yaml" title="Link to this heading">#</a></h2>
+<p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml</span></code>. Repeat an
+<code class="docutils literal notranslate"><span class="pre">entity_model</span></code> block for every class in builder.py. The <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code> guard on
+the <code class="docutils literal notranslate"><span class="pre">STREAM_PROTOCOL_PATH</span></code> environment set ensures it only runs once even when
+multiple hidenRGA instances are loaded.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json</span>
+
+<span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
+
+<span class="nt">entity_models</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">      </span><span class="no">Hiden Analytical RGA (Residual Gas Analyser), generic variant, 100 amu.</span>
+<span class="w">      </span><span class="no">Loads hiden_generic.db which includes: global controls (state, filaments,</span>
+<span class="w">      </span><span class="no">PSU, LEDs, error handling), bar scan (1-100 amu), MID scan (24 channels,</span>
+<span class="w">      </span><span class="no">default masses 1-24 amu), degas control, and per-mass sensitivity array.</span>
+<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">Unique name for this RGA instance, used as the asyn port name.</span>
+<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">IP address and TCP port of the Hiden HAL RC controller,</span>
+<span class="w">          </span><span class="no">e.g. &quot;192.168.0.1:5025&quot;</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">PV prefix, e.g. &quot;BL01I-EA-RGA-01:&quot;</span>
+<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">PV suffix. Defaults to empty string.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">Number of samples in the MID scan rolling results buffer per mass channel.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+
+<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
+
+<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_generic.db</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
+<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+
+<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA_HMT</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">      </span><span class="no">Hiden HMT RC RGA, high-pressure variant, 100 amu.</span>
+<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Unique name for this RGA instance, used as the asyn port name.</span>
+<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP address and TCP port of the Hiden HAL RC controller.</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV prefix.</span>
+<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV suffix.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rolling buffer size per mass channel.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+
+<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
+
+<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_HMT.db</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
+<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+
+<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA_hpr20</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">      </span><span class="no">Hiden HPR-20 High Pressure Gas Analyser, 200 amu, SEM detector.</span>
+<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Unique name for this RGA instance, used as the asyn port name.</span>
+<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP address and TCP port of the Hiden HAL RC controller.</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV prefix.</span>
+<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV suffix.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rolling buffer size per mass channel.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+
+<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
+
+<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_hpr20.db</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
+<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+
+<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA_qga</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">      </span><span class="no">Hiden QGA Quad Gas Analyser, 200 amu, Faraday detector.</span>
+<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Unique name for this RGA instance, used as the asyn port name.</span>
+<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP address and TCP port of the Hiden HAL RC controller.</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV prefix.</span>
+<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV suffix.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rolling buffer size per mass channel.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+
+<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
+<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
+
+<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_qga.db</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
+<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+
+<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="verify-with-builder2ibek">
+<h2>7. Verify with builder2ibek<a class="headerlink" href="#verify-with-builder2ibek" title="Link to this heading">#</a></h2>
+<p>Once your YAML is in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>, you can validate it by converting a
+real IOC XML that uses the module:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span>&lt;path/to/IOC.xml&gt;<span class="w"> </span>--yaml<span class="w"> </span>/tmp/test.yaml
+</pre></div>
+</div>
+<p>Then inspect <code class="docutils literal notranslate"><span class="pre">/tmp/test.yaml</span></code> and check that the entity types and parameter names
+match what you defined in the support YAML.</p>
+</section>
+<hr class="docutils" />
+<section id="summary-of-what-maps-to-what">
+<h2>Summary of what maps to what<a class="headerlink" href="#summary-of-what-maps-to-what" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>builder.py element</p></th>
+<th class="head"><p>ibek YAML field</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Class name</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity_models[].name</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Docstring</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity_models[].description</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TemplateFile</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">databases[].file</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DbdFileList</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">install.yml:</span> <span class="pre">dbds</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LibFileList</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">install.yml:</span> <span class="pre">libs</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProtocolFiles</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">install.yml:</span> <span class="pre">protocol_files</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PostIocInitialise</span></code> print statements</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">post_init[].value</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Runtime macros (P, Q, PORT, BUFFER_SIZE)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">databases[].args</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Baked-in macros (MASS_RANGE, HMT_RC)</p></td>
+<td><p>not in databases.args</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Dependencies</span> <span class="pre">=</span> <span class="pre">(Asyn,...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pre_init</span></code> <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> call</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Dependencies</span> <span class="pre">=</span> <span class="pre">(Seq,...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">post_init</span></code> <code class="docutils literal notranslate"><span class="pre">seq(...)</span></code> call</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code></p></td>
+<td><p>once-per-IOC commands (e.g. STREAM_PROTOCOL_PATH)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tutorials.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="create-support-yaml-advanced.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Advanced: ibek support YAML for a complex builder.py</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-builder-py">1. Read builder.py</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#determine-runtime-vs-baked-in-macros">2. Determine runtime vs baked-in macros</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-builder-arguments-to-ibek-parameters">3. Map builder arguments to ibek parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-the-example-boot-script">4. Check the example boot script</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-install-yml">5. Write the install.yml</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-ibek-support-yaml">6. Write the ibek.support.yaml</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-with-builder2ibek">7. Verify with builder2ibek</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-what-maps-to-what">Summary of what maps to what</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/1.1.2/docs/tutorials/create-support-yaml.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/create-support-yaml.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
