@@ -1,4 +1,4 @@
-# How-to: Create a builder2ibek converter for a support module
+# Create a builder2ibek converter for a support module
 
 When `builder2ibek xml2yaml` converts a builder XML file it applies a
 **converter** — a small Python module — for each XML component prefix it
