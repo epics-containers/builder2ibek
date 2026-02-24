@@ -1,4 +1,4 @@
-# How-to: Convert a builder XML IOC instance to ibek YAML
+# Convert a builder XML IOC instance to ibek YAML
 
 `builder2ibek xml2yaml` converts a DLS XMLbuilder IOC definition file (`.xml`)
 into an ibek `ioc.yaml` that can be consumed by `ibek` at runtime to generate
@@ -15,14 +15,7 @@ into an ibek `ioc.yaml` that can be consumed by `ibek` at runtime to generate
 
 ## 1. Locate the builder XML
 
-DLS XMLbuilder IOC definitions are stored under the beamline builder repository,
-typically at:
-
-```
-/dls_sw/<beamline>/epics/<release>/iocs/<IOC_NAME>.xml
-```
-
-or in a shared builder tree such as:
+DLS XMLbuilder IOC definitions are in the builder support module e.g.
 
 ```
 /dls_sw/work/R3.14.12.7/support/BL11I-BUILDER/etc/makeIocs/BL11I-CS-IOC-09.xml
@@ -95,7 +88,7 @@ entities:
 
 Notice that `asyn.AsynIP` and `hidenRGA.hidenRGA_qga` remain as separate entities
 in the output, reflecting the original XML structure.  The ibek entity models
-for both must be present in the support submodules used by the Generic IOC.
+for both must be present in the `ibek-support*` submodules used by the Generic IOC.
 
 ---
 
@@ -116,14 +109,19 @@ Auto-conversion is a best-effort translation; review the output for:
   one now.
 - **Default values**: some converters inject sensible defaults (e.g. autosave
   `debug: false`).  Verify these are appropriate.
-- **Module coverage**: if a module has no converter, its entities will be missing
-  or flagged.  Add the module to `ibek-support-dls` and re-run.
+- **Module coverage**: if a module has no converter, its entities will be just have
+  identical parameters to the XML attributes in the original. For some entities this
+  will be perfectly OK as we try to make the `xxx.ibek.support.yaml` as compatible
+  with the original XML as possible.
 - **Schema validation**: open the YAML in VSCode with the Red Hat YAML extension;
   the `$schema` line at the top will highlight any type mismatches.
 
 ---
 
 ## 4. Add to the test suite
+
+If your IOC is using support modules that are not currently covered in the
+builder2ibek tests then in could be worth updating the tests as follows.
 
 To prevent regressions, copy the XML into `tests/samples/` and regenerate:
 

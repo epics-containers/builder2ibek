@@ -1,4 +1,4 @@
-# Tutorial: Creating ibek support YAML from a builder.py module (DLS-internal)
+# Creating ibek support YAML from a builder.py module
 
 This tutorial walks you through converting a DLS EPICS support module that uses
 the old XMLbuilder (`builder.py`) format into the ibek YAML files needed for a

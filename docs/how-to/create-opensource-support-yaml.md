@@ -1,4 +1,4 @@
-# How-to: Create open-source ibek support YAML for a builder.py module
+# Create ibek-support YAML for a builder.py module
 
 This guide covers the same conversion task as the
 [DLS-internal tutorial](../tutorials/create-support-yaml.md) but targets the

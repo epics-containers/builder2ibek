@@ -1,4 +1,4 @@
-# How-to: Create a Generic IOC repository
+# Create a Generic IOC repository
 
 A Generic IOC is a container image (or RTEMS binary) that bundles one or more
 support modules and can be configured at runtime by ibek from an `ioc.yaml` file.

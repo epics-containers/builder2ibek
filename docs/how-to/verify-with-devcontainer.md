@@ -1,4 +1,4 @@
-# How-to: Verify a converted IOC using the devcontainer and db-compare
+# Verify a converted IOC using db-compare
 
 After converting a builder XML IOC to `ioc.yaml`, the most rigorous way to
 verify correctness is to run the Generic IOC inside the devcontainer, generate
