@@ -47,7 +47,7 @@ If your module lives in `ibek-support-dls` rather than the community
 
 ```bash
 cd ioc-<module>
-git submodule add https://gitlab.diamond.ac.uk/controls/ioc/ibek-support-dls
+git submodule add https://gitlab.diamond.ac.uk/controls/containers/utils/ibek-support-dls
 ```
 
 Or initialise the existing placeholder:

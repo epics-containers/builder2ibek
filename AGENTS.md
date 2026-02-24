@@ -48,7 +48,7 @@ A Generic IOC bundles support modules into a container (Linux) or RTEMS binary.
 Full guide: [docs/how-to/create-generic-ioc-repo.md](docs/how-to/create-generic-ioc-repo.md)
 
 Quick reference:
-- Use `copier copy gh:epics-containers/ioc-template ioc-<module>`
+- Use `uvx copier copy --trust gh:epics-containers/ioc-template ioc-<module>`
 - Add `ibek-support-dls` as a submodule
 - In the Dockerfile, `ansible.sh <module>` for each support module
 - For RTEMS: use a native EPICS app instead; ibek-support submodules are
@@ -172,7 +172,7 @@ If a module has no converter, its XML elements are passed through unchanged. To
 add a converter:
 
 1. Create `src/builder2ibek/converters/<module>.py`
-2. Register it in `src/builder2ibek/convert.py`
+2. No registration is needed — converters are auto-discovered by `moduleinfos.py` via glob scan of `src/builder2ibek/converters/*.py`
 3. Add a sample XML to `tests/samples/` and run `make_samples.sh`
 4. Commit both the converter and the generated YAML
 

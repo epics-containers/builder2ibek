@@ -17,7 +17,7 @@ to running EPICS IOCs in containers under Kubernetes.
 
 In epics-containers, each IOC instance is expressed as an ibek `ioc.yaml` file
 and support modules are described by `ibek.support.yaml` entity models.
-`builder2ibek` converts the former and herein documents how to author the latter.
+`builder2ibek` converts the former, and this documentation covers how to author the latter.
 
 ## Philosophy of conversion
 
@@ -55,7 +55,7 @@ for support modules.  For example, the `hidenRGA` support YAML was generated wit
 Claude and is available as a reference at
 [ibek-support-dls hidenRGA-CLAUDE](https://gitlab.diamond.ac.uk/controls/containers/utils/ibek-support-dls/-/tree/hidenRGA-CLAUDE/hidenRGA).
 
-This repository contains an [AGENTS.md](https://github.com/epics-containers/builder2ibek/blob/main/AGENTS.md)
+This repository contains an [AGENTS.md](../AGENTS.md)
 that describes the full context and skills needed for an AI agent to repeat
 that process for other modules.
 
