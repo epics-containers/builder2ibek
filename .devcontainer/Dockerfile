@@ -1,7 +1,7 @@
 # ideas from https://www.docker.com/blog/containerized-python-development-part-1/
 
-# This file is for use as a .vscode devcontainer as well as a runtime 
-# container. The devcontainer should be rootful and use podman or docker 
+# This file is for use as a .vscode devcontainer as well as a runtime
+# container. The devcontainer should be rootful and use podman or docker
 # with user namespaces.
 
 ARG BASE="mcr.microsoft.com/vscode/devcontainers/python:0-3.10-bullseye"

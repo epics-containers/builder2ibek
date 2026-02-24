@@ -25,7 +25,8 @@
         "actions/download-artifact",
         "softprops/action-gh-release",
         "codecov/codecov-action",
-        "pypa/gh-action-pypi-publish"
+        "pypa/gh-action-pypi-publish",
+        "peaceiris/actions-gh-pages"
       ],
       "matchManagers": [
         "github-actions"
