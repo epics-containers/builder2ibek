@@ -101,6 +101,14 @@ for both must be present in the support submodules used by the Generic IOC.
 
 ## 3. Review and adjust
 
+:::{note}
+If your IOC uses the older `vacuumValve`, `interlock`, or `temperature` modules,
+`xml2yaml` will automatically translate many entities to their `dlsPLC`
+equivalents.  Some cases (e.g. `vacuumValveRead2`, pump templates) require
+manual fixup.  See the [dlsPLC migration reference](../reference/dlsplc-migration.md)
+for the complete mapping table and argument transformation rules.
+:::
+
 Auto-conversion is a best-effort translation; review the output for:
 
 - **Commented-out elements**: builder XML comments (`<!-- ... -->`) are skipped.

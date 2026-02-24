@@ -68,6 +68,13 @@ uv run builder2ibek xml2yaml /path/to/BL-IOC.xml --yaml output.yaml
 - Add XML to `tests/samples/` and run `make_samples.sh`
 - Run `./update-schema` after adding new entity models
 
+**dlsPLC migration**: `vacuumValve`, `interlock`, and `temperature` XML modules
+are obsolete — `xml2yaml` auto-translates many to `dlsPLC.*` equivalents.
+Some cases need manual fixup (vacuumValveRead2, pump templates, flow_asyn).
+See [docs/reference/dlsplc-migration.md](docs/reference/dlsplc-migration.md)
+for the full mapping table, argument transformations (valve×10=addr,
+ilkA→ilk10, outaddr calculation), and which conversions are automatic.
+
 ---
 
 ## Repository layout

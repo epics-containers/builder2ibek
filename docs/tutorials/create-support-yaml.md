@@ -1,4 +1,4 @@
-# Tutorial: Creating ibek support YAML from a builder.py module
+# Tutorial: Creating ibek support YAML from a builder.py module (DLS-internal)
 
 This tutorial walks you through converting a DLS EPICS support module that uses
 the old XMLbuilder (`builder.py`) format into the ibek YAML files needed for a
@@ -7,6 +7,20 @@ Generic IOC. We use the `hidenRGA` support module as a concrete example.
 After completing this tutorial you will have created:
 - `ibek-support-dls/<module>/<module>.ibek.support.yaml` — entity model definitions
 - `ibek-support-dls/<module>/<module>.install.yml` — build dependencies and assets
+
+:::{important}
+**This tutorial targets `ibek-support-dls`, the DLS-internal support
+repository.**  If your module could be useful to other facilities, it is
+strongly recommended to open-source it and contribute the support YAML to the
+community `ibek-support` repository on GitHub instead.  The epics-containers
+project provides a full tutorial for this approach, using the Lakeshore 340
+temperature controller as an example:
+
+[epics-containers: Creating a Generic IOC — Lakeshore 340](https://epics-containers.github.io/main/tutorials/generic_ioc.html#lakeshore-340-temperature-controller)
+
+For a how-to covering the open-source workflow see
+[Create open-source ibek support YAML](../how-to/create-opensource-support-yaml.md).
+:::
 
 ## Prerequisites
 
