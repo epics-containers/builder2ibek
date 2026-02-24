@@ -6,5 +6,10 @@ Practical step-by-step guides for the more experienced user.
 :maxdepth: 1
 :glob:
 
-how-to/*
+how-to/create-generic-ioc-repo.md
+how-to/create-opensource-support-yaml.md
+how-to/convert-ioc-instance.md
+how-to/autosave.md
+how-to/verify-with-devcontainer.md
+how-to/contribute
 ```

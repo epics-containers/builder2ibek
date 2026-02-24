@@ -6,10 +6,32 @@ into an ibek `ioc.yaml` that can be consumed by `ibek` at runtime to generate
 
 ## Prerequisites
 
-- `builder2ibek` installed (run via `uv run builder2ibek` in the repo, or
-  `pip install builder2ibek`)
-- The ibek support YAML for every module used in the XML must exist in
-  `ibek-support` or `ibek-support-dls`
+In order to test the converted IOC you should be working inside a devcontainer.
+
+There are two options:
+
+**builder2ibek devcontainer** — the devcontainer shipped with this repository.
+It has the full `ibek-support` and `ibek-support-dls` submodule trees checked
+out, so every supported module's YAML is available.  Run `builder2ibek` with
+`uv run`:
+
+```bash
+uv run builder2ibek xml2yaml ...
+```
+
+**Generic IOC devcontainer** — the devcontainer for a specific Generic IOC
+(e.g. `ioc-bl11i-rga`).  Only the ibek support YAML that was built into that
+container image is available, so schema validation can only validate
+entities that the target IOC already supports.  Here `builder2ibek` is not
+installed in the repo but can be run directly with `uvx`:
+
+```bash
+uvx builder2ibek xml2yaml ...
+```
+
+In both cases the ibek support YAML for every module referenced in the XML
+must be present — either in the builder2ibek submodules or in the Generic
+IOC's installed support tree.
 
 ---
 
@@ -115,6 +137,14 @@ Auto-conversion is a best-effort translation; review the output for:
   with the original XML as possible.
 - **Schema validation**: open the YAML in VSCode with the Red Hat YAML extension;
   the `$schema` line at the top will highlight any type mismatches.
+  IMPORTANT: you will need to update the schema when you have made changes
+  See [](#schema-update)
+
+For schema validation to work your `ioc.yaml` should have the following header:
+
+```yaml
+# yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json
+```
 
 ---
 
@@ -152,15 +182,23 @@ uv run builder2ibek db-compare \
     /epics/runtime/ioc.db
 ```
 
+(schema-update)=
 ## 6. Updating the schema
 
-If you have added new entity models to `ibek-support-dls`, regenerate the
-global schema that VSCode uses for validation:
+If you have added new entity models to `ibek-support*` or changed existing models,
+regenerate the global schema that VSCode uses for validation.
 
+In the builder2ibek devcontainer:
 ```bash
 ./update-schema
 ```
 
+In a generic IOC devcontainer:
+```bash
+ibek ioc generate-schema > /epics/ibek-defs/ioc.schema.json
+```
+
+Both commands update the ioc instance schema in `/epics/ibek-defs/ioc.schema.json`
 ---
 
 ## Relationship between XML elements and ibek entity types
