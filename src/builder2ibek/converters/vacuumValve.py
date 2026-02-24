@@ -13,6 +13,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     XML to YAML specialist convertor function for the vacuumValve support module
 
     This module gets converted to dlsPLC equivalents
+    See https://confluence.diamond.ac.uk/x/i4kuAw
     """
 
     if entity_type == "vacuumValveRead":
