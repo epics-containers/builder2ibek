@@ -37,7 +37,11 @@ Quick reference:
    Calls contributed by dependencies (e.g. `drvAsynIPPortConfigure` from `Asyn`)
    won't appear in the class methods — find them in the boot script of a real
    builder-generated IOC, not an example boot script.
-5. `STREAM_PROTOCOL_PATH` → `pre_init[]` with `when: first`
+5. `STREAM_PROTOCOL_PATH` is handled globally by `builder2ibek` — do NOT add it
+   to entity model `pre_init`. It is emitted as an `epics.EpicsEnvSet` entity in
+   the generated `ioc.yaml` automatically.
+6. For pure `AutoSubstitution` classes, use `.*:` in `databases.args` to pass
+   all parameters through without listing each one.
 
 Note: `install.yml` (not `.yaml`).
 
@@ -88,11 +92,13 @@ src/builder2ibek/
 
 docs/
 ├── tutorials/
-│   ├── installation.md
-│   └── create-support-yaml.md   ← how to write ibek support YAML
+│   ├── convert-ioc-xml.md           ← quickstart: xml2yaml walkthrough
+│   ├── create-support-yaml.md       ← how to write ibek support YAML
+│   └── create-support-yaml-advanced.md ← advanced patterns (ports, templates)
 ├── how-to/
 │   ├── create-generic-ioc-repo.md   ← ioc-template workflow
-│   └── convert-ioc-instance.md      ← xml2yaml workflow with example
+│   ├── convert-ioc-instance.md      ← xml2yaml workflow with example
+│   └── verify-with-devcontainer.md  ← db-compare verification
 ├── explanations/
 └── reference.md
 
@@ -116,8 +122,19 @@ ibek-support-dls/    # submodule: DLS entity models
 
 **`when: first`**
 : A `pre_init` guard that ensures a command runs only once even when multiple
-  instances of the same entity type are loaded. Used for `STREAM_PROTOCOL_PATH`
-  and similar one-time environment setup.
+  instances of the same entity type are loaded. Used for one-time environment
+  setup such as configuring a shared library path.
+
+**Jinja2 rendering**
+: `pre_init`, `databases`, and `post_init` values are rendered as Jinja2
+  templates with the entity's parameters as context. `{{P}}` resolves to the
+  value of the `P` parameter.
+
+**`databases.args` conventions**
+: A list of `key: value` pairs passed as macros to `dbLoadRecords`. If the
+  value is omitted (e.g. `P:` with no value), ibek uses the value of the
+  parameter with the same name. Keys can be regular expressions — `.*:` passes
+  all parameters through, which is correct for pure `AutoSubstitution` entities.
 
 **Database macros vs baked-in macros**
 : The substitution (`.subst`) files are processed by MSI at build time to
