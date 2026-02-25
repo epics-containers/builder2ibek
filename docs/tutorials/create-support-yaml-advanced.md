@@ -1,7 +1,7 @@
 # ibek support YAML for a complex builder.py
 
 This tutorial extends the
-[basic tutorial](create-support-yaml.md) to cover patterns that arise in
+[](create-support-yaml.md) to cover patterns that arise in
 more complex modules: `InitialiseOnce`, cross-referencing other entities as
 `type: object`, templates that include shared base templates, and `install.yml`
 fields for system package dependencies and Makefile patching.
@@ -21,7 +21,7 @@ By the end of this tutorial you will understand how:
 ## Prerequisites
 
 - Completed (or familiar with) the
-  [basic tutorial](create-support-yaml.md)
+  [](create-support-yaml.md)
 - A GitHub account and fork of
   [epics-containers/ibek-support](https://github.com/epics-containers/ibek-support)
 - Access to the [ffmpegServer module source](https://github.com/DiamondLightSource/ffmpegServer) published on GitHub
