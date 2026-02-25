@@ -1,7 +1,7 @@
-# Advanced: ibek support YAML for a complex builder.py
+# ibek support YAML for a complex builder.py
 
 This tutorial extends the
-[basic tutorial](create-support-yaml.md) to cover patterns that arise in
+[](create-support-yaml.md) to cover patterns that arise in
 more complex modules: `InitialiseOnce`, cross-referencing other entities as
 `type: object`, templates that include shared base templates, and `install.yml`
 fields for system package dependencies and Makefile patching.
@@ -21,7 +21,7 @@ By the end of this tutorial you will understand how:
 ## Prerequisites
 
 - Completed (or familiar with) the
-  [basic tutorial](create-support-yaml.md)
+  [](create-support-yaml.md)
 - A GitHub account and fork of
   [epics-containers/ibek-support](https://github.com/epics-containers/ibek-support)
 - Access to the [ffmpegServer module source](https://github.com/DiamondLightSource/ffmpegServer) published on GitHub
@@ -77,7 +77,7 @@ class ffmpegFile(AsynPort):
 | `FFmpegServer` has `AutoInstantiate = True` | It is loaded automatically by xmlbuilder; it does **not** become a user-facing entity model |
 | `ffmpegStream` and `ffmpegFile` are `AsynPort` subclasses | Each becomes one `entity_model` |
 | `UniqueName = "PORT"` | `PORT` is the unique identifier per instance, maps to `type: id` in ibek |
-| `_ffmpegStream` uses `@includesTemplates(NDPluginBaseTemplate)` | Macros from the base template (`SCANRATE`, `PRIORITY`, `STACKSIZE`) are also runtime parameters |
+| `_ffmpegStream` uses `@includesTemplates(NDPluginBaseTemplate)` | Database macros from the base template (`SCANRATE`, `PRIORITY`, `STACKSIZE`) must also be ibek parameters |
 | `InitialiseOnce` on `ffmpegStream` | `ffmpegServerConfigure()` runs **once per IOC** regardless of how many streams are configured — maps to `when: first` |
 | `NDARRAY_PORT` is declared `Ident('...', AsynPort)` | It is a reference to another entity's port — maps to `type: object` |
 
@@ -162,9 +162,8 @@ databases:
 
 `_ffmpegStream` is decorated with `@includesTemplates(NDPluginBaseTemplate)`.
 This merges the base template's macro set into `_ffmpegStream.ArgInfo`.
-Macros defined in `NDPluginBaseTemplate` that are **not** baked in by
-substitution patterns survive as runtime macros and must also appear in the
-ibek entity parameters.
+Macros defined in `NDPluginBaseTemplate` that survive into the compiled `.db`
+as database macros must also appear in the ibek entity parameters.
 
 For `ffmpegStream` the relevant inherited macros are `SCANRATE`, `PRIORITY`,
 and `STACKSIZE`, which appear in `NDPluginBase.template` records.  Add them
@@ -377,6 +376,33 @@ entity_models:
           NDARRAY_PORT:
 ```
 
+The following extract from
+`bl19i-di-cam-01/config/ioc.yaml`
+shows these entity models in use:
+
+```yaml
+  - type: ADAravis.aravisCamera
+    PORT: D1CAM.cam
+    P: BL19I-DI-CAM-01
+    R: ":CAM:"
+    ID: 172.23.119.136
+    BUFFERS: 200
+    CLASS: AutoADGenICam
+
+  - type: ffmpegServer.ffmpegStream
+    PORT: D1CAM.mjpg
+    NDARRAY_PORT: D1CAM.cam
+    P: BL19I-DI-CAM-01
+    R: ":MJPG:"
+```
+
+`PORT: D1CAM.cam` on the camera entity is a `type: id` — it creates the asyn
+port that downstream plugins connect to.  `NDARRAY_PORT: D1CAM.cam` on
+`ffmpegStream` is a `type: object` reference to that same port — this is the
+cross-referencing pattern described in section 4.  `PORT: D1CAM.mjpg` on
+`ffmpegStream` is its own `type: id`, creating a new port that could in turn be
+referenced by further downstream entities.
+
 ---
 
 ## 7. Write the install.yml
@@ -436,27 +462,6 @@ patch_lines:
 
 ---
 
-## 8. Test in the devcontainer
-
-With the files written into `ibek-support/ffmpegServer/`, install and verify
-inside the Generic IOC devcontainer:
-
-```bash
-ansible.sh ffmpegServer
-cd /epics/ioc && make
-ibek ioc generate-schema > /tmp/ibek.ioc.schema.json
-```
-
-Convert a real IOC XML that uses ffmpegServer and verify with db-compare:
-
-```bash
-uvx builder2ibek xml2yaml example.xml --yaml /tmp/test.yaml
-# then verify with ibek dev instance + db-compare
-# see verify-with-devcontainer.md
-```
-
----
-
 ## Summary of advanced patterns
 
 | builder.py pattern | ibek mapping |
@@ -465,6 +470,6 @@ uvx builder2ibek xml2yaml example.xml --yaml /tmp/test.yaml
 | `InitialiseOnce` | `pre_init` entry with `when: first` |
 | `Ident(...)` argument | `type: object` parameter |
 | `UniqueName = "PORT"` | `PORT` parameter has `type: id` |
-| `@includesTemplates(Base)` | Add the base template's runtime macros to the entity parameters |
+| `@includesTemplates(Base)` | Add the base template's database macros to the entity parameters |
 | System package dependencies | `apt_developer` / `apt_runtime` in `install.yml` |
 | Upstream Makefile incompatibilities | `comment_out` / `patch_lines` in `install.yml` |

@@ -4,7 +4,7 @@ This tutorial walks you through converting a DLS EPICS support module that uses
 the old XMLbuilder (`builder.py`) format into the ibek YAML files needed for a
 Generic IOC. We use the `hidenRGA` support module as a concrete example.
 
-After completing this tutorial you will have created:
+After completing this tutorial you should understand:
 - `ibek-support-dls/<module>/<module>.ibek.support.yaml` — entity model definitions
 - `ibek-support-dls/<module>/<module>.install.yml` — build dependencies and assets
 
@@ -20,14 +20,15 @@ temperature controller as an example:
 
 For a tutorial covering a more complex module and the full open-source
 contribution workflow, see
-[Advanced: ibek support YAML for a complex builder.py module](create-support-yaml-advanced.md).
+[](create-support-yaml-advanced.md).
 :::
 
-## Prerequisites
+## Steps
 
-- Access to the module source at its DLS prod or work path
-- An `ibek-support-dls` repository (or submodule) to write the files into
-- Familiarity with EPICS asyn/StreamDevice concepts
+- Take a look at `etc/builder.py` in the support module you are converting
+- Build a `<module>.install.yml` for it
+- Build a `<module>.ibek.support.yaml` for it
+- Convert any autosave comments in templates to `.req` files
 
 ---
 
@@ -92,90 +93,12 @@ Key information extracted:
 
 ---
 
-## 2. Determine runtime vs baked-in macros
-
-`AutoSubstitution` classes derive their parameters from the template's
-substitution file. Macros that appear **in the pattern rows** are expanded by MSI
-at build time and do not survive into the compiled `.db`. Only macros **absent
-from patterns** remain as `$(MACRO)` references at runtime.
-
-For `hidenRGA` the relevant substitution file is
-`hidenRGAApp/Db/hiden_qga.substitutions` (same logic applies to all four variants):
-
-```
-file hiden_rga_global.template
-{
-pattern {MASS_RANGE}
- {200}
-}
-...
-file hiden_rga_mid_mass.template
-{
-pattern {NAME, ROW, MASS, MASS_RANGE, DETECTOR, VARIABLE, DWELL, SETTLE, EGU, PREC, ADEL, EGUCAL, ENABLE, DISP}
- {1, 1, 1, 200, 0, 0, 100, 10, Torr, 2, 1e-11, mbar, 1, 1}
- ...
-}
-```
-
-`MASS_RANGE` appears in every pattern row — it is baked in.
-
-The macros **not** present in any pattern row — `P`, `Q`, `PORT`, and
-`BUFFER_SIZE` — survive as `$(P)`, `$(Q)`, `$(PORT)`, `$(BUFFER_SIZE)` in the
-compiled `.db` and **must** be passed at `dbLoadRecords` time.
-
----
-
-## 3. Map builder arguments to ibek parameters
-
-In builder XML, `hidenRGA_qga` appeared like this:
-
-```xml
-<hidenRGA.hidenRGA_qga BUFFER_SIZE="100" P="BL11I-EA-RGA-01" PORT="rgaPort" Q="" name="ENV.RGA"/>
-```
-
-The XML attributes become ibek parameter names.  The asyn port (`PORT`) was
-previously provided by a separate `<asyn.AsynIP>` element; in ibek we keep this
-separation: the `name` parameter becomes the asyn port identifier, and `PORT` in
-`databases.args` is set to `"{{name}}"`.
-
-| XML attribute | ibek parameter | type | notes |
-|---|---|---|---|
-| `name` | `name` | `id` | asyn port name, unique per instance |
-| `P` | `P` | `str` | PV prefix |
-| `Q` | `Q` | `str` | PV suffix, default `""` |
-| `PORT` | — | — | not a parameter; set to `{{name}}` in databases.args |
-| `BUFFER_SIZE` | `BUFFER_SIZE` | `int` | default 1000 |
-
-An additional `ip` parameter (str) is added to specify the network address — this
-has no XML equivalent but is required for `drvAsynIPPortConfigure` in `pre_init`.
-
----
-
-## 4. Check the example boot script
-
-The compiled example at
-`iocs/example/iocBoot/iocexample/O.linux-x86_64/stexample.boot` confirms the
-runtime initialisation sequence:
-
-```
-drvAsynIPPortConfigure("rgaPort", "10.76.5.10:5025", 100, 0, 0)
-
-epicsEnvSet "STREAM_PROTOCOL_PATH", "$(HIDENRGA)/data"
-
-dbLoadRecords 'db/example_expanded.db'
-
-iocInit
-
-seq(sncDegas, "P=hidenExample")
-```
-
-This gives us the exact `pre_init`, `databases`, and `post_init` content needed.
-
----
-
-## 5. Write the install.yml
+## 2. Write the install.yml
 
 The `.install.yml` (note: `.yml` not `.yaml`) captures build-time dependencies.
+
+It provides instructions to ansible as to how to build this support module as part of
+of a generic IOC container build.
 
 Create `ibek-support-dls/hidenRGA/hidenRGA.install.yml`:
 
@@ -205,12 +128,258 @@ Fields map directly from builder.py:
 
 ---
 
-## 6. Write the ibek.support.yaml
+## 3. Map builder arguments to ibek parameters
 
-Create `ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml`. Repeat an
-`entity_model` block for every class in builder.py. The `when: first` guard on
-the `STREAM_PROTOCOL_PATH` environment set ensures it only runs once even when
-multiple hidenRGA instances are loaded.
+In builder XML, `hidenRGA_qga` appeared like this:
+
+```xml
+<hidenRGA.hidenRGA_qga BUFFER_SIZE="100" P="BL11I-EA-RGA-01" PORT="rgaPort" Q="" name="ENV.RGA"/>
+```
+
+The XML attributes become ibek parameter names.  `name` is dropped (the entity
+has no cross-references and creates no asyn port) and handled by a converter.
+`PORT` references the companion `asyn.AsynIP` entity by name.
+
+| XML attribute | ibek parameter | type | notes |
+|---|---|---|---|
+| `name` | — | — | dropped; converter discards it from XML |
+| `P` | `P` | `str` | PV prefix |
+| `Q` | `Q` | `str` | PV suffix, default `""` |
+| `PORT` | `PORT` | `object` | name of the companion `asyn.AsynIP` entity |
+| `BUFFER_SIZE` | `BUFFER_SIZE` | `int` | default 1000 |
+
+---
+
+## 4. Determine the startup script sequence
+
+The canonical source for `pre_init` and `post_init` content is **builder.py
+itself**.  Look at the `Initialise`, `InitialiseOnce`, and `PostIocInitialise`
+methods on each class — these are what builder emits into the boot script.
+
+For `hidenRGA_qga` the relevant method is:
+
+```python
+def PostIocInitialise(self):
+    print 'seq(sncDegas, "P=%s")' % self.args["P"]
+```
+
+This maps directly to the `post_init` block.  The `drvAsynIPPortConfigure` call
+comes from the `Asyn` dependency rather than from the class itself, so it does
+not appear in `hidenRGA_qga`'s own methods.
+
+To see what the startup script should look like, see a boot script of a **real
+IOC instance** that builder generated for a beamline using this module.  For
+`hidenRGA_qga` the I11 IOC at
+`/dls_sw/work/R3.14.12.7/support/BL11I-BUILDER/iocs/BL11I-CS-IOC-09/` was used;
+its generated boot script contains:
+
+```
+drvAsynIPPortConfigure("ENV.RGA", "10.76.5.10:5025", 100, 0, 0)
+
+epicsEnvSet "STREAM_PROTOCOL_PATH", "$(HIDENRGA)/data"
+
+dbLoadRecords("db/BL11I-CS-IOC-09_expanded.db", ...)
+
+iocInit
+
+seq(sncDegas, "P=BL11I-EA-RGA-01")
+```
+
+This can confirm the `pre_init`, `databases`, and `post_init` content needed.
+
+Note that here drvAsynIPPortConfigure is supplied by an asyn.AsynIP object.
+
+---
+
+## 5. Write the ibek.support.yaml
+
+`hidenRGA` has four builder.py classes (`hidenRGA`, `hidenRGA_hpr20`,
+`hidenRGA_qga`, `hidenRGA_HMT`), each loading a different substitutions file
+but otherwise identical in structure.  To keep the tutorial focused we work
+through `hidenRGA_qga` in full detail — this is the variant deployed on I11 at
+DLS.  The other three follow exactly the same logic and their entity models are
+just repeats with the appropriate `db` filename substituted.
+
+### 5a. Review what parameters you need
+
+The XML element that appears in a real I11 IOC is:
+
+```xml
+<hidenRGA.hidenRGA_qga BUFFER_SIZE="100" P="BL11I-EA-RGA-01" PORT="rgaPort" Q="" name="ENV.RGA"/>
+```
+
+We derive the ibek parameters by investigating the purpose of each of the
+attributes of the hidenRGA_qga element.
+
+---
+
+#### `name` → drop this parameter
+
+**Source: XMLbuilder row identifier.**  *Some* XMLbuilder objects carry a `name`
+attribute — not all do.  XMLbuilder uses it to auto-generate OPI/EDM GUI panels
+(irrelevant in ibek) and to allow other objects to cross-reference this one.
+
+You need to carry `name` through to ibek as a `type: id` parameter only when:
+
+- another entity_model in a `support.yaml` will reference this entity. This
+  is common for Asyn devices that expose their Asyn port as 'name', **or**
+- you need the name as a runtime value inside the entity's own `pre_init` or
+  `databases.args`.
+
+The most common case is **any object that creates
+an asyn port**.  The object calls `drvAsynIPPortConfigure` (or equivalent) with
+`name` as the port identifier, and other objects reference it by that same port
+name — so `name` identifies this object and provides a cross-reference target.
+If you see a `drvAsynIPPortConfigure` or `drvAsynSerialPortConfigure` call in
+`pre_init`, keep `name` as `type: id`.
+
+If neither condition applies and this is a true *leaf* object, you can drop
+`name` entirely — but then you need a converter to discard it when reading the
+XML, so that `xml2yaml` does not try to pass an unrecognised attribute to the
+entity model.  `src/builder2ibek/converters/cmsIon.py` is the simplest example:
+it does nothing except call `entity.remove("name")` for its entity types.
+
+For `hidenRGA_qga`, neither condition applies: the asyn port is created by the
+companion `asyn.AsynIP` entity (not by this one), and nothing in `ioc.yaml`
+cross-references `hidenRGA_qga` by name.  We therefore **drop** `name` and add
+a converter that discards it when reading the XML.
+
+---
+
+#### `P` → `type: str`
+
+**Source: database macro from  `hiden_qga.db`.**
+
+The macro declarations at the top of
+`/dls_sw/prod/R3.14.12.7/support/hidenRGA/1-12/db/hiden_qga.db` are the
+definitive list of what must (or can) be passed at `dbLoadRecords` time:
+
+```
+# % macro, P, Prefix
+# % macro, Q, Suffix
+# % macro, PORT, Asyn port name
+# % macro, MASS_RANGE, Mass range of RGA. Defaults to 100amu.
+# % macro, HMT_RC, Set to one for high pressure HMT RC variant. Defaults to zero
+```
+
+Macros **without** a default in the declaration must always be supplied →
+required ibek parameters.  Macros **with** a default (`MASS_RANGE`, `HMT_RC`)
+may be omitted entirely from the call — which is why they did not need to appear
+in the builder XML.  They can still be exposed as optional ibek parameters if
+you want users to be able to override the default.
+
+`P` has no default and therefore must always be supplied:
+
+```
+record(stringin, "$(P,undefined)$(Q,undefined):ID-I") { ... }
+```
+
+XML value: `P="BL11I-EA-RGA-01"`.
+
+---
+
+#### `Q` → `type: str`, `default: ""`
+
+**Source: database macro, same reasoning as `P`.**
+
+`Q` has no default in the `hiden_qga.db` macro declarations, however as the
+one IOC we were translating used "", we give it the reasonable default of `""`
+in the ibek model so it can be omitted from `ioc.yaml` when not needed.
+
+XML value: `Q=""`.
+
+---
+
+#### `PORT` → `type: object` referencing the `asyn.AsynIP` entity
+
+**Source: database macro in `hiden_qga.db`.**
+
+`PORT` is declared in the `hiden_qga.db` header with no default and appears in
+StreamDevice links:
+
+```
+record(stringin, "$(P,undefined)$(Q,undefined):ID-I")
+{
+    field(DTYP, "stream")
+    field(INP,  "@hiden_rga.proto getID() $(PORT,undefined)")
+```
+
+It has no default, so it must be passed in `databases.args`.  In the builder XML, `PORT="rgaPort"` matched the `PORT`
+attribute of the companion `<asyn.AsynIP PORT="rgaPort" .../>` element — i.e.
+`PORT` is the *name of another entity*.
+
+This is a very common ibek pattern: one entity creates an asyn port (an
+`asyn.AsynIP` or `asyn.AsynSerial` entity with `name: type: id`), and a second
+entity references it by name via a parameter called `PORT` (or sometimes
+`ASYN_PORT`).  In ibek the referencing parameter has `type: object`, which
+ensures `ioc.yaml` validation catches mismatched names.
+
+XML value: `PORT="rgaPort"` → ibek parameter `PORT` of `type: object`, value is
+the `name` of the `asyn.AsynIP` entity in `ioc.yaml`.
+
+---
+
+#### `BUFFER_SIZE` → `type: int`, `default: 1000`
+
+**Source: database macro in `hiden_qga.db`.**
+
+`hiden_qga.db` declares it as a macro and uses it in waveform records:
+
+```
+# % macro, BUFFER_SIZE, Number of points to allocate for results buffer
+  field(NSAM, "$(BUFFER_SIZE,undefined)")
+```
+
+It has no meaningful default, so it must be passed in `databases.args`.
+
+XML value: `BUFFER_SIZE="100"`.  The ibek default is set to 1000 — a
+conservative value that works well for typical MID scan usage.
+
+---
+
+#### `MASS_RANGE` and `HMT_RC` → `type: int` with defaults from the `.db`
+
+**Source: database macros with defaults in `hiden_qga.db`.**
+
+```
+# % macro, MASS_RANGE, Mass range of RGA. Defaults to 100amu.
+# % macro, HMT_RC, Set to one for high pressure HMT RC variant. Defaults to zero
+```
+
+These were not present in the builder XML because their defaults were
+sufficient for normal use.  We add them to the ibek entity model as optional
+parameters with the same defaults, so that instances can override them if
+needed.
+
+Neither appears in the original XML — ibek defaults: `MASS_RANGE: 100`,
+`HMT_RC: 0`.
+
+---
+
+### 5b. The entity model
+
+Each entity model has four main sections:
+
+- **`parameters:`** — the values a user supplies in `ioc.yaml`; ibek validates
+  types
+- **`pre_init:`** — IOC shell commands emitted before `iocInit`
+- **`databases:`** — `.db` files to load via `dbLoadRecords`, with their macro
+  arguments
+- **`post_init:`** — IOC shell commands emitted after `iocInit`
+
+The `pre_init`, `databases`, and `post_init` values are rendered as Jinja2
+templates with the entity's parameters supplied as context, so `{{P}}` anywhere
+in those sections resolves to the value of the `P` parameter.
+
+`databases.args` is a list of `key: value` pairs passed as macros to
+`dbLoadRecords`.  If the value is omitted (e.g. `P:` with no value), ibek
+defaults it to the value of the parameter with the same name.  Keys can also be
+regular expressions — `.*:` matches all parameters and passes them through,
+which is convenient for pure `AutoSubstitution` entities where every parameter
+maps directly to a database macro.
+
+
+Create `ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml`:
 
 ```yaml
 # yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json
@@ -218,183 +387,76 @@ multiple hidenRGA instances are loaded.
 module: hidenRGA
 
 entity_models:
-  - name: hidenRGA
-    description: |-
-      Hiden Analytical RGA (Residual Gas Analyser), generic variant, 100 amu.
-      Loads hiden_generic.db which includes: global controls (state, filaments,
-      PSU, LEDs, error handling), bar scan (1-100 amu), MID scan (24 channels,
-      default masses 1-24 amu), degas control, and per-mass sensitivity array.
-    parameters:
-      name:
-        type: id
-        description: |-
-          Unique name for this RGA instance, used as the asyn port name.
-      ip:
-        type: str
-        description: |-
-          IP address and TCP port of the Hiden HAL RC controller,
-          e.g. "192.168.0.1:5025"
-      P:
-        type: str
-        description: |-
-          PV prefix, e.g. "BL01I-EA-RGA-01:"
-      Q:
-        type: str
-        description: |-
-          PV suffix. Defaults to empty string.
-        default: ""
-      BUFFER_SIZE:
-        type: int
-        description: |-
-          Number of samples in the MID scan rolling results buffer per mass channel.
-        default: 1000
-
-    pre_init:
-      - value: |
-          drvAsynIPPortConfigure("{{name}}", "{{ip}}", 100, 0, 0)
-      - when: first
-        value: |
-          epicsEnvSet("STREAM_PROTOCOL_PATH", "$(HIDENRGA)/data")
-
-    databases:
-      - file: $(HIDENRGA)/db/hiden_generic.db
-        args:
-          P:
-          Q:
-          PORT: "{{name}}"
-          BUFFER_SIZE:
-
-    post_init:
-      - value: |
-          seq(sncDegas, "P={{P}}{{Q}}")
-
-  - name: hidenRGA_HMT
-    description: |-
-      Hiden HMT RC RGA, high-pressure variant, 100 amu.
-    parameters:
-      name:
-        type: id
-        description: Unique name for this RGA instance, used as the asyn port name.
-      ip:
-        type: str
-        description: IP address and TCP port of the Hiden HAL RC controller.
-      P:
-        type: str
-        description: PV prefix.
-      Q:
-        type: str
-        description: PV suffix.
-        default: ""
-      BUFFER_SIZE:
-        type: int
-        description: Rolling buffer size per mass channel.
-        default: 1000
-
-    pre_init:
-      - value: |
-          drvAsynIPPortConfigure("{{name}}", "{{ip}}", 100, 0, 0)
-      - when: first
-        value: |
-          epicsEnvSet("STREAM_PROTOCOL_PATH", "$(HIDENRGA)/data")
-
-    databases:
-      - file: $(HIDENRGA)/db/hiden_HMT.db
-        args:
-          P:
-          Q:
-          PORT: "{{name}}"
-          BUFFER_SIZE:
-
-    post_init:
-      - value: |
-          seq(sncDegas, "P={{P}}{{Q}}")
-
-  - name: hidenRGA_hpr20
-    description: |-
-      Hiden HPR-20 High Pressure Gas Analyser, 200 amu, SEM detector.
-    parameters:
-      name:
-        type: id
-        description: Unique name for this RGA instance, used as the asyn port name.
-      ip:
-        type: str
-        description: IP address and TCP port of the Hiden HAL RC controller.
-      P:
-        type: str
-        description: PV prefix.
-      Q:
-        type: str
-        description: PV suffix.
-        default: ""
-      BUFFER_SIZE:
-        type: int
-        description: Rolling buffer size per mass channel.
-        default: 1000
-
-    pre_init:
-      - value: |
-          drvAsynIPPortConfigure("{{name}}", "{{ip}}", 100, 0, 0)
-      - when: first
-        value: |
-          epicsEnvSet("STREAM_PROTOCOL_PATH", "$(HIDENRGA)/data")
-
-    databases:
-      - file: $(HIDENRGA)/db/hiden_hpr20.db
-        args:
-          P:
-          Q:
-          PORT: "{{name}}"
-          BUFFER_SIZE:
-
-    post_init:
-      - value: |
-          seq(sncDegas, "P={{P}}{{Q}}")
-
   - name: hidenRGA_qga
     description: |-
       Hiden QGA Quad Gas Analyser, 200 amu, Faraday detector.
+      Loads hiden_qga.db: global controls, bar scan (1-200 amu),
+      MID scan (24 configurable mass channels), degas control,
+      and per-mass sensitivity array.
     parameters:
-      name:
-        type: id
-        description: Unique name for this RGA instance, used as the asyn port name.
-      ip:
-        type: str
-        description: IP address and TCP port of the Hiden HAL RC controller.
+      PORT:
+        type: object
+        description: |-
+          Name of the asyn port to use for StreamDevice communication.
+          Must be the name of a companion asyn.AsynIP entity.
       P:
         type: str
-        description: PV prefix.
+        description: |-
+          PV prefix, e.g. "BL11I-EA-RGA-01". Macro passed to
+          dbLoadRecords; present in the compiled .db as $(P).
       Q:
         type: str
-        description: PV suffix.
+        description: |-
+          PV suffix appended to P in all PV names.
         default: ""
       BUFFER_SIZE:
         type: int
-        description: Rolling buffer size per mass channel.
+        description: |-
+          Number of samples in the MID scan rolling results buffer per
+          mass channel.
         default: 1000
-
-    pre_init:
-      - value: |
-          drvAsynIPPortConfigure("{{name}}", "{{ip}}", 100, 0, 0)
-      - when: first
-        value: |
-          epicsEnvSet("STREAM_PROTOCOL_PATH", "$(HIDENRGA)/data")
+      MASS_RANGE:
+        type: int
+        description: Mass range of RGA in amu.
+        default: 100
+      HMT_RC:
+        type: int
+        description: Set to 1 for high pressure HMT RC variant.
+        default: 0
 
     databases:
       - file: $(HIDENRGA)/db/hiden_qga.db
         args:
-          P:
-          Q:
-          PORT: "{{name}}"
-          BUFFER_SIZE:
+          .*:
 
     post_init:
       - value: |
           seq(sncDegas, "P={{P}}{{Q}}")
 ```
 
+The other three variants (`hidenRGA`, `hidenRGA_hpr20`, `hidenRGA_HMT`) have
+identical parameters.  Add them as additional `entity_models` entries, changing
+only the `name`, `description`, and the `databases[].file` path to the
+appropriate `.db` file.
+
+Because `name` was dropped from the entity model, a converter is needed to
+discard it when reading the XML.  Create
+`src/builder2ibek/converters/hidenRGA.py` following the pattern of
+`src/builder2ibek/converters/cmsIon.py`:
+
+```python
+from builder2ibek.converters import register
+
+@register("hidenRGA")
+def convert(entity):
+    entity.remove("name")
+```
+
+Register it in `src/builder2ibek/convert.py` alongside the other converters.
+
 ---
 
-## 7. Verify with builder2ibek
+## 6. Verify with builder2ibek
 
 Once your YAML is in `ibek-support-dls`, you can validate it by converting a
 real IOC XML that uses the module:
@@ -405,6 +467,37 @@ uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml /tmp/test.yaml
 
 Then inspect `/tmp/test.yaml` and check that the entity types and parameter names
 match what you defined in the support YAML.
+
+The real I11 IOC instance at
+`/scratch/hgv27681/work/i11-services/services/b11i-ea-hiden-01/config/ioc.yaml`
+was generated this way and illustrates the expected output:
+
+```yaml
+entities:
+  - type: epics.EpicsEnvSet
+    name: STREAM_PROTOCOL_PATH
+    value: /epics/runtime/protocol/
+
+  - type: asyn.AsynIP
+    name: rgaPort
+    port: 10.111.5.1:5025
+
+  - type: hidenRGA.hidenRGA_qga
+    BUFFER_SIZE: 100
+    P: BL11I-EA-RGA-01
+    PORT: rgaPort
+```
+
+Note the `STREAM_PROTOCOL_PATH` entry.  Rather than each StreamDevice entity
+model emitting an `epicsEnvSet` in its own `pre_init`, ibek consolidates all
+protocol files into a single directory (`/epics/runtime/protocol/`) during IOC
+startup, and `builder2ibek` always adds a single `epics.EpicsEnvSet` entity for
+`STREAM_PROTOCOL_PATH` to the generated `ioc.yaml`.  There is no need to handle
+this in the support YAML at all.
+
+Also note that `asyn.AsynIP` appears as a first-class entity in `ioc.yaml` with
+its own `name: rgaPort`, and `hidenRGA_qga` references it via `PORT: rgaPort` —
+the `type: object` pattern in action.
 
 ---
 
@@ -419,8 +512,8 @@ match what you defined in the support YAML.
 | `LibFileList` | `install.yml: libs` |
 | `ProtocolFiles` | `install.yml: protocol_files` |
 | `PostIocInitialise` print statements | `post_init[].value` |
-| Runtime macros (P, Q, PORT, BUFFER_SIZE) | `databases[].args` |
-| Baked-in macros (MASS_RANGE, HMT_RC) | not in databases.args |
+| Database macros without defaults (P, Q, PORT, BUFFER_SIZE) | `databases[].args` — required parameters |
+| Database macros with defaults (MASS_RANGE, HMT_RC) | `databases[].args` — optional parameters with matching defaults |
 | `Dependencies = (Asyn,...)` | `pre_init` `drvAsynIPPortConfigure` call |
 | `Dependencies = (Seq,...)` | `post_init` `seq(...)` call |
 | `when: first` | once-per-IOC commands (e.g. STREAM_PROTOCOL_PATH) |
