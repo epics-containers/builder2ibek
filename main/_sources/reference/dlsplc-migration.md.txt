@@ -140,7 +140,7 @@ vlvcc="BL04I-VA-VLVCC-01"
 
 ### `interlock` — field names and addresses
 
-Interlock bit labels `ilkA`–`ilkF` become `ilk10`–`ilk16` (decimal):
+Interlock bit labels `ilkA`–`ilkF` become `ilk10`–`ilk15` (decimal):
 
 ```
 ilkA → ilk10
@@ -165,12 +165,12 @@ subtracting an offset, **add that offset back**:
 The three arguments `addr`, `in`, `out` collapse into a single `outaddr`:
 
 ```
-outaddr = (addr × 10) + out
+outaddr = (addr × 10) + in
 ```
 
-The input address is always `outaddr - 1`.
+The input address is always `outaddr + 1`.
 
-Example: `addr=08, in=1, out=0` → reads DM81, writes DM80 → `outaddr=80`.
+Example: `addr=08, in=1, out=0` → writes DM80, reads DM81 → `outaddr=80`.
 
 The `in`, `out`, and `addr` arguments are removed; `name` is also removed.
 
@@ -302,7 +302,7 @@ in builder XML; ibek uses the `device` PV name instead).
     name="ITLK" port="ty_40_0"/>
 ```
 
-**New ioc.yaml** (`outaddr = 08×10 + 0 = 80`; `in`, `out`, `addr`, `name` removed):
+**New ioc.yaml** (`outaddr = 08×10 = 80`; `in`, `out`, `addr`, `name` removed):
 ```yaml
 - type: dlsPLC.overrideRequestMain
   P: BL04I-VA-VLVCC-01

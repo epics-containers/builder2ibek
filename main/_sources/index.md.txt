@@ -17,7 +17,7 @@ to running EPICS IOCs in containers under Kubernetes.
 
 In epics-containers, each IOC instance is expressed as an ibek `ioc.yaml` file
 and support modules are described by `ibek.support.yaml` entity models.
-`builder2ibek` converts the former and herein documents how to author the latter.
+`builder2ibek` converts the former, and this documentation covers how to author the latter.
 
 ## Philosophy of conversion
 

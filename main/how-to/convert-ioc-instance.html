@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 1.1.3.dev5+g0590e1d2e documentation</title>
+    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 1.1.3.dev10+g87ca8d0df documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=b8dc8d56"></script>
+    <script src="../_static/documentation_options.js?v=71d407fa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -579,15 +579,17 @@ If the original had alternative configurations in comments, choose the right
 one now.</p></li>
 <li><p><strong>Default values</strong>: some converters inject sensible defaults (e.g. autosave
 <code class="docutils literal notranslate"><span class="pre">debug:</span> <span class="pre">false</span></code>).  Verify these are appropriate.</p></li>
-<li><p><strong>Module coverage</strong>: if a module has no converter, its entities will be just have
+<li><p><strong>Module coverage</strong>: if a module has no converter, its entities will just have
 identical parameters to the XML attributes in the original. For some entities this
 will be perfectly OK as we try to make the <code class="docutils literal notranslate"><span class="pre">xxx.ibek.support.yaml</span></code> as compatible
 with the original XML as possible.</p></li>
 <li><p><strong>Schema validation</strong>: open the YAML in VSCode with the Red Hat YAML extension;
-the <code class="docutils literal notranslate"><span class="pre">$schema</span></code> line at the top will highlight any type mismatches.
-IMPORTANT: you will need to update the schema when you have made changes
-See <a class="reference internal" href="#schema-update"><span class="std std-ref">6. Updating the schema</span></a></p></li>
+the <code class="docutils literal notranslate"><span class="pre">$schema</span></code> line at the top will highlight any type mismatches.</p></li>
 </ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>You will need to update the schema when you have made changes — see <a class="reference internal" href="#schema-update"><span class="std std-ref">6. Updating the schema</span></a>.</p>
+</div>
 <p>For schema validation to work your <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> should have the following header:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json</span>
 </pre></div>

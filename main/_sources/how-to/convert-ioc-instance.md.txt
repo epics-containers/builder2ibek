@@ -131,14 +131,16 @@ Auto-conversion is a best-effort translation; review the output for:
   one now.
 - **Default values**: some converters inject sensible defaults (e.g. autosave
   `debug: false`).  Verify these are appropriate.
-- **Module coverage**: if a module has no converter, its entities will be just have
+- **Module coverage**: if a module has no converter, its entities will just have
   identical parameters to the XML attributes in the original. For some entities this
   will be perfectly OK as we try to make the `xxx.ibek.support.yaml` as compatible
   with the original XML as possible.
 - **Schema validation**: open the YAML in VSCode with the Red Hat YAML extension;
   the `$schema` line at the top will highlight any type mismatches.
-  IMPORTANT: you will need to update the schema when you have made changes
-  See [](#schema-update)
+
+:::{important}
+You will need to update the schema when you have made changes — see [](#schema-update).
+:::
 
 For schema validation to work your `ioc.yaml` should have the following header:
 

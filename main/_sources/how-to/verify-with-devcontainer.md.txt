@@ -26,7 +26,7 @@ The devcontainer expects the instance configuration in a folder containing
 `ioc.yaml`. Make sure your services repository is cloned next to your
 generic IOC folder e.g.
 
-For example, to test `BL11I-CS-IOC-09` which is a ioc-hidenrga based IOC we
+For example, to test `BL11I-CS-IOC-09` which is an ioc-hidenrga based IOC we
 would need:
 
 ```
