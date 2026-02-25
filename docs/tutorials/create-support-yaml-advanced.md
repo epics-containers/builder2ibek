@@ -1,4 +1,4 @@
-# Advanced: ibek support YAML for a complex builder.py
+# ibek support YAML for a complex builder.py
 
 This tutorial extends the
 [basic tutorial](create-support-yaml.md) to cover patterns that arise in

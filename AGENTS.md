@@ -30,14 +30,14 @@ Full step-by-step guide: [docs/tutorials/create-support-yaml.md](docs/tutorials/
 
 Quick reference:
 1. Read `etc/builder.py` — each class → one `entity_model`
-2. Check `<module>App/Db/*.substitutions` — identify runtime vs baked-in macros
+2. `DbdFileList` / `LibFileList` / `ProtocolFiles` → `install.yml`
 3. ibek parameter names must match the XML attribute names exactly so
-   `xml2yaml` round-trips correctly
-4. `TemplateFile` → `databases[].file`
-5. `PostIocInitialise` print statements → `post_init[].value`
-6. `drvAsynIPPortConfigure` call → `pre_init[].value`
-7. `STREAM_PROTOCOL_PATH` → `pre_init[]` with `when: first`
-8. `DbdFileList` / `LibFileList` / `ProtocolFiles` → `install.yml`
+   `xml2yaml` round-trips correctly; `TemplateFile` → `databases[].file`
+4. `PostIocInitialise`/`Initialise`/`InitialiseOnce` methods → `post_init`/`pre_init`.
+   Calls contributed by dependencies (e.g. `drvAsynIPPortConfigure` from `Asyn`)
+   won't appear in the class methods — find them in the boot script of a real
+   builder-generated IOC, not an example boot script.
+5. `STREAM_PROTOCOL_PATH` → `pre_init[]` with `when: first`
 
 Note: `install.yml` (not `.yaml`).
 
@@ -119,11 +119,39 @@ ibek-support-dls/    # submodule: DLS entity models
   instances of the same entity type are loaded. Used for `STREAM_PROTOCOL_PATH`
   and similar one-time environment setup.
 
-**Runtime vs baked-in macros**
-: Macros that appear in substitution pattern rows are expanded by MSI at build
-  time and do not appear in the compiled `.db`. Only macros absent from all
-  patterns (typically P, Q, PORT, BUFFER_SIZE) must be passed as
-  `databases[].args`.
+**Database macros vs baked-in macros**
+: The substitution (`.subst`) files are processed by MSI at build time to
+  produce compiled `.db` files. Ibek loads these compiled `.db` files at
+  runtime — you never need to look at the `.subst` files. The canonical source
+  is the macro declarations at the top of the compiled `.db`. Macros listed
+  there are database macros and must (or can) be passed in `databases[].args`.
+  Macros with no default must always be supplied. Macros with a default
+  (e.g. `MASS_RANGE`, `HMT_RC`) may not have appeared in the original builder
+  XML but should still be added as optional ibek parameters with the same
+  default, so instances can override them. Macros fully baked in by MSI will
+  not appear in the `.db` declarations at all.
+
+**`name` parameter and `type: id`**
+: Only *some* XMLbuilder objects have a `name` attribute. Carry it through to
+  ibek as `type: id` only when another entity will cross-reference this one, or
+  when you need the name as a runtime value inside `pre_init`/`databases.args`.
+  The most common case is any object that **creates an asyn port** (e.g.
+  `asyn.AsynIP`, `asyn.AsynSerial`): its `name` becomes the port identifier, and
+  other entities reference it by that name.  Keep `name` as `type: id` on the
+  port-creating entity.
+  If this is a leaf object with no referencing use, drop `name` — but a
+  converter must call `entity.remove("name")` to discard it when reading the
+  XML, so `xml2yaml` does not pass an unrecognised attribute to the entity model.
+  See `src/builder2ibek/converters/cmsIon.py` as a minimal example.
+
+**`PORT` parameter and `type: object` (asyn port reference pattern)**
+: A very common ibek pattern: one entity creates an asyn port (its `name` is
+  `type: id`), and a second entity references that port via a parameter named
+  `PORT` (or `ASYN_PORT`) of `type: object`.  In the builder XML the two are
+  linked by matching string values (e.g. `PORT="rgaPort"` on both elements).
+  In ibek, `type: object` makes the link explicit and validated.  Pass `PORT:`
+  through unchanged in `databases.args`.  Do not hard-code it or fold it into
+  the port-creating entity.
 
 **`builder2ibek xml2yaml`**
 : Auto-generates `ioc.yaml` from builder XML. Converters in `converters/` handle
@@ -196,7 +224,7 @@ in VSCode.
 
 | Module | ibek support YAML | Notes |
 |---|---|---|
-| `hidenRGA` | `ibek-support-dls/hidenRGA/` | 4 variants; baked-in MASS_RANGE |
+| `hidenRGA` | `ibek-support-dls/hidenRGA/` | 4 variants; MASS_RANGE/HMT_RC optional with defaults |
 | `cmsIon` | `ibek-support-dls/cmsIon/` | |
 | `digitelMpc` | `ibek-support-dls/digitelMpc/` | |
 | `iocStats` | `ibek-support/iocStats/` | community module |
