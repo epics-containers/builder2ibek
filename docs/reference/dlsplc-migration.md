@@ -168,9 +168,9 @@ The three arguments `addr`, `in`, `out` collapse into a single `outaddr`:
 outaddr = (addr × 10) + in
 ```
 
-The input address is always `outaddr - 1`.
+The input address is always `outaddr + 1`.
 
-Example: `addr=08, in=1, out=0` → writes DM81, reads DM80 → `outaddr=81`.
+Example: `addr=08, in=1, out=0` → writes DM80, reads DM81 → `outaddr=80`.
 
 The `in`, `out`, and `addr` arguments are removed; `name` is also removed.
 
@@ -302,12 +302,12 @@ in builder XML; ibek uses the `device` PV name instead).
     name="ITLK" port="ty_40_0"/>
 ```
 
-**New ioc.yaml** (`outaddr = 08×10 + 1 = 81`; `in`, `out`, `addr`, `name` removed):
+**New ioc.yaml** (`outaddr = 08×10 = 80`; `in`, `out`, `addr`, `name` removed):
 ```yaml
 - type: dlsPLC.overrideRequestMain
   P: BL04I-VA-VLVCC-01
   Q: :OVERRIDE
-  outaddr: 81
+  outaddr: 80
   port: ty_40_0
 ```
 
