@@ -16,7 +16,7 @@ Builder IOC definitions live under a beamline's `BL*-BUILDER` repository, in
 `etc/makeIocs/`.  For example,
 `/dls_sw/work/R3.14.12.7/support/BL19I-BUILDER/etc/makeIocs/BL19I-MO-IOC-14.xml`:
 
-```xml
+```none
 <?xml version="1.0" ?>
 <components arch="linux-x86_64">
     <utility.pingWait delay="3" ip="10.119.2.14"/>
