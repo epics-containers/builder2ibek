@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Generating autosave req files from DB templates &#8212; builder2ibek 1.1.2.dev14+g52473c6f4 documentation</title>
+    <title>Generating autosave req files from DB templates &#8212; builder2ibek 1.1.3.dev5+g0590e1d2e documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=eec33938"></script>
+    <script src="../_static/documentation_options.js?v=b8dc8d56"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -686,13 +686,13 @@ xxx.ibek.support.yaml. These will be used at runtime by ibek startup.</p></li>
 <p>If you are converting an existing DLS IOC support module to ibek, generate
 the autosave request files as part of the initial migration:</p>
 <ol class="arabic simple">
-<li><p><a class="reference internal" href="../tutorials/create-support-yaml.html"><span class="std std-doc">Create the ibek support YAML</span></a></p></li>
+<li><p><a class="reference internal" href="../tutorials/create-support-yaml.html"><span class="std std-doc">Creating ibek support YAML from a builder.py module</span></a></p></li>
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">autosave</span></code> on all DB templates that carry <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%</span> <span class="pre">autosave</span></code>
 comments</p></li>
 <li><p>Commit the generated <code class="docutils literal notranslate"><span class="pre">.req</span></code> files into the support module’s <code class="docutils literal notranslate"><span class="pre">Db/</span></code> directory</p></li>
 <li><p>Add an <code class="docutils literal notranslate"><span class="pre">autosave.Autosave</span></code> entity to your <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> (this is usually
 already present in converted IOCs — see
-<a class="reference internal" href="convert-ioc-instance.html"><span class="std std-doc">Convert an IOC instance</span></a>)</p></li>
+<a class="reference internal" href="convert-ioc-instance.html"><span class="std std-doc">Convert a builder XML IOC instance to ibek YAML</span></a>)</p></li>
 </ol>
 </section>
 </section>

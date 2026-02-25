@@ -120,7 +120,7 @@ for both must be present in the `ibek-support*` submodules used by the Generic I
 If your IOC uses the older `vacuumValve`, `interlock`, or `temperature` modules,
 `xml2yaml` will automatically translate many entities to their `dlsPLC`
 equivalents.  Some cases (e.g. `vacuumValveRead2`, pump templates) require
-manual fixup.  See the [dlsPLC migration reference](../reference/dlsplc-migration.md)
+manual fixup.  See the [](../reference/dlsplc-migration.md)
 for the complete mapping table and argument transformation rules.
 :::
 
@@ -170,7 +170,7 @@ corresponding `.yaml` files.  Review the diff, then commit both.
 Once you have converted an IOC, the definitive verification is to generate the
 EPICS database inside the devcontainer and compare it record-by-record against
 the original builder `_expanded.db`.  See
-[Verify with devcontainer and db-compare](verify-with-devcontainer.md) for the
+[](verify-with-devcontainer.md) for the
 full workflow.  In brief:
 
 ```bash

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; builder2ibek 1.1.3.dev5+g0590e1d2e documentation</title>
+    <title>Converting a builder XML IOC to ibek ioc.yaml &#8212; builder2ibek 1.1.3.dev5+g0590e1d2e documentation</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/installation';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/convert-ioc-xml';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="How-to Guides" href="../how-to.html" />
-    <link rel="prev" title="ibek support YAML for a complex builder.py" href="create-support-yaml-advanced.html" />
+    <link rel="next" title="Creating ibek support YAML from a builder.py module" href="create-support-yaml.html" />
+    <link rel="prev" title="Tutorials" href="../tutorials.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -397,10 +397,10 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="convert-ioc-xml.html">Converting a builder XML IOC to ibek ioc.yaml</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Converting a builder XML IOC to ibek ioc.yaml</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-support-yaml.html">Creating ibek support YAML from a builder.py module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-support-yaml-advanced.html">ibek support YAML for a complex builder.py</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 </ul>
 </div>
 </nav></div>
@@ -444,7 +444,7 @@
     
     <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">Tutorials</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Installation</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Converting a builder XML IOC to ibek ioc.yaml</span></li>
   </ul>
 </nav>
 </div>
@@ -461,41 +461,134 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
-<section id="check-your-version-of-python">
-<h2>Check your version of python<a class="headerlink" href="#check-your-version-of-python" title="Link to this heading">#</a></h2>
-<p>You will need python 3.11 or later. You can check your version of python by
-typing into a terminal:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 --version
+  <section id="converting-a-builder-xml-ioc-to-ibek-ioc-yaml">
+<h1>Converting a builder XML IOC to ibek ioc.yaml<a class="headerlink" href="#converting-a-builder-xml-ioc-to-ibek-ioc-yaml" title="Link to this heading">#</a></h1>
+<p>This tutorial shows how to use <code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">xml2yaml</span></code> to convert an existing
+DLS XMLbuilder IOC instance into an ibek <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>.  This is the most
+common operation and is all you need to do when working with existing generic
+IOCs.</p>
+<p>This is just a quick intro. For a more comprehensive guide see:
+<a class="reference internal" href="../how-to/convert-ioc-instance.html"><span class="std std-doc">Convert a builder XML IOC instance to ibek YAML</span></a></p>
+<hr class="docutils" />
+<section id="the-input-a-builder-xml-file">
+<h2>The input: a builder XML file<a class="headerlink" href="#the-input-a-builder-xml-file" title="Link to this heading">#</a></h2>
+<p>Builder IOC definitions live under a beamline’s <code class="docutils literal notranslate"><span class="pre">BL*-BUILDER</span></code> repository, in
+<code class="docutils literal notranslate"><span class="pre">etc/makeIocs/</span></code>.  For example,
+<code class="docutils literal notranslate"><span class="pre">/dls_sw/work/R3.14.12.7/support/BL19I-BUILDER/etc/makeIocs/BL19I-MO-IOC-14.xml</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; ?&gt;
+&lt;components arch=&quot;linux-x86_64&quot;&gt;
+    &lt;utility.pingWait delay=&quot;3&quot; ip=&quot;10.119.2.14&quot;/&gt;
+    &lt;pmac.pmacAsynSSHPort IP=&quot;10.119.2.14&quot; PASSWORD=&quot;!ls@OX11&quot; name=&quot;BRICK14_S&quot;/&gt;
+    &lt;pmac.PowerPMAC P=&quot;BL19I-MO-STEP-14&quot; Port=&quot;BRICK14_S&quot; name=&quot;BRICK14&quot;/&gt;
+    &lt;pmac.dls_pmac_asyn_motor ADDR=&quot;1&quot; DESC=&quot;Beamstop X Smaract&quot; M=&quot;:X&quot;
+        P=&quot;BL19I-OP-ABSB-02&quot; PORT=&quot;BRICK14&quot; ... name=&quot;BS2.X&quot;/&gt;
+    &lt;pmac.dls_pmac_asyn_motor ADDR=&quot;2&quot; DESC=&quot;Beamstop Y Smaract&quot; M=&quot;:Y&quot;
+        P=&quot;BL19I-OP-ABSB-02&quot; PORT=&quot;BRICK14&quot; ... name=&quot;BS2.Y&quot;/&gt;
+    &lt;pmac.dls_pmac_asyn_motor ADDR=&quot;3&quot; DESC=&quot;Beamstop Z Smaract&quot; M=&quot;:Z&quot;
+        P=&quot;BL19I-OP-ABSB-02&quot; PORT=&quot;BRICK14&quot; ... name=&quot;BS2.Z&quot;/&gt;
+    &lt;pmac.pmacDisableLimitsCheck Axis=&quot;1&quot; Controller=&quot;BRICK14&quot;/&gt;
+    &lt;pmac.pmacDisableLimitsCheck Axis=&quot;2&quot; Controller=&quot;BRICK14&quot;/&gt;
+    &lt;pmac.pmacDisableLimitsCheck Axis=&quot;3&quot; Controller=&quot;BRICK14&quot;/&gt;
+    &lt;pmac.autohome GRP1=&quot;ALL&quot; GRP2=&quot;X&quot; GRP3=&quot;Y&quot; GRP4=&quot;Z&quot; P=&quot;BL19I-OP-ABSB-02&quot;
+        PLC=&quot;11&quot; PORT=&quot;BRICK14&quot; ... name=&quot;BS2.HOME&quot;/&gt;
+    &lt;BL19I.writeReadPMACVarNEW P=&quot;BL19I-MO-STEP-14&quot; PORT=&quot;BRICK14&quot; VAR=&quot;M32&quot; .../&gt;
+    &lt;BL19I.writeReadPMACVarNEW P=&quot;BL19I-MO-STEP-14&quot; PORT=&quot;BRICK14&quot; VAR=&quot;M33&quot; .../&gt;
+    &lt;BL19I.writeReadPMACVarNEW P=&quot;BL19I-MO-STEP-14&quot; PORT=&quot;BRICK14&quot; VAR=&quot;M34&quot; .../&gt;
+    &lt;devIocStats.devIocStatsHelper ioc=&quot;BL19I-MO-IOC-14&quot; name=&quot;MO-IOC-14&quot;/&gt;
+    &lt;autosave.Autosave iocName=&quot;BL19I-MO-IOC-14&quot; name=&quot;MO-IOC14-SR&quot; .../&gt;
+    &lt;pvlogging.PvLogging/&gt;
+&lt;/components&gt;
 </pre></div>
 </div>
 </section>
-<section id="create-a-virtual-environment">
-<h2>Create a virtual environment<a class="headerlink" href="#create-a-virtual-environment" title="Link to this heading">#</a></h2>
-<p>It is recommended that you install into a “virtual environment” so this
-installation will not interfere with any existing Python software:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m venv /path/to/venv
-$ source /path/to/venv/bin/activate
+<hr class="docutils" />
+<section id="run-the-conversion">
+<h2>Run the conversion<a class="headerlink" href="#run-the-conversion" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/dls_sw/work/R3.14.12.7/support/BL19I-BUILDER/etc/makeIocs/BL19I-MO-IOC-14.xml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--yaml<span class="w"> </span>ioc.yaml
 </pre></div>
 </div>
 </section>
-<section id="installing-the-library">
-<h2>Installing the library<a class="headerlink" href="#installing-the-library" title="Link to this heading">#</a></h2>
-<p>You can now use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install the library and its dependencies:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install builder2ibek
+<hr class="docutils" />
+<section id="the-output-ioc-yaml">
+<h2>The output: ioc.yaml<a class="headerlink" href="#the-output-ioc-yaml" title="Link to this heading">#</a></h2>
+<p>The converter produces an <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> with every entity listed explicitly
+(<code class="docutils literal notranslate"><span class="pre">bl19i-mo-step-14/config/ioc.yaml</span></code>, abbreviated):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ioc_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv">  </span><span class="s">_global.get_env(&#39;IOC_NAME&#39;)</span><span class="nv"> </span><span class="s">}}&quot;</span>
+
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto-generated by https://github.com/epics-containers/builder2ibek</span>
+
+<span class="nt">entities</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">epics.EpicsEnvSet</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">STREAM_PROTOCOL_PATH</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/epics/runtime/protocol/</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pmac.pmacAsynSSHPort</span>
+<span class="w">    </span><span class="nt">IP</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.119.2.14</span>
+<span class="w">    </span><span class="nt">PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;!ls@OX11&quot;</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BRICK14_S</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pmac.PowerPMAC</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL19I-MO-STEP-14</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BRICK14</span>
+<span class="w">    </span><span class="nt">pmacAsynSSHPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BRICK14_S</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pmac.dls_pmac_asyn_motor</span>
+<span class="w">    </span><span class="nt">ADDR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="nt">Controller</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BRICK14</span>
+<span class="w">    </span><span class="nt">DESC</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Beamstop X Smaract</span>
+<span class="w">    </span><span class="nt">M</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">:X</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL19I-OP-ABSB-02</span>
+<span class="w">    </span><span class="c1"># ... further motor parameters ...</span>
+
+<span class="w">  </span><span class="c1"># ... further motors and pmacDisableLimitsCheck entries ...</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pmac.autohome</span>
+<span class="w">    </span><span class="nt">GRP1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ALL</span>
+<span class="w">    </span><span class="nt">GRP2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X</span>
+<span class="w">    </span><span class="nt">GRP3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Y</span>
+<span class="w">    </span><span class="nt">GRP4</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Z</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL19I-OP-ABSB-02</span>
+<span class="w">    </span><span class="nt">PLC</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">11</span>
+<span class="w">    </span><span class="nt">PmacController</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BRICK14</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pmac.pmacVariableWrite</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL19I-MO-STEP-14</span>
+<span class="w">    </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BRICK14</span>
+<span class="w">    </span><span class="nt">VAR</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">M32</span>
+<span class="w">    </span><span class="c1"># ...</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">autosave.Autosave</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;BL19I-MO-STEP-14:&quot;</span>
 </pre></div>
 </div>
-<p>If you require a feature that is not currently released you can also install
-from github:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install git+https://github.com/epics-containers/builder2ibek.git
-</pre></div>
-</div>
-<p>The library should now be installed and the command-line interface on your path.
-You can check the version that has been installed by typing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ builder2ibek --version
-</pre></div>
-</div>
+</section>
+<hr class="docutils" />
+<section id="what-to-review-after-conversion">
+<h2>What to review after conversion<a class="headerlink" href="#what-to-review-after-conversion" title="Link to this heading">#</a></h2>
+<p>The output is a good starting point but always needs a human review:</p>
+<ul class="simple">
+<li><p><strong>Check entity types</strong> — confirm each <code class="docutils literal notranslate"><span class="pre">type:</span></code> matches what you expect from
+the builder XML.</p></li>
+<li><p><strong>Check parameter values</strong> — PV prefixes, IP addresses, and other
+site-specific values should match the original configuration.</p></li>
+<li><p><strong>Commented-out elements</strong> — builder XML elements that the converter could
+not map are emitted as YAML comments.  These need manual attention.</p></li>
+<li><p><strong>Module-specific converters</strong> — some modules (e.g. <code class="docutils literal notranslate"><span class="pre">BL19I.writeReadPMACVarNEW</span></code>
+above) are handled by a converter that remaps them to a standard ibek type
+(<code class="docutils literal notranslate"><span class="pre">pmac.pmacVariableWrite</span></code> / <code class="docutils literal notranslate"><span class="pre">pmac.pmacVariableRead</span></code>).</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="renaming-the-ioc">
+<h2>Renaming the IOC<a class="headerlink" href="#renaming-the-ioc" title="Link to this heading">#</a></h2>
+<p>Builder IOC names like <code class="docutils literal notranslate"><span class="pre">BL19I-MO-IOC-14</span></code> describe the <em>montion IOC number</em>, not the
+device.  In ibek the convention is to name the IOC after the <em>device it
+controls</em>.  Here the IOC drives a PMAC brick managing the beamstop motors, so
+it is renamed <code class="docutils literal notranslate"><span class="pre">bl19i-mo-step-14</span></code> — reflecting the beamline, domain, device
+type, and pmac number.  Update the directory name and any Helm/services
+configuration to match.</p>
 </section>
 </section>
 
@@ -510,20 +603,20 @@ You can check the version that has been installed by typing:</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="create-support-yaml-advanced.html"
+       href="../tutorials.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">ibek support YAML for a complex builder.py</p>
+        <p class="prev-next-title">Tutorials</p>
       </div>
     </a>
     <a class="right-next"
-       href="../how-to.html"
+       href="create-support-yaml.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">How-to Guides</p>
+        <p class="prev-next-title">Creating ibek support YAML from a builder.py module</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -546,9 +639,11 @@ You can check the version that has been installed by typing:</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-your-version-of-python">Check your version of python</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-virtual-environment">Create a virtual environment</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-the-library">Installing the library</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-input-a-builder-xml-file">The input: a builder XML file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-conversion">Run the conversion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-output-ioc-yaml">The output: ioc.yaml</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-to-review-after-conversion">What to review after conversion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#renaming-the-ioc">Renaming the IOC</a></li>
 </ul>
   </nav></div>
 
@@ -556,7 +651,7 @@ You can check the version that has been installed by typing:</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/epics-containers/builder2ibek/edit/main/docs/tutorials/installation.md">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/main/docs/tutorials/convert-ioc-xml.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -572,7 +667,7 @@ You can check the version that has been installed by typing:</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/tutorials/installation.md.txt"
+      <li><a href="../_sources/tutorials/convert-ioc-xml.md.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

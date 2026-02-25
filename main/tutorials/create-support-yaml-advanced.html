@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Advanced: ibek support YAML for a complex builder.py &#8212; builder2ibek 1.1.2.dev14+g52473c6f4 documentation</title>
+    <title>ibek support YAML for a complex builder.py &#8212; builder2ibek 1.1.3.dev5+g0590e1d2e documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=eec33938"></script>
+    <script src="../_static/documentation_options.js?v=b8dc8d56"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -397,8 +397,9 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-xml.html">Converting a builder XML IOC to ibek ioc.yaml</a></li>
 <li class="toctree-l1"><a class="reference internal" href="create-support-yaml.html">Creating ibek support YAML from a builder.py module</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Advanced: ibek support YAML for a complex builder.py</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">ibek support YAML for a complex builder.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 </ul>
 </div>
@@ -443,7 +444,7 @@
     
     <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">Tutorials</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Advanced: ibek support YAML for a complex builder.py</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">ibek support YAML for a complex builder.py</span></li>
   </ul>
 </nav>
 </div>
@@ -460,10 +461,10 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="advanced-ibek-support-yaml-for-a-complex-builder-py">
-<h1>Advanced: ibek support YAML for a complex builder.py<a class="headerlink" href="#advanced-ibek-support-yaml-for-a-complex-builder-py" title="Link to this heading">#</a></h1>
+  <section id="ibek-support-yaml-for-a-complex-builder-py">
+<h1>ibek support YAML for a complex builder.py<a class="headerlink" href="#ibek-support-yaml-for-a-complex-builder-py" title="Link to this heading">#</a></h1>
 <p>This tutorial extends the
-<a class="reference internal" href="create-support-yaml.html"><span class="std std-doc">basic tutorial</span></a> to cover patterns that arise in
+<a class="reference internal" href="create-support-yaml.html"><span class="std std-doc">Creating ibek support YAML from a builder.py module</span></a> to cover patterns that arise in
 more complex modules: <code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code>, cross-referencing other entities as
 <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code>, templates that include shared base templates, and <code class="docutils literal notranslate"><span class="pre">install.yml</span></code>
 fields for system package dependencies and Makefile patching.</p>
@@ -482,7 +483,7 @@ and its ibek support YAML lives in
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Completed (or familiar with) the
-<a class="reference internal" href="create-support-yaml.html"><span class="std std-doc">basic tutorial</span></a></p></li>
+<a class="reference internal" href="create-support-yaml.html"><span class="std std-doc">Creating ibek support YAML from a builder.py module</span></a></p></li>
 <li><p>A GitHub account and fork of
 <a class="reference external" href="https://github.com/epics-containers/ibek-support">epics-containers/ibek-support</a></p></li>
 <li><p>Access to the <a class="reference external" href="https://github.com/DiamondLightSource/ffmpegServer">ffmpegServer module source</a> published on GitHub</p></li>
@@ -548,7 +549,7 @@ and its ibek support YAML lives in
 <td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code> is the unique identifier per instance, maps to <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code> in ibek</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">_ffmpegStream</span></code> uses <code class="docutils literal notranslate"><span class="pre">&#64;includesTemplates(NDPluginBaseTemplate)</span></code></p></td>
-<td><p>Macros from the base template (<code class="docutils literal notranslate"><span class="pre">SCANRATE</span></code>, <code class="docutils literal notranslate"><span class="pre">PRIORITY</span></code>, <code class="docutils literal notranslate"><span class="pre">STACKSIZE</span></code>) are also runtime parameters</p></td>
+<td><p>Database macros from the base template (<code class="docutils literal notranslate"><span class="pre">SCANRATE</span></code>, <code class="docutils literal notranslate"><span class="pre">PRIORITY</span></code>, <code class="docutils literal notranslate"><span class="pre">STACKSIZE</span></code>) must also be ibek parameters</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code> on <code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ffmpegServerConfigure()</span></code> runs <strong>once per IOC</strong> regardless of how many streams are configured — maps to <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code></p></td>
@@ -630,9 +631,8 @@ so the template receives the right <code class="docutils literal notranslate"><s
 <h2>5. Macros from included base templates<a class="headerlink" href="#macros-from-included-base-templates" title="Link to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">_ffmpegStream</span></code> is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;includesTemplates(NDPluginBaseTemplate)</span></code>.
 This merges the base template’s macro set into <code class="docutils literal notranslate"><span class="pre">_ffmpegStream.ArgInfo</span></code>.
-Macros defined in <code class="docutils literal notranslate"><span class="pre">NDPluginBaseTemplate</span></code> that are <strong>not</strong> baked in by
-substitution patterns survive as runtime macros and must also appear in the
-ibek entity parameters.</p>
+Macros defined in <code class="docutils literal notranslate"><span class="pre">NDPluginBaseTemplate</span></code> that survive into the compiled <code class="docutils literal notranslate"><span class="pre">.db</span></code>
+as database macros must also appear in the ibek entity parameters.</p>
 <p>For <code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code> the relevant inherited macros are <code class="docutils literal notranslate"><span class="pre">SCANRATE</span></code>, <code class="docutils literal notranslate"><span class="pre">PRIORITY</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">STACKSIZE</span></code>, which appear in <code class="docutils literal notranslate"><span class="pre">NDPluginBase.template</span></code> records.  Add them
 to the entity model with their builder defaults:</p>
@@ -840,6 +840,30 @@ to the entity model with their builder defaults:</p>
 <span class="w">          </span><span class="nt">NDARRAY_PORT</span><span class="p">:</span>
 </pre></div>
 </div>
+<p>The following extract from
+<code class="docutils literal notranslate"><span class="pre">bl19i-di-cam-01/config/ioc.yaml</span></code>
+shows these entity models in use:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ADAravis.aravisCamera</span>
+<span class="w">    </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">D1CAM.cam</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL19I-DI-CAM-01</span>
+<span class="w">    </span><span class="nt">R</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;:CAM:&quot;</span>
+<span class="w">    </span><span class="nt">ID</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">172.23.119.136</span>
+<span class="w">    </span><span class="nt">BUFFERS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+<span class="w">    </span><span class="nt">CLASS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AutoADGenICam</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ffmpegServer.ffmpegStream</span>
+<span class="w">    </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">D1CAM.mjpg</span>
+<span class="w">    </span><span class="nt">NDARRAY_PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">D1CAM.cam</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL19I-DI-CAM-01</span>
+<span class="w">    </span><span class="nt">R</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;:MJPG:&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">PORT:</span> <span class="pre">D1CAM.cam</span></code> on the camera entity is a <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code> — it creates the asyn
+port that downstream plugins connect to.  <code class="docutils literal notranslate"><span class="pre">NDARRAY_PORT:</span> <span class="pre">D1CAM.cam</span></code> on
+<code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code> is a <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> reference to that same port — this is the
+cross-referencing pattern described in section 4.  <code class="docutils literal notranslate"><span class="pre">PORT:</span> <span class="pre">D1CAM.mjpg</span></code> on
+<code class="docutils literal notranslate"><span class="pre">ffmpegStream</span></code> is its own <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code>, creating a new port that could in turn be
+referenced by further downstream entities.</p>
 </section>
 <hr class="docutils" />
 <section id="write-the-install-yml">
@@ -912,23 +936,6 @@ adapt the upstream Makefile.</p>
 </section>
 </section>
 <hr class="docutils" />
-<section id="test-in-the-devcontainer">
-<h2>8. Test in the devcontainer<a class="headerlink" href="#test-in-the-devcontainer" title="Link to this heading">#</a></h2>
-<p>With the files written into <code class="docutils literal notranslate"><span class="pre">ibek-support/ffmpegServer/</span></code>, install and verify
-inside the Generic IOC devcontainer:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ansible.sh<span class="w"> </span>ffmpegServer
-<span class="nb">cd</span><span class="w"> </span>/epics/ioc<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>make
-ibek<span class="w"> </span>ioc<span class="w"> </span>generate-schema<span class="w"> </span>&gt;<span class="w"> </span>/tmp/ibek.ioc.schema.json
-</pre></div>
-</div>
-<p>Convert a real IOC XML that uses ffmpegServer and verify with db-compare:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uvx<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span>example.xml<span class="w"> </span>--yaml<span class="w"> </span>/tmp/test.yaml
-<span class="c1"># then verify with ibek dev instance + db-compare</span>
-<span class="c1"># see verify-with-devcontainer.md</span>
-</pre></div>
-</div>
-</section>
-<hr class="docutils" />
 <section id="summary-of-advanced-patterns">
 <h2>Summary of advanced patterns<a class="headerlink" href="#summary-of-advanced-patterns" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table">
@@ -951,7 +958,7 @@ ibek<span class="w"> </span>ioc<span class="w"> </span>generate-schema<span clas
 <td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code> parameter has <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;includesTemplates(Base)</span></code></p></td>
-<td><p>Add the base template’s runtime macros to the entity parameters</p></td>
+<td><p>Add the base template’s database macros to the entity parameters</p></td>
 </tr>
 <tr class="row-odd"><td><p>System package dependencies</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">apt_developer</span></code> / <code class="docutils literal notranslate"><span class="pre">apt_runtime</span></code> in <code class="docutils literal notranslate"><span class="pre">install.yml</span></code></p></td>
@@ -1026,7 +1033,6 @@ ibek<span class="w"> </span>ioc<span class="w"> </span>generate-schema<span clas
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#install-yml-advanced-fields-explained"><code class="docutils literal notranslate"><span class="pre">install.yml</span></code> advanced fields explained</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-in-the-devcontainer">8. Test in the devcontainer</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-advanced-patterns">Summary of advanced patterns</a></li>
 </ul>
   </nav></div>

@@ -13,7 +13,7 @@ rather than cosmetic ones.
 
 - A Generic IOC repo (e.g. `ioc-hidenrga`) cloned locally with the devcontainer
   configured
-- The converted `ioc.yaml` (see [Convert a builder XML instance](convert-ioc-instance.md))
+- The converted `ioc.yaml` (see [](convert-ioc-instance.md))
 - The original `_expanded.db` from the builder IOC build, accessible on the host
   (typically under `/dls_sw/.../<IOC>/db/<IOC>_expanded.db`)
 - Docker or Podman, and VSCode with the Dev Containers extension
@@ -189,7 +189,7 @@ value differing between builder and ibek, or a template version mismatch.
 When you find differences:
 
 1. **Missing module records**: add the module to `ibek-support-dls` following
-   the [create-support-yaml tutorial](../tutorials/create-support-yaml.md) and
+   the [](../tutorials/create-support-yaml.md) and
    rebuild the devcontainer (or run `ibek dev support <module-path>` to
    hot-load the module without a full rebuild).
 

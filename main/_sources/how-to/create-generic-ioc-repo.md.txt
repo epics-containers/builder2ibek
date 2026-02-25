@@ -9,7 +9,7 @@ This guide shows how to create the repository that produces the image.
 - `copier` installed (`pip install copier` or `uvx copier`)
 - Git and access to the `epics-containers` GitHub organisation
 - The ibek support YAML for your module already exists in `ibek-support-dls`
-  (see [Creating ibek support YAML](../tutorials/create-support-yaml.md))
+  (see [](../tutorials/create-support-yaml.md))
 
 ---
 

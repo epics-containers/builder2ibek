@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 1.1.2.dev14+g52473c6f4 documentation</title>
+    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 1.1.3.dev5+g0590e1d2e documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=eec33938"></script>
+    <script src="../_static/documentation_options.js?v=b8dc8d56"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Advanced: ibek support YAML for a complex builder.py" href="create-support-yaml-advanced.html" />
-    <link rel="prev" title="Tutorials" href="../tutorials.html" />
+    <link rel="next" title="ibek support YAML for a complex builder.py" href="create-support-yaml-advanced.html" />
+    <link rel="prev" title="Converting a builder XML IOC to ibek ioc.yaml" href="convert-ioc-xml.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -397,8 +397,9 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-xml.html">Converting a builder XML IOC to ibek ioc.yaml</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating ibek support YAML from a builder.py module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="create-support-yaml-advanced.html">Advanced: ibek support YAML for a complex builder.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-support-yaml-advanced.html">ibek support YAML for a complex builder.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 </ul>
 </div>
@@ -465,7 +466,7 @@
 <p>This tutorial walks you through converting a DLS EPICS support module that uses
 the old XMLbuilder (<code class="docutils literal notranslate"><span class="pre">builder.py</span></code>) format into the ibek YAML files needed for a
 Generic IOC. We use the <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> support module as a concrete example.</p>
-<p>After completing this tutorial you will have created:</p>
+<p>After completing this tutorial you should understand:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">ibek-support-dls/&lt;module&gt;/&lt;module&gt;.ibek.support.yaml</span></code> — entity model definitions</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ibek-support-dls/&lt;module&gt;/&lt;module&gt;.install.yml</span></code> — build dependencies and assets</p></li>
@@ -481,14 +482,15 @@ temperature controller as an example:</p>
 <p><a class="reference external" href="https://epics-containers.github.io/main/tutorials/generic_ioc.html#lakeshore-340-temperature-controller">epics-containers: Creating a Generic IOC — Lakeshore 340</a></p>
 <p>For a tutorial covering a more complex module and the full open-source
 contribution workflow, see
-<a class="reference internal" href="create-support-yaml-advanced.html"><span class="std std-doc">Advanced: ibek support YAML for a complex builder.py module</span></a>.</p>
+<a class="reference internal" href="create-support-yaml-advanced.html"><span class="std std-doc">ibek support YAML for a complex builder.py</span></a>.</p>
 </div>
-<section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<section id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Access to the module source at its DLS prod or work path</p></li>
-<li><p>An <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code> repository (or submodule) to write the files into</p></li>
-<li><p>Familiarity with EPICS asyn/StreamDevice concepts</p></li>
+<li><p>Take a look at <code class="docutils literal notranslate"><span class="pre">etc/builder.py</span></code> in the support module you are converting</p></li>
+<li><p>Build a <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.install.yml</span></code> for it</p></li>
+<li><p>Build a <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.ibek.support.yaml</span></code> for it</p></li>
+<li><p>Convert any autosave comments in templates to <code class="docutils literal notranslate"><span class="pre">.req</span></code> files</p></li>
 </ul>
 </section>
 <hr class="docutils" />
@@ -570,107 +572,11 @@ in the support YAML.</p>
 </div>
 </section>
 <hr class="docutils" />
-<section id="determine-runtime-vs-baked-in-macros">
-<h2>2. Determine runtime vs baked-in macros<a class="headerlink" href="#determine-runtime-vs-baked-in-macros" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">AutoSubstitution</span></code> classes derive their parameters from the template’s
-substitution file. Macros that appear <strong>in the pattern rows</strong> are expanded by MSI
-at build time and do not survive into the compiled <code class="docutils literal notranslate"><span class="pre">.db</span></code>. Only macros <strong>absent
-from patterns</strong> remain as <code class="docutils literal notranslate"><span class="pre">$(MACRO)</span></code> references at runtime.</p>
-<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> the relevant substitution file is
-<code class="docutils literal notranslate"><span class="pre">hidenRGAApp/Db/hiden_qga.substitutions</span></code> (same logic applies to all four variants):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">file</span> <span class="n">hiden_rga_global</span><span class="o">.</span><span class="n">template</span>
-<span class="p">{</span>
-<span class="n">pattern</span> <span class="p">{</span><span class="n">MASS_RANGE</span><span class="p">}</span>
- <span class="p">{</span><span class="mi">200</span><span class="p">}</span>
-<span class="p">}</span>
-<span class="o">...</span>
-<span class="n">file</span> <span class="n">hiden_rga_mid_mass</span><span class="o">.</span><span class="n">template</span>
-<span class="p">{</span>
-<span class="n">pattern</span> <span class="p">{</span><span class="n">NAME</span><span class="p">,</span> <span class="n">ROW</span><span class="p">,</span> <span class="n">MASS</span><span class="p">,</span> <span class="n">MASS_RANGE</span><span class="p">,</span> <span class="n">DETECTOR</span><span class="p">,</span> <span class="n">VARIABLE</span><span class="p">,</span> <span class="n">DWELL</span><span class="p">,</span> <span class="n">SETTLE</span><span class="p">,</span> <span class="n">EGU</span><span class="p">,</span> <span class="n">PREC</span><span class="p">,</span> <span class="n">ADEL</span><span class="p">,</span> <span class="n">EGUCAL</span><span class="p">,</span> <span class="n">ENABLE</span><span class="p">,</span> <span class="n">DISP</span><span class="p">}</span>
- <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">Torr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">1e-11</span><span class="p">,</span> <span class="n">mbar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">}</span>
- <span class="o">...</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code> appears in every pattern row — it is baked in.</p>
-<p>The macros <strong>not</strong> present in any pattern row — <code class="docutils literal notranslate"><span class="pre">P</span></code>, <code class="docutils literal notranslate"><span class="pre">Q</span></code>, <code class="docutils literal notranslate"><span class="pre">PORT</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code> — survive as <code class="docutils literal notranslate"><span class="pre">$(P)</span></code>, <code class="docutils literal notranslate"><span class="pre">$(Q)</span></code>, <code class="docutils literal notranslate"><span class="pre">$(PORT)</span></code>, <code class="docutils literal notranslate"><span class="pre">$(BUFFER_SIZE)</span></code> in the
-compiled <code class="docutils literal notranslate"><span class="pre">.db</span></code> and <strong>must</strong> be passed at <code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code> time.</p>
-</section>
-<hr class="docutils" />
-<section id="map-builder-arguments-to-ibek-parameters">
-<h2>3. Map builder arguments to ibek parameters<a class="headerlink" href="#map-builder-arguments-to-ibek-parameters" title="Link to this heading">#</a></h2>
-<p>In builder XML, <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> appeared like this:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hidenRGA.hidenRGA_qga</span><span class="w"> </span><span class="na">BUFFER_SIZE=</span><span class="s">&quot;100&quot;</span><span class="w"> </span><span class="na">P=</span><span class="s">&quot;BL11I-EA-RGA-01&quot;</span><span class="w"> </span><span class="na">PORT=</span><span class="s">&quot;rgaPort&quot;</span><span class="w"> </span><span class="na">Q=</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ENV.RGA&quot;</span><span class="nt">/&gt;</span>
-</pre></div>
-</div>
-<p>The XML attributes become ibek parameter names.  The asyn port (<code class="docutils literal notranslate"><span class="pre">PORT</span></code>) was
-previously provided by a separate <code class="docutils literal notranslate"><span class="pre">&lt;asyn.AsynIP&gt;</span></code> element; in ibek we keep this
-separation: the <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter becomes the asyn port identifier, and <code class="docutils literal notranslate"><span class="pre">PORT</span></code> in
-<code class="docutils literal notranslate"><span class="pre">databases.args</span></code> is set to <code class="docutils literal notranslate"><span class="pre">&quot;{{name}}&quot;</span></code>.</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>XML attribute</p></th>
-<th class="head"><p>ibek parameter</p></th>
-<th class="head"><p>type</p></th>
-<th class="head"><p>notes</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
-<td><p>asyn port name, unique per instance</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
-<td><p>PV prefix</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
-<td><p>PV suffix, default <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code></p></td>
-<td><p>—</p></td>
-<td><p>—</p></td>
-<td><p>not a parameter; set to <code class="docutils literal notranslate"><span class="pre">{{name}}</span></code> in databases.args</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
-<td><p>default 1000</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>An additional <code class="docutils literal notranslate"><span class="pre">ip</span></code> parameter (str) is added to specify the network address — this
-has no XML equivalent but is required for <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> in <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>.</p>
-</section>
-<hr class="docutils" />
-<section id="check-the-example-boot-script">
-<h2>4. Check the example boot script<a class="headerlink" href="#check-the-example-boot-script" title="Link to this heading">#</a></h2>
-<p>The compiled example at
-<code class="docutils literal notranslate"><span class="pre">iocs/example/iocBoot/iocexample/O.linux-x86_64/stexample.boot</span></code> confirms the
-runtime initialisation sequence:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">drvAsynIPPortConfigure</span><span class="p">(</span><span class="s2">&quot;rgaPort&quot;</span><span class="p">,</span> <span class="s2">&quot;10.76.5.10:5025&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-<span class="n">epicsEnvSet</span> <span class="s2">&quot;STREAM_PROTOCOL_PATH&quot;</span><span class="p">,</span> <span class="s2">&quot;$(HIDENRGA)/data&quot;</span>
-
-<span class="n">dbLoadRecords</span> <span class="s1">&#39;db/example_expanded.db&#39;</span>
-
-<span class="n">iocInit</span>
-
-<span class="n">seq</span><span class="p">(</span><span class="n">sncDegas</span><span class="p">,</span> <span class="s2">&quot;P=hidenExample&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This gives us the exact <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, <code class="docutils literal notranslate"><span class="pre">databases</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> content needed.</p>
-</section>
-<hr class="docutils" />
 <section id="write-the-install-yml">
-<h2>5. Write the install.yml<a class="headerlink" href="#write-the-install-yml" title="Link to this heading">#</a></h2>
+<h2>2. Write the install.yml<a class="headerlink" href="#write-the-install-yml" title="Link to this heading">#</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">.install.yml</span></code> (note: <code class="docutils literal notranslate"><span class="pre">.yml</span></code> not <code class="docutils literal notranslate"><span class="pre">.yaml</span></code>) captures build-time dependencies.</p>
+<p>It provides instructions to ansible as to how to build this support module as part of
+of a generic IOC container build.</p>
 <p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.install.yml</span></code>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=../../ibek-support/_scripts/support_install_variables.json</span>
 
@@ -698,195 +604,313 @@ runtime initialisation sequence:</p>
 </ul>
 </section>
 <hr class="docutils" />
+<section id="map-builder-arguments-to-ibek-parameters">
+<h2>3. Map builder arguments to ibek parameters<a class="headerlink" href="#map-builder-arguments-to-ibek-parameters" title="Link to this heading">#</a></h2>
+<p>In builder XML, <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> appeared like this:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hidenRGA.hidenRGA_qga</span><span class="w"> </span><span class="na">BUFFER_SIZE=</span><span class="s">&quot;100&quot;</span><span class="w"> </span><span class="na">P=</span><span class="s">&quot;BL11I-EA-RGA-01&quot;</span><span class="w"> </span><span class="na">PORT=</span><span class="s">&quot;rgaPort&quot;</span><span class="w"> </span><span class="na">Q=</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ENV.RGA&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>The XML attributes become ibek parameter names.  <code class="docutils literal notranslate"><span class="pre">name</span></code> is dropped (the entity
+has no cross-references and creates no asyn port) and handled by a converter.
+<code class="docutils literal notranslate"><span class="pre">PORT</span></code> references the companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity by name.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>XML attribute</p></th>
+<th class="head"><p>ibek parameter</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>dropped; converter discards it from XML</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>PV prefix</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>PV suffix, default <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">object</span></code></p></td>
+<td><p>name of the companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>default 1000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="determine-the-startup-script-sequence">
+<h2>4. Determine the startup script sequence<a class="headerlink" href="#determine-the-startup-script-sequence" title="Link to this heading">#</a></h2>
+<p>The canonical source for <code class="docutils literal notranslate"><span class="pre">pre_init</span></code> and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> content is <strong>builder.py
+itself</strong>.  Look at the <code class="docutils literal notranslate"><span class="pre">Initialise</span></code>, <code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code>, and <code class="docutils literal notranslate"><span class="pre">PostIocInitialise</span></code>
+methods on each class — these are what builder emits into the boot script.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> the relevant method is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">PostIocInitialise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">&#39;seq(sncDegas, &quot;P=</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This maps directly to the <code class="docutils literal notranslate"><span class="pre">post_init</span></code> block.  The <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> call
+comes from the <code class="docutils literal notranslate"><span class="pre">Asyn</span></code> dependency rather than from the class itself, so it does
+not appear in <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code>’s own methods.</p>
+<p>To see what the startup script should look like, see a boot script of a <strong>real
+IOC instance</strong> that builder generated for a beamline using this module.  For
+<code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> the I11 IOC at
+<code class="docutils literal notranslate"><span class="pre">/dls_sw/work/R3.14.12.7/support/BL11I-BUILDER/iocs/BL11I-CS-IOC-09/</span></code> was used;
+its generated boot script contains:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">drvAsynIPPortConfigure</span><span class="p">(</span><span class="s2">&quot;ENV.RGA&quot;</span><span class="p">,</span> <span class="s2">&quot;10.76.5.10:5025&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">epicsEnvSet</span> <span class="s2">&quot;STREAM_PROTOCOL_PATH&quot;</span><span class="p">,</span> <span class="s2">&quot;$(HIDENRGA)/data&quot;</span>
+
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;db/BL11I-CS-IOC-09_expanded.db&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+<span class="n">iocInit</span>
+
+<span class="n">seq</span><span class="p">(</span><span class="n">sncDegas</span><span class="p">,</span> <span class="s2">&quot;P=BL11I-EA-RGA-01&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This can confirm the <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, <code class="docutils literal notranslate"><span class="pre">databases</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> content needed.</p>
+<p>Note that here drvAsynIPPortConfigure is supplied by an asyn.AsynIP object.</p>
+</section>
+<hr class="docutils" />
 <section id="write-the-ibek-support-yaml">
-<h2>6. Write the ibek.support.yaml<a class="headerlink" href="#write-the-ibek-support-yaml" title="Link to this heading">#</a></h2>
-<p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml</span></code>. Repeat an
-<code class="docutils literal notranslate"><span class="pre">entity_model</span></code> block for every class in builder.py. The <code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code> guard on
-the <code class="docutils literal notranslate"><span class="pre">STREAM_PROTOCOL_PATH</span></code> environment set ensures it only runs once even when
-multiple hidenRGA instances are loaded.</p>
+<h2>5. Write the ibek.support.yaml<a class="headerlink" href="#write-the-ibek-support-yaml" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> has four builder.py classes (<code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_hpr20</span></code>,
+<code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_HMT</span></code>), each loading a different substitutions file
+but otherwise identical in structure.  To keep the tutorial focused we work
+through <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> in full detail — this is the variant deployed on I11 at
+DLS.  The other three follow exactly the same logic and their entity models are
+just repeats with the appropriate <code class="docutils literal notranslate"><span class="pre">db</span></code> filename substituted.</p>
+<section id="a-review-what-parameters-you-need">
+<h3>5a. Review what parameters you need<a class="headerlink" href="#a-review-what-parameters-you-need" title="Link to this heading">#</a></h3>
+<p>The XML element that appears in a real I11 IOC is:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hidenRGA.hidenRGA_qga</span><span class="w"> </span><span class="na">BUFFER_SIZE=</span><span class="s">&quot;100&quot;</span><span class="w"> </span><span class="na">P=</span><span class="s">&quot;BL11I-EA-RGA-01&quot;</span><span class="w"> </span><span class="na">PORT=</span><span class="s">&quot;rgaPort&quot;</span><span class="w"> </span><span class="na">Q=</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ENV.RGA&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>We derive the ibek parameters by investigating the purpose of each of the
+attributes of the hidenRGA_qga element.</p>
+<hr class="docutils" />
+<section id="name-drop-this-parameter">
+<h4><code class="docutils literal notranslate"><span class="pre">name</span></code> → drop this parameter<a class="headerlink" href="#name-drop-this-parameter" title="Link to this heading">#</a></h4>
+<p><strong>Source: XMLbuilder row identifier.</strong>  <em>Some</em> XMLbuilder objects carry a <code class="docutils literal notranslate"><span class="pre">name</span></code>
+attribute — not all do.  XMLbuilder uses it to auto-generate OPI/EDM GUI panels
+(irrelevant in ibek) and to allow other objects to cross-reference this one.</p>
+<p>You need to carry <code class="docutils literal notranslate"><span class="pre">name</span></code> through to ibek as a <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code> parameter only when:</p>
+<ul class="simple">
+<li><p>another entity_model in a <code class="docutils literal notranslate"><span class="pre">support.yaml</span></code> will reference this entity. This
+is common for Asyn devices that expose their Asyn port as ‘name’, <strong>or</strong></p></li>
+<li><p>you need the name as a runtime value inside the entity’s own <code class="docutils literal notranslate"><span class="pre">pre_init</span></code> or
+<code class="docutils literal notranslate"><span class="pre">databases.args</span></code>.</p></li>
+</ul>
+<p>The most common case is <strong>any object that creates
+an asyn port</strong>.  The object calls <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> (or equivalent) with
+<code class="docutils literal notranslate"><span class="pre">name</span></code> as the port identifier, and other objects reference it by that same port
+name — so <code class="docutils literal notranslate"><span class="pre">name</span></code> identifies this object and provides a cross-reference target.
+If you see a <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> or <code class="docutils literal notranslate"><span class="pre">drvAsynSerialPortConfigure</span></code> call in
+<code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, keep <code class="docutils literal notranslate"><span class="pre">name</span></code> as <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code>.</p>
+<p>If neither condition applies and this is a true <em>leaf</em> object, you can drop
+<code class="docutils literal notranslate"><span class="pre">name</span></code> entirely — but then you need a converter to discard it when reading the
+XML, so that <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> does not try to pass an unrecognised attribute to the
+entity model.  <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code> is the simplest example:
+it does nothing except call <code class="docutils literal notranslate"><span class="pre">entity.remove(&quot;name&quot;)</span></code> for its entity types.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code>, neither condition applies: the asyn port is created by the
+companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity (not by this one), and nothing in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>
+cross-references <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> by name.  We therefore <strong>drop</strong> <code class="docutils literal notranslate"><span class="pre">name</span></code> and add
+a converter that discards it when reading the XML.</p>
+</section>
+<hr class="docutils" />
+<section id="p-type-str">
+<h4><code class="docutils literal notranslate"><span class="pre">P</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code><a class="headerlink" href="#p-type-str" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro from  <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<p>The macro declarations at the top of
+<code class="docutils literal notranslate"><span class="pre">/dls_sw/prod/R3.14.12.7/support/hidenRGA/1-12/db/hiden_qga.db</span></code> are the
+definitive list of what must (or can) be passed at <code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code> time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % macro, P, Prefix</span>
+<span class="c1"># % macro, Q, Suffix</span>
+<span class="c1"># % macro, PORT, Asyn port name</span>
+<span class="c1"># % macro, MASS_RANGE, Mass range of RGA. Defaults to 100amu.</span>
+<span class="c1"># % macro, HMT_RC, Set to one for high pressure HMT RC variant. Defaults to zero</span>
+</pre></div>
+</div>
+<p>Macros <strong>without</strong> a default in the declaration must always be supplied →
+required ibek parameters.  Macros <strong>with</strong> a default (<code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code>, <code class="docutils literal notranslate"><span class="pre">HMT_RC</span></code>)
+may be omitted entirely from the call — which is why they did not need to appear
+in the builder XML.  They can still be exposed as optional ibek parameters if
+you want users to be able to override the default.</p>
+<p><code class="docutils literal notranslate"><span class="pre">P</span></code> has no default and therefore must always be supplied:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">(</span><span class="n">stringin</span><span class="p">,</span> <span class="s2">&quot;$(P,undefined)$(Q,undefined):ID-I&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">P=&quot;BL11I-EA-RGA-01&quot;</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="q-type-str-default">
+<h4><code class="docutils literal notranslate"><span class="pre">Q</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">&quot;&quot;</span></code><a class="headerlink" href="#q-type-str-default" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro, same reasoning as <code class="docutils literal notranslate"><span class="pre">P</span></code>.</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">Q</span></code> has no default in the <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code> macro declarations, however as the
+one IOC we were translating used “”, we give it the reasonable default of <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>
+in the ibek model so it can be omitted from <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> when not needed.</p>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">Q=&quot;&quot;</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="port-type-object-referencing-the-asyn-asynip-entity">
+<h4><code class="docutils literal notranslate"><span class="pre">PORT</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> referencing the <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity<a class="headerlink" href="#port-type-object-referencing-the-asyn-asynip-entity" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro in <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">PORT</span></code> is declared in the <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code> header with no default and appears in
+StreamDevice links:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">(</span><span class="n">stringin</span><span class="p">,</span> <span class="s2">&quot;$(P,undefined)$(Q,undefined):ID-I&quot;</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">field</span><span class="p">(</span><span class="n">DTYP</span><span class="p">,</span> <span class="s2">&quot;stream&quot;</span><span class="p">)</span>
+    <span class="n">field</span><span class="p">(</span><span class="n">INP</span><span class="p">,</span>  <span class="s2">&quot;@hiden_rga.proto getID() $(PORT,undefined)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It has no default, so it must be passed in <code class="docutils literal notranslate"><span class="pre">databases.args</span></code>.  In the builder XML, <code class="docutils literal notranslate"><span class="pre">PORT=&quot;rgaPort&quot;</span></code> matched the <code class="docutils literal notranslate"><span class="pre">PORT</span></code>
+attribute of the companion <code class="docutils literal notranslate"><span class="pre">&lt;asyn.AsynIP</span> <span class="pre">PORT=&quot;rgaPort&quot;</span> <span class="pre">.../&gt;</span></code> element — i.e.
+<code class="docutils literal notranslate"><span class="pre">PORT</span></code> is the <em>name of another entity</em>.</p>
+<p>This is a very common ibek pattern: one entity creates an asyn port (an
+<code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> or <code class="docutils literal notranslate"><span class="pre">asyn.AsynSerial</span></code> entity with <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">type:</span> <span class="pre">id</span></code>), and a second
+entity references it by name via a parameter called <code class="docutils literal notranslate"><span class="pre">PORT</span></code> (or sometimes
+<code class="docutils literal notranslate"><span class="pre">ASYN_PORT</span></code>).  In ibek the referencing parameter has <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code>, which
+ensures <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> validation catches mismatched names.</p>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">PORT=&quot;rgaPort&quot;</span></code> → ibek parameter <code class="docutils literal notranslate"><span class="pre">PORT</span></code> of <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code>, value is
+the <code class="docutils literal notranslate"><span class="pre">name</span></code> of the <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="buffer-size-type-int-default-1000">
+<h4><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">1000</span></code><a class="headerlink" href="#buffer-size-type-int-default-1000" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro in <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code> declares it as a macro and uses it in waveform records:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % macro, BUFFER_SIZE, Number of points to allocate for results buffer</span>
+  <span class="n">field</span><span class="p">(</span><span class="n">NSAM</span><span class="p">,</span> <span class="s2">&quot;$(BUFFER_SIZE,undefined)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It has no meaningful default, so it must be passed in <code class="docutils literal notranslate"><span class="pre">databases.args</span></code>.</p>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE=&quot;100&quot;</span></code>.  The ibek default is set to 1000 — a
+conservative value that works well for typical MID scan usage.</p>
+</section>
+<hr class="docutils" />
+<section id="mass-range-and-hmt-rc-type-int-with-defaults-from-the-db">
+<h4><code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code> and <code class="docutils literal notranslate"><span class="pre">HMT_RC</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code> with defaults from the <code class="docutils literal notranslate"><span class="pre">.db</span></code><a class="headerlink" href="#mass-range-and-hmt-rc-type-int-with-defaults-from-the-db" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macros with defaults in <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % macro, MASS_RANGE, Mass range of RGA. Defaults to 100amu.</span>
+<span class="c1"># % macro, HMT_RC, Set to one for high pressure HMT RC variant. Defaults to zero</span>
+</pre></div>
+</div>
+<p>These were not present in the builder XML because their defaults were
+sufficient for normal use.  We add them to the ibek entity model as optional
+parameters with the same defaults, so that instances can override them if
+needed.</p>
+<p>Neither appears in the original XML — ibek defaults: <code class="docutils literal notranslate"><span class="pre">MASS_RANGE:</span> <span class="pre">100</span></code>,
+<code class="docutils literal notranslate"><span class="pre">HMT_RC:</span> <span class="pre">0</span></code>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="b-the-entity-model">
+<h3>5b. The entity model<a class="headerlink" href="#b-the-entity-model" title="Link to this heading">#</a></h3>
+<p>Each entity model has four main sections:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">parameters:</span></code></strong> — the values a user supplies in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>; ibek validates
+types</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">pre_init:</span></code></strong> — IOC shell commands emitted before <code class="docutils literal notranslate"><span class="pre">iocInit</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">databases:</span></code></strong> — <code class="docutils literal notranslate"><span class="pre">.db</span></code> files to load via <code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code>, with their macro
+arguments</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">post_init:</span></code></strong> — IOC shell commands emitted after <code class="docutils literal notranslate"><span class="pre">iocInit</span></code></p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, <code class="docutils literal notranslate"><span class="pre">databases</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> values are rendered as Jinja2
+templates with the entity’s parameters supplied as context, so <code class="docutils literal notranslate"><span class="pre">{{P}}</span></code> anywhere
+in those sections resolves to the value of the <code class="docutils literal notranslate"><span class="pre">P</span></code> parameter.</p>
+<p><code class="docutils literal notranslate"><span class="pre">databases.args</span></code> is a list of <code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pairs passed as macros to
+<code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code>.  If the value is omitted (e.g. <code class="docutils literal notranslate"><span class="pre">P:</span></code> with no value), ibek
+defaults it to the value of the parameter with the same name.  Keys can also be
+regular expressions — <code class="docutils literal notranslate"><span class="pre">.*:</span></code> matches all parameters and passes them through,
+which is convenient for pure <code class="docutils literal notranslate"><span class="pre">AutoSubstitution</span></code> entities where every parameter
+maps directly to a database macro.</p>
+<p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml</span></code>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json</span>
 
 <span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
 
 <span class="nt">entity_models</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
-<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">      </span><span class="no">Hiden Analytical RGA (Residual Gas Analyser), generic variant, 100 amu.</span>
-<span class="w">      </span><span class="no">Loads hiden_generic.db which includes: global controls (state, filaments,</span>
-<span class="w">      </span><span class="no">PSU, LEDs, error handling), bar scan (1-100 amu), MID scan (24 channels,</span>
-<span class="w">      </span><span class="no">default masses 1-24 amu), degas control, and per-mass sensitivity array.</span>
-<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">          </span><span class="no">Unique name for this RGA instance, used as the asyn port name.</span>
-<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">          </span><span class="no">IP address and TCP port of the Hiden HAL RC controller,</span>
-<span class="w">          </span><span class="no">e.g. &quot;192.168.0.1:5025&quot;</span>
-<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">          </span><span class="no">PV prefix, e.g. &quot;BL01I-EA-RGA-01:&quot;</span>
-<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">          </span><span class="no">PV suffix. Defaults to empty string.</span>
-<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">          </span><span class="no">Number of samples in the MID scan rolling results buffer per mass channel.</span>
-<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-
-<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
-
-<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_generic.db</span>
-<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
-<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
-
-<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
-
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA_HMT</span>
-<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">      </span><span class="no">Hiden HMT RC RGA, high-pressure variant, 100 amu.</span>
-<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Unique name for this RGA instance, used as the asyn port name.</span>
-<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP address and TCP port of the Hiden HAL RC controller.</span>
-<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV prefix.</span>
-<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV suffix.</span>
-<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rolling buffer size per mass channel.</span>
-<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-
-<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
-
-<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_HMT.db</span>
-<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
-<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
-
-<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
-
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA_hpr20</span>
-<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
-<span class="w">      </span><span class="no">Hiden HPR-20 High Pressure Gas Analyser, 200 amu, SEM detector.</span>
-<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Unique name for this RGA instance, used as the asyn port name.</span>
-<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP address and TCP port of the Hiden HAL RC controller.</span>
-<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV prefix.</span>
-<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV suffix.</span>
-<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
-<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rolling buffer size per mass channel.</span>
-<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-
-<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
-
-<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_hpr20.db</span>
-<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
-<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
-
-<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
-
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA_qga</span>
 <span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
 <span class="w">      </span><span class="no">Hiden QGA Quad Gas Analyser, 200 amu, Faraday detector.</span>
+<span class="w">      </span><span class="no">Loads hiden_qga.db: global controls, bar scan (1-200 amu),</span>
+<span class="w">      </span><span class="no">MID scan (24 configurable mass channels), degas control,</span>
+<span class="w">      </span><span class="no">and per-mass sensitivity array.</span>
 <span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">name</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Unique name for this RGA instance, used as the asyn port name.</span>
-<span class="w">      </span><span class="nt">ip</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IP address and TCP port of the Hiden HAL RC controller.</span>
+<span class="w">      </span><span class="nt">PORT</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">Name of the asyn port to use for StreamDevice communication.</span>
+<span class="w">          </span><span class="no">Must be the name of a companion asyn.AsynIP entity.</span>
 <span class="w">      </span><span class="nt">P</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV prefix.</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">PV prefix, e.g. &quot;BL11I-EA-RGA-01&quot;. Macro passed to</span>
+<span class="w">          </span><span class="no">dbLoadRecords; present in the compiled .db as $(P).</span>
 <span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PV suffix.</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">PV suffix appended to P in all PV names.</span>
 <span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
 <span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
-<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Rolling buffer size per mass channel.</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">Number of samples in the MID scan rolling results buffer per</span>
+<span class="w">          </span><span class="no">mass channel.</span>
 <span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
-
-<span class="w">    </span><span class="nt">pre_init</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">drvAsynIPPortConfigure(&quot;{{name}}&quot;, &quot;{{ip}}&quot;, 100, 0, 0)</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">when</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">first</span>
-<span class="w">        </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">epicsEnvSet(&quot;STREAM_PROTOCOL_PATH&quot;, &quot;$(HIDENRGA)/data&quot;)</span>
+<span class="w">      </span><span class="nt">MASS_RANGE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Mass range of RGA in amu.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">      </span><span class="nt">HMT_RC</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set to 1 for high pressure HMT RC variant.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
 
 <span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_qga.db</span>
 <span class="w">        </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">P</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">Q</span><span class="p">:</span>
-<span class="w">          </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{name}}&quot;</span>
-<span class="w">          </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">.*</span><span class="p">:</span>
 
 <span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
 <span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
 </pre></div>
 </div>
+<p>The other three variants (<code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_hpr20</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_HMT</span></code>) have
+identical parameters.  Add them as additional <code class="docutils literal notranslate"><span class="pre">entity_models</span></code> entries, changing
+only the <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>, and the <code class="docutils literal notranslate"><span class="pre">databases[].file</span></code> path to the
+appropriate <code class="docutils literal notranslate"><span class="pre">.db</span></code> file.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">name</span></code> was dropped from the entity model, a converter is needed to
+discard it when reading the XML.  Create
+<code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/hidenRGA.py</span></code> following the pattern of
+<code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">register</span>
+
+<span class="nd">@register</span><span class="p">(</span><span class="s2">&quot;hidenRGA&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="n">entity</span><span class="p">):</span>
+    <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Register it in <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/convert.py</span></code> alongside the other converters.</p>
+</section>
 </section>
 <hr class="docutils" />
 <section id="verify-with-builder2ibek">
-<h2>7. Verify with builder2ibek<a class="headerlink" href="#verify-with-builder2ibek" title="Link to this heading">#</a></h2>
+<h2>6. Verify with builder2ibek<a class="headerlink" href="#verify-with-builder2ibek" title="Link to this heading">#</a></h2>
 <p>Once your YAML is in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>, you can validate it by converting a
 real IOC XML that uses the module:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span>&lt;path/to/IOC.xml&gt;<span class="w"> </span>--yaml<span class="w"> </span>/tmp/test.yaml
@@ -894,6 +918,33 @@ real IOC XML that uses the module:</p>
 </div>
 <p>Then inspect <code class="docutils literal notranslate"><span class="pre">/tmp/test.yaml</span></code> and check that the entity types and parameter names
 match what you defined in the support YAML.</p>
+<p>The real I11 IOC instance at
+<code class="docutils literal notranslate"><span class="pre">/scratch/hgv27681/work/i11-services/services/b11i-ea-hiden-01/config/ioc.yaml</span></code>
+was generated this way and illustrates the expected output:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">entities</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">epics.EpicsEnvSet</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">STREAM_PROTOCOL_PATH</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/epics/runtime/protocol/</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asyn.AsynIP</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rgaPort</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.111.5.1:5025</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA.hidenRGA_qga</span>
+<span class="w">    </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL11I-EA-RGA-01</span>
+<span class="w">    </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rgaPort</span>
+</pre></div>
+</div>
+<p>Note the <code class="docutils literal notranslate"><span class="pre">STREAM_PROTOCOL_PATH</span></code> entry.  Rather than each StreamDevice entity
+model emitting an <code class="docutils literal notranslate"><span class="pre">epicsEnvSet</span></code> in its own <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, ibek consolidates all
+protocol files into a single directory (<code class="docutils literal notranslate"><span class="pre">/epics/runtime/protocol/</span></code>) during IOC
+startup, and <code class="docutils literal notranslate"><span class="pre">builder2ibek</span></code> always adds a single <code class="docutils literal notranslate"><span class="pre">epics.EpicsEnvSet</span></code> entity for
+<code class="docutils literal notranslate"><span class="pre">STREAM_PROTOCOL_PATH</span></code> to the generated <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>.  There is no need to handle
+this in the support YAML at all.</p>
+<p>Also note that <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> appears as a first-class entity in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> with
+its own <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">rgaPort</span></code>, and <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> references it via <code class="docutils literal notranslate"><span class="pre">PORT:</span> <span class="pre">rgaPort</span></code> —
+the <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> pattern in action.</p>
 </section>
 <hr class="docutils" />
 <section id="summary-of-what-maps-to-what">
@@ -926,11 +977,11 @@ match what you defined in the support YAML.</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PostIocInitialise</span></code> print statements</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">post_init[].value</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>Runtime macros (P, Q, PORT, BUFFER_SIZE)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">databases[].args</span></code></p></td>
+<tr class="row-odd"><td><p>Database macros without defaults (P, Q, PORT, BUFFER_SIZE)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">databases[].args</span></code> — required parameters</p></td>
 </tr>
-<tr class="row-even"><td><p>Baked-in macros (MASS_RANGE, HMT_RC)</p></td>
-<td><p>not in databases.args</p></td>
+<tr class="row-even"><td><p>Database macros with defaults (MASS_RANGE, HMT_RC)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">databases[].args</span></code> — optional parameters with matching defaults</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Dependencies</span> <span class="pre">=</span> <span class="pre">(Asyn,...)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">pre_init</span></code> <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> call</p></td>
@@ -958,12 +1009,12 @@ match what you defined in the support YAML.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../tutorials.html"
+       href="convert-ioc-xml.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Tutorials</p>
+        <p class="prev-next-title">Converting a builder XML IOC to ibek ioc.yaml</p>
       </div>
     </a>
     <a class="right-next"
@@ -971,7 +1022,7 @@ match what you defined in the support YAML.</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Advanced: ibek support YAML for a complex builder.py</p>
+        <p class="prev-next-title">ibek support YAML for a complex builder.py</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -994,14 +1045,25 @@ match what you defined in the support YAML.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#steps">Steps</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-builder-py">1. Read builder.py</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#determine-runtime-vs-baked-in-macros">2. Determine runtime vs baked-in macros</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-install-yml">2. Write the install.yml</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-builder-arguments-to-ibek-parameters">3. Map builder arguments to ibek parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-the-example-boot-script">4. Check the example boot script</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-install-yml">5. Write the install.yml</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-ibek-support-yaml">6. Write the ibek.support.yaml</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-with-builder2ibek">7. Verify with builder2ibek</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#determine-the-startup-script-sequence">4. Determine the startup script sequence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-ibek-support-yaml">5. Write the ibek.support.yaml</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-review-what-parameters-you-need">5a. Review what parameters you need</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#name-drop-this-parameter"><code class="docutils literal notranslate"><span class="pre">name</span></code> → drop this parameter</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#p-type-str"><code class="docutils literal notranslate"><span class="pre">P</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#q-type-str-default"><code class="docutils literal notranslate"><span class="pre">Q</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">""</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#port-type-object-referencing-the-asyn-asynip-entity"><code class="docutils literal notranslate"><span class="pre">PORT</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> referencing the <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#buffer-size-type-int-default-1000"><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">1000</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-range-and-hmt-rc-type-int-with-defaults-from-the-db"><code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code> and <code class="docutils literal notranslate"><span class="pre">HMT_RC</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code> with defaults from the <code class="docutils literal notranslate"><span class="pre">.db</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#b-the-entity-model">5b. The entity model</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-with-builder2ibek">6. Verify with builder2ibek</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-what-maps-to-what">Summary of what maps to what</a></li>
 </ul>
   </nav></div>

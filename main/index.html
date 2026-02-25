@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>builder2ibek &#8212; builder2ibek 1.1.2.dev14+g52473c6f4 documentation</title>
+    <title>builder2ibek &#8212; builder2ibek 1.1.3.dev5+g0590e1d2e documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=eec33938"></script>
+    <script src="_static/documentation_options.js?v=b8dc8d56"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -494,14 +494,30 @@ that process for other modules.</p>
 </section>
 <section id="where-to-start">
 <h2>Where to start<a class="headerlink" href="#where-to-start" title="Link to this heading">#</a></h2>
-<p><a class="reference internal" href="how-to/convert-ioc-instance.html"><span class="std std-doc"><strong>Converting an existing DLS IOC XML to ibek YAML</strong></span></a></p>
-<p><a class="reference internal" href="how-to/verify-with-devcontainer.html"><span class="std std-doc"><strong>Verifying the converted IOC against the original builder database</strong></span></a></p>
-<p><a class="reference internal" href="tutorials/create-support-yaml.html"><span class="std std-doc"><strong>Creating ibek support YAML for a simple builder.py</strong></span></a></p>
-<p><a class="reference internal" href="tutorials/create-support-yaml-advanced.html"><span class="std std-doc"><strong>Creating ibek support YAML from a more complex builder.py</strong></span></a></p>
-<p><a class="reference internal" href="how-to/create-converter.html"><span class="std std-doc"><strong>xml2yaml output is wrong for a particular module — fixing the converter</strong></span></a></p>
-<p><a class="reference internal" href="how-to/autosave.html"><span class="std std-doc"><strong>Generating autosave request files from DLS DB templates</strong></span></a></p>
-<p><a class="reference internal" href="reference/dlsplc-migration.html"><span class="std std-doc"><strong>Migrating old vacuum/interlock modules to dlsPLC</strong></span></a></p>
-<p><a class="reference internal" href="how-to/create-generic-ioc-repo.html"><span class="std std-doc"><strong>Setting up a new Generic IOC repository</strong></span></a></p>
+<p><strong>Do you already have a Generic IOC that contains the support modules you need?</strong></p>
+<p>If not, you need to build that first:</p>
+<ol class="arabic simple">
+<li><p>Write the <code class="docutils literal notranslate"><span class="pre">ibek.support.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">install.yml</span></code> for each support module —
+start with <a class="reference internal" href="tutorials/create-support-yaml.html"><span class="std std-doc">Creating ibek support YAML from a builder.py module</span></a> for the straightforward case,
+or <a class="reference internal" href="tutorials/create-support-yaml-advanced.html"><span class="std std-doc">ibek support YAML for a complex builder.py</span></a> if needed.</p></li>
+<li><p>Create the Generic IOC container project that bundles those modules —
+see <a class="reference internal" href="how-to/create-generic-ioc-repo.html"><span class="std std-doc">Create a Generic IOC repository</span></a>.</p></li>
+<li><p>If any support modules use autosave, generate the required <code class="docutils literal notranslate"><span class="pre">.req</span></code> files —
+see <a class="reference internal" href="how-to/autosave.html"><span class="std std-doc">Generating autosave req files from DB templates</span></a>.</p></li>
+</ol>
+<p><strong>Once you have a Generic IOC</strong></p>
+<ol class="arabic simple">
+<li><p>Start with <a class="reference internal" href="tutorials/convert-ioc-xml.html"><span class="std std-doc">Converting a builder XML IOC to ibek ioc.yaml</span></a> for a quick walkthrough,
+or <a class="reference internal" href="how-to/convert-ioc-instance.html"><span class="std std-doc">Convert a builder XML IOC instance to ibek YAML</span></a> for the full guide including edge cases.</p></li>
+<li><p>If there are issues with the conversion then the fix
+belongs in a converter — see <a class="reference internal" href="how-to/create-converter.html"><span class="std std-doc">Create a builder2ibek converter for a support module</span></a>. Or you may
+need to go back to <code class="docutils literal notranslate"><span class="pre">ibek.support.yaml</span></code>, make adjustments and rebuild the
+generic IOC.</p></li>
+<li><p>After conversion, use <a class="reference internal" href="how-to/verify-with-devcontainer.html"><span class="std std-doc">Verify a converted IOC using db-compare</span></a> to check the
+output record-for-record against the original builder database.</p></li>
+</ol>
+<p>If you encounter old vacuum or interlock modules, see
+<a class="reference internal" href="reference/dlsplc-migration.html"><span class="std std-doc">dlsPLC migration reference</span></a>.</p>
 </section>
 <section id="how-the-documentation-is-structured">
 <h2>How the documentation is structured<a class="headerlink" href="#how-the-documentation-is-structured" title="Link to this heading">#</a></h2>
@@ -517,8 +533,9 @@ that process for other modules.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/convert-ioc-xml.html">Converting a builder XML IOC to ibek ioc.yaml</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/create-support-yaml.html">Creating ibek support YAML from a builder.py module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/create-support-yaml-advanced.html">Advanced: ibek support YAML for a complex builder.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/create-support-yaml-advanced.html">ibek support YAML for a complex builder.py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/installation.html">Installation</a></li>
 </ul>
 </li>

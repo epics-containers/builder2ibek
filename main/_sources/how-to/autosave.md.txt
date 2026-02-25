@@ -209,10 +209,10 @@ module and it has no .req files then you have two options:
 If you are converting an existing DLS IOC support module to ibek, generate
 the autosave request files as part of the initial migration:
 
-1. [Create the ibek support YAML](../tutorials/create-support-yaml.md)
+1. [](../tutorials/create-support-yaml.md)
 2. Run `builder2ibek autosave` on all DB templates that carry `# % autosave`
    comments
 3. Commit the generated `.req` files into the support module's `Db/` directory
 4. Add an `autosave.Autosave` entity to your `ioc.yaml` (this is usually
    already present in converted IOCs — see
-   [Convert an IOC instance](convert-ioc-instance.md))
+   [](convert-ioc-instance.md))

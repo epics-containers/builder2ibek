@@ -61,21 +61,33 @@ that process for other modules.
 
 ## Where to start
 
-[**Converting an existing DLS IOC XML to ibek YAML**](how-to/convert-ioc-instance.md)
+**Do you already have a Generic IOC that contains the support modules you need?**
 
-[**Verifying the converted IOC against the original builder database**](how-to/verify-with-devcontainer.md)
+If not, you need to build that first:
 
-[**Creating ibek support YAML for a simple builder.py**](tutorials/create-support-yaml.md)
+1. Write the `ibek.support.yaml` and `install.yml` for each support module —
+   start with [](tutorials/create-support-yaml.md) for the straightforward case,
+   or [](tutorials/create-support-yaml-advanced.md) if needed.
+2. Create the Generic IOC container project that bundles those modules —
+   see [](how-to/create-generic-ioc-repo.md).
+3. If any support modules use autosave, generate the required `.req` files —
+   see [](how-to/autosave.md).
 
-[**Creating ibek support YAML from a more complex builder.py**](tutorials/create-support-yaml-advanced.md)
+**Once you have a Generic IOC**
 
-[**xml2yaml output is wrong for a particular module — fixing the converter**](how-to/create-converter.md)
+1. Start with [](tutorials/convert-ioc-xml.md) for a quick walkthrough,
+or [](how-to/convert-ioc-instance.md) for the full guide including edge cases.
 
-[**Generating autosave request files from DLS DB templates**](how-to/autosave.md)
+2. If there are issues with the conversion then the fix
+   belongs in a converter — see [](how-to/create-converter.md). Or you may
+   need to go back to `ibek.support.yaml`, make adjustments and rebuild the
+   generic IOC.
 
-[**Migrating old vacuum/interlock modules to dlsPLC**](reference/dlsplc-migration.md)
+3. After conversion, use [](how-to/verify-with-devcontainer.md) to check the
+   output record-for-record against the original builder database.
 
-[**Setting up a new Generic IOC repository**](how-to/create-generic-ioc-repo.md)
+If you encounter old vacuum or interlock modules, see
+[](reference/dlsplc-migration.md).
 
 How the documentation is structured
 -----------------------------------
