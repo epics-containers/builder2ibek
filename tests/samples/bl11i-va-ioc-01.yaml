@@ -31,6 +31,9 @@ entities:
     cardid: 1
     name: EVR1
 
+  - type: epics.InterruptVectorVME
+    name: Vec1
+
   - type: ipac.Hy8002
     name: CARD4
     slot: 4
@@ -40,12 +43,12 @@ entities:
     slot: 5
 
   - type: epics.InterruptVectorVME
-    name: Vec1
+    name: Vec2
 
   - type: ipac.Hy8001
     direction: Input
     intLevel: 2
-    interrupt_vector: Vec1
+    interrupt_vector: Vec2
     invertin: true
     invertout: true
     name: CARD6
@@ -53,21 +56,12 @@ entities:
     slot: 6
 
   - type: epics.InterruptVectorVME
-    name: Vec2
+    name: Vec3
 
   - type: Hy8401ip.Hy8401
     carrier: CARD5
-    interrupt_vector: Vec2
-    ipslot: 0
-
-  - type: epics.InterruptVectorVME
-    name: Vec3
-
-  - type: DLS8515.DLS8515
-    carrier: CARD4
     interrupt_vector: Vec3
     ipslot: 0
-    name: CARD40
 
   - type: epics.InterruptVectorVME
     name: Vec4
@@ -75,15 +69,24 @@ entities:
   - type: DLS8515.DLS8515
     carrier: CARD4
     interrupt_vector: Vec4
-    ipslot: 1
-    name: CARD41
+    ipslot: 0
+    name: CARD40
 
   - type: epics.InterruptVectorVME
     name: Vec5
 
-  - type: DLS8515.DLS8516
+  - type: DLS8515.DLS8515
     carrier: CARD4
     interrupt_vector: Vec5
+    ipslot: 1
+    name: CARD41
+
+  - type: epics.InterruptVectorVME
+    name: Vec6
+
+  - type: DLS8515.DLS8516
+    carrier: CARD4
+    interrupt_vector: Vec6
     ipslot: 2
     name: CARD42
 
@@ -305,289 +308,294 @@ entities:
     device: BL11I-EA-ROBOT-01:MOVN
     s: 37
 
-  - type: temperature.temperaturePLCRead
+  - type: dlsPLC.read100
+    century: 1
     device: BL11I-VA-TMPCC-01
-    name: TMPCC
     port: ty_40_2
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.read100
+    century: 2
+    device: BL11I-VA-TMPCC-01
+    port: ty_40_2
+
+  - type: dlsPLC.temperature
     desc: Temperature 1
     device: BL11I-RS-ABSB-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 0
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: GBC
+    offset: 10
+    port: ty_40_2
     temp: :TEMP1
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 2
     device: BL11I-RS-ABSB-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 1
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
+    offset: 11
+    port: ty_40_2
     temp: :TEMP2
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 3
     device: BL11I-RS-ABSB-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 2
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB1
+    offset: 12
+    port: ty_40_2
     temp: :TEMP3
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 4
     device: BL11I-RS-ABSB-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 3
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB2
+    offset: 13
+    port: ty_40_2
     temp: :TEMP4
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 1
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 6
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: S1
+    offset: 16
+    port: ty_40_2
     temp: :TEMP1
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 2
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 7
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB3
+    offset: 17
+    port: ty_40_2
     temp: :TEMP2
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 3
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 8
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB4
+    offset: 18
+    port: ty_40_2
     temp: :TEMP3
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 1
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 4
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 9
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB5
+    offset: 19
+    port: ty_40_2
     temp: :TEMP4
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 2
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 5
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 2
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB6
+    offset: 22
+    port: ty_40_2
     temp: :TEMP5
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 2
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 6
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 3
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB7
+    offset: 23
+    port: ty_40_2
     temp: :TEMP6
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 2
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 7
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 4
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB8
+    offset: 24
+    port: ty_40_2
     temp: :TEMP7
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 2
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Temperature 8
     device: BL11I-AL-SLITS-01
     high: 30
     hihi: 40
     hopr: 50
     hyst: 2
-    indx: 5
     llsv: NO_ALARM
     lolo: 0
     lopr: 0
     low: 0
     lsv: NO_ALARM
     name: .OB9
+    offset: 25
+    port: ty_40_2
     temp: :TEMP8
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 2
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Optics Hutch Temp 1
     device: BL11I-OP-HUTCH-01
     high: 4000
     hihi: 4000
     hopr: 50
     hyst: 2
-    indx: 8
     lolo: 0
     lopr: 0
     low: 0
     name: OH
+    offset: 28
+    port: ty_40_2
     temp: :TEMP1
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 2
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Optics Hutch Temp 2
     device: BL11I-OP-HUTCH-01
     high: 4000
     hihi: 4000
     hopr: 50
     hyst: 2
-    indx: 9
     lolo: 0
     lopr: 0
     low: 0
     name: .OB10
+    offset: 29
+    port: ty_40_2
     temp: :TEMP2
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 3
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Optics Hutch Temp 3
     device: BL11I-OP-HUTCH-01
     high: 4000
     hihi: 4000
     hopr: 50
     hyst: 2
-    indx: 0
     lolo: 0
     lopr: 0
     low: 0
     name: .OB11
+    offset: 30
+    port: ty_40_2
     temp: :TEMP3
+    tmpcc: BL11I-VA-TMPCC-01
 
-  - type: temperature.temperaturePLC
-    addr: 3
-    crate: TMPCC
+  - type: dlsPLC.temperature
     desc: Optics Hutch Temp 4
     device: BL11I-OP-HUTCH-01
     high: 4000
     hihi: 4000
     hopr: 50
     hyst: 2
-    indx: 1
     lolo: 0
     lopr: 0
     low: 0
     name: .OB12
+    offset: 31
+    port: ty_40_2
     temp: :TEMP4
+    tmpcc: BL11I-VA-TMPCC-01
 
   - type: water.flow
     C: 60
@@ -635,7 +643,7 @@ entities:
     device: BL11I-VA-VLVCC-02
     port: ty_41_3
 
-  - type: vacuumValve.auto_vacuumValveReadExtra
+  - type: vacuumValve.vacuumValveReadExtra
     B1: 39
     B2: 40
     B3: 41
@@ -753,10 +761,6 @@ entities:
     ilk7: BStop not overridden
     name: SHTR1
     port: ty_41_3
-    tclose_hhsv: MAJOR
-    tclose_high: 3
-    tclose_hihi: 5
-    tclose_hsv: MINOR
     vlvcc: VLVCC2
 
   - type: dlsPLC.vacValve
@@ -792,10 +796,6 @@ entities:
     ilk2: Guardline B
     name: SHTR2
     port: ty_41_3
-    tclose_hhsv: MAJOR
-    tclose_high: 3
-    tclose_hihi: 5
-    tclose_hsv: MINOR
     vlvcc: VLVCC2
 
   - type: dlsPLC.interlock
@@ -1388,75 +1388,74 @@ entities:
     device: BL11I-RS-RDMON-01
     evr: BL11I-VA-EVR-01
 
-  - type: vacuumValve.externalValve
+  - type: dlsPLC.externalValve
     device: FE11I-VA-VALVE-02
-    name: FE11I-VA-VALVE-02
 
   - type: vacuumSpace.space_b
     device: BL11I-VA-SPACE-01
-    gauge0: GAUGE1
-    gauge1: GAUGE2
-    img0: IMG01
-    img1: IMG02
-    ionp0: IONP1
-    ionp1: IONP2
+    gauge1: GAUGE1
+    gauge2: GAUGE2
+    img1: IMG01
+    img2: IMG02
+    ionp1: BL11I-VA-IONP-01
+    ionp2: BL11I-VA-IONP-02
     name: SPACE1
-    pirg0: PIRG01
-    pirg1: PIRG02
-    valve0: FE11I-VA-VALVE-02
+    pirg1: PIRG01
+    pirg2: PIRG02
+    valve1: FE11I-VA-VALVE-02
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-02
-    gauge0: GAUGE3
-    img0: IMG03
-    ionp0: IONP3
+    gauge1: GAUGE3
+    img1: BL11I-VA-IMG-03
+    ionp1: BL11I-VA-IONP-03
     name: SPACE2
-    pirg0: PIRG03
-    valve0: GV1
+    pirg1: BL11I-VA-PIRG-03
+    valve1: GV1
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-03
-    gauge0: GAUGE4
-    img0: IMG04
-    ionp0: IONP4
+    gauge1: GAUGE4
+    img1: BL11I-VA-IMG-04
+    ionp1: BL11I-VA-IONP-04
     name: SPACE3
-    pirg0: PIRG04
-    valve0: GV2
+    pirg1: BL11I-VA-PIRG-04
+    valve1: GV2
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-04
-    gauge0: GAUGE5
-    img0: IMG05
-    ionp0: IONP5
+    gauge1: GAUGE5
+    img1: BL11I-VA-IMG-05
+    ionp1: BL11I-VA-IONP-05
     name: SPACE4
-    pirg0: PIRG05
-    valve0: GV3
+    pirg1: BL11I-VA-PIRG-05
+    valve1: GV3
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-05
-    gauge0: GAUGE6
-    img0: IMG06
-    ionp0: IONP6
-    ionp1: IONP7
+    gauge1: GAUGE6
+    img1: BL11I-VA-IMG-06
+    ionp1: BL11I-VA-IONP-06
+    ionp2: BL11I-VA-IONP-07
     name: SPACE5
-    pirg0: PIRG06
-    valve0: GV4
+    pirg1: BL11I-VA-PIRG-06
+    valve1: GV4
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-06
-    gauge0: GAUGE7
-    img0: IMG07
-    ionp0: IONP8
+    gauge1: GAUGE7
+    img1: BL11I-VA-IMG-07
+    ionp1: BL11I-VA-IONP-08
     name: SPACE6
-    pirg0: PIRG07
-    valve0: GV5
+    pirg1: BL11I-VA-PIRG-07
+    valve1: GV5
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-07
-    gauge0: GAUGE8
-    img0: IMG08
-    ionp0: IONP9
-    ionp1: IONP10
+    gauge1: GAUGE8
+    img1: BL11I-VA-IMG-08
+    ionp1: BL11I-VA-IONP-09
+    ionp2: BL11I-VA-IONP-10
     name: SPACE7
-    pirg0: PIRG08
-    valve0: GV6
+    pirg1: BL11I-VA-PIRG-08
+    valve1: GV6

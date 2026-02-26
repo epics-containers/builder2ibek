@@ -31,6 +31,9 @@ entities:
     cardid: 1
     name: EVR1
 
+  - type: epics.InterruptVectorVME
+    name: Vec1
+
   - type: ipac.Hy8002
     name: BL04I-VA-IOC-01.Slot4
     slot: 4
@@ -40,13 +43,13 @@ entities:
     slot: 5
 
   - type: epics.InterruptVectorVME
-    name: Vec1
+    name: Vec2
 
   - type: ipac.Hy8001
     cardid: 60
     direction: Input
     intLevel: 0
-    interrupt_vector: Vec1
+    interrupt_vector: Vec2
     invertin: true
     invertout: true
     ip_support: true
@@ -55,29 +58,29 @@ entities:
     slot: 6
 
   - type: epics.InterruptVectorVME
-    name: Vec2
-
-  - type: DLS8515.DLS8515
-    carrier: BL04I-VA-IOC-01.Slot4
-    interrupt_vector: Vec2
-    ipslot: 0
-    name: BL04I-VA-IOC-01.Slot4.A
-
-  - type: epics.InterruptVectorVME
     name: Vec3
 
   - type: DLS8515.DLS8515
     carrier: BL04I-VA-IOC-01.Slot4
     interrupt_vector: Vec3
-    ipslot: 2
-    name: BL04I-VA-IOC-01.Slot4.C
+    ipslot: 0
+    name: BL04I-VA-IOC-01.Slot4.A
 
   - type: epics.InterruptVectorVME
     name: Vec4
 
-  - type: DLS8515.DLS8516
+  - type: DLS8515.DLS8515
     carrier: BL04I-VA-IOC-01.Slot4
     interrupt_vector: Vec4
+    ipslot: 2
+    name: BL04I-VA-IOC-01.Slot4.C
+
+  - type: epics.InterruptVectorVME
+    name: Vec5
+
+  - type: DLS8515.DLS8516
+    carrier: BL04I-VA-IOC-01.Slot4
+    interrupt_vector: Vec5
     ipslot: 1
     name: BL04I-VA-IOC-01.Slot4.B
 
@@ -142,7 +145,6 @@ entities:
     channel: 0
     data: 7
     flow: N
-    name: VCC1.SER
     parity: E
     stop: 2
 
@@ -150,47 +152,39 @@ entities:
     baud: 38400
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 1
-    name: RGA1.SER
 
   - type: DLS8515.DLS8515channel
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 2
-    name: ION1.SER
     parity: E
 
   - type: DLS8515.DLS8515channel
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 3
-    name: ION2.SER
     parity: E
 
   - type: DLS8515.DLS8515channel
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 4
-    name: ION3.SER
     parity: E
 
   - type: DLS8515.DLS8515channel
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 5
-    name: GC1.SER
 
   - type: DLS8515.DLS8515channel
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 6
-    name: GC2.SER
     parity: E
 
   - type: DLS8515.DLS8515channel
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 7
-    name: GC3.SER
     parity: E
 
   - type: DLS8515.DLS8515channel
     card: BL04I-VA-IOC-01.Slot4.C
     channel: 0
-    name: CG11.SER
     parity: E
 
   - type: DLS8515.DLS8516channel
@@ -199,19 +193,19 @@ entities:
     fullduplex: true
 
   - type: epics.InterruptVectorVME
-    name: Vec5
+    name: Vec6
 
   - type: Hy8401ip.Hy8401
     carrier: BL04I-VA-IOC-01.Slot5
-    interrupt_vector: Vec5
+    interrupt_vector: Vec6
     ipslot: 0
 
   - type: epics.InterruptVectorVME
-    name: Vec6
+    name: Vec7
 
   - type: Hy8402ip.Hy8402
     carrier: BL04I-VA-IOC-01.Slot5
-    interrupt_vector: Vec6
+    interrupt_vector: Vec7
     ipslot: 1
 
   - type: cmsIon.RS4hour
@@ -970,19 +964,14 @@ entities:
     ilk9: Unused
     name: SHTR1
     port: ty_40_0
-    tclose_hhsv: MAJOR
-    tclose_high: 3
-    tclose_hihi: 5
-    tclose_hsv: MINOR
     vlvcc: VLVCC01
 
-  - type: vacuumValve.auto_vacuumValveReadExtra
+  - type: vacuumValve.vacuumValveReadExtra
     B1: 39
     B2: 40
     B3: 41
     N: 5
     device: BL04I-VA-VLVCC-01
-    name: VLVCC01.OB1
     port: ty_40_0
 
   - type: dlsPLC.interlock
