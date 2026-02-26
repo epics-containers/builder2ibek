@@ -1,7 +1,7 @@
 ---
 name: ioc-convert
 description: Convert a builder XML IOC to ibek ioc.yaml, validate schema, generate runtime assets, and iterate until correct.
-argument-hint: <path/to/IOC.xml> <path/to/services-repo>
+argument-hint: <path/to/IOC.xml> [<path/to/services-repo>]
 disable-model-invocation: true
 ---
 
@@ -15,18 +15,27 @@ and `ioc.subst` are correct.
 
 ## Step 1 — Convert XML to ioc.yaml
 
-### 1a. Create instance directory and run conversion
+### 1a. Resolve the services repo
+
+The services repo path is `$1`. If `$1` is empty or not provided:
+
+- Read `.claude/skills/ioc-convert/last-services-repo` (if it exists) and use
+  that path as the services repo. Tell the user which repo is being reused.
+- If the file does not exist, stop and ask the user to supply a services repo path.
+
+Once the services repo is known, write its absolute path to
+`.claude/skills/ioc-convert/last-services-repo` (overwrite if present).
 
 Derive `IOC_NAME` = lowercase XML filename without extension.
 
-`INSTANCE_DIR` = `$1/services/$IOC_NAME`
+`INSTANCE_DIR` = `<services-repo>/services/$IOC_NAME`
 
 - If `INSTANCE_DIR` already exists and `config/ioc.yaml` is present:
-  - Run `git -C $1 status` — if ioc.yaml is modified or untracked, ensure it is
-    committed or stashed before overwriting.
+  - Run `git -C <services-repo> status` — if ioc.yaml is modified or untracked,
+    ensure it is committed or stashed before overwriting.
 - If `INSTANCE_DIR` does not exist:
-  - If `$1/services/.ioc_template/` exists:
-    `cp -r $1/services/.ioc_template/ $INSTANCE_DIR`
+  - If `<services-repo>/services/.ioc_template/` exists:
+    `cp -r <services-repo>/services/.ioc_template/ $INSTANCE_DIR`
   - Otherwise: `mkdir -p $INSTANCE_DIR/config/`
 
 Run the conversion:
@@ -65,7 +74,7 @@ clean.
 
 ```bash
 mkdir -p /epics/ioc
-ibek dev instance $1/services/$IOC_NAME
+ibek dev instance <services-repo>/services/$IOC_NAME
 ./update-schema
 ```
 
@@ -78,7 +87,7 @@ ibek dev instance $1/services/$IOC_NAME
 ## Step 3 — Generate runtime assets (iterate until clean)
 
 ```bash
-uvx --python 3.13 ibek runtime generate2 --no-pvi $1/services/$IOC_NAME/config
+uvx --python 3.13 ibek runtime generate2 --no-pvi <services-repo>/services/$IOC_NAME/config
 ```
 
 Runtime assets are written to `/epics/runtime/`: `st.cmd`, `ioc.subst`.
