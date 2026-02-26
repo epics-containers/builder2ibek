@@ -103,9 +103,13 @@ is clean of converter-fixable issues.
 
 Parse the final ioc.yaml. For each entity type `<module>.<Entity>`:
 
-1. Check whether the support YAML already exists:
+1. Check whether the support YAML already exists — **always check BOTH
+   submodules before concluding anything is missing**:
    - `ibek-support-dls/<module>/<module>.ibek.support.yaml`
    - `ibek-support/<module>/<module>.ibek.support.yaml`
+   The module directory name and the YAML filename are always the same as
+   `<module>`. Use `ls ibek-support-dls/ ibek-support/` to see all available
+   modules, then check both before declaring something missing.
 2. If it exists, check whether the specific entity model is present inside it.
 3. Collect all `<module>` names where the support YAML is **missing** or
    **missing the required entity model**.
