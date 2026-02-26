@@ -80,6 +80,33 @@ relevant converter** (e.g. `converters/vacuumValve.py`, `converters/vacuumPump.p
 — not by editing ioc.yaml by hand. The transformation rules (valve×10→addr,
 ilkA→ilk10, outaddr calculation, etc.) are all documented in that reference.
 
+**Object-reference chains** — if entity A's parameter is `type: object` pointing
+to entity B, then entity B's identifying field must be `type: id` (not `type: str`).
+Example: `dlsPLC.externalValve.device` must be `type: id` so that
+`vacuumSpace.space.valve0` (which is `type: object`) can resolve it. If you see
+`object BL19I-VA-... not found` errors from generate2, check the `type:` of the
+id field in the referenced entity's support YAML.
+
+**`name` vs `device` as ibek id (mks937a vs mks937b pattern)** — some support
+modules use `name` as `type: id` (e.g. `mks937b.mks937bImg` → id = `IMG01`),
+while others use `device` as `type: id` (e.g. `mks937a.mks937aImg` → id =
+`BL19I-VA-IMG-03`). When a cross-referencing converter (like `vacuumSpace.py`)
+builds a builder-name→ibek-id translation map, it must skip entities whose
+`name` is still present in `ioc.entities` after conversion (those entities
+already register under their builder short-name, so no translation is needed).
+
+**Converters that emit multiple entities** — when a single XML element must
+produce more than one ibek entity (e.g. `temperaturePLCRead` → 2×
+`dlsPLC.read100`), use `entity.add_entity(extra)` and `entity.delete_me()`.
+**Critical**: pass plain `dict` objects to `add_entity()`, never `Entity(...)`.
+Creating a new `Entity` resets the class-level `_extra_entities` list, silently
+dropping all previously added extras. Example:
+```python
+entity.add_entity({"type": "dlsPLC.read100", "device": entity.device, ...})
+entity.add_entity({"type": "dlsPLC.read100", "device": entity.device, ...})
+entity.delete_me()
+```
+
 After any converter change: re-run xml2yaml and repeat 1b until the ioc.yaml is
 clean.
 
@@ -115,6 +142,9 @@ Runtime assets are written to `/epics/runtime/`: `st.cmd`, `ioc.subst`.
 | Unknown parameter `X` on `foo.Bar` | Parameter missing or named differently in entity model | Check the support YAML; also check whether `src/builder2ibek/converters/foo.py` needs to rename or inject the attribute |
 | Validation error on a field | Wrong ibek type, or XML value ibek can't accept | Fix the type in the support YAML; or add a converter to transform/drop the offending attribute |
 | Attribute value wrong or unwanted | Maps through from XML incorrectly | Add or update `src/builder2ibek/converters/foo.py`; re-run xml2yaml, then re-run generation |
+| `object BL19I-VA-... not found` | Referenced entity's id field is `type: str` instead of `type: id` | Change the id field to `type: id` in the referenced entity's support YAML. Run `./update-schema`. |
+| `Field required` on a parameter | Parameter has no default and wasn't set in XML | Add `default:` to the parameter. Check builder.py for the auto-computed default value. |
+| `database arg 'fooN' not found in context` | Support YAML database args reference a parameter name that the entity model doesn't define — often an index mismatch: entity has 0-indexed params (`gauge0..7`) but database args request 1-indexed macro names (`gauge1..8`) | Check the template's `# % macro` declarations and compare the index range against the entity model params. Consider whether to fix via the converter (injecting aliases into the entity dict before ibek sees it) or via explicit Jinja2 `gauge1: "{{ gauge0 }}"` mappings in the database args section. |
 
 After any **support YAML** fix: `./update-schema` then re-run `uvx` generate.
 After any **converter** fix: re-run `uv run builder2ibek xml2yaml`, then re-run `uvx` generate.
@@ -131,13 +161,37 @@ Read `/epics/runtime/st.cmd`. Verify:
 - `iocInit` is present
 - `seq(...)` or other `post_init` calls present where expected
 
-Compare against the original builder boot script if available:
+Compare against the original builder boot script if available.
+Deployed IOCs are at:
+```
+/dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/<version>/bin/vxWorks-ppc604_long/<IOC-NAME>.boot
+```
+To find it, use (avoids the very slow `find /dls_sw` recursive search):
+```bash
+ls /dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/
+```
+For example for `BL19I-VA-IOC-01`:
+```bash
+ls /dls_sw/prod/R3.14.12.7/ioc/BL19I/BL19I-VA-IOC-01/
+```
+The beamline segment (`BL19I`) is the first two dash-separated fields of the IOC name.
+The in-progress builder version may also be at:
 ```
 /dls_sw/work/R3.14.12.7/support/<BUILDER>/iocs/<IOC>/cmd/<IOC>.boot
 ```
 
-If commands are missing, the entity model's `pre_init` or `post_init` section
-needs updating.
+Expected differences between the original VxWorks boot script and the generated `st.cmd`:
+
+| Original (VxWorks) | Generated (container) | Notes |
+|---|---|---|
+| Serial port paths `/ty/40/0` etc. | `/dev/tty400` etc. | Normal VxWorks → Linux translation |
+| `DLS8515DevConfigure(port, baud, ...)` for every port | `asynSetOption` only for non-default settings | Asyn defaults to 9600/8/1/N; only overrides are needed |
+| `STREAM_PROTOCOL_PATH = calloc/strcat(...)` with absolute prod paths | `epicsEnvSet STREAM_PROTOCOL_PATH /epics/runtime/protocol/` | Container-relative path — correct |
+| `ErTimeProviderInit`, `installLastResortEventProvider`, `syncSysClock` after `ErConfigurePMC` | Not present | VxWorks timing calls; not used in containers |
+| `ld < bin/...munch`, `dbLoadDatabase "dbd/..."` | `dbLoadDatabase dbd/ioc.dbd` | VxWorks binary load replaced by standard dbd load |
+| `asSetFilename` with absolute prod path | Container-relative `/epics/support/pvlogging/src/access.acf` | Expected |
+
+If commands from the original script are missing and are **not** in the table above, the relevant entity model's `pre_init` or `post_init` section needs updating.
 
 ---
 
