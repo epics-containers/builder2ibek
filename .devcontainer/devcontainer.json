@@ -50,7 +50,7 @@
         }
     },
     // Create the config folder for the bash-config feature, uv cache, and claude settings
-    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config ${localEnv:HOME}/.claude",
+    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config ${localEnv:HOME}/.config/claude ${localEnv:HOME}/.claude",
     "runArgs": [
         // Allow the container to access the host X11 display and EPICS CA
         "--net=host",
@@ -74,6 +74,12 @@
         {
             "source": "${localEnv:HOME}/.claude",
             "target": "/root/.claude",
+            "type": "bind"
+        },
+        // Mount host ~/.config/claude so Claude authentication token persists in the container
+        {
+            "source": "${localEnv:HOME}/.config/claude",
+            "target": "/root/.config/claude",
             "type": "bind"
         },
         // Mount /dls_sw readonly; slave propagation ensures autofs submounts on the host
