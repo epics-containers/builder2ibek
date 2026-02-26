@@ -19,7 +19,7 @@ class Entity(dict[str, Any]):
     in the convertors package easier to type and read
     """
 
-    _extra_entities: list["Entity"]
+    _extra_entities: list["Entity | dict[str, Any]"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,7 +42,7 @@ class Entity(dict[str, Any]):
             self[new] = self[attr]
             del self[attr]
 
-    def add_entity(self, entity: "Entity"):
+    def add_entity(self, entity: "Entity | dict[str, Any]"):
         self._extra_entities.append(entity)
 
     def get_extra_entities(self):
