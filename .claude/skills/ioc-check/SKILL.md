@@ -131,6 +131,13 @@ Read `/epics/runtime/ioc.subst`. For each `file` block verify:
 - All expected macros are present in the `pattern`
 - Macro values match the ioc.yaml entity parameters
 
+> **`entity_enabled` and `type` in pattern columns**: When a support YAML uses
+> `.*:` in `databases.args`, ibek passes all entity attributes as db macros —
+> including `entity_enabled` (added by ibek to every entity model) and `type`
+> (the entity type string). These will appear as extra columns in `ioc.subst`
+> pattern blocks. They are **not** referenced in the db file and are harmless —
+> do not flag them as errors.
+
 To check what macros a db file expects:
 ```bash
 grep "^# % macro" /dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/<file>.db
