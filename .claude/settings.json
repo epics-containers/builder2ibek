@@ -2,10 +2,9 @@
   "permissions": {
     "allow": [
       "Edit(/workspaces/**)",
-      "Write(/workspaces/builder2ibek/**)",
+      "Write(/workspaces/**)",
       "Read(/workspaces/**)",
-      "Read(/dls_sw/work/**)",
-      "Read(/dls_sw/prod/**)",
+      "Read(/dls_sw/**)",
       "Read(/epics/**)",
       "Bash(ls:*)",
       "Bash(find:*)",
@@ -45,6 +44,7 @@
       "Bash(git checkout:*)",
       "Bash(git switch:*)",
       "Bash(git restore:*)",
+      "Bash(git clone:*)",
       "Bash(git fetch:*)",
       "Bash(git -C:*)",
       "Bash(python:*)",
