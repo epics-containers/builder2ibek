@@ -34,17 +34,23 @@
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
                 "ms-python.python",
-                "github.vscode-github-actions",
-                "tamasfe.even-better-toml",
-                "redhat.vscode-yaml",
-                "ryanluker.vscode-coverage-gutters",
+                "ms-python.vscode-pylance",
                 "charliermarsh.ruff",
-                "ms-azuretools.vscode-docker"
+                "redhat.vscode-yaml",
+                "tamasfe.even-better-toml",
+                "ryanluker.vscode-coverage-gutters",
+                "github.vscode-pull-request-github",
+                "ms-vscode.makefile-tools",
+                "streetsidesoftware.code-spell-checker",
+                "moshfeu.compare-folders",
+                "nsd.vscode-epics",
+                "anthropic.claude-code",
+                "github.copilot-chat"
             ]
         }
     },
-    // Create the config folder for the bash-config feature and uv cache
-    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config",
+    // Create the config folder for the bash-config feature, uv cache, and claude settings
+    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config ${localEnv:HOME}/.claude",
     "runArgs": [
         // Allow the container to access the host X11 display and EPICS CA
         "--net=host",
@@ -63,7 +69,16 @@
             "source": "devcontainer-shared-cache",
             "target": "/cache",
             "type": "volume"
-        }
+        },
+        // Mount host ~/.claude so Claude Code settings and memory persist in the container
+        {
+            "source": "${localEnv:HOME}/.claude",
+            "target": "/root/.claude",
+            "type": "bind"
+        },
+        // Mount /dls_sw readonly; slave propagation ensures autofs submounts on the host
+        // are visible inside the container without needing to trigger them from within it
+        "type=bind,source=/dls_sw,target=/dls_sw,readonly,bind-propagation=slave"
     ],
     // Mount the parent as /workspaces so we can pip install peers as editable
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",

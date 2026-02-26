@@ -10,7 +10,11 @@ vxSerial = re.compile(r"/ty/(\d\d)/(\d)")
 
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
-    if entity_type == "AsynSerial":
+    if entity_type == "auto_asynRecord":
+        # asyn diagnostic record — debug tool only, no container equivalent
+        entity.delete_me()
+
+    elif entity_type == "AsynSerial":
         # check if this has a VxWorks serial device address
         m = vxSerial.match(entity.port)
         if m:

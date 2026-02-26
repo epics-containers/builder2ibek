@@ -42,6 +42,21 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
         entity.port = read100Objects[entity.vlvcc]
 
+        # tclose_* fields came from builder but dlsPLC.vacValve does not support
+        # them (a separate dlsPLC.vacValveTclose entity handles that).  Strip
+        # them so validation passes.  The tclose template uses a different
+        # addressing scheme (century/index) and is not yet implemented.
+        for f in ["tclose_high", "tclose_hihi", "tclose_hhsv", "tclose_hsv"]:
+            entity.remove(f)
+
     elif entity_type == "vacuumValveGroup":
         entity.type = "dlsPLC.vacValveGroup"
+        entity.remove("name")
+
+    elif entity_type == "auto_vacuumValveReadExtra":
+        entity.type = "vacuumValve.vacuumValveReadExtra"
+        entity.remove("name")
+
+    elif entity_type == "externalValve":
+        entity.type = "dlsPLC.externalValve"
         entity.remove("name")

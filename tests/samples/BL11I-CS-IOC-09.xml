@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<devIocStats.devIocStatsHelper ioc="BL11I-CS-IOC-09" name="CSIOC2"/>
+	<autosave.Autosave bl="True" iocName="BL11I-CS-IOC-09" name="BL11I-CS-IOC-09.AS" path="/dls_sw/i11/epics/autosave" skip_1="True"/>
+	<pvlogging.PvLogging/>
+	<asyn.AsynIP name="rgaPort" port="10.111.5.1:5025"/>
+	<!--<asyn.AsynIP name="rgaPort" port="172.23.111.5:7016"/>-->
+	<hidenRGA.hidenRGA_qga BUFFER_SIZE="100" P="BL11I-EA-RGA-01" PORT="rgaPort" Q="" name="ENV.RGA"/>
+</components>

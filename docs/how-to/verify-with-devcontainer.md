@@ -88,14 +88,13 @@ reflected inside the container without restarting.
 Generate `st.cmd` and the compiled database without actually launching the IOC:
 
 ```bash
-ibek runtime generate /epics/ioc/config/ioc.yaml \
-    /epics/generic-source/ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml \
-    /epics/generic-source/ibek-support/iocStats/iocStats.ibek.support.yaml \
-    ... (all relevant support yaml files)
+ibek runtime generate2 /epics/ioc/config
 ```
 
-Or, more conveniently, let `start.sh` do it (it calls `ibek runtime generate2`
-which discovers YAML files automatically from `/epics/generic-source`):
+`ibek runtime generate2` discovers all support YAML files automatically from
+`/epics/generic-source`, so no manual list of files is required.
+
+Alternatively, `start.sh` calls the same command and then launches the IOC:
 
 ```bash
 /epics/ioc/start.sh
@@ -107,13 +106,6 @@ After generation, the runtime assets are in `/epics/runtime/`:
 ├── st.cmd      ← generated startup script
 ├── ioc.db      ← fully expanded EPICS database
 └── protocol/   ← StreamDevice protocol files
-```
-
-To generate without starting the IOC (useful for DB comparison only), stop
-after ibek's generation step:
-
-```bash
-ibek runtime generate2 /epics/ioc/config
 ```
 
 ---

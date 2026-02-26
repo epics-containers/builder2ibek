@@ -382,7 +382,7 @@ maps directly to a database macro.
 Create `ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml`:
 
 ```yaml
-# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json
 
 module: hidenRGA
 
@@ -445,14 +445,19 @@ discard it when reading the XML.  Create
 `src/builder2ibek/converters/cmsIon.py`:
 
 ```python
-from builder2ibek.converters import register
+from builder2ibek.converters.globalHandler import globalHandler
+from builder2ibek.types import Entity, Generic_IOC
 
-@register("hidenRGA")
-def convert(entity):
+xml_component = "hidenRGA"
+
+
+@globalHandler
+def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     entity.remove("name")
 ```
 
-Register it in `src/builder2ibek/convert.py` alongside the other converters.
+`moduleinfos.py` discovers all `.py` files in the `converters/` directory
+automatically — no manual registration step is needed.
 
 ---
 
@@ -468,9 +473,8 @@ uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml /tmp/test.yaml
 Then inspect `/tmp/test.yaml` and check that the entity types and parameter names
 match what you defined in the support YAML.
 
-The real I11 IOC instance at
-`/scratch/hgv27681/work/i11-services/services/b11i-ea-hiden-01/config/ioc.yaml`
-was generated this way and illustrates the expected output:
+A real I11 IOC instance (`b11i-ea-hiden-01`) was generated this way and
+illustrates the expected output:
 
 ```yaml
 entities:

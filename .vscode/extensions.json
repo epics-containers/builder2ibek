@@ -1,5 +1,20 @@
 {
     "recommendations": [
         "ms-vscode-remote.remote-containers",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "ryanluker.vscode-coverage-gutters",
+        "github.vscode-pull-request-github",
+        "ms-vscode.makefile-tools",
+        "eamodio.gitlens",
+        "streetsidesoftware.code-spell-checker",
+        "gruntfuggly.todo-tree",
+        "moshfeu.compare-folders",
+        "nsd.vscode-epics",
+        "anthropic.claude-code",
+        "github.copilot-chat"
     ]
 }

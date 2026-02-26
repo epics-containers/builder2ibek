@@ -39,7 +39,20 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     XML to YAML specialist convertor function for the pvlogging support module
     """
 
-    if entity_type == "Hy8001":
+    if entity_type == "Hy8002":
+        # In VxWorks, the Hy8002 carrier claims one interrupt vector (shared by
+        # all Hy8002 carriers in the crate).  Consume it once so subsequent
+        # devices (Hy8001, DLS8515, Hy8401...) get the correct vector numbers.
+        prior = sum(1 for e in ioc.entities if e.get("type") == "ipac.Hy8002")
+        if prior == 1:  # only the current entity — this is the first Hy8002
+            # In VxWorks, the Hy8002 carrier claims interrupt vector 192 as its
+            # base, shared by all Hy8002 carriers.  Emit a dummy
+            # InterruptVectorVME so ibek assigns 192 to it; subsequent device
+            # vectors then start at 193, matching the original VxWorks numbers.
+            vec = add_interrupt_vector()
+            entity.add_entity(vec)
+
+    elif entity_type == "Hy8001":
         vec = add_interrupt_vector()
         entity.add_entity(vec)
         entity.interrupt_vector = vec.name
