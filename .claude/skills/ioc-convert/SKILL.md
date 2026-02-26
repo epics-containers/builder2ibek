@@ -215,6 +215,14 @@ ibek dev instance <services-repo>/services/$IOC_NAME
 ./update-schema
 ```
 
+If any converters or support YAMLs were created or modified in Phase 2, run
+the builder2ibek test suite before generation to catch regressions:
+```bash
+uv run pytest
+```
+Fix any failures before continuing. If a test was already failing before this
+session, note it and proceed.
+
 Run generation:
 ```bash
 uvx --python 3.13 ibek runtime generate2 --no-pvi <services-repo>/services/$IOC_NAME/config
@@ -283,8 +291,11 @@ For each error group, construct a prompt containing:
 
 1. If any subagent made converter fixes: re-run xml2yaml.
 2. Run `./update-schema`.
-3. Re-run `generate2`.
-4. If errors remain, repeat Phase 4 (but at most 3 iterations — if errors
+3. Run `uv run pytest` — fix any regressions before proceeding (a failing test
+   means a converter or support YAML change broke an existing IOC; fix it now
+   while still in the fixing loop).
+4. Re-run `generate2`.
+5. If errors remain, repeat Phase 4 (but at most 3 iterations — if errors
    persist after 3 rounds, report to the user and ask for guidance).
 
 **Object-reference chain note**: if you see `object BL19I-VA-... not found`,
