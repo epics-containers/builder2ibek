@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Verify a converted IOC using db-compare &#8212; builder2ibek 1.1.3.dev10+g87ca8d0df documentation</title>
+    <title>Verify a converted IOC using db-compare &#8212; builder2ibek 1.1.3.dev26+gda3642bd8 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=71d407fa"></script>
+    <script src="../_static/documentation_options.js?v=3d473baf"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -541,14 +541,12 @@ reflected inside the container without restarting.</p>
 <section id="generate-the-epics-runtime-files">
 <h2>4. Generate the EPICS runtime files<a class="headerlink" href="#generate-the-epics-runtime-files" title="Link to this heading">#</a></h2>
 <p>Generate <code class="docutils literal notranslate"><span class="pre">st.cmd</span></code> and the compiled database without actually launching the IOC:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ibek<span class="w"> </span>runtime<span class="w"> </span>generate<span class="w"> </span>/epics/ioc/config/ioc.yaml<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>/epics/generic-source/ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>/epics/generic-source/ibek-support/iocStats/iocStats.ibek.support.yaml<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>...<span class="w"> </span><span class="o">(</span>all<span class="w"> </span>relevant<span class="w"> </span>support<span class="w"> </span>yaml<span class="w"> </span>files<span class="o">)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ibek<span class="w"> </span>runtime<span class="w"> </span>generate2<span class="w"> </span>/epics/ioc/config
 </pre></div>
 </div>
-<p>Or, more conveniently, let <code class="docutils literal notranslate"><span class="pre">start.sh</span></code> do it (it calls <code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">runtime</span> <span class="pre">generate2</span></code>
-which discovers YAML files automatically from <code class="docutils literal notranslate"><span class="pre">/epics/generic-source</span></code>):</p>
+<p><code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">runtime</span> <span class="pre">generate2</span></code> discovers all support YAML files automatically from
+<code class="docutils literal notranslate"><span class="pre">/epics/generic-source</span></code>, so no manual list of files is required.</p>
+<p>Alternatively, <code class="docutils literal notranslate"><span class="pre">start.sh</span></code> calls the same command and then launches the IOC:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/epics/ioc/start.sh
 </pre></div>
 </div>
@@ -557,11 +555,6 @@ which discovers YAML files automatically from <code class="docutils literal notr
 ├── st.cmd      ← generated startup script
 ├── ioc.db      ← fully expanded EPICS database
 └── protocol/   ← StreamDevice protocol files
-</pre></div>
-</div>
-<p>To generate without starting the IOC (useful for DB comparison only), stop
-after ibek’s generation step:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ibek<span class="w"> </span>runtime<span class="w"> </span>generate2<span class="w"> </span>/epics/ioc/config
 </pre></div>
 </div>
 </section>

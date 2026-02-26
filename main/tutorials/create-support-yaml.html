@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 1.1.3.dev10+g87ca8d0df documentation</title>
+    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 1.1.3.dev26+gda3642bd8 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=71d407fa"></script>
+    <script src="../_static/documentation_options.js?v=3d473baf"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -838,7 +838,7 @@ regular expressions — <code class="docutils literal notranslate"><span class="
 which is convenient for pure <code class="docutils literal notranslate"><span class="pre">AutoSubstitution</span></code> entities where every parameter
 maps directly to a database macro.</p>
 <p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml</span></code>:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json</span>
 
 <span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
 
@@ -898,14 +898,19 @@ appropriate <code class="docutils literal notranslate"><span class="pre">.db</sp
 discard it when reading the XML.  Create
 <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/hidenRGA.py</span></code> following the pattern of
 <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.converters</span><span class="w"> </span><span class="kn">import</span> <span class="n">register</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.converters.globalHandler</span><span class="w"> </span><span class="kn">import</span> <span class="n">globalHandler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">Generic_IOC</span>
 
-<span class="nd">@register</span><span class="p">(</span><span class="s2">&quot;hidenRGA&quot;</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="n">entity</span><span class="p">):</span>
+<span class="n">xml_component</span> <span class="o">=</span> <span class="s2">&quot;hidenRGA&quot;</span>
+
+
+<span class="nd">@globalHandler</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
     <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Register it in <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/convert.py</span></code> alongside the other converters.</p>
+<p><code class="docutils literal notranslate"><span class="pre">moduleinfos.py</span></code> discovers all <code class="docutils literal notranslate"><span class="pre">.py</span></code> files in the <code class="docutils literal notranslate"><span class="pre">converters/</span></code> directory
+automatically — no manual registration step is needed.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -918,9 +923,8 @@ real IOC XML that uses the module:</p>
 </div>
 <p>Then inspect <code class="docutils literal notranslate"><span class="pre">/tmp/test.yaml</span></code> and check that the entity types and parameter names
 match what you defined in the support YAML.</p>
-<p>The real I11 IOC instance at
-<code class="docutils literal notranslate"><span class="pre">/scratch/hgv27681/work/i11-services/services/b11i-ea-hiden-01/config/ioc.yaml</span></code>
-was generated this way and illustrates the expected output:</p>
+<p>A real I11 IOC instance (<code class="docutils literal notranslate"><span class="pre">b11i-ea-hiden-01</span></code>) was generated this way and
+illustrates the expected output:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">entities</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">epics.EpicsEnvSet</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">STREAM_PROTOCOL_PATH</span>

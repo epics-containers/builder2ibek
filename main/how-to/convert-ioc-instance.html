@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 1.1.3.dev10+g87ca8d0df documentation</title>
+    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 1.1.3.dev26+gda3642bd8 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=71d407fa"></script>
+    <script src="../_static/documentation_options.js?v=3d473baf"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -554,7 +554,6 @@ IOC’s installed support tree.</p>
 <span class="w">    </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
 <span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL11I-EA-RGA-01</span>
 <span class="w">    </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rgaPort</span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ENV.RGA</span>
 </pre></div>
 </div>
 <p>Notice that <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> and <code class="docutils literal notranslate"><span class="pre">hidenRGA.hidenRGA_qga</span></code> remain as separate entities
@@ -630,7 +629,7 @@ uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"
 <p>If you have added new entity models to <code class="docutils literal notranslate"><span class="pre">ibek-support*</span></code> or changed existing models,
 regenerate the global schema that VSCode uses for validation.</p>
 <p>In the builder2ibek devcontainer:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./update-schema
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./update-schema<span class="w"> </span><span class="c1"># first time only - after that use ibek to update schema as below</span>
 </pre></div>
 </div>
 <p>In a generic IOC devcontainer:</p>
