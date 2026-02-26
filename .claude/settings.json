@@ -6,6 +6,7 @@
       "Read(/workspaces/**)",
       "Read(/dls_sw/work/**)",
       "Read(/dls_sw/prod/**)",
+      "Read(/epics/**)",
       "Bash(ls:*)",
       "Bash(find:*)",
       "Bash(cat:*)",
@@ -29,6 +30,9 @@
       "Bash(tr:*)",
       "Bash(jq:*)",
       "Bash(yq:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
       "Bash(git log:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
@@ -42,13 +46,23 @@
       "Bash(git switch:*)",
       "Bash(git restore:*)",
       "Bash(git fetch:*)",
+      "Bash(git -C:*)",
       "Bash(python:*)",
       "Bash(python3:*)",
       "Bash(uv:*)",
+      "Bash(uvx:*)",
+      "Bash(ibek:*)",
+      "Bash(./update-schema:*)",
       "Bash(pytest:*)",
       "Bash(pre-commit:*)",
       "Bash(make:*)",
       "Bash(code:*)"
+    ],
+    "additionalDirectories": [
+      "/workspaces/builder2ibek/.claude/skills",
+      "/dls_sw/work",
+      "/dls_sw/prod",
+      "/epics"
     ]
   }
 }

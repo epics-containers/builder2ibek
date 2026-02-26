@@ -41,7 +41,7 @@ Read the generated `ioc.yaml`. Look for:
 **Spurious attributes** — `name:` fields on leaf entities that don't need them
 (e.g. hidenRGA, cmsIon). These should be dropped by a converter. If a converter
 doesn't exist yet, create `src/builder2ibek/converters/<module>.py` following
-the pattern in [AGENTS.md](../../../AGENTS.md#adding-a-new-converter).
+the pattern in [CLAUDE.md](../../../CLAUDE.md#adding-a-new-converter).
 
 **Attributes needing transformation** — values that need renaming, numeric
 transformation, or removal before ibek sees them. Add or update the converter
@@ -138,21 +138,32 @@ grep "^# % macro" /dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/<file>.d
 
 ---
 
-## Step 6 — Iterate and commit
+## Step 6 — Report and suggest commits
 
 Repeat Steps 3–5 until:
 - `ibek runtime generate2` completes without errors
 - `st.cmd` and `ioc.subst` look correct by inspection
 
-Once clean, commit any new or modified files in the builder2ibek repo:
+Once clean, **do not commit anything**. Instead, report to the user:
+
+1. **Conversion summary** — what entities were generated, any issues noticed
+2. **st.cmd comparison** — key differences from the original builder boot script
+   (e.g. container-relative paths replacing absolute paths — expected and correct)
+3. **ioc.subst validation** — db files, macros, and values match expectations
+4. **Files changed** — list what was created/modified and in which repo
+5. **Suggested git commands** for the user to run when satisfied:
 
 ```bash
-# In /workspaces/builder2ibek:
-git add ibek-support-dls/<module>/   # if DLS-internal module was added/modified
-git add ibek-support/<module>/       # if community module was added/modified
-git add src/builder2ibek/converters/ # if converter was added/modified
-git add tests/samples/               # optional: add IOC as regression test
-git commit
+# In /workspaces/i11-services — new IOC instance (always needed):
+git -C /workspaces/i11-services add services/<ioc-name>/
+git -C /workspaces/i11-services commit -m "Add <ioc-name> (converted from builder XML)"
+
+# In /workspaces/builder2ibek — only if support YAMLs or converters changed:
+git -C /workspaces/builder2ibek add ibek-support-dls/<module>/   # DLS-internal module
+git -C /workspaces/builder2ibek add ibek-support/<module>/       # community module
+git -C /workspaces/builder2ibek add src/builder2ibek/converters/ # converter
+git -C /workspaces/builder2ibek add tests/samples/               # optional regression test
+git -C /workspaces/builder2ibek commit
 ```
 
 > **Note on submodules**: Entity models live in one of two submodules:
