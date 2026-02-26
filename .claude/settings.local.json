@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /workspaces/builder2ibek status)",
+      "Bash(uv --version)",
+      "Bash(ibek --version)",
+      "Bash(git -C /workspaces/builder2ibek diff)",
+      "Bash(git -C /workspaces/builder2ibek log --oneline -5)",
+      "Bash(git -C /workspaces/builder2ibek add .claude/settings.local.json)"
+    ]
+  }
+}

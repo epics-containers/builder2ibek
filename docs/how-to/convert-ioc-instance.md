@@ -19,6 +19,7 @@ out, so every supported module's YAML is available.  Run `builder2ibek` with
 uv run builder2ibek xml2yaml ...
 ```
 
+
 **Generic IOC devcontainer** — the devcontainer for a specific Generic IOC
 (e.g. `ioc-bl11i-rga`).  Only the ibek support YAML that was built into that
 container image is available, so schema validation can only validate
@@ -105,7 +106,6 @@ entities:
     BUFFER_SIZE: 100
     P: BL11I-EA-RGA-01
     PORT: rgaPort
-    name: ENV.RGA
 ```
 
 Notice that `asyn.AsynIP` and `hidenRGA.hidenRGA_qga` remain as separate entities
@@ -192,7 +192,7 @@ regenerate the global schema that VSCode uses for validation.
 
 In the builder2ibek devcontainer:
 ```bash
-./update-schema
+./update-schema # first time only - after that use ibek to update schema as below
 ```
 
 In a generic IOC devcontainer:

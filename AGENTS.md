@@ -81,6 +81,34 @@ ilkA→ilk10, outaddr calculation), and which conversions are automatic.
 
 ---
 
+## Searching /dls_sw
+
+When looking up support modules, builder.py files, db files, or IOC instances
+in `/dls_sw`, use these paths:
+
+| Path | Purpose |
+|---|---|
+| `/dls_sw/prod/R3.14.12.7/` | Released items for the current most widely used EPICS version |
+| `/dls_sw/prod/R7.0.7/` | Latest EPICS version, used especially for RTEMS IOCs |
+| `/dls_sw/work/R3.14.12.7/` | Unreleased/in-progress work for the standard EPICS version |
+| `/dls_sw/work/R7.0.7/` | Unreleased/in-progress RTEMS work (most likely to have recent changes) |
+
+Default to `/dls_sw/prod/R3.14.12.7/` unless there is a specific reason to
+look elsewhere (e.g. RTEMS, or seeking the latest unreleased changes).
+
+To find builder XML files for IOCs that use a particular support module, use:
+
+```bash
+grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml")
+```
+
+Example — find all IOCs using hidenRGA:
+```bash
+grep -i hidenRGA $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml")
+```
+
+---
+
 ## Repository layout
 
 ```
