@@ -112,63 +112,45 @@ ibek-support-dls/    # submodule: DLS entity models
 ## Key concepts
 
 **ibek support YAML** (`*.ibek.support.yaml`)
-: Defines `entity_models` — the set of device types a support module provides.
-  Each entity model has parameters, pre_init commands, databases to load, and
-  post_init commands. Schema 3.1.1.
+: Defines `entity_models` — parameters, pre_init commands, databases to load,
+  and post_init commands.  Full walkthrough:
+  [docs/tutorials/create-support-yaml.md](docs/tutorials/create-support-yaml.md).
 
 **install.yml** (`*.install.yml`)
 : Declares the DBDs, libraries, and protocol files that `ansible.sh` will
   compile and install during the Docker build.
 
-**`when: first`**
-: A `pre_init` guard that ensures a command runs only once even when multiple
-  instances of the same entity type are loaded. Used for one-time environment
-  setup such as configuring a shared library path.
-
 **Jinja2 rendering**
-: `pre_init`, `databases`, and `post_init` values are rendered as Jinja2
-  templates with the entity's parameters as context. `{{P}}` resolves to the
-  value of the `P` parameter.
+: `pre_init`, `databases`, and `post_init` values are Jinja2 templates with the
+  entity's parameters as context. `{{P}}` resolves to the value of parameter `P`.
 
 **`databases.args` conventions**
-: A list of `key: value` pairs passed as macros to `dbLoadRecords`. If the
-  value is omitted (e.g. `P:` with no value), ibek uses the value of the
-  parameter with the same name. Keys can be regular expressions — `.*:` passes
-  all parameters through, which is correct for pure `AutoSubstitution` entities.
+: `key: value` pairs passed as macros to `dbLoadRecords`. Omitting the value
+  uses the parameter of the same name. `.*:` passes all parameters through
+  (correct for pure `AutoSubstitution` entities).
 
-**Database macros vs baked-in macros**
-: The substitution (`.subst`) files are processed by MSI at build time to
-  produce compiled `.db` files. Ibek loads these compiled `.db` files at
-  runtime — you never need to look at the `.subst` files. The canonical source
-  is the macro declarations at the top of the compiled `.db`. Macros listed
-  there are database macros and must (or can) be passed in `databases[].args`.
-  Macros with no default must always be supplied. Macros with a default
-  (e.g. `MASS_RANGE`, `HMT_RC`) may not have appeared in the original builder
-  XML but should still be added as optional ibek parameters with the same
-  default, so instances can override them. Macros fully baked in by MSI will
-  not appear in the `.db` declarations at all.
+**`when: first`**
+: A `pre_init` guard that runs a command only once per IOC regardless of how
+  many instances are loaded. Maps to `InitialiseOnce` in builder.py.
+
+**Database macros**
+: Determined from the macro declarations at the top of the compiled `.db` file —
+  never from `.subst` files. Macros without a default must be ibek parameters;
+  those with a default (e.g. `MASS_RANGE`) should be optional ibek parameters so
+  instances can override them.
 
 **`name` parameter and `type: id`**
-: Only *some* XMLbuilder objects have a `name` attribute. Carry it through to
-  ibek as `type: id` only when another entity will cross-reference this one, or
-  when you need the name as a runtime value inside `pre_init`/`databases.args`.
-  The most common case is any object that **creates an asyn port** (e.g.
-  `asyn.AsynIP`, `asyn.AsynSerial`): its `name` becomes the port identifier, and
-  other entities reference it by that name.  Keep `name` as `type: id` on the
-  port-creating entity.
-  If this is a leaf object with no referencing use, drop `name` — but a
-  converter must call `entity.remove("name")` to discard it when reading the
-  XML, so `xml2yaml` does not pass an unrecognised attribute to the entity model.
-  See `src/builder2ibek/converters/cmsIon.py` as a minimal example.
+: Carry `name` through as `type: id` only when another entity cross-references
+  this one.  The classic case is an asyn port creator (`asyn.AsynIP` etc.) whose
+  `name` is the port identifier.  For leaf objects, drop `name` — the converter
+  must call `entity.remove("name")`.  See `src/builder2ibek/converters/cmsIon.py`.
 
 **`PORT` parameter and `type: object` (asyn port reference pattern)**
-: A very common ibek pattern: one entity creates an asyn port (its `name` is
-  `type: id`), and a second entity references that port via a parameter named
-  `PORT` (or `ASYN_PORT`) of `type: object`.  In the builder XML the two are
-  linked by matching string values (e.g. `PORT="rgaPort"` on both elements).
-  In ibek, `type: object` makes the link explicit and validated.  Pass `PORT:`
-  through unchanged in `databases.args`.  Do not hard-code it or fold it into
-  the port-creating entity.
+: Port-creating entity: `name` → `type: id`.  Referencing entity: `PORT` →
+  `type: object`.  In builder XML the two share a matching string value; in ibek
+  it becomes an explicit, validated reference.  Pass `PORT:` unchanged in
+  `databases.args`.  See
+  [docs/tutorials/create-support-yaml-advanced.md](docs/tutorials/create-support-yaml-advanced.md).
 
 **`builder2ibek xml2yaml`**
 : Auto-generates `ioc.yaml` from builder XML. Converters in `converters/` handle
