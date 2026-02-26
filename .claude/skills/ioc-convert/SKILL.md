@@ -17,11 +17,26 @@ and `ioc.subst` are correct.
 
 ### 1a. Resolve the services repo
 
-The services repo path is `$1`. If `$1` is empty or not provided:
+Resolve the services repo using the following priority order:
 
-- Read `.claude/skills/ioc-convert/last-services-repo` (if it exists) and use
-  that path as the services repo. Tell the user which repo is being reused.
-- If the file does not exist, stop and ask the user to supply a services repo path.
+1. **Explicit argument** — if `$1` is provided, use it directly.
+
+2. **Infer from IOC prefix** — derive the beamline name from the XML filename:
+   - Extract the first `-`-delimited segment, e.g. `BL11I-CS-IOC-09.xml` → `BL11I`
+   - Strip the leading `BL`, separate digits and trailing letter(s):
+     `BL11I` → digits=`11`, letter=`I` → beamline=`i11`
+   - Services repo name = `<beamline>-services`, e.g. `i11-services`
+   - Look for it at `/workspaces/<services-repo-name>/`
+
+3. **Fallback** — read `.claude/skills/ioc-convert/last-services-repo` if the
+   inferred path does not exist on disk.
+
+If the resolved path does not exist locally, clone it:
+```bash
+git clone git@gitlab.diamond.ac.uk:controls/containers/beamline/<services-repo-name> /workspaces/<services-repo-name>
+```
+
+Tell the user which services repo is being used and how it was resolved.
 
 Once the services repo is known, write its absolute path to
 `.claude/skills/ioc-convert/last-services-repo` (overwrite if present).
