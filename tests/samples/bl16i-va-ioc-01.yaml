@@ -75,7 +75,6 @@ entities:
     interrupt_vector: Vec5
     ipslot: 0
     name: SER40
-    prefix: ty
 
   - type: epics.InterruptVectorVME
     name: Vec6
@@ -85,7 +84,6 @@ entities:
     interrupt_vector: Vec6
     ipslot: 1
     name: SER41
-    prefix: ty
 
   - type: epics.InterruptVectorVME
     name: Vec7
@@ -955,7 +953,6 @@ entities:
     ilk5: BL16I-VA-PIRG-02
     ilk6: BL16I-VA-PIRG-03
     ilk7: Valve 21 Closed
-    name: GV01.ALL
     port: VLVCC01
     vlvcc: BL16I-VA-VLVCC-01
 
@@ -975,7 +972,6 @@ entities:
     ilk3: BL16I-VA-PIRG-03
     ilk4: BL16I-VA-PIRG-04
     ilk5: Valve 21 Closed
-    name: GV02.ALL
     port: VLVCC01
     vlvcc: BL16I-VA-VLVCC-01
 
@@ -994,7 +990,6 @@ entities:
     ilk2: BL16I-VA-IMG-05
     ilk3: BL16I-VA-PIRG-04
     ilk4: BL16I-VA-PIRG-05
-    name: GV03.ALL
     port: VLVCC01
     vlvcc: BL16I-VA-VLVCC-01
 
@@ -1013,7 +1008,6 @@ entities:
     ilk2: BL16I-VA-IMG-06
     ilk3: BL16I-VA-PIRG-05
     ilk4: BL16I-VA-PIRG-06
-    name: GV04.ALL
     port: VLVCC01
     vlvcc: BL16I-VA-VLVCC-01
 
@@ -1036,7 +1030,6 @@ entities:
     ilk7: BL16I-VA-IMG-05
     ilk8: BL16I-VA-IMG-06
     ilk9: BL16I-VA-IMG-07
-    name: D2.PHDGN
     port: VLVCC01
     vlvcc: BL16I-VA-VLVCC-01
 
@@ -1049,7 +1042,6 @@ entities:
     ilk2: BL16I-VA-IMG-08
     ilk3: BL16I-VA-PIRG-07
     ilk4: BL16I-VA-PIRG-08
-    name: GV05.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1062,7 +1054,6 @@ entities:
     ilk2: Zone 3 Vacuum
     ilk3: PSS Guardline A
     ilk4: PSS Guardline B
-    name: SHTR02.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1075,7 +1066,6 @@ entities:
     ilk2: BL16I-VA-IMG-09
     ilk3: BL16I-VA-PIRG-08
     ilk4: BL16I-VA-PIRG-09
-    name: GV06.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1090,7 +1080,6 @@ entities:
     ilk4: BL16I-VA-PIRG-10
     ilk5: VALVE-08/09 Shut
     ilk6: VALVE-08 OpenReq
-    name: GV07.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1105,7 +1094,6 @@ entities:
     ilk4: Low Vac
     ilk5: BL16I-VA-IMG-10
     ilk6: BL16I-VA-IMG-11
-    name: GV08.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1117,7 +1105,6 @@ entities:
     ilk15: Valve fault
     ilk2: VALVE-08 OpenReq
     ilk3: BL16I-VA-PIRG-12
-    name: GV09.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1132,7 +1119,6 @@ entities:
     ilk4: Stop Button
     mode1: Remote
     mode2: Local
-    name: GV21.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1144,7 +1130,6 @@ entities:
     ilk3: Stop Button
     mode1: Remote
     mode2: Local
-    name: GV22.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1159,7 +1144,6 @@ entities:
     ilk6: Stop Button
     mode1: Remote
     mode2: Local
-    name: GV23.ALL
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1202,7 +1186,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: GBC1.T1
     offset: 10
     port: TMPCC01
     temp: :TEMP1
@@ -1217,7 +1200,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: GBC1.T2
     offset: 11
     port: TMPCC01
     temp: :TEMP2
@@ -1232,7 +1214,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: GBC1.T3
     offset: 12
     port: TMPCC01
     temp: :TEMP3
@@ -1247,7 +1228,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: GBC1.T4
     offset: 13
     port: TMPCC01
     temp: :TEMP4
@@ -1262,7 +1242,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T1
     offset: 16
     port: TMPCC01
     temp: :A:TEMP1
@@ -1277,7 +1256,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T2
     offset: 17
     port: TMPCC01
     temp: :A:TEMP2
@@ -1292,7 +1270,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T3
     offset: 18
     port: TMPCC01
     temp: :A:TEMP3
@@ -1307,7 +1284,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T4
     offset: 19
     port: TMPCC01
     temp: :A:TEMP4
@@ -1322,7 +1298,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T5
     offset: 20
     port: TMPCC01
     temp: :B:TEMP1
@@ -1337,7 +1312,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T6
     offset: 21
     port: TMPCC01
     temp: :B:TEMP2
@@ -1352,7 +1326,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T7
     offset: 22
     port: TMPCC01
     temp: :B:TEMP3
@@ -1367,7 +1340,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: S1.T8
     offset: 23
     port: TMPCC01
     temp: :B:TEMP4
@@ -1382,7 +1354,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: VFM1.T1
     offset: 28
     port: TMPCC01
     temp: :X1:TEMP
@@ -1397,7 +1368,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: VFM1.T2
     offset: 29
     port: TMPCC01
     temp: :X2:TEMP
@@ -1412,7 +1382,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: HFM1.T1
     offset: 30
     port: TMPCC01
     temp: :X1:TEMP
@@ -1427,7 +1396,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: HFM1.T2
     offset: 31
     port: TMPCC01
     temp: :X2:TEMP
@@ -1442,7 +1410,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: PPR.CHI
     offset: 34
     port: TMPCC01
     temp: :CHI:TEMP
@@ -1457,7 +1424,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: PPR.THETA1
     offset: 35
     port: TMPCC01
     temp: :S1:THETA:TEMP
@@ -1472,7 +1438,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: PPR.THETA2
     offset: 36
     port: TMPCC01
     temp: :S2:THETA:TEMP
@@ -1487,7 +1452,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: PPR.Z1
     offset: 37
     port: TMPCC01
     temp: :S1:Z:TEMP
@@ -1502,7 +1466,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: PPR.Z2
     offset: 38
     port: TMPCC01
     temp: :S2:Z:TEMP
@@ -1521,7 +1484,6 @@ entities:
     ilk6: MLM water
     ilk7: W/B Stop water
     interlock: :INT1
-    name: IntWater
     port: VLVCC01
 
   - type: dlsPLC.interlock
@@ -1531,7 +1493,6 @@ entities:
     ilk0: Run Vac 2 of IMG 1,2&3
     ilk1: V1 Open
     interlock: :INT3
-    name: IntMachine
     port: VLVCC01
 
   - type: dlsPLC.interlock
@@ -1550,7 +1511,6 @@ entities:
     ilk8: BL16I-VA-IMG-03
     ilk9: V1 Open
     interlock: :INT2
-    name: IntFE
     port: VLVCC01
 
   - type: dlsPLC.interlock
@@ -1570,7 +1530,6 @@ entities:
     ilk8: W/B SlitB Temp 1
     ilk9: W/B SlitB Temp 2
     interlock: :INT1
-    name: IntT1
     port: TMPCC01
 
   - type: dlsPLC.interlock
@@ -1583,7 +1542,6 @@ entities:
     ilk3: HFM X1 Temp
     ilk4: HFM X2 Temp
     interlock: :INT2
-    name: IntT2
     port: TMPCC01
 
   - type: dlsPLC.interlock
@@ -1596,7 +1554,6 @@ entities:
     ilk3: PPR Z 1 Temp
     ilk4: PPR Z 2 Temp
     interlock: :INT3
-    name: PPR
     port: TMPCC01
 
   - type: dlsPLC.vacPump
@@ -1606,14 +1563,12 @@ entities:
     ilk2: Valve 23 Not Open
     ilk3: PIRG21 Healthy
     ilk4: Stop Button
-    name: TURBO1
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
   - type: dlsPLC.vacPump
     addr: 140
     device: BL16I-VA-SCROL-01
-    name: SCROLL1
     port: VLVCC02
     vlvcc: BL16I-VA-VLVCC-02
 
@@ -1640,7 +1595,6 @@ entities:
     PRESSURE1: BL16I-VA-GAUGE-03:P
     PRESSURE2: BL16I-VA-GAUGE-03:P
     SETPOINT: 500
-    name: DCM.PiezoOverride
 
   - type: dlsPLC.overrideRequestIndividual
     BIT: 1
@@ -1650,7 +1604,6 @@ entities:
     PRESSURE1: BL16I-VA-GAUGE-06:P
     PRESSURE2: BL16I-VA-GAUGE-06:P
     SETPOINT: 600
-    name: VFM.PiezoOverride
 
   - type: dlsPLC.writeEnum
     P: BL16I-VA-DCM-01
@@ -1660,7 +1613,6 @@ entities:
     VAL0: 0
     VAL1: 1
     addr: 202
-    name: DCMRemoteServiceOn
     port: VLVCC02
 
   - type: vacuumSpace.space
@@ -1688,7 +1640,7 @@ entities:
     ionp1: BL16I-VA-IONP-03
     name: SP3
     pirg1: PIRG03
-    valve1: GV01.ALL
+    valve1: BL16I-VA-VALVE-01
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-04
@@ -1697,7 +1649,7 @@ entities:
     ionp1: BL16I-VA-IONP-04
     name: SP4
     pirg1: BL16I-VA-PIRG-04
-    valve1: GV02.ALL
+    valve1: BL16I-VA-VALVE-02
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-05
@@ -1706,7 +1658,7 @@ entities:
     ionp1: BL16I-VA-IONP-05
     name: SP5
     pirg1: BL16I-VA-PIRG-05
-    valve1: GV03.ALL
+    valve1: BL16I-VA-VALVE-03
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-06
@@ -1719,7 +1671,7 @@ entities:
     name: SP6
     pirg1: BL16I-VA-PIRG-06
     pirg2: BL16I-VA-PIRG-07
-    valve1: GV04.ALL
+    valve1: BL16I-VA-VALVE-04
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-07
@@ -1728,7 +1680,7 @@ entities:
     ionp1: BL16I-VA-IONP-08
     name: SP7
     pirg1: BL16I-VA-PIRG-08
-    valve1: GV05.ALL
+    valve1: BL16I-VA-VALVE-05
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-08
@@ -1739,7 +1691,7 @@ entities:
     ionp3: BL16I-VA-IONP-11
     name: SP8
     pirg1: BL16I-VA-PIRG-09
-    valve1: GV06.ALL
+    valve1: BL16I-VA-VALVE-06
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-09
@@ -1748,7 +1700,7 @@ entities:
     ionp1: BL16I-VA-IONP-12
     name: SP9
     pirg1: BL16I-VA-PIRG-10
-    valve1: GV07.ALL
+    valve1: BL16I-VA-VALVE-07
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-10
@@ -1766,7 +1718,7 @@ entities:
     ionp1: BL16I-VA-DIONP-02
     name: BL16I-VA-SPACE-11
     pirg1: BL16I-VA-PIRG-12
-    valve1: GV09.ALL
+    valve1: BL16I-VA-VALVE-09
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-21
@@ -1775,7 +1727,7 @@ entities:
     ionp1: BL16I-VA-DIONP-13
     name: BL16I-VA-SPACE-21
     pirg1: BL16I-VA-PIRG-21
-    valve1: GV21.ALL
+    valve1: BL16I-VA-VALVE-21
 
   - type: vacuumSpace.space
     device: BL16I-VA-SPACE-91
@@ -1791,7 +1743,7 @@ entities:
     pirg1: BL16I-VA-PIRG-09
     pirg2: BL16I-VA-PIRG-10
     pirg3: BL16I-VA-PIRG-11
-    valve1: GV07.ALL
+    valve1: BL16I-VA-VALVE-07
 
   - type: vacuumSpace.spaceGroup
     device: BL16I-VA-SPACE-90

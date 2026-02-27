@@ -1251,7 +1251,6 @@ entities:
     PITCH: YAW
     PITCHLIM: 30
     SUFFIX: YAW
-    name: FSWT.OB1
 
   - type: mirror.mirror2post
     CDEPTH: 154
@@ -1266,7 +1265,6 @@ entities:
     PITCH: PITCH
     PITCHLIM: 30
     SUFFIX: PITCH
-    name: FSWT.OB2
 
   - type: mxEH.Cryojet_Retraction
     BRICK1PORT: BRICK_1
@@ -1306,11 +1304,9 @@ entities:
     PORT: BRICK_4
     ROCKER: 6
     TRANSLATION: 5
-    name: TRANS
 
   - type: transfocator.BL04I_beamsizeCalc
     P: BL04I-MO-FSWT-01
-    name: TRANS_CALC
 
   - type: pvlogging.PvLogging
     access_file: /epics/support/pvlogging/src/access.acf

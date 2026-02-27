@@ -478,7 +478,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB1.TEMP1
     offset: 10
     port: TMPCC1.Hostlink
     temp: :TEMP1
@@ -493,7 +492,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB1.TEMP2
     offset: 11
     port: TMPCC1.Hostlink
     temp: :TEMP2
@@ -508,7 +506,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: W1.TEMP1
     offset: 12
     port: TMPCC1.Hostlink
     temp: :TEMP1
@@ -523,7 +520,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: W1.TEMP2
     offset: 13
     port: TMPCC1.Hostlink
     temp: :TEMP2
@@ -538,7 +534,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: FM.TEMP1
     offset: 14
     port: TMPCC1.Hostlink
     temp: :TEMP1
@@ -553,7 +548,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: FM.TEMP2
     offset: 15
     port: TMPCC1.Hostlink
     temp: :TEMP2
@@ -568,7 +562,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JS1.TEMP1
     offset: 16
     port: TMPCC1.Hostlink
     temp: :A:TEMP1
@@ -583,7 +576,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JS1.TEMP2
     offset: 17
     port: TMPCC1.Hostlink
     temp: :A:TEMP2
@@ -598,7 +590,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JS1.TEMP3
     offset: 18
     port: TMPCC1.Hostlink
     temp: :B:TEMP1
@@ -613,7 +604,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JS1.TEMP4
     offset: 19
     port: TMPCC1.Hostlink
     temp: :B:TEMP2
@@ -628,7 +618,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S1.TEMP1
     offset: 22
     port: TMPCC1.Hostlink
     temp: :A:TEMP1
@@ -643,7 +632,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S1.TEMP2
     offset: 23
     port: TMPCC1.Hostlink
     temp: :A:TEMP2
@@ -658,7 +646,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S1.TEMP3
     offset: 24
     port: TMPCC1.Hostlink
     temp: :B:TEMP1
@@ -673,7 +660,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S1.TEMP4
     offset: 25
     port: TMPCC1.Hostlink
     temp: :B:TEMP2
@@ -688,7 +674,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JF1.TEMP1
     offset: 20
     port: TMPCC1.Hostlink
     temp: :TEMP1
@@ -703,7 +688,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JF1.TEMP2
     offset: 21
     port: TMPCC1.Hostlink
     temp: :TEMP2
@@ -718,7 +702,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JF1.TEMP3
     offset: 26
     port: TMPCC1.Hostlink
     temp: :TEMP3
@@ -733,7 +716,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JF1.TEMP4
     offset: 27
     port: TMPCC1.Hostlink
     temp: :TEMP4
@@ -748,7 +730,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP1
     offset: 34
     port: TMPCC1.Hostlink
     temp: :XTAL2:TEMP1
@@ -763,7 +744,6 @@ entities:
     lolo: -273
     lopr: -70
     low: -273
-    name: DCM.TEMP2
     offset: 35
     port: TMPCC1.Hostlink
     temp: :XTAL2:TEMP2
@@ -778,7 +758,6 @@ entities:
     lolo: -273
     lopr: -20
     low: -273
-    name: DCM.TEMP3
     offset: 36
     port: TMPCC1.Hostlink
     temp: :XTAL2:TEMP3
@@ -793,7 +772,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP4
     offset: 37
     port: TMPCC1.Hostlink
     temp: :XTAL2:TEMP4
@@ -808,7 +786,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP5
     offset: 38
     port: TMPCC1.Hostlink
     temp: :XTAL2:TEMP5
@@ -823,7 +800,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP6
     offset: 39
     port: TMPCC1.Hostlink
     temp: :XTAL2:TEMP6
@@ -838,7 +814,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP7
     offset: 40
     port: TMPCC1.Hostlink
     temp: :XTAL2:Y:TEMP
@@ -853,7 +828,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP8
     offset: 41
     port: TMPCC1.Hostlink
     temp: :XTAL2:THETA:TEMP
@@ -868,7 +842,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP9
     offset: 42
     port: TMPCC1.Hostlink
     temp: :XTAL1:Z:TEMP
@@ -883,7 +856,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP10
     offset: 43
     port: TMPCC1.Hostlink
     temp: :XTAL1:TEMP1
@@ -898,7 +870,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP11
     offset: 44
     port: TMPCC1.Hostlink
     temp: :XTAL1:TEMP2
@@ -913,7 +884,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP12
     offset: 45
     port: TMPCC1.Hostlink
     temp: :XTAL1:Y:TEMP
@@ -928,7 +898,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP13
     offset: 46
     port: TMPCC1.Hostlink
     temp: :TEMP1
@@ -943,7 +912,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP14
     offset: 47
     port: TMPCC1.Hostlink
     temp: :XTAL1:THETA:TEMP
@@ -958,7 +926,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP15
     offset: 48
     port: TMPCC1.Hostlink
     temp: :XTAL1:ROLL:TEMP
@@ -973,7 +940,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: DCM.TEMP16
     offset: 49
     port: TMPCC1.Hostlink
     temp: :TEMP2
@@ -988,7 +954,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP17
     offset: 50
     port: TMPCC1.Hostlink
     temp: :TEMP3
@@ -1003,7 +968,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP18
     offset: 51
     port: TMPCC1.Hostlink
     temp: :XTAL1:TEMP
@@ -1018,7 +982,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP19
     offset: 52
     port: TMPCC1.Hostlink
     temp: :TEMP4
@@ -1033,7 +996,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP20
     offset: 53
     port: TMPCC1.Hostlink
     temp: :TEMP5
@@ -1048,7 +1010,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP21
     offset: 54
     port: TMPCC1.Hostlink
     temp: :TEMP6
@@ -1063,7 +1024,6 @@ entities:
     lolo: -273
     lopr: -200
     low: -273
-    name: DCM.TEMP22
     offset: 55
     port: TMPCC1.Hostlink
     temp: :TEMP7
@@ -1078,7 +1038,6 @@ entities:
     lolo: -273
     lopr: -70
     low: -273
-    name: DCM.TEMP23
     offset: 56
     port: TMPCC1.Hostlink
     temp: :XTAL1:TEMP3
@@ -1093,7 +1052,6 @@ entities:
     lolo: -273
     lopr: -20
     low: -273
-    name: DCM.TEMP24
     offset: 57
     port: TMPCC1.Hostlink
     temp: :XTAL1:TEMP4
@@ -1108,7 +1066,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP1
     offset: 10
     port: TMPCC2.Hostlink
     temp: :TEMP1
@@ -1123,7 +1080,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP2
     offset: 11
     port: TMPCC2.Hostlink
     temp: :TEMP2
@@ -1138,7 +1094,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP3
     offset: 12
     port: TMPCC2.Hostlink
     temp: :TEMP3
@@ -1153,7 +1108,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP4
     offset: 13
     port: TMPCC2.Hostlink
     temp: :TEMP4
@@ -1168,7 +1122,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP5
     offset: 14
     port: TMPCC2.Hostlink
     temp: :TEMP5
@@ -1183,7 +1136,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP6
     offset: 16
     port: TMPCC2.Hostlink
     temp: :TEMP6
@@ -1198,7 +1150,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP7
     offset: 17
     port: TMPCC2.Hostlink
     temp: :TEMP7
@@ -1213,7 +1164,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP8
     offset: 18
     port: TMPCC2.Hostlink
     temp: :TEMP8
@@ -1228,7 +1178,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP9
     offset: 19
     port: TMPCC2.Hostlink
     temp: :TEMP9
@@ -1243,7 +1192,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: JLAUE.TEMP10
     offset: 20
     port: TMPCC2.Hostlink
     temp: :TEMP10
@@ -1258,7 +1206,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB2.TEMP1
     offset: 22
     port: TMPCC2.Hostlink
     temp: :TEMP1
@@ -1273,7 +1220,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB2.TEMP2
     offset: 23
     port: TMPCC2.Hostlink
     temp: :TEMP2
@@ -1288,7 +1234,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB2.TEMP3
     offset: 24
     port: TMPCC2.Hostlink
     temp: :TEMP3
@@ -1303,7 +1248,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB2.TEMP4
     offset: 25
     port: TMPCC2.Hostlink
     temp: :TEMP4
@@ -1318,7 +1262,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S6.TEMP1
     offset: 28
     port: TMPCC1.Hostlink
     temp: :TEMP1
@@ -1333,7 +1276,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S6.TEMP2
     offset: 29
     port: TMPCC1.Hostlink
     temp: :TEMP2
@@ -1348,7 +1290,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M1.TEMP1
     offset: 34
     port: TMPCC2.Hostlink
     temp: :BEND1:TEMP
@@ -1363,7 +1304,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M1.TEMP2
     offset: 35
     port: TMPCC2.Hostlink
     temp: :BEND2:TEMP
@@ -1378,7 +1318,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M1.TEMP3
     offset: 37
     port: TMPCC2.Hostlink
     temp: :MASK:TEMP
@@ -1393,7 +1332,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M1.TEMP4
     offset: 38
     port: TMPCC2.Hostlink
     temp: :MIRROR:TEMP
@@ -1408,7 +1346,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: SHTR1.TEMP1
     offset: 46
     port: TMPCC2.Hostlink
     temp: :TEMP1
@@ -1423,7 +1360,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: SHTR1.TEMP2
     offset: 47
     port: TMPCC2.Hostlink
     temp: :TEMP2
@@ -1438,7 +1374,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: SHTR1.TEMP3
     offset: 48
     port: TMPCC2.Hostlink
     temp: :TEMP3
@@ -1453,7 +1388,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M2.TEMP1
     offset: 40
     port: TMPCC2.Hostlink
     temp: :BEND1:TEMP
@@ -1468,7 +1402,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M2.TEMP2
     offset: 41
     port: TMPCC2.Hostlink
     temp: :BEND2:TEMP
@@ -1483,7 +1416,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M2.TEMP3
     offset: 42
     port: TMPCC2.Hostlink
     temp: :MASK:TEMP1
@@ -1498,7 +1430,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M2.TEMP4
     offset: 43
     port: TMPCC2.Hostlink
     temp: :MASK:TEMP2
@@ -1513,7 +1444,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: M2.TEMP5
     offset: 44
     port: TMPCC2.Hostlink
     temp: :GA:FIN
@@ -1528,7 +1458,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: W6.TEMP1
     offset: 56
     port: TMPCC2.Hostlink
     temp: :TEMP1
@@ -1543,7 +1472,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: W6.TEMP2
     offset: 57
     port: TMPCC2.Hostlink
     temp: :TEMP2
@@ -1558,7 +1486,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S3.TEMP1
     offset: 52
     port: TMPCC2.Hostlink
     temp: :A:TEMP1
@@ -1573,7 +1500,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S3.TEMP2
     offset: 53
     port: TMPCC2.Hostlink
     temp: :A:TEMP2
@@ -1588,7 +1514,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S3.TEMP3
     offset: 54
     port: TMPCC2.Hostlink
     temp: :B:TEMP1
@@ -1603,7 +1528,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: S3.TEMP4
     offset: 55
     port: TMPCC2.Hostlink
     temp: :B:TEMP2
@@ -1618,7 +1542,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: SHTR2.TEMP1
     offset: 22
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1633,7 +1556,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: SHTR2.TEMP2
     offset: 23
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1648,7 +1570,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: SHTR2.TEMP3
     offset: 24
     port: TMPCC3.Hostlink
     temp: :TEMP3
@@ -1663,7 +1584,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: W7.TEMP1
     offset: 30
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1678,7 +1598,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: W7.TEMP2
     offset: 31
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1693,7 +1612,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: HO8.TEMP1
     offset: 28
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1708,7 +1626,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: HO8.TEMP2
     offset: 29
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1723,7 +1640,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB5.TEMP1
     offset: 48
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1738,7 +1654,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: AB5.TEMP2
     offset: 49
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1753,7 +1668,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: HO9.TEMP1
     offset: 46
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1768,7 +1682,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: HO9.TEMP2
     offset: 47
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1783,7 +1696,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH50.TEMP1
     offset: 34
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1798,7 +1710,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH50.TEMP2
     offset: 35
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1813,7 +1724,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH50.TEMP3
     offset: 36
     port: TMPCC3.Hostlink
     temp: :TEMP3
@@ -1828,7 +1738,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH51.TEMP1
     offset: 40
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1843,7 +1752,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH51.TEMP2
     offset: 41
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1858,7 +1766,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH51.TEMP3
     offset: 42
     port: TMPCC3.Hostlink
     temp: :TEMP3
@@ -1873,7 +1780,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH52.TEMP1
     offset: 10
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1888,7 +1794,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH52.TEMP2
     offset: 11
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1903,7 +1808,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH52.TEMP3
     offset: 12
     port: TMPCC3.Hostlink
     temp: :TEMP3
@@ -1918,7 +1822,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH53.TEMP1
     offset: 16
     port: TMPCC3.Hostlink
     temp: :TEMP1
@@ -1933,7 +1836,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH53.TEMP2
     offset: 17
     port: TMPCC3.Hostlink
     temp: :TEMP2
@@ -1948,7 +1850,6 @@ entities:
     lolo: -273
     lopr: 0
     low: -273
-    name: PATCH53.TEMP3
     offset: 18
     port: TMPCC3.Hostlink
     temp: :TEMP3
@@ -1969,7 +1870,6 @@ entities:
     ilk2: Gauges1-12&21&Baratron
     ilk3: JV1-3/JS1Closed
     ilk4: JEHSOpen/JS1Closed
-    name: FM.Valve
     port: VLVCC1.Hostlink
     vlvcc: BL15I-VA-VLVCC-01
 
@@ -1987,7 +1887,6 @@ entities:
     ilk2: IMG-03/FABSB-01&V2
     ilk3: PIRG-02
     ilk4: PIRG-03
-    name: GV1
     port: VLVCC1.Hostlink
     vlvcc: BL15I-VA-VLVCC-01
 
@@ -2005,7 +1904,6 @@ entities:
     ilk2: IMG-04/FABSB-01&V2
     ilk3: PIRG-03
     ilk4: PIRG-04
-    name: GV2
     port: VLVCC1.Hostlink
     vlvcc: BL15I-VA-VLVCC-01
 
@@ -2019,7 +1917,6 @@ entities:
     gilk5: GAUGE-04
     ilk0: Air Pressure
     ilk15: Valve fault
-    name: AB2.Valve
     port: VLVCC1.Hostlink
     vlvcc: BL15I-VA-VLVCC-01
 
@@ -2037,7 +1934,6 @@ entities:
     ilk2: IMG-05
     ilk3: PIRG-04
     ilk4: PIRG-05
-    name: GV3
     port: VLVCC1.Hostlink
     vlvcc: BL15I-VA-VLVCC-01
 
@@ -2055,7 +1951,6 @@ entities:
     ilk2: J-IMG-01
     ilk3: PIRG-04
     ilk4: J-PIRG-01
-    name: JGV1
     port: VLVCC1.Hostlink
     vlvcc: BL15I-VA-VLVCC-01
 
@@ -2077,7 +1972,6 @@ entities:
     ilk2: IMG-06
     ilk3: PIRG-05
     ilk4: PIRG-06
-    name: GV4
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2099,7 +1993,6 @@ entities:
     ilk2: IMG-07
     ilk3: PIRG-06
     ilk4: PIRG-07
-    name: GV5
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2121,7 +2014,6 @@ entities:
     ilk2: IMG-08
     ilk3: PIRG-07
     ilk4: PIRG-08
-    name: GV6
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2143,7 +2035,6 @@ entities:
     ilk2: IMG-09
     ilk3: PIRG-08
     ilk4: PIRG-09
-    name: GV7
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2166,7 +2057,6 @@ entities:
     ilk3: V8 Open
     ilk5: V10 Open/SHTR2 Close
     ilk6: EH2 Temperatures
-    name: SHTR1.Valve
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2188,7 +2078,6 @@ entities:
     ilk2: IMG-10 & IMG-11
     ilk3: PIRG-09
     ilk4: PIRG-10 & PIRG-11
-    name: GV8
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2210,7 +2099,6 @@ entities:
     ilk2: IMG-12
     ilk3: PIRG-11
     ilk4: PIRG-12
-    name: GV9
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2230,7 +2118,6 @@ entities:
     ilk1: IMG-12
     ilk15: Valve fault
     ilk2: IONP-13 INTLK
-    name: GV10
     port: VLVCC2.Hostlink
     vlvcc: BL15I-VA-VLVCC-02
 
@@ -2248,7 +2135,6 @@ entities:
     ilk5: EH1 Temperatures
     ilk6: V10 Open
     ilk7: Baratron-01
-    name: SHTR2.Valve
     port: VLVCC3.Hostlink
     vlvcc: BL15I-VA-VLVCC-03
 
@@ -2259,7 +2145,6 @@ entities:
     gilk2: BARATRON-01
     ilk0: Air Pressure
     ilk15: Device fault
-    name: D1.Valve
     port: VLVCC3.Hostlink
     vlvcc: BL15I-VA-VLVCC-03
 
@@ -2270,7 +2155,6 @@ entities:
     gilk2: BARATRON-01
     ilk0: Air Pressure
     ilk15: Device fault
-    name: D2.Valve
     port: VLVCC3.Hostlink
     vlvcc: BL15I-VA-VLVCC-03
 
@@ -2281,7 +2165,6 @@ entities:
     gilk2: BARATRON-01
     ilk0: Air Pressure
     ilk15: Device fault
-    name: SHEAD.Valve
     port: VLVCC3.Hostlink
     vlvcc: BL15I-VA-VLVCC-03
 
@@ -2292,7 +2175,6 @@ entities:
     gilk2: BARATRON-01
     ilk0: Air Pressure
     ilk15: Device fault
-    name: D3.Valve
     port: VLVCC3.Hostlink
     vlvcc: BL15I-VA-VLVCC-03
 
@@ -2303,7 +2185,6 @@ entities:
     gilk2: BARATRON-01
     ilk0: Air Pressure
     ilk15: Device fault
-    name: D5.Valve
     port: VLVCC3.Hostlink
     vlvcc: BL15I-VA-VLVCC-03
 
@@ -2314,7 +2195,6 @@ entities:
     gilk2: BARATRON-01
     ilk0: Air Pressure
     ilk15: Device fault
-    name: DETSH.Valve
     port: VLVCC3.Hostlink
     vlvcc: BL15I-VA-VLVCC-03
 
@@ -2356,7 +2236,6 @@ entities:
     ilk5: VFM
     ilk6: Downstream Water
     interlock: :INT1
-    name: VLVCC1.Interlock1
     port: VLVCC1.Hostlink
 
   - type: dlsPLC.interlock
@@ -2377,7 +2256,6 @@ entities:
     ilk8: Water Flows
     ilk9: Cryos Running
     interlock: :INT2
-    name: VLVCC1.Interlock2
     port: VLVCC1.Hostlink
 
   - type: dlsPLC.interlock
@@ -2389,7 +2267,6 @@ entities:
     ilk2: QBPM-02
     ilk4: Shutter-2
     interlock: :INT1
-    name: VLVCC2.Interlock1
     port: VLVCC2.Hostlink
 
   - type: dlsPLC.interlock
@@ -2413,7 +2290,6 @@ entities:
     ilk8: Slits-01 B1
     ilk9: Slits-01 B2
     interlock: :INT1
-    name: TMPCC1.Interlock1
     port: TMPCC1.Hostlink
 
   - type: dlsPLC.interlock
@@ -2437,7 +2313,6 @@ entities:
     ilk8: DCM 1st Xtal T6
     ilk9: DCM 1st Xtal T7
     interlock: :INT2
-    name: TMPCC1.Interlock2
     port: TMPCC1.Hostlink
 
   - type: dlsPLC.interlock
@@ -2456,7 +2331,6 @@ entities:
     ilk8: DCM Temp 6
     ilk9: DCM Temp 7
     interlock: :INT3
-    name: TMPCC1.Interlock3
     port: TMPCC1.Hostlink
 
   - type: dlsPLC.interlock
@@ -2477,7 +2351,6 @@ entities:
     ilk8: Laue Xtal Sel Motor
     ilk9: Main BS Temp 1
     interlock: :INT1
-    name: TMPCC2.Interlock1
     port: TMPCC2.Hostlink
 
   - type: dlsPLC.interlock
@@ -2489,7 +2362,6 @@ entities:
     ilk2: VFM Mask
     ilk3: VFM Mirror
     interlock: :INT3
-    name: TMPCC2.Interlock3
     port: TMPCC2.Hostlink
 
   - type: dlsPLC.interlock
@@ -2505,7 +2377,6 @@ entities:
     ilk6: Shutter-01 T2
     ilk7: Shutter-01 T3
     interlock: :INT4
-    name: TMPCC2.Interlock4
     port: TMPCC2.Hostlink
 
   - type: dlsPLC.interlock
@@ -2516,7 +2387,6 @@ entities:
     ilk1: Shutter-2 Temp 2
     ilk2: Shutter-2 Temp 3
     interlock: :INT2
-    name: TMPCC3.Interlock2
     port: TMPCC3.Hostlink
 
   - type: dlsPLC.interlock
@@ -2532,7 +2402,6 @@ entities:
     ilk6: Absorber-05 Temp 1
     ilk7: Absorber-05 Temp 2
     interlock: :INT3
-    name: TMPCC3.Interlock3
     port: TMPCC3.Hostlink
 
   - type: dlsPLC.interlock
@@ -2541,7 +2410,6 @@ entities:
     device: BL15I-VA-VLVCC-01
     ilk0: IMG-01
     interlock: :INT3
-    name: VLVCC1.Interlock3
     port: VLVCC1.Hostlink
 
   - type: dlsPLC.overrideRequestMain
@@ -3139,7 +3007,7 @@ entities:
     ionp1: BL15I-VA-IONP-03
     name: SPACE3
     pirg1: BL15I-VA-PIRG-03
-    valve1: GV1
+    valve1: BL15I-VA-VALVE-01
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-04
@@ -3148,7 +3016,7 @@ entities:
     ionp1: BL15I-VA-IONP-04
     name: SPACE4
     pirg1: BL15I-VA-PIRG-04
-    valve1: GV2
+    valve1: BL15I-VA-VALVE-02
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-05
@@ -3157,7 +3025,7 @@ entities:
     ionp1: BL15I-VA-IONP-05
     name: SPACE5
     pirg1: BL15I-VA-PIRG-05
-    valve1: GV3
+    valve1: BL15I-VA-VALVE-03
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-06
@@ -3166,7 +3034,7 @@ entities:
     ionp1: BL15I-VA-IONP-06
     name: SPACE6
     pirg1: BL15I-VA-PIRG-06
-    valve1: GV4
+    valve1: BL15I-VA-VALVE-04
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-07
@@ -3175,7 +3043,7 @@ entities:
     ionp1: BL15I-VA-IONP-07
     name: SPACE7
     pirg1: BL15I-VA-PIRG-07
-    valve1: GV5
+    valve1: BL15I-VA-VALVE-05
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-08
@@ -3184,7 +3052,7 @@ entities:
     ionp1: BL15I-VA-IONP-08
     name: SPACE8
     pirg1: BL15I-VA-PIRG-08
-    valve1: GV6
+    valve1: BL15I-VA-VALVE-06
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-09
@@ -3193,7 +3061,7 @@ entities:
     ionp1: BL15I-VA-IONP-09
     name: SPACE9
     pirg1: BL15I-VA-PIRG-09
-    valve1: GV7
+    valve1: BL15I-VA-VALVE-07
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-10
@@ -3210,7 +3078,7 @@ entities:
     pirg1: BL15I-VA-PIRG-10
     pirg2: BL15I-VA-PIRG-11
     pirg3: BL15I-VA-PIRG-12
-    valve1: GV8
+    valve1: BL15I-VA-VALVE-08
 
   - type: water.flow
     C: 60

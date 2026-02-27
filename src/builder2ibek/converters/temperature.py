@@ -48,4 +48,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("indx")
         entity.remove("crate")
 
+        entity.remove("name")
         entity.type = "dlsPLC.temperature"

@@ -180,6 +180,14 @@ ibek-support-dls/    # submodule: DLS entity models
   `databases.args`.  See
   [docs/tutorials/create-support-yaml-advanced.md](docs/tutorials/create-support-yaml-advanced.md).
 
+**Auto-substitution entities (`auto_*`)**
+: Entity types like `module.auto_xxxx` in builder XML correspond to a database
+  template `xxxx.template` in the `db/` directory of support module `module`.
+  For example, `mks937a.auto_mks937aInterlock` → `mks937aInterlock.template`
+  in `mks937a/db/`. These need a support YAML entity model with parameters and
+  a `databases` section only (no `pre_init`/`post_init`). Use `.*:` in
+  `databases.args` and drop `name` (gui label, not a cross-reference).
+
 **`builder2ibek xml2yaml`**
 : Auto-generates `ioc.yaml` from builder XML. Converters in `converters/` handle
   module-specific remapping. Output should be reviewed and may need manual

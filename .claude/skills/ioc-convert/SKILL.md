@@ -134,14 +134,18 @@ entity.add_entity({"type": "dlsPLC.read100", "device": entity.device, ...})
 entity.delete_me()
 ```
 
-**XML template entities (`auto_xml_*`)** — if the ioc.yaml contains entities
-with `auto_xml_` class names (e.g. `GIGE-BUILDER.auto_xml_GIGE_FIT_TEMPLATE`),
-these are XML template expansions. A single XML element expands to multiple
-child entities from other support modules. The `auto_xml_*` entity itself
-cannot be represented as a single ibek entity model — it needs a converter
-that expands it into the constituent entities (or the IOC XML must be
-rewritten to use the child entities directly). Locate the template XML file
-in the same `etc/makeIocs/` directory to understand what it expands to.
+**Auto-substitution entities (`auto_*`)** — entity types like
+`module.auto_xxxx` correspond to a database template `xxxx.template` in the
+`db/` directory of the support module `module`. For example:
+- `mks937a.auto_mks937aInterlock` → `mks937aInterlock.template` in `mks937a/db/`
+- `BL04I.auto_BL04I_flux` → `BL04I_flux.template` in `BL04I/db/`
+
+These need a support YAML entity model with just parameters and a `databases`
+section — no `pre_init` or `post_init`. The parameters come from the XML
+attributes; the database file is `$(<MODULE>)/db/xxxx.template`. Use `.*:` in
+`databases.args` to pass all parameters through, and drop `name` if present
+(it is a gui label, not a cross-reference). Check the `# % macro` lines in
+the template to identify required vs optional parameters.
 
 After any converter change: re-run xml2yaml and repeat 1b until the ioc.yaml
 is clean of converter-fixable issues.
@@ -206,6 +210,17 @@ For each module, construct a prompt containing **all** of the following:
 > - `STREAM_PROTOCOL_PATH` is handled globally — do NOT add it to pre_init.
 > - Macros without a default in the compiled `.db` file must be ibek parameters.
 >   Macros with a default should be optional parameters so instances can override.
+> - **Infer parameter types from the db template** — do not default everything
+>   to `type: str`. Read the `.db`/`.template` file and check how each macro is
+>   used in EPICS record fields:
+>   - Numeric fields (DRVH, DRVL, DOL, HIGH, LOW, HOPR, LOPR, HIHI, LOLO,
+>     VAL on ao/ai/calc, EGU scaling fields) → `type: float`
+>   - Integer fields (SCAN index, ADDR, channel, slot, NAXES, PLC number,
+>     SREV, PREC) → `type: int`
+>   - String/PV fields (DESC, INP, OUT, PORT, device names) → `type: str`
+>   - This matters because xml2yaml preserves YAML's native typing: `0.0001`
+>     becomes a float, `42` becomes an int. If the support YAML says
+>     `type: str` but the ioc.yaml value is a float, schema validation fails.
 > - Support YAML path (DLS-specific): `ibek-support-dls/<module>/<module>.ibek.support.yaml`
 > - Support YAML path (community): `ibek-support/<module>/<module>.ibek.support.yaml`
 > - Install file path: `ibek-support-dls/<module>/<module>.install.yml`

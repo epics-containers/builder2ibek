@@ -1289,13 +1289,3 @@ entities:
     name: SPACE1
     pirg: BL04I-VA-GPIRG-01
     valve: FE04I-VA-VALVE-02
-
-  - type: leybold.centerOne
-    HIGH: 0.0005
-    HIHI: 0.0008
-    LOLO: 1e-06
-    LOW: 2e-06
-    P: BL04I-VA-ESVG-01
-    PORT: LPORT
-    SCAN: 5 second
-    name: LB1

@@ -15,20 +15,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         id = int(id_val)  # type: ignore
         id_enum = f"{id:02d}"
         entity.id = id_enum
-    elif entity_type in [
-        "NX102_readReal",
-        "read100",
-        "externalValve",
-        "dummyValve",
-        "overrideRequestMain",
-        "vacValveGroup",
-    ]:
-        entity.remove("name")
-    elif entity_type in ["vacValve", "vacValveDebounce"]:
-        # name is not always present but is required by the auto-converted
-        # dlsPLC.ibek.support.yaml - investigate why it is creating name=id
-        # and fix the auto-conversion instead of having this workaround
-        entity.name = entity.get("name") or entity.get("device")
+
+    # name is a gui association label, not cross-referenced by any entity
+    entity.remove("name")
 
     # remove blank interlock name fields
     new_entity = entity.copy()

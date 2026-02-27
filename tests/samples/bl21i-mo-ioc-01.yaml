@@ -20,5 +20,5 @@ entities:
   - type: pvlogging.PvLogging
     access_file: /epics/support/pvlogging/src/access.acf
 
-  - type: pvlogging.BlacklistPv
+  - type: pvlogging.BlacklistPvs
     blacklist_file: /epics/ioc/config/pvlogging_excl.txt

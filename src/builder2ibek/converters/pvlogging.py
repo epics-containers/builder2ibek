@@ -30,6 +30,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
 
     if entity_type == "BlacklistPv":
+        entity.type = "pvlogging.BlacklistPvs"
         if not blacklist:
             # blacklistFile and headers definitions
             global filename
@@ -41,7 +42,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         else:
             # remove previous blacklist entity, we only need one with all PVs
             for ent in ioc.entities:
-                if ent["type"] == "pvlogging.BlacklistPv":
+                if ent["type"] == "pvlogging.BlacklistPvs":
                     ioc.entities.remove(ent)
                     break
 

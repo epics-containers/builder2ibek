@@ -330,7 +330,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: GBC
     offset: 10
     port: ty_40_2
     temp: :TEMP1
@@ -365,7 +364,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB1
     offset: 12
     port: ty_40_2
     temp: :TEMP3
@@ -383,7 +381,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB2
     offset: 13
     port: ty_40_2
     temp: :TEMP4
@@ -401,7 +398,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: S1
     offset: 16
     port: ty_40_2
     temp: :TEMP1
@@ -419,7 +415,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB3
     offset: 17
     port: ty_40_2
     temp: :TEMP2
@@ -437,7 +432,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB4
     offset: 18
     port: ty_40_2
     temp: :TEMP3
@@ -455,7 +449,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB5
     offset: 19
     port: ty_40_2
     temp: :TEMP4
@@ -473,7 +466,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB6
     offset: 22
     port: ty_40_2
     temp: :TEMP5
@@ -491,7 +483,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB7
     offset: 23
     port: ty_40_2
     temp: :TEMP6
@@ -509,7 +500,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB8
     offset: 24
     port: ty_40_2
     temp: :TEMP7
@@ -527,7 +517,6 @@ entities:
     lopr: 0
     low: 0
     lsv: NO_ALARM
-    name: .OB9
     offset: 25
     port: ty_40_2
     temp: :TEMP8
@@ -543,7 +532,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: OH
     offset: 28
     port: ty_40_2
     temp: :TEMP1
@@ -559,7 +547,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: .OB10
     offset: 29
     port: ty_40_2
     temp: :TEMP2
@@ -575,7 +562,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: .OB11
     offset: 30
     port: ty_40_2
     temp: :TEMP3
@@ -591,7 +577,6 @@ entities:
     lolo: 0
     lopr: 0
     low: 0
-    name: .OB12
     offset: 31
     port: ty_40_2
     temp: :TEMP4
