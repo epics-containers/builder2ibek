@@ -177,6 +177,11 @@ For each module, construct a prompt containing **all** of the following:
 > `/dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/`
 > Check `# % macro` lines to identify required vs optional macros.
 >
+> For a systematic guide to reading builder.py files — including how to
+> identify classes, extract parameters with types and defaults, find database
+> macros, and determine pre_init/post_init commands — see
+> [builder-py-analysis.md](../../shared/builder-py-analysis.md).
+>
 > Do NOT call `./update-schema` — the main agent will do that after all
 > subagents complete.
 
@@ -330,16 +335,8 @@ Then read:
 /dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/<version>/bin/vxWorks-ppc604_long/<IOC-NAME>.boot
 ```
 
-Expected differences (do not flag these as problems):
-
-| Original (VxWorks) | Generated (container) | Notes |
-|---|---|---|
-| Serial port paths `/ty/40/0` etc. | `/dev/tty400` etc. | Normal VxWorks → Linux translation |
-| `DLS8515DevConfigure(port, baud, ...)` for every port | `asynSetOption` only for non-default settings | Asyn defaults to 9600/8/1/N; only overrides needed |
-| `STREAM_PROTOCOL_PATH = calloc/strcat(...)` with absolute prod paths | `epicsEnvSet STREAM_PROTOCOL_PATH /epics/runtime/protocol/` | Container-relative path — correct |
-| `ErTimeProviderInit`, `installLastResortEventProvider`, `syncSysClock` | Not present | VxWorks timing calls; not used in containers |
-| `ld < bin/...munch`, `dbLoadDatabase "dbd/..."` | `dbLoadDatabase dbd/ioc.dbd` | VxWorks binary load replaced by standard dbd load |
-| `asSetFilename` with absolute prod path | Container-relative `/epics/support/pvlogging/src/access.acf` | Expected |
+Expected differences (do not flag these as problems) — see
+[vxworks-to-rtems-differences.md](../shared/vxworks-to-rtems-differences.md).
 
 If commands from the original are missing and not in the table, the relevant
 entity model's `pre_init` or `post_init` section needs updating.
