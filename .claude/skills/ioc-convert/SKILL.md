@@ -112,6 +112,15 @@ entity.add_entity({"type": "dlsPLC.read100", "device": entity.device, ...})
 entity.delete_me()
 ```
 
+**XML template entities (`auto_xml_*`)** — if the ioc.yaml contains entities
+with `auto_xml_` class names (e.g. `GIGE-BUILDER.auto_xml_GIGE_FIT_TEMPLATE`),
+these are XML template expansions. A single XML element expands to multiple
+child entities from other support modules. The `auto_xml_*` entity itself
+cannot be represented as a single ibek entity model — it needs a converter
+that expands it into the constituent entities (or the IOC XML must be
+rewritten to use the child entities directly). Locate the template XML file
+in the same `etc/makeIocs/` directory to understand what it expands to.
+
 After any converter change: re-run xml2yaml and repeat 1b until the ioc.yaml
 is clean of converter-fixable issues.
 

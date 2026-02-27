@@ -25,6 +25,40 @@ The primary file is `builder.py`, but some modules split logic across multiple
 
 ---
 
+## Step 1b: Check for XML template files
+
+Some modules define **XML template files** in `etc/makeIocs/` alongside the
+IOC XMLs. These are XML files with `$(macro)` parameters that expand inline
+into multiple child entities when included by an IOC XML.
+
+```bash
+# Look for XML files that use $(macro) syntax — these are templates
+grep -l '$(.*)'  /dls_sw/prod/R3.14.12.7/support/<module>/<version>/etc/makeIocs/*.xml 2>/dev/null
+```
+
+The builder system auto-generates `auto_xml_<TEMPLATE_NAME>` classes from
+these files. For example, `GIGE-FIT-TEMPLATE_G158B.xml` becomes the class
+`auto_xml_GIGE_FIT_TEMPLATE_G158B`.
+
+**How XML templates differ from db AutoSubstitution:**
+
+| Feature | db AutoSubstitution (`auto_*`) | XML template (`auto_xml_*`) |
+|---|---|---|
+| Source | `.template` / `.db` file in `db/` | `.xml` file in `etc/makeIocs/` |
+| What it produces | A single `dbLoadRecords` call | Multiple child entities (each with its own db, init commands, etc.) |
+| Parameters | db macro declarations (`# % macro`) | `$(macro)` references in XML attributes |
+| In ibek | One entity model with `databases` | Cannot be represented as a single entity — must expand to constituent entities |
+
+**Reporting XML templates:**
+- List the template parameters (extracted from `$(macro)` and `$(macro=default)` references)
+- List what child entities it expands to (read the template XML)
+- Note which support modules the child entities come from — these are the
+  real dependencies
+
+XML templates can appear in both BUILDER modules and support modules.
+
+---
+
 ## Step 2: Identify classes and their base types
 
 Each Python class in builder.py typically corresponds to one user-facing

@@ -72,6 +72,19 @@ Read the XML file. Extract:
 
 Group elements by support module.
 
+**XML template entities (`auto_xml_*`)**: Some entities use classes like
+`GIGE-BUILDER.auto_xml_GIGE_FIT_TEMPLATE_G158B`. These are XML template
+expansions — a single element in the IOC XML that expands to multiple child
+entities from other support modules. When you encounter an `auto_xml_*` class:
+
+1. Locate the template XML file — it will be in the same `etc/makeIocs/`
+   directory as the IOC XML, named after the template (e.g.
+   `GIGE-FIT-TEMPLATE_G158B.xml`)
+2. Read the template to see what child entities it expands to
+3. In the report, list it as an XML template and note what it expands to
+   (e.g. "Expands to: ADAravis.aravisCamera, ADCore.NDTransform, ...")
+4. The child entities' support modules are the real dependencies
+
 ---
 
 ## Step 4 — Produce the report

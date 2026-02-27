@@ -44,11 +44,18 @@ ls /dls_sw/prod/R3.14.12.7/support/$0/<version>/etc/*.py
 Read every `.py` file found. The primary file is `builder.py` but some modules
 split across multiple files.
 
+**Note**: `builder.py` may be empty — this means the module defines no Python
+classes. It may still define `auto_` classes (from `.template` db files) and/or
+`auto_xml_` classes (from XML template files). Check the db/ directory for
+`.template` files and `etc/makeIocs/` for XML files containing `$(macro)`
+references.
+
 ### 3. Analyze using the shared methodology
 
 Follow the step-by-step procedure in
 [builder-py-analysis.md](../shared/builder-py-analysis.md) to extract:
 
+- XML template files and their child entities (Step 1b)
 - Classes and their base types (Step 2)
 - Parameters with types, defaults, and required/optional status (Step 3)
 - Database files and their macros (Step 4)
@@ -130,3 +137,8 @@ Source: /dls_sw/prod/R3.14.12.7/support/<module>/<version>/etc/builder.py
   to Jinja2 or any other format
 - If a class has no init commands, say "(none)" rather than omitting the section
 - List dependencies from both the `Dependencies` tuple and any `Ident` parameters
+- If the module has **XML template files** (`auto_xml_*` classes), report them
+  in a separate "XML Templates" section showing: template parameters, what
+  child entities they expand to, and which support modules those children
+  come from. These are composition layers — the real logic lives in the
+  child entities' support modules.
