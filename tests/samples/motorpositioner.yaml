@@ -22,6 +22,7 @@ entities:
     name: BRICK_2
 
   - type: pmac.GeoBrick
+    P: BL04I-MO-MAPT-01
     name: GeoBrick_2
     pmacAsynPort: BRICK_2
 
