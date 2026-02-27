@@ -18,19 +18,22 @@ not how to translate it. Use `/ioc-convert` for the ibek translation workflow.
 
 ### 1. Locate the module
 
-Find the latest version:
+Search prod for the module, starting with R3.14.12.7 (the most common version),
+then trying other EPICS versions if not found:
 
 ```bash
+# Check R3.14.12.7 first
 ls /dls_sw/prod/R3.14.12.7/support/$0/
+
+# If not found, discover all EPICS versions and try each
+for v in $(ls -d /dls_sw/prod/R* | sort -rV | xargs -n1 basename); do
+  ls /dls_sw/prod/$v/support/$0/ 2>/dev/null && break
+done
 ```
 
-Pick the latest version directory. If not found in `prod`, try:
+Pick the highest version directory within the module (e.g. `1-7` over `1-6`).
 
-```bash
-ls /dls_sw/work/R3.14.12.7/support/$0/
-```
-
-If the module is not found at all, report this and stop.
+If the module is not found in any EPICS version, report this and stop.
 
 ### 2. Read all source files
 
