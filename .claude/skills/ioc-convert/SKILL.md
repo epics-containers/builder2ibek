@@ -56,6 +56,22 @@ Derive `IOC_NAME` = lowercase XML filename without extension.
     `cp -r <services-repo>/services/.ioc_template/ $INSTANCE_DIR`
   - Otherwise: `mkdir -p $INSTANCE_DIR/config/`
 
+Read the `_RELEASE` file next to the XML to resolve support module paths:
+
+1. Read `<xml-dir>/<IOC-NAME>_RELEASE` (where `<IOC-NAME>` is the uppercase
+   XML filename without extension, e.g. `BL21I-VA-IOC-01_RELEASE`)
+2. Read the BUILDER's `configure/RELEASE` (or `configure/RELEASE.<arch>.Common`)
+   to get the `SUPPORT=` macro value
+3. Substitute `$(SUPPORT)` in each `_RELEASE` line to get absolute paths
+4. Record a **module path table** mapping module name → resolved path, e.g.:
+   ```
+   ethercat → /dls_sw/prod/R3.14.12.7/support/ethercat/7-2
+   rackFan  → /dls_sw/prod/R3.14.12.7/support/rackFan/2-12
+   ```
+
+This table will be passed to subagents in Phases 2 and 4 so they can find
+`builder.py` and `db/` files without guessing directory names.
+
 Run the conversion:
 ```bash
 uv run builder2ibek xml2yaml $0 --yaml $INSTANCE_DIR/config/ioc.yaml
@@ -169,11 +185,13 @@ For each module, construct a prompt containing **all** of the following:
 > - `ibek-support-dls/cmsIon/cmsIon.ibek.support.yaml` — name dropped (leaf entity)
 > - `ibek-support-dls/digitelMpc/digitelMpc.ibek.support.yaml`
 >
-> Find builder.py at:
+> Find builder.py and db files using the **known path from _RELEASE** provided
+> in the module-specific context below — this gives the exact module directory
+> name and version. If the known path is not provided, fall back to:
 > `/dls_sw/prod/R3.14.12.7/support/<module>/<version>/etc/builder.py`
 > (list `/dls_sw/prod/R3.14.12.7/support/<module>/` to find the version)
 >
-> Find db files at:
+> Find db files at: `<known-path>/db/` or
 > `/dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/`
 > Check `# % macro` lines to identify required vs optional macros.
 >
@@ -190,6 +208,11 @@ For each module, construct a prompt containing **all** of the following:
 **Module-specific context** (filled in by main agent per module):
 
 > Module name: `<module>`
+>
+> Known path from _RELEASE: `/dls_sw/prod/R3.14.12.7/support/<module>/<version>`
+> (Use this path to find `etc/builder.py` and `db/` files. If you need the
+> latest version instead, list the parent directory — but this confirms the
+> correct module directory name.)
 >
 > Entity types used in this IOC (from ioc.yaml):
 > - `<module>.<EntityA>` — parameters seen: `P=BL19I-VA-IMG-01`, `name=IMG01`, ...
@@ -274,6 +297,9 @@ For each error group, construct a prompt containing:
 
 > Module: `<module>`
 >
+> Known path from _RELEASE: `/dls_sw/prod/R3.14.12.7/support/<module>/<version>`
+> (Use this to find `etc/builder.py` and `db/` files.)
+>
 > Error(s) from `ibek runtime generate2`:
 > ```
 > <paste exact error messages>
@@ -284,7 +310,7 @@ For each error group, construct a prompt containing:
 > <paste full current content>
 > ```
 >
-> Relevant db file(s) to check: `/dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/<file>.db`
+> Relevant db file(s) to check: `<known-path>/db/<file>.db`
 >
 > Fix the support YAML (and/or converter if needed). Do NOT run ./update-schema
 > or xml2yaml — the main agent handles re-runs. Return a brief summary of what
