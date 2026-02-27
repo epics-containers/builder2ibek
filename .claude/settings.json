@@ -9,9 +9,7 @@
       "Edit(/epics/**)",
       "Read(/epics/**)",
       "Write(/epics/**)",
-      "Bash(*:*)",
-      "Bash(python3 -c \":*)",
-      "Bash(grep)"
+      "Bash(*)"
     ],
     "additionalDirectories": [
       "/workspaces/builder2ibek/.claude/skills",
