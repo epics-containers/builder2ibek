@@ -48,15 +48,17 @@ tell the user to run `/ioc-convert $0` first.
 
 ## Step 2 — Set up ibek environment
 
+Create an isolated `EPICS_ROOT` for this session so multiple checks can run in
+parallel without conflicting:
 ```bash
-mkdir -p /epics/ioc
+export EPICS_ROOT=$(mktemp -d /tmp/epics-ioc-check-XXXXXX)
+mkdir -p $EPICS_ROOT/ioc
 ibek dev instance <services-repo>/services/$IOC_NAME
 ./update-schema
 ```
 
-- `ibek dev instance` symlinks `/epics/ioc/config` → the instance config dir
-- `./update-schema` symlinks all `ibek-support*` YAMLs into `/epics/ibek-defs/`
-  and regenerates `/epics/ibek-defs/ioc.schema.json`
+`EPICS_ROOT` must be exported so that `ibek` and `./update-schema` use the
+isolated directory tree instead of the shared `/epics/`.
 
 ---
 
@@ -65,6 +67,8 @@ ibek dev instance <services-repo>/services/$IOC_NAME
 ```bash
 uvx --python 3.13 ibek runtime generate2 --no-pvi <services-repo>/services/$IOC_NAME/config
 ```
+
+(The `EPICS_ROOT` env var ensures output goes to `$EPICS_ROOT/runtime/`.)
 
 **If generation fails**, categorise and report the errors using this table,
 then **stop** — do not make any fixes:
@@ -84,7 +88,7 @@ then **stop** — do not make any fixes:
 
 ## Step 4 — Validate st.cmd
 
-Read `/epics/runtime/st.cmd`.
+Read `$EPICS_ROOT/runtime/st.cmd`.
 
 Find the original VxWorks boot script:
 - Derive `BLXX` from the IOC name: first two dash-delimited fields
@@ -115,7 +119,7 @@ table below.
 
 ## Step 5 — Validate ioc.subst
 
-Read `/epics/runtime/ioc.subst`. For each `file` block verify:
+Read `$EPICS_ROOT/runtime/ioc.subst`. For each `file` block verify:
 - The db file path looks plausible
 - All expected macros are present in the `pattern`
 - Macro values match the ioc.yaml entity parameters
@@ -137,13 +141,13 @@ accessible, run:
 ```bash
 uv run builder2ibek db-compare \
     /dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/<version>/db/<IOC-NAME>_expanded.db \
-    /epics/runtime/ioc.db \
+    $EPICS_ROOT/runtime/ioc.db \
     --output /tmp/compare.diff
 ```
 then read `/tmp/compare.diff` and report missing records, extra records, and
 field differences.
 
-Note: `/epics/runtime/ioc.db` is only generated inside a Generic IOC
+Note: `$EPICS_ROOT/runtime/ioc.db` is only generated inside a Generic IOC
 devcontainer where `msi` can expand `ioc.subst` with all support `/db` paths
 present. If it is absent, skip db-compare and validate by inspection only.
 

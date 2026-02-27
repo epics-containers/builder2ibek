@@ -16,6 +16,22 @@ fixing, to keep the main context small and speed up large IOCs.
 
 ---
 
+## Phase 0 — Create isolated EPICS_ROOT (main agent)
+
+Create a unique temporary directory for this agent's ibek state. This ensures
+multiple `/ioc-convert` invocations can run in parallel without conflicting
+over `/epics/runtime/`, `/epics/ibek-defs/`, or `/epics/ioc/`.
+
+```bash
+export EPICS_ROOT=$(mktemp -d /tmp/epics-ioc-convert-XXXXXX)
+```
+
+All subsequent `ibek` and `./update-schema` commands in this session (and in
+subagent prompts) must have `EPICS_ROOT` set to this value. The `ibek` CLI
+reads `EPICS_ROOT` from the environment and derives all paths from it.
+
+---
+
 ## Phase 1 — Setup and XML conversion (main agent)
 
 ### 1a. Resolve the services repo
@@ -34,10 +50,16 @@ Resolve the services repo using the following priority order:
 3. **Fallback** — read `.claude/skills/ioc-convert/last-services-repo` if the
    inferred path does not exist on disk.
 
-If the resolved path does not exist locally, clone it:
+If the resolved path does not exist locally, try to clone it:
 ```bash
 git clone git@gitlab.diamond.ac.uk:controls/containers/beamline/<services-repo-name> /workspaces/<services-repo-name>
 ```
+If the clone fails (e.g. the repo doesn't exist yet), create a minimal skeleton:
+```bash
+mkdir -p /workspaces/<services-repo-name>/services/$IOC_NAME/config
+```
+This is enough for the conversion to proceed — the ioc.yaml will be written
+into the config directory.
 
 Tell the user which services repo is being used and how it was resolved.
 
@@ -248,12 +270,15 @@ should be"). Note these for manual follow-up.
 
 ## Phase 3 — Generate runtime assets (main agent)
 
-Set up the ibek environment:
+Set up the ibek environment (using the isolated `EPICS_ROOT` from Phase 0):
 ```bash
-mkdir -p /epics/ioc
+mkdir -p $EPICS_ROOT/ioc
 ibek dev instance <services-repo>/services/$IOC_NAME
 ./update-schema
 ```
+
+`EPICS_ROOT` must be exported in the shell so that `ibek dev instance`,
+`./update-schema`, and `generate2` all use the isolated directory tree.
 
 If any converters or support YAMLs were created or modified in Phase 2, run
 the builder2ibek test suite before generation to catch regressions:
@@ -358,7 +383,7 @@ must skip entities whose `name` is still present after conversion.
 
 ### 5a. Validate st.cmd
 
-Read `/epics/runtime/st.cmd`. Verify:
+Read `$EPICS_ROOT/runtime/st.cmd`. Verify:
 
 - Environment variables set correctly (`EPICS_TS_MIN_WEST`, `STREAM_PROTOCOL_PATH`)
 - `drvAsynIPPortConfigure` calls present with correct port name and IP:port
@@ -384,7 +409,7 @@ entity model's `pre_init` or `post_init` section needs updating.
 
 ### 5b. Validate ioc.subst
 
-Read `/epics/runtime/ioc.subst`. Verify each `file` block:
+Read `$EPICS_ROOT/runtime/ioc.subst`. Verify each `file` block:
 
 - Correct db file path (matches the db file in the support module)
 - All required macros present in `pattern`
