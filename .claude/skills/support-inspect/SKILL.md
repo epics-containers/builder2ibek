@@ -2,7 +2,6 @@
 name: support-inspect
 description: Analyze a support module's builder.py and report its classes, parameters, databases, st.cmd commands, and dependencies.
 argument-hint: <module-name>
-disable-model-invocation: true
 ---
 
 # Support Module Inspector
