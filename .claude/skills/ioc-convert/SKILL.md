@@ -211,6 +211,9 @@ For each module, construct a prompt containing **all** of the following:
 >
 > Do NOT call `./update-schema` — the main agent will do that after all
 > subagents complete.
+>
+> After writing or modifying any support YAML or converter, run `uv run pytest`
+> and fix any failures before finishing. This catches regressions early.
 
 ---
 
@@ -322,8 +325,11 @@ For each error group, construct a prompt containing:
 > Relevant db file(s) to check: `<known-path>/db/<file>.db`
 >
 > Fix the support YAML (and/or converter if needed). Do NOT run ./update-schema
-> or xml2yaml — the main agent handles re-runs. Return a brief summary of what
-> you changed and whether a converter fix was also needed.
+> or xml2yaml — the main agent handles re-runs.
+>
+> After making changes, run `uv run pytest` and fix any failures before
+> finishing. Return a brief summary of what you changed and whether a converter
+> fix was also needed.
 
 ---
 
