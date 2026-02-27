@@ -108,19 +108,8 @@ original, report whether the equivalent is present in `st.cmd`. Flag any
 command that is absent from `st.cmd` and is **not** in the expected-differences
 table below.
 
-**Expected VxWorks → container differences (do not flag as missing):**
-
-| Original (VxWorks) | Generated (container) | Notes |
-|---|---|---|
-| Serial port paths `/ty/40/0` etc. | `/dev/tty400` etc. | Normal VxWorks → Linux translation |
-| `DLS8515DevConfigure(port, baud, ...)` for every port | `asynSetOption` only for non-default settings | Asyn defaults to 9600/8/1/N; only overrides needed |
-| `STREAM_PROTOCOL_PATH = calloc/strcat(...)` with absolute prod paths | `epicsEnvSet STREAM_PROTOCOL_PATH /epics/runtime/protocol/` | Container-relative path — correct |
-| `ErTimeProviderInit`, `installLastResortEventProvider`, `syncSysClock` after `ErConfigurePMC` | Not present | VxWorks timing calls; not used in containers |
-| `ld < bin/...munch`, `dbLoadDatabase "dbd/..."` | `dbLoadDatabase dbd/ioc.dbd` | VxWorks binary load replaced by standard dbd load |
-| `asSetFilename` with absolute prod path | `/epics/support/pvlogging/src/access.acf` | Container-relative path — expected |
-| `taskDelete(taskNameToId(...))` | Not present | VxWorks-specific housekeeping |
-| `dbLoadRecords "db/..._expanded.db"` | `dbLoadRecords /ioc.db` | Container-standard |
-| VxWorks autosave paths and `create_monitor_set` with `.req` file names | Container-standard autosave setup | Normal translation |
+**Expected VxWorks → RTEMS differences (do not flag as missing)** — see
+[vxworks-to-rtems-differences.md](../shared/vxworks-to-rtems-differences.md).
 
 ---
 

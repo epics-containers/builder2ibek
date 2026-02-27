@@ -5,8 +5,13 @@
       "Write(/workspaces/**)",
       "Read(/workspaces/**)",
       "Read(/dls_sw/**)",
+      "Read(//dls_sw/**)",
+      "Edit(/epics/**)",
       "Read(/epics/**)",
-      "Bash(*:*)"
+      "Write(/epics/**)",
+      "Bash(*:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(grep)"
     ],
     "additionalDirectories": [
       "/workspaces/builder2ibek/.claude/skills",

@@ -14,6 +14,14 @@ PyPI            | `pip install builder2ibek`
 Documentation   | <https://epics-containers.github.io/builder2ibek>
 Releases        | <https://github.com/epics-containers/builder2ibek/releases>
 
+Note: the devcontainer includes Claude Code vscode plugin and skills for doing
+IOC conversions from XmlBuilder to ibek.
+
+For a fully up to date claude client you can install the latest CLI as follows:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
 
 <!-- README only content. Anything below this line won't be included in index.md -->
 
