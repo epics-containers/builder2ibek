@@ -1007,6 +1007,7 @@ entities:
     dom: SR03C
     eip_port: VLVCC_01_EIP
     fins_port: VLVCC_01_FINS
+    name: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
     id: '01'

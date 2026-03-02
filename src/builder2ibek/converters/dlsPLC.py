@@ -17,7 +17,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.id = id_enum
 
     # name is a gui association label, not cross-referenced by any entity
-    entity.remove("name")
+    # (except fastVacuumMaster, where name is used by fastVacuumChannel.master)
+    if entity_type != "fastVacuumMaster":
+        entity.remove("name")
 
     # remove blank interlock name fields
     new_entity = entity.copy()

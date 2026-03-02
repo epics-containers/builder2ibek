@@ -18,6 +18,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "interlock":
         entity.type = "dlsPLC.interlock"
+        entity.remove("name")
         hex_to_int(entity, "ilk")
 
     if entity_type == "overrideRequestMain":
@@ -32,3 +33,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "overrideRequestIndividual":
         entity.type = "dlsPLC.overrideRequestIndividual"
         entity.remove("FIELD")
+        entity.remove("name")

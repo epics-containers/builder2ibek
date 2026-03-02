@@ -650,7 +650,6 @@ entities:
     ilk3: PIRG3 Healthy
     ilk4: DCM Man Closed/Abs Open
     ilk5: "(Can't shut: beam on)"
-    name: GV1
     port: ty_40_3
     vlvcc: VLVCC1
 
@@ -669,7 +668,6 @@ entities:
     ilk4: PIRG4 Healthy
     ilk5: DCM Man Closed/Abs Open
     ilk6: "(Can't shut: beam on)"
-    name: GV2
     port: ty_40_3
     vlvcc: VLVCC1
 
@@ -687,7 +685,6 @@ entities:
     ilk3: PIRG4 Healthy
     ilk4: PIRG5 Healthy
     ilk5: FE ABSB Open
-    name: GV3
     port: ty_40_3
     vlvcc: VLVCC1
 
@@ -701,7 +698,6 @@ entities:
     ilk3: PIRG5 Healthy
     ilk4: PIRG6 Healthy
     ilk5: FE ABSB Open
-    name: GV4
     port: ty_40_3
     vlvcc: VLVCC1
 
@@ -715,7 +711,6 @@ entities:
     ilk3: PIRG6 Healthy
     ilk4: PIRG7 Healthy
     ilk5: SHTR1 Open
-    name: GV5
     port: ty_41_3
     vlvcc: VLVCC2
 
@@ -729,7 +724,6 @@ entities:
     ilk3: PIRG7 Healthy
     ilk4: PIRG8 Healthy
     ilk5: SHTR1 Open
-    name: GV6
     port: ty_41_3
     vlvcc: VLVCC2
 
@@ -744,7 +738,6 @@ entities:
     ilk4: V6 Open
     ilk5: BStop config OK
     ilk7: BStop not overridden
-    name: SHTR1
     port: ty_41_3
     vlvcc: VLVCC2
 
@@ -752,7 +745,6 @@ entities:
     addr: 30
     device: BL11I-DI-PHDGN-02
     ilk15: Valve Fault
-    name: D2
     port: ty_40_3
     vlvcc: VLVCC1
 
@@ -760,7 +752,6 @@ entities:
     addr: 60
     device: BL11I-DI-PHDGN-03
     ilk15: Valve Fault
-    name: D3
     port: ty_40_3
     vlvcc: VLVCC1
 
@@ -768,7 +759,6 @@ entities:
     addr: 40
     device: BL11I-DI-PHDGN-04
     ilk15: Valve Fault
-    name: D4
     port: ty_41_3
     vlvcc: VLVCC2
 
@@ -779,7 +769,6 @@ entities:
     ilk1: Guardline A
     ilk15: Valve Fault
     ilk2: Guardline B
-    name: SHTR2
     port: ty_41_3
     vlvcc: VLVCC2
 
@@ -792,7 +781,6 @@ entities:
     ilk2: S1 Water 2
     ilk3: D1 Water
     interlock: :INT1
-    name: ILK1
     port: ty_40_3
 
   - type: dlsPLC.interlock
@@ -815,7 +803,6 @@ entities:
     ilk8: DCM Man Valve Closed/Abs Open
     ilk9: DCM Temps OK
     interlock: :INT2
-    name: ILK2
     port: ty_40_3
 
   - type: dlsPLC.interlock
@@ -827,7 +814,6 @@ entities:
     ilk2: GBC Temp 3
     ilk3: GBC Temp 4
     interlock: :INT1
-    name: ILK3
     port: ty_40_2
 
   - type: dlsPLC.interlock
@@ -843,7 +829,6 @@ entities:
     ilk6: S1 ApB Temp 3
     ilk7: S1 ApB Temp 4
     interlock: :INT2
-    name: ILK4
     port: ty_40_2
 
   - type: dlsPLC.interlock
@@ -853,7 +838,6 @@ entities:
     ilk0: Valve1 Open
     ilk1: IMG01 / IMG02
     interlock: :INT3
-    name: ILK7
     port: ty_40_3
 
   - type: digitelMpc.digitelMpc
@@ -1396,7 +1380,7 @@ entities:
     ionp1: BL11I-VA-IONP-03
     name: SPACE2
     pirg1: BL11I-VA-PIRG-03
-    valve1: GV1
+    valve1: BL11I-VA-VALVE-01
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-03
@@ -1405,7 +1389,7 @@ entities:
     ionp1: BL11I-VA-IONP-04
     name: SPACE3
     pirg1: BL11I-VA-PIRG-04
-    valve1: GV2
+    valve1: BL11I-VA-VALVE-02
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-04
@@ -1414,7 +1398,7 @@ entities:
     ionp1: BL11I-VA-IONP-05
     name: SPACE4
     pirg1: BL11I-VA-PIRG-05
-    valve1: GV3
+    valve1: BL11I-VA-VALVE-03
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-05
@@ -1424,7 +1408,7 @@ entities:
     ionp2: BL11I-VA-IONP-07
     name: SPACE5
     pirg1: BL11I-VA-PIRG-06
-    valve1: GV4
+    valve1: BL11I-VA-VALVE-04
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-06
@@ -1433,7 +1417,7 @@ entities:
     ionp1: BL11I-VA-IONP-08
     name: SPACE6
     pirg1: BL11I-VA-PIRG-07
-    valve1: GV5
+    valve1: BL11I-VA-VALVE-05
 
   - type: vacuumSpace.space
     device: BL11I-VA-SPACE-07
@@ -1443,4 +1427,4 @@ entities:
     ionp2: BL11I-VA-IONP-10
     name: SPACE7
     pirg1: BL11I-VA-PIRG-08
-    valve1: GV6
+    valve1: BL11I-VA-VALVE-06

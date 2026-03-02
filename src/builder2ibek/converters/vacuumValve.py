@@ -39,6 +39,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.rename("crate", "vlvcc")
         entity.addr = int(entity.valve) * 10
         entity.remove("valve")
+        entity.remove("name")
 
         entity.port = read100Objects[entity.vlvcc]
 

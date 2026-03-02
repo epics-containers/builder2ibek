@@ -60,6 +60,17 @@ entities:
     VELO: 20
     VMAX: 20
 
+  - type: positioner.multipositioner
+    DESC: Mini Apertures Y
+    MP: :Y:MP
+    P: BL04I-MO-MAPT-01
+    STRA: LARGE_APERTURE
+    STRB: MEDIUM_APERTURE
+    STRC: SMALL_APERTURE
+    STRD: ROBOT_LOAD
+    STRE: MANUAL_LOAD
+    name: MAPT.OB2
+
   - type: positioner.motorpositioner
     DESC: Mini Aperture Y
     EGU: mm

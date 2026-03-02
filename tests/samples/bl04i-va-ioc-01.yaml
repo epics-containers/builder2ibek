@@ -852,7 +852,6 @@ entities:
     ilk7: QBPM3 Out/V1 Open
     ilk8: Unused
     ilk9: Unused
-    name: VALVE1
     port: ty_40_0
     vlvcc: VLVCC01
 
@@ -881,7 +880,6 @@ entities:
     ilk7: QBPM3 Out/V2 Open
     ilk8: Unused
     ilk9: Unused
-    name: VALVE2
     port: ty_40_0
     vlvcc: VLVCC01
 
@@ -910,7 +908,6 @@ entities:
     ilk7: QBPM3 Out/V3 Open
     ilk8: Unused
     ilk9: Unused
-    name: VALVE3
     port: ty_40_0
     vlvcc: VLVCC01
 
@@ -939,7 +936,6 @@ entities:
     ilk7: Close Rq & ABSB Ope
     ilk8: QBPM1 Out/V11 Open
     ilk9: Unused
-    name: VALVE11
     port: ty_40_0
     vlvcc: VLVCC01
 
@@ -962,7 +958,6 @@ entities:
     ilk7: Unused
     ilk8: Unused
     ilk9: Unused
-    name: SHTR1
     port: ty_40_0
     vlvcc: VLVCC01
 
@@ -995,7 +990,6 @@ entities:
     ilk8: Unused
     ilk9: Unused
     interlock: :INT1
-    name: INT1
     port: ty_40_0
 
   - type: dlsPLC.interlock
@@ -1019,7 +1013,6 @@ entities:
     ilk8: Valve 1 Open
     ilk9: Valve 2 Open
     interlock: :INT2
-    name: INT2
     port: ty_40_0
 
   - type: dlsPLC.interlock
@@ -1043,7 +1036,6 @@ entities:
     ilk8: Unused
     ilk9: Unused
     interlock: :INT4
-    name: INT4
     port: ty_40_0
 
   - type: rga.rga
@@ -1176,7 +1168,6 @@ entities:
     PRESSURE1: BL04I-VA-GAUGE-04:P
     PRESSURE2: BL04I-VA-GAUGE-04:P
     SETPOINT: 500
-    name: HFMOR
 
   - type: dlsPLC.overrideRequestIndividual
     BIT: 2
@@ -1186,7 +1177,6 @@ entities:
     PRESSURE1: BL04I-VA-GAUGE-05:P
     PRESSURE2: BL04I-VA-GAUGE-05:P
     SETPOINT: 500
-    name: VFMOR
 
   - type: dlsPLC.overrideRequestIndividual
     BIT: 3
@@ -1196,7 +1186,6 @@ entities:
     PRESSURE1: BL04I-VA-GAUGE-04:P
     PRESSURE2: BL04I-VA-GAUGE-05:P
     SETPOINT: 500
-    name: BIOR
 
   - type: cmsIon.cmsIon
     device: BL04I-RS-RDMON-01
