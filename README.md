@@ -23,6 +23,28 @@ For a fully up to date claude client you can install the latest CLI as follows:
 curl -fsSL https://claude.ai/install.sh | bash
 ```
 
+## Testing
+
+Run the full test suite:
+
+```bash
+uv run pytest
+```
+
+Tests are parameterized per sample XML, so you can run a single IOC:
+
+```bash
+uv run pytest -k "BL11I-CS-IOC-09"
+uv run pytest "tests/test_file_conversion.py::test_convert[BL11I-CS-IOC-09]"
+```
+
+Regenerate expected outputs and schema:
+
+```bash
+./tests/samples/make_samples.sh
+./update-schema
+```
+
 <!-- README only content. Anything below this line won't be included in index.md -->
 
 <pre><font color="#AAAAAA">╭─ Commands ───────────────────────────────────────────────────────────────────╮</font>
