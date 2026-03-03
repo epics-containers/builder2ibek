@@ -11,7 +11,10 @@ cd $THIS
 
 set -e
 
-for x in *.xml; do
+# pass a list of XML files as args or use all xml files in the samples dir
+XMLS=${@:-$(ls *.xml)}
+
+for x in ${XMLS}; do
   stem=$(echo "${x%.xml}" | tr '[:upper:]' '[:lower:]')
   y="${stem}.yaml"
 
