@@ -12,7 +12,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     XML to YAML specialist convertor function for the temperature support module
 
-    temperaturePLCRead  → 2× dlsPLC.read100 (century=1 setpoints, century=2 readbacks)
+    temperaturePLCRead  → 2 dlsPLC.read100 (century=1 setpoints, century=2 readbacks)
     temperaturePLC      → dlsPLC.temperature
                           offset = addr*10 + indx
                           tmpcc/port looked up from the crate reference

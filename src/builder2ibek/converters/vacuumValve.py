@@ -5,6 +5,8 @@ xml_component = "vacuumValve"
 
 # records the port names of the read100 entities keyed by name
 read100Objects = {}
+# records devices already claimed by vacValve entities
+vacValveDevices: set[str] = set()
 
 
 @globalHandler
@@ -42,6 +44,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
 
         entity.port = read100Objects[entity.vlvcc]
+        vacValveDevices.add(entity.device)
 
         # tclose_* fields came from builder but dlsPLC.vacValve does not support
         # them (a separate dlsPLC.vacValveTclose entity handles that).  Strip
@@ -59,5 +62,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
 
     elif entity_type == "externalValve":
-        entity.type = "dlsPLC.externalValve"
-        entity.remove("name")
+        if entity.device in vacValveDevices:
+            entity.delete_me()
+        else:
+            entity.type = "dlsPLC.externalValve"
+            entity.remove("name")
