@@ -16,7 +16,8 @@
         "UV_PROJECT_ENVIRONMENT": "/cache/venv-for${localWorkspaceFolder}",
         // Do the equivalent of "activate" the venv so we don't have to "uv run" everything
         "VIRTUAL_ENV": "/cache/venv-for${localWorkspaceFolder}",
-        "PATH": "/cache/venv-for${localWorkspaceFolder}/bin:${containerEnv:PATH}"
+        "PATH": "/cache/venv-for${localWorkspaceFolder}/bin:${containerEnv:PATH}",
+        "BUILDER2IBEK_DEVCONTAINER": "1"
     },
     "customizations": {
         "vscode": {

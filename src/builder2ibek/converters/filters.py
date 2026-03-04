@@ -13,4 +13,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "auto_pneuCombinations":
         entity.type = "filters.pneuCombinations"
 
+    # Ensure numeric-looking string fields stay as strings
+    if hasattr(entity, "module"):
+        entity.module = str(entity.module)
+    if hasattr(entity, "DIR"):
+        entity.DIR = str(entity.DIR)
+
     entity.remove("name")

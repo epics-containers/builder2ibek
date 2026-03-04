@@ -14,9 +14,6 @@ GDA_PLUGINS = Path(__file__).parent / "gdaPlugins.yaml"
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "positioner":
         entity.DEADBAND = str(entity.DEADBAND)
-
-    # Don't remove multipositioner's name because motorpostioner references it
-    elif entity_type == "positioner":
         entity.remove("name")
 
     elif entity_type == "motorpositioner":

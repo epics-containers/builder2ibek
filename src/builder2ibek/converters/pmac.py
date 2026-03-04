@@ -91,7 +91,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # this is a redundant parameter
         entity.remove("PLCNum")
 
-    elif entity_type == "pmacVariableWrite":
+    elif entity_type in ["pmacVariableWrite", "pmacVariableReadLED"]:
         # remove GUI only parameters
         entity.remove("name")
         entity.remove("LABEL")

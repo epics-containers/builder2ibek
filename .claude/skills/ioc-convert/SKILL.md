@@ -38,9 +38,13 @@ subagent prompts) must have `EPICS_ROOT` set to this value.
 Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
 using `$1` (if provided) or the IOC prefix from `$0`.
 
-- If `INSTANCE_DIR` already exists and `config/ioc.yaml` is present:
-  - Run `git -C <services-repo> status` — if ioc.yaml is modified or untracked,
-    ensure it is committed or stashed before overwriting.
+- If `INSTANCE_DIR` already exists:
+  - Check `$INSTANCE_DIR/values.yaml` — if it contains `dev-c7:`, this is a
+    legacy IOC. Remove the entire folder (`rm -rf $INSTANCE_DIR`) and recreate
+    it from `.ioc_template` (fall through to the "does not exist" case below).
+  - Otherwise, if `config/ioc.yaml` is present: run `git -C <services-repo> status`
+    — if ioc.yaml is modified or untracked, ensure it is committed or stashed
+    before overwriting.
 - If `INSTANCE_DIR` does not exist:
   - If `<services-repo>/services/.ioc_template/` exists:
     `cp -r <services-repo>/services/.ioc_template/ $INSTANCE_DIR`

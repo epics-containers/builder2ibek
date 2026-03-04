@@ -11,6 +11,10 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 - Converters are auto-discovered from `src/builder2ibek/converters/*.py` — no registration needed.
 - Find dependency init calls (e.g. `drvAsynIPPortConfigure`) in real boot scripts, not example ones.
 
+## Services Repo
+
+- If an existing IOC folder in a services repo has `dev-c7:` in its `values.yaml`, it is a legacy IOC. Delete the entire folder and recreate it from `.ioc_template` as usual.
+
 ## Foot-Guns
 
 - Database macros come from the compiled `.db` file, never `.subst` files.
