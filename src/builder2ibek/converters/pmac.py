@@ -100,6 +100,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # this is a redundant parameter
         entity.remove("PLCNum")
 
+    elif entity_type == "CS_accel_dcm":
+        # name is type: id in support YAML but only used for GUI association.
+        # XML may not provide it, so generate a default if missing.
+        if not entity.name:
+            entity.name = f"{entity.P}_CS{entity.COORD}"
+
     elif entity_type in ["pmacVariableWrite", "pmacVariableReadLED"]:
         # remove GUI only parameters
         entity.remove("name")
@@ -118,3 +124,22 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("simulation")
         if ":" not in entity.IP:
             entity.IP = entity.IP + ":1025"
+
+    elif entity_type == "RunCommand":
+        # XML uses BRICK but support YAML expects PORT
+        entity.rename("BRICK", "PORT")
+
+    elif entity_type == "RunPlc":
+        # XML uses BRICK but support YAML expects PORT
+        entity.rename("BRICK", "PORT")
+
+    elif entity_type in ["auto_pmacStatus8Axes", "auto_pmacStatus32Axes"]:
+        # These entities are auto-created by GeoBrick/PowerPMAC in builder.py
+        # but arrive from XML with no attributes. Find the last controller
+        # in raw_entities and inject its PMAC (P) and PORT (name).
+        for raw in reversed(ioc.raw_entities):
+            raw_type = raw.get("type", "")
+            if raw_type in ["pmac.GeoBrick", "pmac.PowerPMAC"]:
+                entity.PMAC = raw.get("P", "")
+                entity.PORT = raw.get("name", "")
+                break

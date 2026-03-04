@@ -9,9 +9,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     XML to YAML specialist convertor function for the motor support module.
 
-    Strips 'name' from leaf entities like basic_asyn_motor where it is just
-    a GUI label, not cross-referenced by any other entity.
+    basic_asyn_motor has name: type: id (cross-referenced by other entities),
+    so name must be preserved. Other motor entity types that are leaf entities
+    can have name stripped.
     """
-
-    if entity_type in ["basic_asyn_motor"]:
-        entity.remove("name")
+    pass
