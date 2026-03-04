@@ -16,8 +16,14 @@ pattern
 
 file "$(ADANDOR)/db/andorCCD.template" {
 pattern 
-	{ "P",               "R",     "PORT",     "TIMEOUT", "ADDR", "name",  "SCANRATE" }
-	{ "BL99P-EA-DET-03", ":CAM:", "DET3.cam", "1",       "0",    "Andor", "I/O Intr" }
+	{ "P",               "R",     "PORT",     "TIMEOUT", "ADDR", "SCANRATE" }
+	{ "BL99P-EA-DET-03", ":CAM:", "DET3.cam", "1",       "0",    "I/O Intr" }
+}
+
+file "$(ADANDOR)/db/andorCCD-DLSGui.template" {
+pattern 
+	{ "P",               "R",     "PORT"     }
+	{ "BL99P-EA-DET-03", ":CAM:", "DET3.cam" }
 }
 
 file "$(ADCORE)/db/NDPosPlugin.template" {

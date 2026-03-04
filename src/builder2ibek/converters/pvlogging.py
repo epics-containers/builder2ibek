@@ -3,9 +3,7 @@ import re
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
-default_acf = re.compile(
-    r"/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf"
-)
+default_acf = re.compile(r"/dls_sw/.*/.*/support/pvlogging/1-4/data/access.acf")
 
 xml_component = "pvlogging"
 

@@ -26,10 +26,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # its P and M params.
         # Set motorpositioner.motor = motor's PV.
         # Set motorpositioner.EGU = motor's EGU.
+        motor_types = ("dls_pmac_asyn_motor", "basic_asyn_motor")
         motors = [
             e
             for e in ioc.raw_entities
-            if e.get("type", "").endswith("dls_pmac_asyn_motor")
+            if any(e.get("type", "").endswith(t) for t in motor_types)
             and e.get("name") == entity.motor
         ]
 
