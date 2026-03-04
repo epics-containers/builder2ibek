@@ -30,7 +30,10 @@
                 "python.terminal.activateEnvironment": false,
                 // Workaround to prevent garbled python REPL in the terminal
                 // https://github.com/microsoft/vscode-python/issues/25505
-                "python.terminal.shellIntegration.enabled": false
+                "python.terminal.shellIntegration.enabled": false,
+                // Only forward explicitly listed ports — auto-detection races with
+                // sphinx-autobuild and steals the port on restart
+                "remote.autoForwardPorts": false
             },
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
@@ -50,6 +53,8 @@
             ]
         }
     },
+    // Explicitly forward sphinx-autobuild port (auto-detection disabled above)
+    "forwardPorts": [8000],
     // Create the config folder for the bash-config feature, uv cache, and claude settings
     "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config ${localEnv:HOME}/.config/claude ${localEnv:HOME}/.claude",
     "runArgs": [

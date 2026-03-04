@@ -11,3 +11,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     # name is a gui label, not cross-referenced by any entity
     entity.remove("name")
+
+    if entity_type == "EtherIPInit":
+        # port is a string name, ensure it stays str when XML parses as int
+        if hasattr(entity, "port") and entity.port is not None:
+            entity.port = str(entity.port)

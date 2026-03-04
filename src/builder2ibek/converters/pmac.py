@@ -57,6 +57,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.FOFF = "Frozen"
         else:
             entity.FOFF = "Variable"
+        # ensure string params stay as strings when XML parses them as int
+        if hasattr(entity, "INIT") and entity.INIT is not None:
+            entity.INIT = str(entity.INIT)
+        if hasattr(entity, "HOME") and entity.HOME is not None:
+            entity.HOME = str(entity.HOME)
 
     elif entity_type == "auto_translated_motor":
         # remove GUI only parameters
@@ -64,6 +69,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     elif entity_type == "GeoBrick":
         entity.rename("Port", "pmacAsynPort")
+
+    elif entity_type == "PowerPMAC":
+        # standardise the name of the SSH port reference
+        entity.rename("Port", "pmacAsynSSHPort")
 
     elif entity_type == "GeoBrickTrajectoryControlT":
         # don't bore the user with the fact this is a template!
@@ -95,6 +104,15 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # remove GUI only parameters
         entity.remove("name")
         entity.remove("LABEL")
+
+    elif entity_type == "pmacSetOpenLoopEncoderAxis":
+        entity.rename("Axis", "AXIS")
+        entity.rename("Controller", "CONTROLLER")
+        entity.rename("Encoder_axis", "ENCODER_AXIS")
+
+    elif entity_type == "pmacSetCoordStepsPerUnit":
+        entity.rename("Axis", "AXIS")
+        entity.rename("Scale", "SCALE")
 
     elif entity_type == "pmacAsynIPPort":
         entity.remove("simulation")

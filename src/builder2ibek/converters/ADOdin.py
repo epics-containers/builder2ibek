@@ -57,6 +57,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     XML to YAML converter for the ADOdin support module.
 
     - Strips 'name' from leaf entities
+    - Strips SENSOR_X/SENSOR_Y from EigerPluginConfig (not in support YAML)
     - Resolves CONTROL_SERVER_IP, CONTROL_SERVER_PORT, and TOTAL
       for driver and detector entities from the referenced control server
     """
@@ -64,6 +65,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     # Strip 'name' from leaf entities
     if entity_type in LEAF_ENTITIES:
         entity.remove("name")
+
+    # EigerPluginConfig does not accept SENSOR_X/SENSOR_Y — those belong
+    # on EigerOdinDataDriver instead
+    if entity_type == "EigerPluginConfig":
+        entity.remove("SENSOR_X")
+        entity.remove("SENSOR_Y")
 
     # For EigerOdinDataDriver and TristanOdinDataDriver: resolve control server
     # IP/PORT and compute TOTAL OdinData processes
