@@ -63,7 +63,8 @@ For each IOC XML, spawn a `general-purpose` subagent:
 > Report your results when complete.
 
 **Parallelism**: each subagent creates its own `EPICS_ROOT` (Phase 0), so file
-conflicts are avoided. Run 2-3 IOCs in parallel for best throughput.
+conflicts are avoided. Launch up to 10 IOCs in parallel per batch for best
+throughput — wait for each batch to complete before launching the next.
 
 ## Step 5 — Consolidate and report
 
