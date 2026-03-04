@@ -2,17 +2,6 @@
 
 Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML for epics-containers.
 
-## MCP Tools Available
-
-This project provides MCP tools via `mcp_server.py`. Use them to query the DLS
-filesystem and analyze IOC/module structure:
-
-- **find_module_path** — Resolve a support module's filesystem path (e.g. `hidenRGA` → `/dls_sw/prod/R3.14.12.7/support/hidenRGA/3-17`)
-- **find_boot_script** — Get the original VxWorks boot script for an IOC
-- **find_ioc_xmls** — List all IOC XMLs for a beamline (e.g. `BL19I`)
-- **support_inspect** — Analyze a module's builder.py (classes, parameters, databases, st.cmd commands)
-- **ioc_inspect** — Parse an IOC XML and report modules/entities used
-
 ## Key Paths
 
 | Path | Purpose |

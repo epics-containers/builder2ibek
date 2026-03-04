@@ -32,7 +32,6 @@ dev = [
     "sphinx-design",
     "tox-uv",
     "types-mock",
-    "fastmcp",
 ]
 
 [project.scripts]
