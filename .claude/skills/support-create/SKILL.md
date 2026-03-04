@@ -78,7 +78,7 @@ grep "^# % macro" <module-path>/db/<file>.db
 
 Match macros to parameters. Determine required vs optional.
 Apply the **type inference rules** from
-[support-yaml-rules.md](../shared/support-yaml-rules.md#parameter-type-inference).
+[ibek-concepts](../ibek-concepts/SKILL.md).
 
 ## Step 5 — Determine DLS-specific vs community
 
@@ -113,18 +113,14 @@ Note: install files use `.yml` extension, not `.yaml`.
 
 ## Step 8 — Create converter if needed
 
-**Default: keep `name: type: id`** — only drop `name` after verifying the
-entity is truly a leaf. Before dropping, check all `type: object` params in the
-module's support YAML and sample IOC YAMLs to confirm nothing references the
-entity by name. Untyped `object` params (no specific type constraint) can
-accept multiple entity types — check all of them.
+Follow the `name` parameter rules in
+[support-yaml-rules.md](../shared/support-yaml-rules.md) to determine whether
+`name` should be kept or dropped.
 
 If `name` must be dropped (confirmed leaf entity), create or update
 `src/builder2ibek/converters/<module>.py`. Follow the pattern in existing
-converters like `src/builder2ibek/converters/cmsIon.py`.
-
-Converters are auto-discovered from `src/builder2ibek/converters/*.py` — no
-registration needed.
+converters like `src/builder2ibek/converters/cmsIon.py`. Converters are
+auto-discovered — no registration needed.
 
 **Important**: pass plain `dict` to `entity.add_entity()`, never `Entity(...)`.
 

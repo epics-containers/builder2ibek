@@ -47,7 +47,7 @@ error, determine the fix type:
   ```
 - Compare parameter names, types, and defaults against what generate2 expects
 - Apply the type inference rules from
-  [support-yaml-rules.md](../shared/support-yaml-rules.md#parameter-type-inference)
+  [ibek-concepts](../ibek-concepts/SKILL.md)
 
 **For converter errors:**
 - Read the current converter (if any):

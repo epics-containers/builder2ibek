@@ -75,11 +75,9 @@ that work is delegated to subagents in Phase 2.
 
 Scan quickly for converter issues that must be fixed before support YAML work:
 
-**Spurious `name:` fields** — only drop `name` from entities that are truly
-leaf (not cross-referenced). Before dropping, check all `type: object` params
-in the module's support YAML and sample IOC YAMLs to verify nothing references
-the entity by name. When in doubt, **keep `name: type: id`** — it is safe to
-keep but dangerous to drop. If a converter is needed, create
+**Spurious `name:` fields** — follow the `name` parameter rules in
+[support-yaml-rules.md](../shared/support-yaml-rules.md). When in doubt,
+**keep `name: type: id`**. If a converter is needed, create
 `src/builder2ibek/converters/<module>.py` (auto-discovered, no registration).
 
 **Attributes needing transformation** — values that need renaming, numeric
