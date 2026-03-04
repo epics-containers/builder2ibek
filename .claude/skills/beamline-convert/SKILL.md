@@ -27,6 +27,12 @@ files for beamline `$0`.
 List all XMLs found. Ask the user to confirm which ones to convert (default:
 all).
 
+## Quick reference — xml2yaml syntax
+
+```bash
+uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
+```
+
 ## Step 3 — Pre-pass: enumerate all modules
 
 To avoid parallel write conflicts (two IOC subagents trying to create the same

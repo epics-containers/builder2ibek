@@ -39,9 +39,13 @@ Find IOC XMLs using a module:
 grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml")
 ```
 
-## Testing
+## CLI Commands
 
 ```bash
+# Convert a single IOC XML to ibek YAML:
+uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
+
+# Testing:
 uv run pytest
 ./tests/samples/make_samples.sh   # regenerate sample outputs
 ./update-schema                   # rebuild global ioc schema
