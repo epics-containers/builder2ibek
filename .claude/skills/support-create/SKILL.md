@@ -82,6 +82,10 @@ Apply the **type inference rules** from
 
 ## Step 5 — Determine DLS-specific vs community
 
+**CRITICAL — no duplicates:** A module must exist in exactly ONE of the two
+submodules. If step 1 found an existing folder in either location, always
+use that same location. Never create a second copy in the other submodule.
+
 - If the module is DLS-specific (no upstream open-source project):
   write to `ibek-support-dls/<module>/`
 - If it could benefit other facilities (e.g. asyn, StreamDevice, motor):

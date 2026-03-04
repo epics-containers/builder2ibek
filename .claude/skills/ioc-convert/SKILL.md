@@ -141,8 +141,10 @@ For each module, construct a prompt:
 > - `<module>.<EntityA>` — parameters seen: `P=BL19I-VA-IMG-01`, `name=IMG01`, ...
 > - `<module>.<EntityB>` — parameters seen: ...
 >
-> Check both `ibek-support-dls/<module>/` and `ibek-support/<module>/` before
-> creating anything — the community version may already exist.
+> **CRITICAL — no duplicates:** A module must exist in exactly ONE of
+> `ibek-support/` or `ibek-support-dls/`. Check both directories first. If
+> the module already exists in one location, use that location — never
+> create a second copy in the other submodule.
 >
 > Write (or update) the support YAML. Return a brief summary of what you
 > created/changed.

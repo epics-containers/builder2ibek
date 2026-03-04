@@ -10,6 +10,7 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 - Install files are `*.install.yml` (not `.yaml`).
 - Converters are auto-discovered from `src/builder2ibek/converters/*.py` — no registration needed.
 - Find dependency init calls (e.g. `drvAsynIPPortConfigure`) in real boot scripts, not example ones.
+- **No duplicate modules** across `ibek-support/` and `ibek-support-dls/` — each module lives in exactly one. Always check both before creating a new folder.
 
 ## Services Repo
 

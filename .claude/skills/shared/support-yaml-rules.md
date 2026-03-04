@@ -97,6 +97,11 @@ but the ioc.yaml value is a float/int, schema validation fails.
 | Community support YAML | `ibek-support/<module>/<module>.ibek.support.yaml` |
 | Install file | `ibek-support-dls/<module>/<module>.install.yml` (`.yml` not `.yaml`) |
 
+**No duplicates:** A module must exist in exactly ONE of `ibek-support/` or
+`ibek-support-dls/`. Always check both directories before creating a new
+folder. If the module already exists in one location, use that location —
+never create a second copy in the other submodule.
+
 ## Reference examples
 
 Always look at existing support YAMLs before creating new ones:
