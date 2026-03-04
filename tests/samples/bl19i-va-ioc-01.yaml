@@ -2292,7 +2292,6 @@ entities:
     PREC: 3
     R: :VOLTAGE
     SCAN: 1 second
-    name: AI
 
   - type: dlsPLC.externalValve
     device: FE19I-VA-VALVE-02

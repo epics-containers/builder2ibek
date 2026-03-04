@@ -134,16 +134,16 @@ pattern
 
 file "$(MKS937B)/db/mks937bPirg.template" {
 pattern 
-	{ "address", "port",    "device",           "offwarn", "GCTLR",  "channel", "name"   }
-	{ "001",     "ty_40_4", "BL16I-VA-PIRG-01", "0",       "GCTRL1", "5",       "PIRG01" }
-	{ "001",     "ty_40_4", "BL16I-VA-PIRG-03", "0",       "GCTRL1", "6",       "PIRG03" }
+	{ "address", "port",    "device",           "offwarn", "GCTLR",  "channel" }
+	{ "001",     "ty_40_4", "BL16I-VA-PIRG-01", "0",       "GCTRL1", "5"       }
+	{ "001",     "ty_40_4", "BL16I-VA-PIRG-03", "0",       "GCTRL1", "6"       }
 }
 
 file "$(MKS937B)/db/mks937bGauge.template" {
 pattern 
-	{ "plog_adc_pv",         "ctlsp_drvl", "name",    "ctlsp_lopr", "dom",   "ctlsp_hopr", "ctlsp_drvh", "GCTLR", "ctlsp_level", "ctlspoff_desc",  "plog_calc",                 "ctlsp_desc", "id" }
-	{ "BL16I-VA-ADC-01:CH0", "0.0027",     "GAUGE01", "0.0027",     "BL16I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "01" }
-	{ "BL16I-VA-ADC-01:CH1", "0.0027",     "GAUGE03", "0.0027",     "BL16I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "03" }
+	{ "plog_adc_pv",         "ctlsp_drvl", "ctlsp_lopr", "dom",   "ctlsp_hopr", "ctlsp_drvh", "GCTLR", "ctlsp_level", "ctlspoff_desc",  "plog_calc",                 "ctlsp_desc", "id" }
+	{ "BL16I-VA-ADC-01:CH0", "0.0027",     "0.0027",     "BL16I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "01" }
+	{ "BL16I-VA-ADC-01:CH1", "0.0027",     "0.0027",     "BL16I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "03" }
 }
 
 file "$(MKS937B)/db/mks937bRelays.template" {
@@ -247,10 +247,10 @@ pattern
 
 file "$(USERIO)/db/bi.template" {
 pattern 
-	{ "P",               "R",           "DTYP",             "INP",                          "SCAN",     "ZNAM", "ONAM", "ZSV", "OSV", "COSV", "DESC",         "archiver_rate", "name"           }
-	{ "BL16I-VA-DCM-01", ":VENTENABLE", "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B0 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10",            "DCM.VENTENABLE" }
-	{ "BL16I-VA-DCM-01", ":SERVICE",    "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B1 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10",            "DCM.SERVICE"    }
-	{ "BL16I-VA-DCM-01", ":TEST",       "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B2 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10",            "DCM.TEST"       }
+	{ "P",               "R",           "DTYP",             "INP",                          "SCAN",     "ZNAM", "ONAM", "ZSV", "OSV", "COSV", "DESC",         "archiver_rate" }
+	{ "BL16I-VA-DCM-01", ":VENTENABLE", "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B0 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10"            }
+	{ "BL16I-VA-DCM-01", ":SERVICE",    "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B1 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10"            }
+	{ "BL16I-VA-DCM-01", ":TEST",       "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B2 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10"            }
 }
 
 file "$(DLSPLC)/db/dlsPLC_temperature.template" {

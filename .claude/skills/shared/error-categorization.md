@@ -7,7 +7,7 @@ How to diagnose errors from `ibek runtime generate2` and determine the fix type.
 | Unknown entity type `foo.Bar` | No entity model exists | Support YAML — add entity model |
 | Unknown parameter `X` on `foo.Bar` | Parameter missing or renamed | Support YAML — add parameter; or Converter — rename/drop attribute |
 | Validation error on a field | Wrong ibek type, or XML value ibek can't accept | Support YAML — fix type; or Converter — transform value |
-| `object BL19I-VA-... not found` | Referenced entity's id field is `type: str` not `type: id` | Support YAML — change id field to `type: id` |
+| `object BL19I-VA-... not found` or `object XXX not found` | Referenced entity's id field is `type: str` not `type: id`, or `name`/`type: id` was wrongly removed from a non-leaf entity | Support YAML — change id field to `type: id`; or restore `name: type: id` and update converter to keep `name` |
 | `Field required` on a parameter | Parameter has no default and wasn't set in XML | Support YAML — add `default:` |
 | `database arg 'fooN' not found in context` | Template uses a param name the entity model doesn't define | Support YAML — add param or fix databases.args; or Converter — rename attribute |
 | Attribute value wrong or unwanted | XML value needs transformation | Converter — re-run xml2yaml after fix |

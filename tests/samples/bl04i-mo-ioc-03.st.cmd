@@ -61,8 +61,8 @@ set_max_array_length 10
 dbLoadRecords /ioc.db
 iocInit
 
-dbpf "BL04I-MO-STEP-04:AXIS5:DESC" "{'FSWT Transition'}"
-dbpf "BL04I-MO-STEP-04:AXIS6:DESC" "{'FSWT Rocker'}"
+dbpf "BL04I-MO-STEP-04:AXIS5:DESC" "FSWT Transition"
+dbpf "BL04I-MO-STEP-04:AXIS6:DESC" "FSWT Rocker"
 # Autosave post iocInit
 create_monitor_set autosave_positions.req, 5, ""
 create_monitor_set autosave_settings.req, 30, ""

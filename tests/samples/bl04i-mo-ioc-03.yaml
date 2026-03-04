@@ -897,11 +897,11 @@ entities:
 
   - type: epics.dbpf
     pv: BL04I-MO-STEP-04:AXIS5:DESC
-    value: "{'FSWT Transition'}"
+    value: FSWT Transition
 
   - type: epics.dbpf
     pv: BL04I-MO-STEP-04:AXIS6:DESC
-    value: "{'FSWT Rocker'}"
+    value: FSWT Rocker
 
   - type: positioner.multipositioner
     DESC: Mini Apertures X

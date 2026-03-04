@@ -107,7 +107,7 @@ iocInit
 create_monitor_set autosave_positions.req, 5, ""
 create_monitor_set autosave_settings.req, 30, ""
 
-dbpf "BL16I-VA-PIRG-21:CTL:SETSP" "{0.2}"
-dbpf "BL16I-VA-IMG-21:CTL:SP.HIGH" "{0.3}"
-dbpf "BL16I-VA-SPACE-21:PSTA.B" "{1e-05}"
-dbpf "BL16I-VA-SPACE-21:P.HIGH" "{1e-05}"
+dbpf "BL16I-VA-PIRG-21:CTL:SETSP" "0.2"
+dbpf "BL16I-VA-IMG-21:CTL:SP.HIGH" "0.3"
+dbpf "BL16I-VA-SPACE-21:PSTA.B" "1e-05"
+dbpf "BL16I-VA-SPACE-21:P.HIGH" "1e-05"

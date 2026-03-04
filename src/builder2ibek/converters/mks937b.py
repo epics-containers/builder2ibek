@@ -10,7 +10,13 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     XML to YAML specialist convertor function for the mks937b support module
     """
 
-    # remove GUI only parameters (except mks937b controller whose name is
-    # cross-referenced by mks937bImg/mks937bGauge/mks937bPirg via GCTLR)
-    if entity_type != "mks937b":
+    # remove GUI only parameters (except entities whose name is cross-referenced:
+    # mks937b via GCTLR, mks937bGauge/mks937bImg/mks937bPirg/mks937bCap via GAUGE)
+    if entity_type not in (
+        "mks937b",
+        "mks937bGauge",
+        "mks937bImg",
+        "mks937bPirg",
+        "mks937bCap",
+    ):
         entity.remove("name")

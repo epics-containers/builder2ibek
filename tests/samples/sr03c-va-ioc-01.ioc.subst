@@ -22,8 +22,8 @@ pattern
 
 file "$(ETHER_IP)/db/ether_ip_plcInfo.template" {
 pattern 
-	{ "name",          "port",         "device"            }
-	{ "VLVCC_01.INFO", "VLVCC_01_EIP", "SR03C-VA-VLVCC-01" }
+	{ "port",         "device"            }
+	{ "VLVCC_01_EIP", "SR03C-VA-VLVCC-01" }
 }
 
 file "$(DLSPLC)/db/NX102_readReal.template" {
@@ -232,12 +232,12 @@ pattern
 
 file "$(USERIO)/db/bi.template" {
 pattern 
-	{ "P",                "R",    "DTYP",         "INP",                                      "SCAN",    "ZNAM", "ONAM",    "ZSV",   "OSV",      "COSV", "DESC",                      "archiver_rate", "name"     }
-	{ "SR03C-VA-FANC-01", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B0 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Fan Status",        "3600 Monitor",  "VAFAN_01" }
-	{ "SR03C-VA-FANC-02", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B1 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Fan Status",        "3600 Monitor",  "VAFAN_02" }
-	{ "SR03C-VA-FANC-03", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B2 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 03 Fan Status",        "3600 Monitor",  "VAFAN_03" }
-	{ "SR03C-VA-PSU-01",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B3 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Duplex PSU Status", "3600 Monitor",  "VAPSU_01" }
-	{ "SR03C-VA-PSU-02",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B4 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Duplex PSU Status", "3600 Monitor",  "VAPSU_02" }
+	{ "P",                "R",    "DTYP",         "INP",                                      "SCAN",    "ZNAM", "ONAM",    "ZSV",   "OSV",      "COSV", "DESC",                      "archiver_rate" }
+	{ "SR03C-VA-FANC-01", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B0 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Fan Status",        "3600 Monitor"  }
+	{ "SR03C-VA-FANC-02", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B1 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Fan Status",        "3600 Monitor"  }
+	{ "SR03C-VA-FANC-03", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B2 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 03 Fan Status",        "3600 Monitor"  }
+	{ "SR03C-VA-PSU-01",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B3 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Duplex PSU Status", "3600 Monitor"  }
+	{ "SR03C-VA-PSU-02",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B4 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Duplex PSU Status", "3600 Monitor"  }
 }
 
 file "$(DLSPLC)/db/NX102_powerSupply.template" {

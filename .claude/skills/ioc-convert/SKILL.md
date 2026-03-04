@@ -75,10 +75,12 @@ that work is delegated to subagents in Phase 2.
 
 Scan quickly for converter issues that must be fixed before support YAML work:
 
-**Spurious attributes** — `name:` fields on leaf entities that don't need them
-(e.g. hidenRGA, cmsIon). These should be dropped by a converter. If a converter
-doesn't exist yet, create `src/builder2ibek/converters/<module>.py`.
-Converters are auto-discovered — no registration needed.
+**Spurious `name:` fields** — only drop `name` from entities that are truly
+leaf (not cross-referenced). Before dropping, check all `type: object` params
+in the module's support YAML and sample IOC YAMLs to verify nothing references
+the entity by name. When in doubt, **keep `name: type: id`** — it is safe to
+keep but dangerous to drop. If a converter is needed, create
+`src/builder2ibek/converters/<module>.py` (auto-discovered, no registration).
 
 **Attributes needing transformation** — values that need renaming, numeric
 transformation, or removal before ibek sees them. Add or update the converter

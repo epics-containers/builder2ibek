@@ -18,7 +18,7 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 ## Foot-Guns
 
 - Database macros come from the compiled `.db` file, never `.subst` files.
-- `name` → `type: id` only when cross-referenced by another entity. Leaf entities must drop `name`.
+- `name` → `type: id` only when cross-referenced by another entity. Leaf entities must drop `name`. Beware untyped `object` params (e.g. `GAUGE`) that accept multiple entity types — check all callers. If you see `"Value error, object XXX not found in [...]"` during validation, you dropped an `id` that is still referenced.
 - `auto_*` entities (`module.auto_xxxx`) → `xxxx.template` in `db/`. No `pre_init`/`post_init`.
 - `entity.add_entity()` must receive plain `dict`, never `Entity(...)` (resets the extras list).
 

@@ -177,9 +177,9 @@ pattern
 
 file "$(MKS937B)/db/mks937bPirg.template" {
 pattern 
-	{ "address", "port",    "device",           "offwarn", "GCTLR",    "channel", "name"   }
-	{ "001",     "ty_40_4", "BL11I-VA-PIRG-01", "0",       "GCTLR-01", "5",       "PIRG01" }
-	{ "001",     "ty_40_4", "BL11I-VA-PIRG-02", "0",       "GCTLR-01", "6",       "PIRG02" }
+	{ "address", "port",    "device",           "offwarn", "GCTLR",    "channel" }
+	{ "001",     "ty_40_4", "BL11I-VA-PIRG-01", "0",       "GCTLR-01", "5"       }
+	{ "001",     "ty_40_4", "BL11I-VA-PIRG-02", "0",       "GCTLR-01", "6"       }
 }
 
 file "$(MKS937A)/db/mks937aPirg.template" {
@@ -195,9 +195,9 @@ pattern
 
 file "$(MKS937B)/db/mks937bGauge.template" {
 pattern 
-	{ "plog_adc_pv",         "ctlsp_drvl", "name",   "ctlsp_lopr", "dom",   "ctlsp_hopr", "ctlsp_drvh", "GCTLR", "ctlsp_level", "ctlspoff_desc",  "plog_calc",                 "ctlsp_desc", "id" }
-	{ "BL11I-VA-ADC-01:CH0", "0.0027",     "GAUGE1", "0.0027",     "BL11I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "01" }
-	{ "BL11I-VA-ADC-01:CH1", "0.0027",     "GAUGE2", "0.0027",     "BL11I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "02" }
+	{ "plog_adc_pv",         "ctlsp_drvl", "ctlsp_lopr", "dom",   "ctlsp_hopr", "ctlsp_drvh", "GCTLR", "ctlsp_level", "ctlspoff_desc",  "plog_calc",                 "ctlsp_desc", "id" }
+	{ "BL11I-VA-ADC-01:CH0", "0.0027",     "0.0027",     "BL11I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "01" }
+	{ "BL11I-VA-ADC-01:CH1", "0.0027",     "0.0027",     "BL11I", "0.95",       "0.95",       "",      "0.01",        "IMG Enable Off", "10.0*A/32767.0/0.6 - 12.0", "IMG Enable", "02" }
 }
 
 file "$(MKS937A)/db/mks937aGauge.template" {

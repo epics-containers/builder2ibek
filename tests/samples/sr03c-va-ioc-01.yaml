@@ -96,12 +96,10 @@ entities:
   - type: FINS.FINSUDPInit
     ip: 192.168.3.10
     name: VLVCC_01_FINS
-    simulation: None
 
   - type: ether_ip.EtherIPInit
     device: SR03C-VA-VLVCC-01
     ip: 192.168.3.10
-    name: VLVCC_01.INFO
     port: VLVCC_01_EIP
 
   - type: dlsPLC.NX102_readReal
@@ -921,7 +919,6 @@ entities:
     ZNAM: FAIL
     ZSV: MAJOR
     archiver_rate: 3600 Monitor
-    name: VAFAN_01
 
   - type: userIO.bi
     DESC: Rack 02 Fan Status
@@ -935,7 +932,6 @@ entities:
     ZNAM: FAIL
     ZSV: MAJOR
     archiver_rate: 3600 Monitor
-    name: VAFAN_02
 
   - type: userIO.bi
     DESC: Rack 03 Fan Status
@@ -949,7 +945,6 @@ entities:
     ZNAM: FAIL
     ZSV: MAJOR
     archiver_rate: 3600 Monitor
-    name: VAFAN_03
 
   - type: userIO.bi
     DESC: Rack 01 Duplex PSU Status
@@ -963,7 +958,6 @@ entities:
     ZNAM: FAIL
     ZSV: MAJOR
     archiver_rate: 3600 Monitor
-    name: VAPSU_01
 
   - type: userIO.bi
     DESC: Rack 02 Duplex PSU Status
@@ -977,7 +971,6 @@ entities:
     ZNAM: FAIL
     ZSV: MAJOR
     archiver_rate: 3600 Monitor
-    name: VAPSU_02
 
   - type: dlsPLC.NX102_powerSupply
     device: SR03C-VA-PSU-01:1

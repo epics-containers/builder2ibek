@@ -36,11 +36,18 @@ Entity parameters are available as context: `{{P}}` resolves to parameter `P`.
 
 ## name parameter
 
-- `name` → `type: id` **only** when another entity cross-references this one
-  (e.g. asyn port creators whose port name is referenced by consumers)
-- For leaf entities (not cross-referenced), `name` is a GUI label — the
-  converter must call `entity.remove("name")` and the support YAML must
-  **not** include `name` as a parameter
+- **Default: keep `name: type: id`**. Only drop `name` after verifying it is
+  truly a leaf (not cross-referenced by any entity in the module).
+- **Verification step** — before dropping `name` from any entity, search ALL
+  `type: object` params in the module's support YAML. Untyped `object` params
+  (e.g. `GAUGE: type: object`) accept **any** entity with an id — check sample
+  IOC YAML files to see which entity names actually appear as values. E.g.
+  `mks937bRelays.GAUGE` accepts Gauge, Img, Pirg, and Cap entities, so all
+  four need `name: type: id`.
+- Only after confirming no `type: object` param references the entity should
+  you drop `name` and add `entity.remove("name")` to the converter.
+- Diagnostic: `"Value error, object XXX not found in [...]"` means you dropped
+  an `id` that is still referenced — restore `type: id` on that entity
 
 ## PORT parameter
 

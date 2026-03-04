@@ -33,7 +33,7 @@ for x in ${XMLS}; do
     cp "$tmpdir/st.cmd" "${stem}.st.cmd"
     cp "$tmpdir/ioc.subst" "${stem}.ioc.subst"
   else
-    echo "  generate2 SKIP (validation failed)"
+    echo " ERROR SKIPPING !!! generate2 SKIP (validation failed)"
     rm -f "${stem}.st.cmd" "${stem}.ioc.subst"
   fi
 

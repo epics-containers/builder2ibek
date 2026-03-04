@@ -44,8 +44,9 @@ def test_generate(sample_xml: Path):
     expected_stcmd = SAMPLES / f"{stem}.st.cmd"
     expected_subst = SAMPLES / f"{stem}.ioc.subst"
 
-    if not expected_stcmd.exists():
-        pytest.skip(f"no expected generate2 outputs for {stem}")
+    assert expected_stcmd.exists(), (
+        f"no expected generate2 outputs for {stem} — run make_samples.sh"
+    )
 
     with tempfile.TemporaryDirectory() as tmpdir:
         config = Path(tmpdir)
@@ -88,11 +89,13 @@ def test_generate(sample_xml: Path):
             f"generate2 failed for {sample_xml.name}:\n{result.stderr}"
         )
 
-        actual_stcmd = (config / "st.cmd").read_text()
-        actual_subst = (config / "ioc.subst").read_text()
+        actual_stcmd = (config / "st.cmd").read_text().rstrip()
+        actual_subst = (config / "ioc.subst").read_text().rstrip()
 
-        assert actual_stcmd == expected_stcmd.read_text(), f"st.cmd mismatch for {stem}"
-        assert actual_subst == expected_subst.read_text(), (
+        assert actual_stcmd == expected_stcmd.read_text().rstrip(), (
+            f"st.cmd mismatch for {stem}"
+        )
+        assert actual_subst == expected_subst.read_text().rstrip(), (
             f"ioc.subst mismatch for {stem}"
         )
 

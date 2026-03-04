@@ -109,7 +109,13 @@ Note: install files use `.yml` extension, not `.yaml`.
 
 ## Step 8 — Create converter if needed
 
-If `name` must be dropped (leaf entity), create or update
+**Default: keep `name: type: id`** — only drop `name` after verifying the
+entity is truly a leaf. Before dropping, check all `type: object` params in the
+module's support YAML and sample IOC YAMLs to confirm nothing references the
+entity by name. Untyped `object` params (no specific type constraint) can
+accept multiple entity types — check all of them.
+
+If `name` must be dropped (confirmed leaf entity), create or update
 `src/builder2ibek/converters/<module>.py`. Follow the pattern in existing
 converters like `src/builder2ibek/converters/cmsIon.py`.
 
