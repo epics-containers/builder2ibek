@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "builder2ibek": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "fastmcp", "run", "mcp_server.py"]
+    }
+  }
+}
