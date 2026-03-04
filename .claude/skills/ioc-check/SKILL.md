@@ -18,24 +18,8 @@ ioc.yaml, or any other file.
 
 ## Step 1 — Resolve services repo and IOC name
 
-Resolve the services repo using the same priority order as `ioc-convert`:
-
-1. **Explicit argument** — if `$1` is provided, use it directly.
-
-2. **Infer from IOC prefix** — derive the beamline name from the XML filename:
-   - Extract the first `-`-delimited segment, e.g. `BL11I-CS-IOC-09.xml` → `BL11I`
-   - Strip the leading `BL`, separate digits and trailing letter(s):
-     `BL11I` → digits=`11`, letter=`I` → beamline=`i11`
-   - Services repo name = `<beamline>-services`, e.g. `i11-services`
-   - Look for it at `/workspaces/<services-repo-name>/`
-
-3. **Fallback** — read `.claude/skills/ioc-convert/last-services-repo` if the
-   inferred path does not exist on disk.
-
-Tell the user which services repo is being used and how it was resolved.
-
-Write the resolved path to `.claude/skills/ioc-convert/last-services-repo`
-(shared cache with `ioc-convert`).
+Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
+using `$1` (if provided) or the IOC prefix from `$0`.
 
 Derive `IOC_NAME` = lowercase XML filename without extension.
 
@@ -68,19 +52,9 @@ isolated directory tree instead of the shared `/epics/`.
 uvx --python 3.13 ibek runtime generate2 --no-pvi <services-repo>/services/$IOC_NAME/config
 ```
 
-(The `EPICS_ROOT` env var ensures output goes to `$EPICS_ROOT/runtime/`.)
-
-**If generation fails**, categorise and report the errors using this table,
-then **stop** — do not make any fixes:
-
-| Error | Cause | What to fix (user action) |
-|---|---|---|
-| Unknown entity type `foo.Bar` | No entity model exists | Add model to `ibek-support-dls/foo/` or `ibek-support/foo/`, then re-run `/ioc-convert` |
-| Unknown parameter `X` on `foo.Bar` | Parameter missing or renamed in entity model | Check support YAML or converter in `src/builder2ibek/converters/foo.py` |
-| Validation error on a field | Wrong ibek type, or XML value ibek can't accept | Fix type in support YAML or add converter to transform/drop the attribute |
-| `object BL19I-VA-... not found` | Referenced entity's id field is `type: str` instead of `type: id` | Change id field to `type: id` in the referenced entity's support YAML |
-| `Field required` on a parameter | Parameter has no default and wasn't set in XML | Add `default:` to the parameter in the support YAML |
-| `database arg 'fooN' not found in context` | Template uses a param name that the entity model doesn't define | Check the template's `# % macro` declarations; fix via converter (renaming) or support YAML |
+**If generation fails**, categorise and report the errors using the table in
+[error-categorization.md](../shared/error-categorization.md), then **stop** —
+do not make any fixes.
 
 **If generation succeeds**, continue to Steps 4–5.
 
@@ -90,30 +64,13 @@ then **stop** — do not make any fixes:
 
 Read `$EPICS_ROOT/runtime/st.cmd`.
 
-Find the original VxWorks boot script:
-- Derive `BLXX` from the IOC name: first two dash-delimited fields
-  (`BL19I-VA-IOC-01` → `BL19I`)
-- Check the deployed prod version:
-  ```bash
-  ls /dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/
-  ```
-  then read the latest version's boot file:
-  ```
-  /dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/<version>/bin/vxWorks-ppc604_long/<IOC-NAME>.boot
-  ```
-  (filename may be `st<IOC-NAME>.boot` or similar)
-- Fallback: in-progress builder version at:
-  ```
-  /dls_sw/work/R3.14.12.7/support/<BUILDER>/iocs/<IOC>/cmd/<IOC>.boot
-  ```
+Find the original VxWorks boot script following
+[find-boot-script.md](../shared/find-boot-script.md).
 
 Compare the original and generated scripts. For each meaningful command in the
 original, report whether the equivalent is present in `st.cmd`. Flag any
 command that is absent from `st.cmd` and is **not** in the expected-differences
-table below.
-
-**Expected VxWorks → RTEMS differences (do not flag as missing)** — see
-[vxworks-to-rtems-differences.md](../shared/vxworks-to-rtems-differences.md).
+table: [vxworks-to-rtems-differences.md](../shared/vxworks-to-rtems-differences.md).
 
 ---
 

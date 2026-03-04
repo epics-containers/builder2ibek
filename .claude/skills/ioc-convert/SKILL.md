@@ -27,8 +27,7 @@ export EPICS_ROOT=$(mktemp -d /tmp/epics-ioc-convert-XXXXXX)
 ```
 
 All subsequent `ibek` and `./update-schema` commands in this session (and in
-subagent prompts) must have `EPICS_ROOT` set to this value. The `ibek` CLI
-reads `EPICS_ROOT` from the environment and derives all paths from it.
+subagent prompts) must have `EPICS_ROOT` set to this value.
 
 ---
 
@@ -36,39 +35,8 @@ reads `EPICS_ROOT` from the environment and derives all paths from it.
 
 ### 1a. Resolve the services repo
 
-Resolve the services repo using the following priority order:
-
-1. **Explicit argument** — if `$1` is provided, use it directly.
-
-2. **Infer from IOC prefix** — derive the beamline name from the XML filename:
-   - Extract the first `-`-delimited segment, e.g. `BL11I-CS-IOC-09.xml` → `BL11I`
-   - Strip the leading `BL`, separate digits and trailing letter(s):
-     `BL11I` → digits=`11`, letter=`I` → beamline=`i11`
-   - Services repo name = `<beamline>-services`, e.g. `i11-services`
-   - Look for it at `/workspaces/<services-repo-name>/`
-
-3. **Fallback** — read `.claude/skills/ioc-convert/last-services-repo` if the
-   inferred path does not exist on disk.
-
-If the resolved path does not exist locally, try to clone it:
-```bash
-git clone git@gitlab.diamond.ac.uk:controls/containers/beamline/<services-repo-name> /workspaces/<services-repo-name>
-```
-If the clone fails (e.g. the repo doesn't exist yet), create a minimal skeleton:
-```bash
-mkdir -p /workspaces/<services-repo-name>/services/$IOC_NAME/config
-```
-This is enough for the conversion to proceed — the ioc.yaml will be written
-into the config directory.
-
-Tell the user which services repo is being used and how it was resolved.
-
-Once the services repo is known, write its absolute path to
-`.claude/skills/ioc-convert/last-services-repo` (overwrite if present).
-
-Derive `IOC_NAME` = lowercase XML filename without extension.
-
-`INSTANCE_DIR` = `<services-repo>/services/$IOC_NAME`
+Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
+using `$1` (if provided) or the IOC prefix from `$0`.
 
 - If `INSTANCE_DIR` already exists and `config/ioc.yaml` is present:
   - Run `git -C <services-repo> status` — if ioc.yaml is modified or untracked,
@@ -78,28 +46,25 @@ Derive `IOC_NAME` = lowercase XML filename without extension.
     `cp -r <services-repo>/services/.ioc_template/ $INSTANCE_DIR`
   - Otherwise: `mkdir -p $INSTANCE_DIR/config/`
 
-Read the `_RELEASE` file next to the XML to resolve support module paths:
+### 1b. Resolve support module paths
 
-1. Read `<xml-dir>/<IOC-NAME>_RELEASE` (where `<IOC-NAME>` is the uppercase
-   XML filename without extension, e.g. `BL21I-VA-IOC-01_RELEASE`)
-2. Read the BUILDER's `configure/RELEASE` (or `configure/RELEASE.<arch>.Common`)
-   to get the `SUPPORT=` macro value
-3. Substitute `$(SUPPORT)` in each `_RELEASE` line to get absolute paths
-4. Record a **module path table** mapping module name → resolved path, e.g.:
-   ```
-   ethercat → /dls_sw/prod/R3.14.12.7/support/ethercat/7-2
-   rackFan  → /dls_sw/prod/R3.14.12.7/support/rackFan/2-12
-   ```
+Read the `_RELEASE` file next to the XML following
+[find-module-path.md](../shared/find-module-path.md). Record a **module path
+table** mapping module name → resolved path, e.g.:
+```
+ethercat → /dls_sw/prod/R3.14.12.7/support/ethercat/7-2
+rackFan  → /dls_sw/prod/R3.14.12.7/support/rackFan/2-12
+```
 
-This table will be passed to subagents in Phases 2 and 4 so they can find
-`builder.py` and `db/` files without guessing directory names.
+This table will be passed to subagents in Phases 2 and 4.
 
-Run the conversion:
+### 1c. Run the conversion
+
 ```bash
 uv run builder2ibek xml2yaml $0 --yaml $INSTANCE_DIR/config/ioc.yaml
 ```
 
-### 1b. Review ioc.yaml and fix converters
+### 1d. Review ioc.yaml and fix converters
 
 Read the generated `ioc.yaml`. **Do not read large referenced files yet** —
 that work is delegated to subagents in Phase 2.
@@ -118,56 +83,32 @@ rather than editing ioc.yaml by hand.
 **dlsPLC entities** — read
 [docs/reference/dlsplc-migration.md](../../../docs/reference/dlsplc-migration.md)
 and check the "What requires manual attention" table. Every case listed there
-(`vacuumValveRead2`, `vacuumPump.*`, `flow.flow_asyn`, `vacuumValveBistable`,
-partial `temperature.*`) should be fixed by implementing or improving the
-relevant converter — not by editing ioc.yaml by hand.
+should be fixed by implementing or improving the relevant converter.
 
 **Converters that emit multiple entities** — when a single XML element must
 produce more than one ibek entity, use `entity.add_entity(extra)` and
 `entity.delete_me()`. **Critical**: pass plain `dict` objects to
-`add_entity()`, never `Entity(...)`. Creating a new `Entity` resets the
-class-level `_extra_entities` list, silently dropping all previously added
-extras:
-```python
-entity.add_entity({"type": "dlsPLC.read100", "device": entity.device, ...})
-entity.add_entity({"type": "dlsPLC.read100", "device": entity.device, ...})
-entity.delete_me()
-```
+`add_entity()`, never `Entity(...)`.
 
 **Auto-substitution entities (`auto_*`)** — entity types like
 `module.auto_xxxx` correspond to a database template `xxxx.template` in the
-`db/` directory of the support module `module`. For example:
-- `mks937a.auto_mks937aInterlock` → `mks937aInterlock.template` in `mks937a/db/`
-- `BL04I.auto_BL04I_flux` → `BL04I_flux.template` in `BL04I/db/`
+`db/` directory of the support module. These need a support YAML entity model
+with just parameters and a `databases` section — no `pre_init` or `post_init`.
 
-These need a support YAML entity model with just parameters and a `databases`
-section — no `pre_init` or `post_init`. The parameters come from the XML
-attributes; the database file is `$(<MODULE>)/db/xxxx.template`. Use `.*:` in
-`databases.args` to pass all parameters through, and drop `name` if present
-(it is a gui label, not a cross-reference). Check the `# % macro` lines in
-the template to identify required vs optional parameters.
-
-After any converter change: re-run xml2yaml and repeat 1b until the ioc.yaml
+After any converter change: re-run xml2yaml and repeat 1d until the ioc.yaml
 is clean of converter-fixable issues.
 
-### 1c. Enumerate modules needing support YAMLs
+### 1e. Enumerate modules needing support YAMLs
 
 Parse the final ioc.yaml. For each entity type `<module>.<Entity>`:
 
 1. Check whether the support YAML already exists — **always check BOTH
-   submodules before concluding anything is missing**:
-   - `ibek-support-dls/<module>/<module>.ibek.support.yaml`
-   - `ibek-support/<module>/<module>.ibek.support.yaml`
-   The module directory name and the YAML filename are always the same as
-   `<module>`. Use `ls ibek-support-dls/ ibek-support/` to see all available
-   modules, then check both before declaring something missing.
+   submodules** (`ibek-support-dls/<module>/` and `ibek-support/<module>/`)
+   before concluding anything is missing.
 2. If it exists, check whether the specific entity model is present inside it.
-3. Collect all `<module>` names where the support YAML is **missing** or
-   **missing the required entity model**.
+3. Collect all modules where the support YAML or entity model is missing.
 
-Also note for each module:
-- The entity type names used (e.g. `mks937b.mks937bImg`)
-- All parameter names and sample values from the ioc.yaml entities
+Also note for each module: entity type names used and sample parameter values.
 
 Tell the user: "Found N modules needing support YAMLs: [list]. Launching
 parallel subagents."
@@ -177,91 +118,18 @@ parallel subagents."
 ## Phase 2 — Parallel support YAML creation (subagents)
 
 **Launch one `general-purpose` subagent per module** that needs a support YAML
-or entity model. Launch all of them in a single message so they run in
-parallel.
-
-Each subagent operates independently and writes its own files directly.
-Since modules map to different file paths, concurrent writes are safe.
+or entity model. Launch all in a single message so they run in parallel.
 
 ### Subagent prompt template
 
-For each module, construct a prompt containing **all** of the following:
+For each module, construct a prompt:
 
----
-**Briefing** (include verbatim in every subagent prompt):
-
-> You are writing an ibek support YAML for an EPICS support module.
-> The ibek support YAML format defines `entity_models` — each one maps to a
-> Python class in the module's `builder.py`. Key rules:
+> Read `/workspaces/builder2ibek/.claude/skills/support-create/SKILL.md` and
+> follow its instructions to create a support YAML for the following module.
 >
-> - Parameter names in the ibek YAML must match XML attribute names exactly
->   (so `xml2yaml` round-trips correctly).
-> - `TemplateFile` in builder.py → `databases[].file` in the ibek YAML.
-> - `PostIocInitialise`/`Initialise`/`InitialiseOnce` methods → `post_init`/`pre_init`.
-> - `InitialiseOnce` → add `when: first` to the pre_init command.
-> - `pre_init`, `databases`, `post_init` values are Jinja2 templates with
->   entity parameters as context. `{{P}}` resolves to parameter `P`.
-> - `databases.args`: `key: value` pairs passed as macros to `dbLoadRecords`.
->   Omitting the value uses the parameter of the same name. `.*:` passes all
->   parameters through (correct for pure `AutoSubstitution` entities).
-> - `name` parameter → `type: id` only when another entity cross-references
->   this one (asyn port creators). For leaf entities, drop `name`.
-> - `PORT` parameter → `type: object` (asyn port reference).
-> - `STREAM_PROTOCOL_PATH` is handled globally — do NOT add it to pre_init.
-> - Macros without a default in the compiled `.db` file must be ibek parameters.
->   Macros with a default should be optional parameters so instances can override.
-> - **Infer parameter types from the db template** — do not default everything
->   to `type: str`. Read the `.db`/`.template` file and check how each macro is
->   used in EPICS record fields:
->   - Numeric fields (DRVH, DRVL, DOL, HIGH, LOW, HOPR, LOPR, HIHI, LOLO,
->     VAL on ao/ai/calc, EGU scaling fields) → `type: float`
->   - Integer fields (SCAN index, ADDR, channel, slot, NAXES, PLC number,
->     SREV, PREC) → `type: int`
->   - String/PV fields (DESC, INP, OUT, PORT, device names) → `type: str`
->   - This matters because xml2yaml preserves YAML's native typing: `0.0001`
->     becomes a float, `42` becomes an int. If the support YAML says
->     `type: str` but the ioc.yaml value is a float, schema validation fails.
-> - Support YAML path (DLS-specific): `ibek-support-dls/<module>/<module>.ibek.support.yaml`
-> - Support YAML path (community): `ibek-support/<module>/<module>.ibek.support.yaml`
-> - Install file path: `ibek-support-dls/<module>/<module>.install.yml`
->   (note: `.yml` not `.yaml`)
->
-> Always look at existing examples first:
-> - `ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml` — 4 variants, optional params with defaults
-> - `ibek-support-dls/cmsIon/cmsIon.ibek.support.yaml` — name dropped (leaf entity)
-> - `ibek-support-dls/digitelMpc/digitelMpc.ibek.support.yaml`
->
-> Find builder.py and db files using the **known path from _RELEASE** provided
-> in the module-specific context below — this gives the exact module directory
-> name and version. If the known path is not provided, fall back to:
-> `/dls_sw/prod/R3.14.12.7/support/<module>/<version>/etc/builder.py`
-> (list `/dls_sw/prod/R3.14.12.7/support/<module>/` to find the version)
->
-> Find db files at: `<known-path>/db/` or
-> `/dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/`
-> Check `# % macro` lines to identify required vs optional macros.
->
-> For a systematic guide to reading builder.py files — including how to
-> identify classes, extract parameters with types and defaults, find database
-> macros, and determine pre_init/post_init commands — see
-> [builder-py-analysis.md](../../shared/builder-py-analysis.md).
->
-> Do NOT call `./update-schema` — the main agent will do that after all
-> subagents complete.
->
-> After writing or modifying any support YAML or converter, run `uv run pytest`
-> and fix any failures before finishing. This catches regressions early.
-
----
-
-**Module-specific context** (filled in by main agent per module):
-
 > Module name: `<module>`
 >
-> Known path from _RELEASE: `/dls_sw/prod/R3.14.12.7/support/<module>/<version>`
-> (Use this path to find `etc/builder.py` and `db/` files. If you need the
-> latest version instead, list the parent directory — but this confirms the
-> correct module directory name.)
+> Known path from _RELEASE: `<resolved-path>`
 >
 > Entity types used in this IOC (from ioc.yaml):
 > - `<module>.<EntityA>` — parameters seen: `P=BL19I-VA-IMG-01`, `name=IMG01`, ...
@@ -270,16 +138,13 @@ For each module, construct a prompt containing **all** of the following:
 > Check both `ibek-support-dls/<module>/` and `ibek-support/<module>/` before
 > creating anything — the community version may already exist.
 >
-> Write (or update) the support YAML. If the module is DLS-specific, also
-> write the `install.yml`. Return a brief summary of what you created/changed.
-
----
+> Write (or update) the support YAML. Return a brief summary of what you
+> created/changed.
 
 ### After all subagents complete
 
 Collect their summaries. Check whether any subagent reported a failure or
-uncertainty (e.g. "could not find builder.py" or "unclear what pre_init
-should be"). Note these for manual follow-up.
+uncertainty. Note these for manual follow-up.
 
 ---
 
@@ -292,16 +157,12 @@ ibek dev instance <services-repo>/services/$IOC_NAME
 ./update-schema
 ```
 
-`EPICS_ROOT` must be exported in the shell so that `ibek dev instance`,
-`./update-schema`, and `generate2` all use the isolated directory tree.
-
 If any converters or support YAMLs were created or modified in Phase 2, run
-the builder2ibek test suite before generation to catch regressions:
+the builder2ibek test suite before generation:
 ```bash
 uv run pytest
 ```
-Fix any failures before continuing. If a test was already failing before this
-session, note it and proceed.
+Fix any failures before continuing.
 
 Run generation:
 ```bash
@@ -319,38 +180,14 @@ uvx --python 3.13 ibek runtime generate2 --no-pvi <services-repo>/services/$IOC_
 Group all errors by the module they implicate. For each group, launch one
 `general-purpose` subagent. Launch all in a single message.
 
-**Distinguish the fix type for each error** before spawning, as it affects
-whether the subagent also needs to re-run xml2yaml:
-
-| Error | Fix type |
-|---|---|
-| Unknown entity type `foo.Bar` | Support YAML — add entity model |
-| Unknown parameter `X` on `foo.Bar` | Support YAML — add parameter; or Converter — rename/drop attribute |
-| Validation error on a field | Support YAML — fix type; or Converter — transform value |
-| `object BL19I-VA-... not found` | Support YAML — change id field to `type: id` |
-| `Field required` on a parameter | Support YAML — add `default:` |
-| `database arg 'fooN' not found in context` | Support YAML — fix database args or add param aliases via Jinja2 |
-| Attribute value wrong or unwanted | Converter — re-run xml2yaml after fix |
-
-Errors that require **converter** fixes cannot be fully resolved by a subagent
-alone — the subagent should make the converter fix and report back; the main
-agent then re-runs xml2yaml before the next generate2 attempt.
-
 ### Fix subagent prompt template
 
-For each error group, construct a prompt containing:
-
----
-**Briefing** (include verbatim — same ibek rules as Phase 2 briefing above):
-> [paste the full briefing block from Phase 2]
-
----
-**Error-specific context** (filled in by main agent):
-
+> Read `/workspaces/builder2ibek/.claude/skills/support-fix/SKILL.md` and
+> follow its instructions to fix the following errors.
+>
 > Module: `<module>`
 >
-> Known path from _RELEASE: `/dls_sw/prod/R3.14.12.7/support/<module>/<version>`
-> (Use this to find `etc/builder.py` and `db/` files.)
+> Known path from _RELEASE: `<resolved-path>`
 >
 > Error(s) from `ibek runtime generate2`:
 > ```
@@ -364,33 +201,16 @@ For each error group, construct a prompt containing:
 >
 > Relevant db file(s) to check: `<known-path>/db/<file>.db`
 >
-> Fix the support YAML (and/or converter if needed). Do NOT run ./update-schema
-> or xml2yaml — the main agent handles re-runs.
->
-> After making changes, run `uv run pytest` and fix any failures before
-> finishing. Return a brief summary of what you changed and whether a converter
-> fix was also needed.
-
----
+> Return a summary of what you changed and whether a converter fix was needed.
 
 ### After all fix subagents complete
 
 1. If any subagent made converter fixes: re-run xml2yaml.
 2. Run `./update-schema`.
-3. Run `uv run pytest` — fix any regressions before proceeding (a failing test
-   means a converter or support YAML change broke an existing IOC; fix it now
-   while still in the fixing loop).
+3. Run `uv run pytest` — fix any regressions before proceeding.
 4. Re-run `generate2`.
 5. If errors remain, repeat Phase 4 (but at most 3 iterations — if errors
    persist after 3 rounds, report to the user and ask for guidance).
-
-**Object-reference chain note**: if you see `object BL19I-VA-... not found`,
-check the `type:` of the id field in the referenced entity's support YAML —
-it must be `type: id` not `type: str`. Also check the `name` vs `device`
-pattern: some modules use `name` as `type: id` (e.g. `mks937b.mks937bImg` →
-id = `IMG01`), others use `device` as `type: id` (e.g. `mks937a.mks937aImg`
-→ id = `BL19I-VA-IMG-03`). Cross-referencing converters like `vacuumSpace.py`
-must skip entities whose `name` is still present after conversion.
 
 ---
 
@@ -398,54 +218,31 @@ must skip entities whose `name` is still present after conversion.
 
 ### 5a. Validate st.cmd
 
-Read `$EPICS_ROOT/runtime/st.cmd`. Verify:
+Read `$EPICS_ROOT/runtime/st.cmd`.
 
-- Environment variables set correctly (`EPICS_TS_MIN_WEST`, `STREAM_PROTOCOL_PATH`)
-- `drvAsynIPPortConfigure` calls present with correct port name and IP:port
-- All `pre_init` commands present (StreamDevice protocol path, driver init calls)
-- `iocInit` is present
-- `seq(...)` or other `post_init` calls present where expected
+Find the original VxWorks boot script following
+[find-boot-script.md](../shared/find-boot-script.md).
 
-Find the original VxWorks boot script:
-```bash
-ls /dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/
-```
-The beamline segment (`BLXX`) = first two dash-separated fields of the IOC name.
-Then read:
-```
-/dls_sw/prod/R3.14.12.7/ioc/<BLXX>/<IOC-NAME>/<version>/bin/vxWorks-ppc604_long/<IOC-NAME>.boot
-```
-
-Expected differences (do not flag these as problems) — see
+Compare the original and generated scripts. For each meaningful command in the
+original, check whether the equivalent is present in `st.cmd`. Flag any
+command that is absent and is **not** in the expected-differences table:
 [vxworks-to-rtems-differences.md](../shared/vxworks-to-rtems-differences.md).
-
-If commands from the original are missing and not in the table, the relevant
-entity model's `pre_init` or `post_init` section needs updating.
 
 ### 5b. Validate ioc.subst
 
-Read `$EPICS_ROOT/runtime/ioc.subst`. Verify each `file` block:
-
-- Correct db file path (matches the db file in the support module)
+Read `$EPICS_ROOT/runtime/ioc.subst`. For each `file` block verify:
+- Correct db file path
 - All required macros present in `pattern`
 - Macro values match the ioc.yaml entity parameters
 
 > **`entity_enabled` and `type` in pattern columns**: When a support YAML uses
 > `.*:` in `databases.args`, ibek passes all entity attributes as db macros —
-> including `entity_enabled` (added by ibek to every entity model) and `type`
-> (the entity type string). These will appear as extra columns in `ioc.subst`
-> pattern blocks. They are **not** referenced in the db file and are harmless —
-> do not flag them as errors.
+> including `entity_enabled` and `type`. These are harmless — do not flag them.
 
 To check what macros a db file expects:
 ```bash
 grep "^# % macro" /dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/<file>.db
 ```
-
-> **db-compare not available in this devcontainer**: Full record-level
-> comparison requires running `msi` over `ioc.subst` with all support module
-> `/db` include paths, which are not present here. For now, validate by
-> inspection against the original `.db` files.
 
 ### 5c. Report and suggest commits
 
@@ -459,21 +256,13 @@ Once clean, **do not commit anything**. Report to the user:
 5. **Suggested git commands** for the user to run when satisfied:
 
 ```bash
-# In /workspaces/<beamline>-services — new IOC instance (always needed):
+# In /workspaces/<beamline>-services — new IOC instance:
 git -C /workspaces/<beamline>-services add services/<ioc-name>/
 git -C /workspaces/<beamline>-services commit -m "Add <ioc-name> (converted from builder XML)"
 
 # In /workspaces/builder2ibek — only if support YAMLs or converters changed:
-git -C /workspaces/builder2ibek add ibek-support-dls/<module>/   # DLS-internal module
-git -C /workspaces/builder2ibek add ibek-support/<module>/       # community module
-git -C /workspaces/builder2ibek add src/builder2ibek/converters/ # converter
-git -C /workspaces/builder2ibek add tests/samples/               # optional regression test
+git -C /workspaces/builder2ibek add ibek-support-dls/<module>/
+git -C /workspaces/builder2ibek add ibek-support/<module>/
+git -C /workspaces/builder2ibek add src/builder2ibek/converters/
 git -C /workspaces/builder2ibek commit
 ```
-
-> **Note on submodules**: Entity models live in one of two submodules:
-> - `ibek-support-dls/` — DLS-specific modules (hidenRGA, cmsIon, digitelMpc, dlsPLC, ...)
-> - `ibek-support/` — Community modules (asyn, StreamDevice, iocStats, autosave, ...)
->
-> Always check both before creating a new entity model — the community version
-> may already exist in `ibek-support/`.
