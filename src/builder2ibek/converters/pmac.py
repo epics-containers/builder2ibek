@@ -62,6 +62,15 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.INIT = str(entity.INIT)
         if hasattr(entity, "HOME") and entity.HOME is not None:
             entity.HOME = str(entity.HOME)
+        # coerce numeric-looking str params to str
+        for field in ("HLM", "LLM", "VMAX", "DHLM", "DLLM", "BACC", "JAR"):
+            val = entity.get(field)
+            if val is not None and not isinstance(val, str):
+                entity[field] = str(val)
+        # convert NTM to enum
+        ntm = entity.get("NTM")
+        if ntm is not None:
+            entity.NTM = "YES" if ntm == 1 else "NO"
 
     elif entity_type == "auto_translated_motor":
         # remove GUI only parameters
@@ -69,6 +78,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     elif entity_type == "GeoBrick":
         entity.rename("Port", "pmacAsynPort")
+        # remove XML-builder GUI-only attributes
+        entity.remove("ControlIP")
+        entity.remove("ControlMode")
+        entity.remove("ControlPort")
+        entity.remove("Description")
 
     elif entity_type == "PowerPMAC":
         # standardise the name of the SSH port reference

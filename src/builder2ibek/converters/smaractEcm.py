@@ -12,3 +12,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "SmaractSmarpodAxis":
         entity.remove("name")
+
+    if entity_type == "Smarpod":
+        # resolution is type: str but XML parses scientific notation as float
+        if hasattr(entity, "resolution") and entity.resolution is not None:
+            entity.resolution = str(entity.resolution)

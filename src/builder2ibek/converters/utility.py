@@ -10,5 +10,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     XML to YAML specialist convertor function for the utility support module
     """
 
-    if entity_type in ["pingWait"]:
-        entity.remove("name")
+    # pingWait is handled by 'ibek do-wait' in epics-containers
+    if entity_type == "pingWait":
+        entity.delete_me()
+        return

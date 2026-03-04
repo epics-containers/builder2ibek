@@ -21,6 +21,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type != "fastVacuumMaster":
         entity.remove("name")
 
+    if entity_type == "flow":
+        # address/bit params are type: str in support YAML but XML parses as int
+        for field in ["loaddress", "lobit", "loloaddress", "lolobit"]:
+            if hasattr(entity, field) and entity[field] is not None:
+                entity[field] = str(entity[field])
+
     # remove blank interlock name fields
     new_entity = entity.copy()
     for key in entity.keys():

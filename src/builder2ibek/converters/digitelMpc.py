@@ -15,5 +15,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         if unit is not None:
             unit_enum = f"{int(unit):02d}"
             entity.unit = unit_enum
-    elif entity_type in ["digitelMpcIonp", "digitelMpcIonpGroup", "dummyIonp"]:
+
+    if entity_type in [
+        "digitelMpcIonp",
+        "digitelMpcIonpGroup",
+        "dummyIonp",
+        "digitelMpcTsp",
+    ]:
         entity.remove("name")
