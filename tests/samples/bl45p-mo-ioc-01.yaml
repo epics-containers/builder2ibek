@@ -55,7 +55,9 @@ entities:
     DLLM: -10000000
     EGU: deg
     FOFF: Variable
+    HLM: 0.0
     HOMEVISSTR: Absolute Encoder
+    LLM: 0.0
     M: :THETA:TOP
     MRES: 0.087890625
     P: BL45P-MO-STAGE-01
@@ -75,7 +77,9 @@ entities:
     DLLM: -10000000
     EGU: deg
     FOFF: Variable
+    HLM: 0.0
     HOMEVISSTR: Absolute Encoder
+    LLM: 0.0
     M: :THETA:BOT
     MRES: 0.087890625
     P: BL45P-MO-STAGE-01
@@ -94,8 +98,10 @@ entities:
     DLLM: -10000000
     EGU: deg
     FOFF: Variable
+    HLM: 0.0
     HOMEVIS: 0
     HOMEVISSTR: Absolute Encoder
+    LLM: 0.0
     M: :ENDAT
     MRES: 4.3e-05
     P: BL45P-MO-CHOP-01
@@ -114,8 +120,10 @@ entities:
     DLLM: -10000000
     EGU: deg
     FOFF: Variable
+    HLM: 0.0
     HOMEVIS: 0
     HOMEVISSTR: Absolute Encoder
+    LLM: 0.0
     M: :BISS
     MRES: 0.000687
     P: BL45P-MO-CHOP-01
@@ -133,6 +141,8 @@ entities:
     DLLM: 0
     EGU: mm
     FOFF: Variable
+    HLM: 0.0
+    LLM: 0.0
     M: :X
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
@@ -150,6 +160,8 @@ entities:
     DLLM: -1
     EGU: mm
     FOFF: Variable
+    HLM: 0.0
+    LLM: 0.0
     M: :Y:TOP
     MRES: 0.0005
     P: BL45P-MO-STAGE-01
@@ -167,6 +179,8 @@ entities:
     DLLM: -1
     EGU: mm
     FOFF: Variable
+    HLM: 0.0
+    LLM: 0.0
     M: :Y:BOT
     MRES: 0.0005
     P: BL45P-MO-STAGE-01
@@ -212,6 +226,8 @@ entities:
     DLLM: -10000
     EGU: deg
     FOFF: Variable
+    HLM: 0.0
+    LLM: 0.0
     M: :THETA:POS
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
@@ -231,6 +247,8 @@ entities:
     DLLM: -360
     EGU: deg
     FOFF: Variable
+    HLM: 0.0
+    LLM: 0.0
     M: :THETA:SKEW
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
@@ -249,6 +267,8 @@ entities:
     DLLM: -1
     EGU: mm
     FOFF: Variable
+    HLM: 0.0
+    LLM: 0.0
     M: :CS:Y
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
@@ -267,6 +287,8 @@ entities:
     DLLM: -2
     EGU: mm
     FOFF: Variable
+    HLM: 0.0
+    LLM: 0.0
     M: :CS:Y:STRETCH
     MRES: 0.0001
     P: BL45P-MO-STAGE-01

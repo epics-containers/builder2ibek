@@ -181,10 +181,10 @@ pattern
 
 file "$(DIGITELMPC)/db/digitelMpc.template" {
 pattern 
-	{ "device",          "port",    "unit", "proto",            "name"  }
-	{ "BL04I-VA-MPC-01", "ty_40_2", "01",   "digitelMpc.proto", "MPC01" }
-	{ "BL04I-VA-MPC-02", "ty_40_3", "01",   "digitelMpc.proto", "MPC02" }
-	{ "BL04I-VA-MPC-03", "ty_40_4", "01",   "digitelMpc.proto", "MPC03" }
+	{ "device",          "port",    "unit", "proto"            }
+	{ "BL04I-VA-MPC-01", "ty_40_2", "01",   "digitelMpc.proto" }
+	{ "BL04I-VA-MPC-02", "ty_40_3", "01",   "digitelMpc.proto" }
+	{ "BL04I-VA-MPC-03", "ty_40_4", "01",   "digitelMpc.proto" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpcIonp.template" {

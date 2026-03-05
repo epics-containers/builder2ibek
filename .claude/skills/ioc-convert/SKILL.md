@@ -99,6 +99,12 @@ produce more than one ibek entity, use `entity.add_entity(extra)` and
 `db/` directory of the support module. These need a support YAML entity model
 with just parameters and a `databases` section — no `pre_init` or `post_init`.
 
+**ethercat IOCs** — the `ethercat` support module requires migration to
+`fastcs-catio` and cannot be converted with a standard support YAML. If an IOC
+uses ethercat entities, emit a TODO stub in the ioc.yaml and report to the
+user that it needs manual migration. Do not attempt to create an ethercat
+support YAML.
+
 After any converter change: re-run xml2yaml and repeat 1d until the ioc.yaml
 is clean of converter-fixable issues.
 

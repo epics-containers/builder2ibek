@@ -97,16 +97,16 @@ pattern
 
 file "$(DIGITELMPC)/db/digitelMpc.template" {
 pattern 
-	{ "device",          "port",          "unit", "proto",            "name"     }
-	{ "SR03S-VA-MPC-01", "MPC_S_01_PORT", "01",   "digitelMpc.proto", "MPC_S_01" }
-	{ "SR03A-VA-MPC-01", "MPC_A_01_PORT", "01",   "digitelMpc.proto", "MPC_A_01" }
-	{ "SR03A-VA-MPC-02", "MPC_A_02_PORT", "01",   "digitelMpc.proto", "MPC_A_02" }
-	{ "SR03A-VA-MPC-03", "MPC_A_03_PORT", "01",   "digitelMpc.proto", "MPC_A_03" }
-	{ "SR03A-VA-MPC-04", "MPC_A_04_PORT", "01",   "digitelMpc.proto", "MPC_A_04" }
-	{ "SR03A-VA-MPC-05", "MPC_A_05_PORT", "01",   "digitelMpc.proto", "MPC_A_05" }
-	{ "SR03A-VA-MPC-06", "MPC_A_06_PORT", "01",   "digitelMpc.proto", "MPC_A_06" }
-	{ "SR03A-VA-MPC-07", "MPC_A_07_PORT", "01",   "digitelMpc.proto", "MPC_A_07" }
-	{ "SR03A-VA-MPC-08", "MPC_A_08_PORT", "01",   "digitelMpc.proto", "MPC_A_08" }
+	{ "device",          "port",          "unit", "proto"            }
+	{ "SR03S-VA-MPC-01", "MPC_S_01_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-01", "MPC_A_01_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-02", "MPC_A_02_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-03", "MPC_A_03_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-04", "MPC_A_04_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-05", "MPC_A_05_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-06", "MPC_A_06_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-07", "MPC_A_07_PORT", "01",   "digitelMpc.proto" }
+	{ "SR03A-VA-MPC-08", "MPC_A_08_PORT", "01",   "digitelMpc.proto" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpcIonp.template" {

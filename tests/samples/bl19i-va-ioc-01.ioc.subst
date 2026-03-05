@@ -201,13 +201,13 @@ pattern
 
 file "$(DIGITELMPC)/db/digitelMpc.template" {
 pattern 
-	{ "device",          "port",    "unit", "proto",            "name" }
-	{ "BL19I-VA-MPC-01", "ty_40_0", "01",   "digitelMpc.proto", "MPC1" }
-	{ "BL19I-VA-MPC-02", "ty_40_1", "01",   "digitelMpc.proto", "MPC2" }
-	{ "BL19I-VA-MPC-03", "ty_40_2", "01",   "digitelMpc.proto", "MPC3" }
-	{ "BL19I-VA-MPC-04", "ty_41_2", "01",   "digitelMpc.proto", "MPC4" }
-	{ "BL19I-VA-MPC-05", "ty_41_3", "01",   "digitelMpc.proto", "MPC5" }
-	{ "BL19I-VA-MPC-06", "ty_41_4", "01",   "digitelMpc.proto", "MPC6" }
+	{ "device",          "port",    "unit", "proto"            }
+	{ "BL19I-VA-MPC-01", "ty_40_0", "01",   "digitelMpc.proto" }
+	{ "BL19I-VA-MPC-02", "ty_40_1", "01",   "digitelMpc.proto" }
+	{ "BL19I-VA-MPC-03", "ty_40_2", "01",   "digitelMpc.proto" }
+	{ "BL19I-VA-MPC-04", "ty_41_2", "01",   "digitelMpc.proto" }
+	{ "BL19I-VA-MPC-05", "ty_41_3", "01",   "digitelMpc.proto" }
+	{ "BL19I-VA-MPC-06", "ty_41_4", "01",   "digitelMpc.proto" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpcIonp.template" {

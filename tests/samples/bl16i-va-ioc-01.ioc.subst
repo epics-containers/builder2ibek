@@ -179,13 +179,13 @@ pattern
 
 file "$(DIGITELMPC)/db/digitelMpc.template" {
 pattern 
-	{ "device",          "port",    "unit", "proto",            "name"            }
-	{ "BL16I-VA-MPC-01", "ty_40_1", "01",   "digitelMpc.proto", "BL16I-VA-MPC-01" }
-	{ "BL16I-VA-MPC-02", "ty_40_2", "01",   "digitelMpc.proto", "BL16I-VA-MPC-02" }
-	{ "BL16I-VA-MPC-03", "ty_40_3", "01",   "digitelMpc.proto", "BL16I-VA-MPC-03" }
-	{ "BL16I-VA-MPC-04", "ty_41_1", "01",   "digitelMpc.proto", "BL16I-VA-MPC-04" }
-	{ "BL16I-VA-MPC-05", "ty_41_2", "01",   "digitelMpc.proto", "BL16I-VA-MPC-05" }
-	{ "BL16I-VA-MPC-06", "ty_41_3", "01",   "digitelMpc.proto", "BL16I-VA-MPC-06" }
+	{ "device",          "port",    "unit", "proto"            }
+	{ "BL16I-VA-MPC-01", "ty_40_1", "01",   "digitelMpc.proto" }
+	{ "BL16I-VA-MPC-02", "ty_40_2", "01",   "digitelMpc.proto" }
+	{ "BL16I-VA-MPC-03", "ty_40_3", "01",   "digitelMpc.proto" }
+	{ "BL16I-VA-MPC-04", "ty_41_1", "01",   "digitelMpc.proto" }
+	{ "BL16I-VA-MPC-05", "ty_41_2", "01",   "digitelMpc.proto" }
+	{ "BL16I-VA-MPC-06", "ty_41_3", "01",   "digitelMpc.proto" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpcIonp.template" {

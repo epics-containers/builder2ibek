@@ -72,10 +72,12 @@ entities:
     EGU: mm
     ERES: 5e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :UPSTREAMX
     MRES: 5e-05
     OFF: 0
@@ -106,10 +108,12 @@ entities:
     EGU: mm
     ERES: 5e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :DOWNSTREAMX
     MRES: 5e-05
     OFF: 0
@@ -140,10 +144,12 @@ entities:
     EGU: mm
     ERES: 5e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :UPSTREAMY
     MRES: 5e-05
     OFF: 0
@@ -174,10 +180,12 @@ entities:
     EGU: mm
     ERES: 5e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :DOWNSTREAMY
     MRES: 5e-05
     OFF: 0
@@ -208,10 +216,12 @@ entities:
     EGU: mm
     ERES: 0.0001
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :X
     MRES: 0.0001
     OFF: 0
@@ -242,10 +252,12 @@ entities:
     EGU: mm
     ERES: 0.0004
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:Y
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Y
     MRES: 0.0004
     OFF: 0
@@ -276,10 +288,12 @@ entities:
     EGU: mm
     ERES: 0.0001
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Z
     MRES: 0.0001
     OFF: 0
@@ -310,10 +324,12 @@ entities:
     EGU: mm
     ERES: 0.0001
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :X
     MRES: 0.0001
     OFF: 0
@@ -344,10 +360,12 @@ entities:
     EGU: mm
     ERES: 0.0001
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Y
     MRES: 0.0001
     OFF: 0
@@ -378,10 +396,12 @@ entities:
     EGU: mm
     ERES: 1.00625e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :X
     MRES: 1.00625e-05
     OFF: 7.74383582973
@@ -412,10 +432,12 @@ entities:
     EGU: mm
     ERES: 2.540625e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :XGAP
     MRES: 2.540625e-05
     OFF: 6.718
@@ -446,10 +468,12 @@ entities:
     EGU: mm
     ERES: 1.00625e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Y
     MRES: 1.00625e-05
     OFF: 7.37141558383
@@ -480,10 +504,12 @@ entities:
     EGU: mm
     ERES: 2.540625e-05
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :YGAP
     MRES: 2.540625e-05
     OFF: 6.925559
@@ -514,10 +540,12 @@ entities:
     EGU: mm
     ERES: 8.4375e-06
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :CENTREY
     MRES: 8.4375e-06
     OFF: -2.519978
@@ -548,10 +576,12 @@ entities:
     EGU: mm
     ERES: 8.4375e-06
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :CENTREZ
     MRES: 8.4375e-06
     OFF: -2.5
@@ -582,10 +612,12 @@ entities:
     EGU: mm
     ERES: 0.0001
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :PLATEY
     MRES: 0.0001
     OFF: 0
@@ -616,10 +648,12 @@ entities:
     EGU: mm
     ERES: 0.0001
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :PLATEZ
     MRES: 0.0001
     OFF: 0
@@ -650,9 +684,11 @@ entities:
     EGU: deg
     ERES: 0.00219727
     FOFF: Variable
+    HLM: 0.0
     HLSV: NO_ALARM
     HOMEVIS: 0
     JAR: 30
+    LLM: 0.0
     M: :PHI
     MRES: 0.00219727
     OFF: 0
@@ -683,10 +719,12 @@ entities:
     EGU: deg
     ERES: 0.00054932
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:KAPPA
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :KAPPA
     MRES: 0.00054932
     OFF: -4
@@ -717,10 +755,12 @@ entities:
     EGU: mm
     ERES: 0.0003125
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Y
     MRES: 0.0003125
     OFF: 0
@@ -751,10 +791,12 @@ entities:
     EGU: mm
     ERES: 0.0003125
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Z
     MRES: 0.0003125
     OFF: 0
@@ -785,10 +827,12 @@ entities:
     EGU: mm
     ERES: 0.0001
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:X
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :X
     MRES: 0.0001
     OFF: 0
@@ -819,10 +863,12 @@ entities:
     EGU: mm
     ERES: 0.0004
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Y
     MRES: 0.0004
     OFF: 0
@@ -853,10 +899,12 @@ entities:
     EGU: mm
     ERES: 0.0004
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Z
     MRES: 0.0004
     OFF: 0

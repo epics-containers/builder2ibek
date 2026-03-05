@@ -62,11 +62,13 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.INIT = str(entity.INIT)
         if hasattr(entity, "HOME") and entity.HOME is not None:
             entity.HOME = str(entity.HOME)
-        # HLM/LLM are type: str (can be blank), coerce numeric values to str
+        # HLM/LLM: default to 0.0 when unset or blank; coerce to float otherwise
         for field in ("HLM", "LLM"):
             val = entity.get(field)
-            if val is not None and not isinstance(val, str):
-                entity[field] = str(val)
+            if val is None or (isinstance(val, str) and val.strip() == ""):
+                entity[field] = 0.0
+            elif not isinstance(val, float):
+                entity[field] = float(val)
         # convert NTM to enum
         ntm = entity.get("NTM")
         if ntm is not None:

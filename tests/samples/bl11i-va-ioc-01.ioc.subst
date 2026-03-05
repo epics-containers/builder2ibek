@@ -119,12 +119,12 @@ pattern
 
 file "$(DIGITELMPC)/db/digitelMpc.template" {
 pattern 
-	{ "device",          "port",    "unit", "proto",            "name"   }
-	{ "BL11I-VA-MPC-01", "ty_40_0", "01",   "digitelMpc.proto", "IONPC1" }
-	{ "BL11I-VA-MPC-02", "ty_40_1", "01",   "digitelMpc.proto", "IONPC2" }
-	{ "BL11I-VA-MPC-03", "ty_41_0", "01",   "digitelMpc.proto", "IONPC3" }
-	{ "BL11I-VA-MPC-04", "ty_41_1", "01",   "digitelMpc.proto", "IONPC4" }
-	{ "BL11I-VA-MPC-05", "ty_41_2", "01",   "digitelMpc.proto", "IONPC5" }
+	{ "device",          "port",    "unit", "proto"            }
+	{ "BL11I-VA-MPC-01", "ty_40_0", "01",   "digitelMpc.proto" }
+	{ "BL11I-VA-MPC-02", "ty_40_1", "01",   "digitelMpc.proto" }
+	{ "BL11I-VA-MPC-03", "ty_41_0", "01",   "digitelMpc.proto" }
+	{ "BL11I-VA-MPC-04", "ty_41_1", "01",   "digitelMpc.proto" }
+	{ "BL11I-VA-MPC-05", "ty_41_2", "01",   "digitelMpc.proto" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpcIonp.template" {

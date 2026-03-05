@@ -29,7 +29,10 @@ topics. Key reminders:
 
 - `name` → `type: id` only when cross-referenced. Drop for leaf entities.
   Diagnostic: `"Value error, object XXX not found"` = dropped an id still referenced.
-- `PORT` → `type: object` (asyn port reference).
+- `PORT`, `port`, `MPC`, `controller`, or any `Ident("...", AsynPort/AsynIP/...)`
+  parameter → `type: object` (asyn port reference). The parameter name varies by
+  module — it is not always `PORT`. Always check the `ArgInfo` declaration in
+  builder.py; if it uses `Ident(...)` it must be `type: object` in the support YAML.
 - `.*:` in `databases.args` passes all parameters through.
 
 ## STREAM_PROTOCOL_PATH
@@ -51,7 +54,8 @@ See [ibek-concepts](../ibek-concepts/SKILL.md) for full details. Key reminders:
   support YAML param to `type: float` (or `int`) rather than adding a `str()`
   coercion in the converter. Only use `type: str` with converter coercion when
   the field genuinely needs to hold non-numeric values (e.g. VMAX default `$(VELO)`
-  references another param, HLM/LLM in pmac can be blank strings).
+  references another param). For optional numeric fields that can be absent, use
+  `type: float` with no default, and emit a numeric default in the converter instead.
 - `auto_*` entities need only `parameters` + `databases` (no init sections)
 
 ## File paths

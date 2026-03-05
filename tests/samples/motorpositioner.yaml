@@ -42,10 +42,12 @@ entities:
     EGU: mm
     ERES: 0.0004
     FOFF: Variable
+    HLM: 0.0
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:Y
     HOMEVIS: 0
     JAR: 1
+    LLM: 0.0
     M: :Y
     MRES: 0.0004
     OFF: 0

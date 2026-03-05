@@ -77,7 +77,16 @@ re-run xml2yaml per IOC. This is deliberate — xml2yaml is cheap, and subagents
 need the full Phase 1d (converter review loop) which may iterate. Don't skip
 phases to "optimise".
 
-## Step 5 — Consolidate and report
+## Step 5 — Verify shared files after subagent completion
+
+Parallel subagents can inadvertently revert each other's edits to shared files
+(support YAMLs, converters, skill docs). After each batch completes:
+
+1. Check that shared files modified during earlier phases still contain the
+   expected content (e.g. `type: object` not reverted to `type: str`).
+2. Re-apply any fixes that were overwritten by a later subagent.
+
+## Step 6 — Consolidate and report
 
 After all IOC conversions complete:
 

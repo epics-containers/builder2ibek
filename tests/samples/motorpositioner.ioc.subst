@@ -29,7 +29,7 @@ pattern
 file "dls_pmac_asyn_motor.template" {
 pattern 
 	{ "P",                "M",  "PORT",       "SPORT",   "CS", "PMAC",             "VELO", "ACCL", "SCALE", "BACC", "alh",  "DHLM", "HOMEVIS", "EGU", "FEHSV",    "VBAS", "VMAX", "HOME",               "BDST", "DIR", "DTYP",      "FEHIGH", "DLLM",  "INIT", "ALLOW_HOMED_SET", "RDBL", "SREV", "LLM", "ADEL", "RDBD",   "URIP", "ADDR", "RTRY", "OFF", "ERES",   "FEHIHI", "FEHHSV",   "JAR", "DESC",                  "BVEL", "MRES",   "DLY", "HLSV",  "UEIP", "RRES", "PREC", "RLNK", "FOFF", "HLM", "NTM", "TWV", "HOMEVISSTR"               }
-	{ "BL04I-MO-MAPT-01", ":Y", "GeoBrick_2", "BRICK_2", "0",  "BL04I-MO-MAPT-01", "20.0", "0.1",  "1",     "0.1",  "None", "50.0", "0",       "mm",  "NO_ALARM", "0.0",  "20.0", "BL04I-MO-MAPT-01:Y", "0.0",  "1",   "asynMotor", "0.0",    "-50.2", "",     "#",               "",     "200",  "",    "0.0",  "0.0001", "0",    "7",    "0",    "0.0", "0.0004", "0.0",    "NO_ALARM", "1.0", "Mini Beam Apertures Y", "0.0",  "0.0004", "0",   "MAJOR", "0",    "0.0",  "4",    "",     "0",    "",    "1",   "1.0", "Use motor summary screen" }
+	{ "BL04I-MO-MAPT-01", ":Y", "GeoBrick_2", "BRICK_2", "0",  "BL04I-MO-MAPT-01", "20.0", "0.1",  "1",     "0.1",  "None", "50.0", "0",       "mm",  "NO_ALARM", "0.0",  "20.0", "BL04I-MO-MAPT-01:Y", "0.0",  "1",   "asynMotor", "0.0",    "-50.2", "",     "#",               "",     "200",  "0.0", "0.0",  "0.0001", "0",    "7",    "0",    "0.0", "0.0004", "0.0",    "NO_ALARM", "1.0", "Mini Beam Apertures Y", "0.0",  "0.0004", "0",   "MAJOR", "0",    "0.0",  "4",    "",     "0",    "0.0", "1",   "1.0", "Use motor summary screen" }
 }
 
 file "$(POSITIONER)/db/multipositioner.template" {
