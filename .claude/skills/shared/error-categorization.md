@@ -20,6 +20,20 @@ How to diagnose errors from `ibek runtime generate2` and determine the fix type.
   `ioc.yaml` with the transformed attributes), then `./update-schema` and
   `generate2`.
 
+## Known recurring issues
+
+Patterns seen across multiple beamline conversions:
+
+| Issue | Symptom | Fix |
+|---|---|---|
+| `when: last` not in ibek | `pingWait` entities fail generate2 | Known gap — ibek 3.3.3 hasn't implemented `When.last` |
+| gdaPlugins incomplete expansion | Only primary ROI+Stat chain generated; missing roi1-6, stat1-6, ffmpeg, PVA | Major gap in gdaPlugins converter — deliberate simplification |
+| Dropped `records.*` entities | calcout/calc/bi/mbbi records silently omitted | Converter TODO — raw EPICS records not yet supported |
+| NDAttributes `%s` format strings | `dbpf %s%s` in post_init outputs unresolved format strings | ADCore support YAML bug — PV names not resolved |
+| vacValveGroup column misalignment | Rows have wrong number of values for multi-column pattern | dlsPLC support YAML — check column count matches template |
+| Moxa16 fixed channel count | NCHANS<16 devices still get 16 channels | terminalServer support YAML — handle NCHANS param |
+| `when: last` not implemented | All `utility.pingWait` uses fail | Known ibek gap |
+
 ## Object-reference chain note
 
 If you see `object BL19I-VA-... not found`, check the `type:` of the id field

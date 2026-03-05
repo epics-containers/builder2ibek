@@ -69,8 +69,13 @@ For each IOC XML, spawn a `general-purpose` subagent:
 > Report your results when complete.
 
 **Parallelism**: each subagent creates its own `EPICS_ROOT` (Phase 0), so file
-conflicts are avoided. Launch up to 10 IOCs in parallel per batch for best
+conflicts are avoided. Launch up to **10 IOCs in parallel** per batch for best
 throughput — wait for each batch to complete before launching the next.
+
+**Intentional redundancy**: Step 3 runs xml2yaml for all IOCs and Step 4 subagents
+re-run xml2yaml per IOC. This is deliberate — xml2yaml is cheap, and subagents
+need the full Phase 1d (converter review loop) which may iterate. Don't skip
+phases to "optimise".
 
 ## Step 5 — Consolidate and report
 
