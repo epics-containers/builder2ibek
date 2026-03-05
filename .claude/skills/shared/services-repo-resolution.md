@@ -17,12 +17,7 @@ If a services repo path is provided as an argument, use it directly.
 - Services repo name = `<beamline>-services`, e.g. `i11-services`
 - Look for it at `/workspaces/<services-repo-name>/`
 
-## 3. Fallback — cached path
-
-Read `.claude/skills/ioc-convert/last-services-repo` if the inferred path
-does not exist on disk.
-
-## 4. If not found locally
+## 3. If not found locally
 
 Try to clone:
 ```bash
@@ -37,7 +32,5 @@ mkdir -p /workspaces/<name>/services/$IOC_NAME/config
 ## After resolution
 
 - Tell the user which services repo is being used and how it was resolved
-- Write the resolved path to `.claude/skills/ioc-convert/last-services-repo`
-  (overwrite if present)
 - Derive `IOC_NAME` = lowercase XML filename without extension
 - `INSTANCE_DIR` = `<services-repo>/services/$IOC_NAME`

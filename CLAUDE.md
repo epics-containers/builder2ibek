@@ -57,6 +57,7 @@ uv run pytest
 - `/ioc-inspect <ioc-name>` — inspect an IOC's XML and support modules
 - `/ioc-convert <xml> [services-repo]` — full conversion workflow with parallel subagents
 - `/ioc-check <xml> [services-repo]` — validate a converted IOC's runtime assets
+- `/beamline-reconvert <beamline> [services-repo]` — re-run xml2yaml on all IOCs and validate schema
 - Use `/ibek-concepts` for ibek entity model patterns (type: id/object, databases.args,
   Jinja2, when: first, auto_* entities, port references, database macros).
 - See [docs/tutorials/create-support-yaml.md](docs/tutorials/create-support-yaml.md)
