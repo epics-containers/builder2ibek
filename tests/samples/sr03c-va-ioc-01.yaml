@@ -35,7 +35,6 @@ entities:
 
   - type: autosave.Autosave
     P: 'SR03C-VA-IOC-01:'
-    debug: false
 
   - type: asyn.AsynIP
     name: GCTLR_A_01_PORT
@@ -287,60 +286,50 @@ entities:
     device: SR03S-VA-MPC-01
     name: MPC_S_01
     port: MPC_S_01_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-01
     name: MPC_A_01
     port: MPC_A_01_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-02
     name: MPC_A_02
     port: MPC_A_02_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-03
     name: MPC_A_03
     port: MPC_A_03_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-04
     name: MPC_A_04
     port: MPC_A_04_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-05
     name: MPC_A_05
     port: MPC_A_05_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-06
     name: MPC_A_06
     port: MPC_A_06_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-07
     name: MPC_A_07
     port: MPC_A_07_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: SR03A-VA-MPC-08
     name: MPC_A_08
     port: MPC_A_08_PORT
-    unit: '01'
 
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_S_01
     device: SR03S-VA-IONP-01
-    proto: digitelMpc.proto
     pump: 1
     size: 300
     sp1off: 0.0001
@@ -351,7 +340,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_S_01
     device: SR03S-VA-IONP-03
-    proto: digitelMpc.proto
     pump: 2
     size: 300
     sp1off: 2e-08
@@ -362,7 +350,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_01
     device: SR03A-VA-IONP-01
-    proto: digitelMpc.proto
     pump: 1
     size: 300
     sp1off: 0.0001
@@ -373,7 +360,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_01
     device: SR03A-VA-IONP-02
-    proto: digitelMpc.proto
     pump: 2
     size: 300
     sp1off: 0.0001
@@ -384,7 +370,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_02
     device: SR03A-VA-IONP-03
-    proto: digitelMpc.proto
     pump: 1
     size: 300
     sp1off: 0.0001
@@ -395,7 +380,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_02
     device: SR03A-VA-IONP-04
-    proto: digitelMpc.proto
     pump: 2
     size: 500
     sp1off: 0.0001
@@ -406,7 +390,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_03
     device: SR03A-VA-IONP-05
-    proto: digitelMpc.proto
     pump: 1
     size: 500
     sp1off: 2e-08
@@ -417,7 +400,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_03
     device: SR03A-VA-IONP-06
-    proto: digitelMpc.proto
     pump: 2
     size: 500
     sp1off: 0.0001
@@ -428,7 +410,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_04
     device: SR03A-VA-IONP-07
-    proto: digitelMpc.proto
     pump: 1
     size: 300
     sp1off: 0.0001
@@ -439,7 +420,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_04
     device: SR03A-VA-IONP-08
-    proto: digitelMpc.proto
     pump: 2
     size: 300
     sp1off: 0.0001
@@ -450,7 +430,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_06
     device: SR03A-VA-IONP-09
-    proto: digitelMpc.proto
     pump: 1
     size: 300
     sp1off: 0.0001
@@ -461,7 +440,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_05
     device: SR03A-VA-IONP-10
-    proto: digitelMpc.proto
     pump: 1
     size: 300
     sp1off: 0.0001
@@ -472,7 +450,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_06
     device: SR03A-VA-IONP-11
-    proto: digitelMpc.proto
     pump: 2
     size: 500
     sp1off: 0.0001
@@ -483,7 +460,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_05
     device: SR03A-VA-IONP-12
-    proto: digitelMpc.proto
     pump: 2
     size: 500
     sp1off: 2e-08
@@ -494,7 +470,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_07
     device: SR03A-VA-IONP-13
-    proto: digitelMpc.proto
     pump: 1
     size: 500
     sp1off: 0.0001
@@ -505,7 +480,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_07
     device: SR03A-VA-IONP-14
-    proto: digitelMpc.proto
     pump: 2
     size: 300
     sp1off: 0.0001
@@ -516,7 +490,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_08
     device: SR03A-VA-IONP-15
-    proto: digitelMpc.proto
     pump: 1
     size: 300
     sp1off: 0.0001
@@ -527,7 +500,6 @@ entities:
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_08
     device: SR03A-VA-IONP-16
-    proto: digitelMpc.proto
     pump: 2
     size: 300
     sp1off: 2e-08

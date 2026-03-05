@@ -19,7 +19,6 @@ entities:
 
   - type: autosave.Autosave
     P: 'BL11I-CS-IOC-09:'
-    debug: false
 
   - type: pvlogging.PvLogging
     access_file: /epics/support/pvlogging/src/access.acf

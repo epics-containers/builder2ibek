@@ -59,331 +59,209 @@ entities:
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 1
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Upstream X
     DHLM: 7
     DIR: Pos
     DLLM: -2
-    DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :UPSTREAMX
     MRES: 5e-05
-    OFF: 0
     P: BL04I-MO-FSWT-01
-    PREC: 5
     RDBD: 5e-05
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.075
     VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 2
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Downstream X
     DHLM: 5
     DIR: Pos
     DLLM: -2
-    DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :DOWNSTREAMX
     MRES: 5e-05
-    OFF: 0
     P: BL04I-MO-FSWT-01
-    PREC: 5
     RDBD: 5e-05
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.075
     VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 3
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Upstream Y
     DHLM: 7.8
     DIR: Pos
     DLLM: -10
-    DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :UPSTREAMY
     MRES: 5e-05
-    OFF: 0
     P: BL04I-MO-FSWT-01
-    PREC: 5
     RDBD: 5e-05
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.075
     VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 4
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Downstream Y
     DHLM: 16.8
     DIR: Pos
     DLLM: -10
-    DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :DOWNSTREAMY
     MRES: 5e-05
-    OFF: 0
     P: BL04I-MO-FSWT-01
-    PREC: 5
     RDBD: 5e-05
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.075
     VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.08
     ADDR: 2
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_1
     DESC: Mini Beam Apertures X
     DHLM: 5
     DIR: Pos
     DLLM: -5
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :X
     MRES: 0.0001
-    OFF: 0
     P: BL04I-MO-MAPT-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 7.5
     VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 7
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_2
     DESC: Mini Beam Apertures Y
     DHLM: 50
     DIR: Neg
     DLLM: -50.2
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0004
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:Y
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Y
     MRES: 0.0004
-    OFF: 0
     P: BL04I-MO-MAPT-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 20
     VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 3
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_1
     DESC: Mini Beam Apertures Z
     DHLM: 15.5
     DIR: Neg
     DLLM: -17
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Z
     MRES: 0.0001
-    OFF: 0
     P: BL04I-MO-MAPT-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 10
     VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 4
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_1
     DESC: Scatter Guard X
     DHLM: 5
     DIR: Pos
     DLLM: -5
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :X
     MRES: 0.0001
-    OFF: 0
     P: BL04I-MO-SCAT-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 5
     VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 5
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_1
     DESC: Scatter Guard Y
     DHLM: 5
     DIR: Pos
     DLLM: -5
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Y
     MRES: 0.0001
-    OFF: 0
     P: BL04I-MO-SCAT-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 7
     VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 4
-    ADEL: 0
     BACC: 0.1
     BDST: 0.1
     BVEL: 0.2
@@ -392,34 +270,23 @@ entities:
     DHLM: 0.2
     DIR: Pos
     DLLM: -14.5
-    DTYP: asynMotor
     EGU: mm
     ERES: 1.00625e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :X
     MRES: 1.00625e-05
     OFF: 7.74383582973
     P: BL04I-AL-SLITS-04
-    PREC: 5
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.2
     VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 3
-    ADEL: 0
     BACC: 0.1
     BDST: 0.1
     BVEL: 0.5
@@ -428,34 +295,23 @@ entities:
     DHLM: 0.5
     DIR: Pos
     DLLM: -8.3
-    DTYP: asynMotor
     EGU: mm
     ERES: 2.540625e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :XGAP
     MRES: 2.540625e-05
     OFF: 6.718
     P: BL04I-AL-SLITS-04
-    PREC: 5
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.5
     VMAX: 0.5
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 6
-    ADEL: 0
     BACC: 0.1
     BDST: 0.1
     BVEL: 0.2
@@ -464,34 +320,23 @@ entities:
     DHLM: 0.2
     DIR: Pos
     DLLM: -14
-    DTYP: asynMotor
     EGU: mm
     ERES: 1.00625e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Y
     MRES: 1.00625e-05
     OFF: 7.37141558383
     P: BL04I-AL-SLITS-04
-    PREC: 5
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.2
     VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 5
-    ADEL: 0
     BACC: 0.1
     BDST: 0.1
     BVEL: 0.5
@@ -500,178 +345,113 @@ entities:
     DHLM: -1.721559
     DIR: Pos
     DLLM: -7.2
-    DTYP: asynMotor
     EGU: mm
     ERES: 2.540625e-05
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :YGAP
     MRES: 2.540625e-05
     OFF: 6.925559
     P: BL04I-AL-SLITS-04
-    PREC: 5
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.5
     VMAX: 0.5
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 3
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_3
     DESC: Samp. Centering Y
     DHLM: 4.069978
     DIR: Pos
     DLLM: 0.969978
-    DTYP: asynMotor
     EGU: mm
     ERES: 8.4375e-06
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :CENTREY
     MRES: 8.4375e-06
     OFF: -2.519978
     P: BL04I-MO-GONIO-01
-    PREC: 5
     RDBD: 0.0025
-    RRES: 0
     SREV: 182400
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.2
     VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 4
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_3
     DESC: Samp. Centering Z
     DHLM: 4.05
     DIR: Pos
     DLLM: 0.95
-    DTYP: asynMotor
     EGU: mm
     ERES: 8.4375e-06
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :CENTREZ
     MRES: 8.4375e-06
     OFF: -2.5
     P: BL04I-MO-GONIO-01
-    PREC: 5
     RDBD: 0.0025
-    RRES: 0
     SREV: 182400
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 0.2
     VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 7
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_1
     DESC: Plate Centering Y
     DHLM: 50
     DIR: Pos
     DLLM: -50
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :PLATEY
     MRES: 0.0001
-    OFF: 0
     P: BL04I-MO-GONIO-01
-    PREC: 5
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 10
     VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 8
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_1
     DESC: Plate Centering Z
     DHLM: 12.5
     DIR: Pos
     DLLM: -12.5
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :PLATEZ
     MRES: 0.0001
-    OFF: 0
     P: BL04I-MO-GONIO-01
-    PREC: 5
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 10
     VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 5
-    ADEL: 0
     BACC: 1
     BDST: 10
     BVEL: 30
@@ -680,33 +460,23 @@ entities:
     DHLM: 0
     DIR: Pos
     DLLM: 0
-    DTYP: asynMotor
     EGU: deg
     ERES: 0.00219727
-    FOFF: Variable
-    HLM: 0.0
     HLSV: NO_ALARM
     HOMEVIS: 0
     JAR: 30
-    LLM: 0.0
     M: :PHI
     MRES: 0.00219727
-    OFF: 0
     P: BL04I-MO-GONIO-01
     PREC: 7
     RDBD: 0.00219727
-    RRES: 0
     SREV: 200
     TWV: 0
-    UEIP: No
-    VBAS: 0
     VELO: 30
     VMAX: 30
 
   - type: pmac.dls_pmac_asyn_motor
-    ACCL: 0.5
     ADDR: 6
-    ADEL: 0
     BACC: 0.5
     BDST: -3
     BVEL: 15
@@ -715,207 +485,134 @@ entities:
     DHLM: 252.5
     DIR: Pos
     DLLM: -10.5
-    DTYP: asynMotor
     EGU: deg
     ERES: 0.00054932
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:KAPPA
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :KAPPA
     MRES: 0.00054932
     OFF: -4
     P: BL04I-MO-GONIO-01
     PREC: 7
     RDBD: 0.00054932
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 15
     VMAX: 15
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 1
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_2
     DESC: Scintillator Y
     DHLM: 0.5
     DIR: Neg
     DLLM: -103.5
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0003125
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Y
     MRES: 0.0003125
-    OFF: 0
     P: BL04I-MO-SCIN-01
     PREC: 4
     RDBD: 0.00031
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 20
     VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 2
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_2
     DESC: Scintillator Z
     DHLM: 0
     DIR: Neg
     DLLM: -103.5
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0003125
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Z
     MRES: 0.0003125
-    OFF: 0
     P: BL04I-MO-SCIN-01
     PREC: 4
     RDBD: 0.00031
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 20
     VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 1
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_1
     DESC: Beamstop X
     DHLM: 4.5
     DIR: Pos
     DLLM: -4.95
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-BS-01:X
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :X
     MRES: 0.0001
-    OFF: 0
     P: BL04I-MO-BS-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 10
     VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 1
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
-    BVEL: 0
     Controller: GeoBrick_3
     DESC: Beamstop Y
     DHLM: 50
     DIR: Neg
     DLLM: -60
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0004
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Y
     MRES: 0.0004
-    OFF: 0
     P: BL04I-MO-BS-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 20
     VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 2
-    ADEL: 0
     BACC: 0.1
-    BDST: 0
     BVEL: 1
     Controller: GeoBrick_3
     DESC: Beamstop Z
     DHLM: 55.5
     DIR: Neg
     DLLM: -58
-    DTYP: asynMotor
     EGU: mm
     ERES: 0.0004
-    FOFF: Variable
-    HLM: 0.0
-    HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
     JAR: 1
-    LLM: 0.0
     M: :Z
     MRES: 0.0004
-    OFF: 0
     P: BL04I-MO-BS-01
     PREC: 4
     RDBD: 0.0001
-    RRES: 0
     SREV: 200
-    TWV: 1
-    UEIP: No
-    VBAS: 0
     VELO: 20
     VMAX: 20
 
@@ -1057,7 +754,6 @@ entities:
     MP: MAPT.OB1
     PREC: 5
     Q: :X:P
-    VALF: 0
     motor: BL04I-MO-MAPT-01:X
 
   - type: positioner.motorpositioner
@@ -1094,7 +790,6 @@ entities:
     Q: :Y:P
     VALA: -0.09937
     VALB: 97.25063
-    VALC: 0
     motor: BL04I-MO-SCIN-01:Y
 
   - type: positioner.motorpositioner
@@ -1105,7 +800,6 @@ entities:
     Q: :Z:P
     VALA: 0.20063
     VALB: 93.87063
-    VALC: 0
     motor: BL04I-MO-SCIN-01:Z
 
   - type: positioner.motorpositioner
@@ -1156,7 +850,6 @@ entities:
     VALA: 4.7801
     VALB: 4.7802
     VALC: -3
-    VALD: 0
     motor: BL04I-MO-SCAT-01:X
 
   - type: positioner.motorpositioner
@@ -1284,7 +977,6 @@ entities:
 
   - type: autosave.Autosave
     P: 'BL04I-MO-IOC-03:'
-    debug: false
 
   - type: mirror.mirror2post
     CDEPTH: 73

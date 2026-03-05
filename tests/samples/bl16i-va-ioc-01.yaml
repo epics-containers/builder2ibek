@@ -19,7 +19,6 @@ entities:
 
   - type: autosave.Autosave
     P: 'BL16I-VA-IOC-01:'
-    debug: false
 
   - type: IOCinfo.IOCinfo
     device: BL16I-VA-IOC-01
@@ -185,7 +184,6 @@ entities:
   - type: DLS8515.DLS8515channel
     card: SER40
     channel: 4
-    parity: N
 
   - type: DLS8515.DLS8515channel
     card: SER40
@@ -526,7 +524,6 @@ entities:
   - type: mks937b.mks937bImg
     GCTLR: GCTRL1
     channel: 1
-    ctl_channel: 0
     device: BL16I-VA-IMG-01
     name: IMG01
     offwarn: 1
@@ -565,15 +562,7 @@ entities:
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: Valve I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-08
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 1
     relay_off_desc: Valve I/L Off
     relay_off_level: 1.1e-06
@@ -581,60 +570,24 @@ entities:
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 2
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: MPS I/L 2
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 3
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: RGA I/L
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.0001
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 4
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG03
     relay_desc: Valve I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
-    relay_level: 1e-06
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 5
     relay_off_desc: Valve I/L Off
     relay_off_level: 1.1e-06
@@ -642,111 +595,48 @@ entities:
   - type: mks937b.mks937bRelays
     GAUGE: IMG03
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 6
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG03
     relay_desc: MPS I/L 2
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 7
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG03
     relay_desc: RGA I/L
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.0001
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 8
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG01
     relay_desc: Ion Pump I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 9
     relay_off_desc: Ion Pump I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG01
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 10
     relay_off_desc: MPS I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG03
     relay_desc: Ion Pump I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 11
     relay_off_desc: Ion Pump I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG03
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 12
     relay_off_desc: MPS I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bFastRelay
     GAUGE: IMG01
@@ -772,37 +662,31 @@ entities:
     device: BL16I-VA-MPC-01
     name: BL16I-VA-MPC-01
     port: ty_40_1
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL16I-VA-MPC-02
     name: BL16I-VA-MPC-02
     port: ty_40_2
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL16I-VA-MPC-03
     name: BL16I-VA-MPC-03
     port: ty_40_3
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL16I-VA-MPC-04
     name: BL16I-VA-MPC-04
     port: ty_41_1
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL16I-VA-MPC-05
     name: BL16I-VA-MPC-05
     port: ty_41_2
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL16I-VA-MPC-06
     name: BL16I-VA-MPC-06
     port: ty_41_3
-    unit: '01'
 
   - type: digitelMpc.digitelMpcIonp
     MPC: BL16I-VA-MPC-01
@@ -1607,8 +1491,6 @@ entities:
     Q: :REMOTESERVICEON
     STR0: OFF
     STR1: ON
-    VAL0: 0
-    VAL1: 1
     addr: 202
     port: VLVCC02
 

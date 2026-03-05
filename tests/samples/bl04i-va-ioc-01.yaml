@@ -25,7 +25,6 @@ entities:
 
   - type: autosave.Autosave
     P: 'BL04I-VA-IOC-01:'
-    debug: false
 
   - type: mrfTiming.EventReceiverPMC
     cardid: 1
@@ -48,7 +47,6 @@ entities:
   - type: ipac.Hy8001
     cardid: 60
     direction: Input
-    intLevel: 0
     interrupt_vector: Vec2
     invertin: true
     invertout: true
@@ -144,7 +142,6 @@ entities:
     card: BL04I-VA-IOC-01.Slot4.A
     channel: 0
     data: 7
-    flow: N
     parity: E
     stop: 2
 
@@ -340,28 +337,24 @@ entities:
     channel: 1
     device: BL04I-VA-IMG-03
     ilk_write_access_pv: BL04I-VA-GAUGE-03:ILKSETSP:NOWRITE
-    offwarn: 0
 
   - type: mks937a.mks937aImg
     GCTLR: GCTLR02
     channel: 2
     device: BL04I-VA-IMG-04
     ilk_write_access_pv: BL04I-VA-GAUGE-04:ILKSETSP:NOWRITE
-    offwarn: 0
 
   - type: mks937a.mks937aImg
     GCTLR: GCTLR03
     channel: 1
     device: BL04I-VA-IMG-05
     ilk_write_access_pv: BL04I-VA-GAUGE-05:ILKSETSP:NOWRITE
-    offwarn: 0
 
   - type: mks937a.mks937aImg
     GCTLR: GCTLR03
     channel: 2
     device: BL04I-VA-IMG-06
     ilk_write_access_pv: BL04I-VA-GAUGE-06:ILKSETSP:NOWRITE
-    offwarn: 0
 
   - type: mks937a.mks937aImgGroup
     delay: 0
@@ -390,7 +383,6 @@ entities:
   - type: mks937b.mks937bImg
     GCTLR: GCTLR01
     channel: 1
-    ctl_channel: 0
     device: BL04I-VA-IMG-01
     ilk_write_access_pv: BL04I-VA-GAUGE-01:ILKSETSP:NOWRITE
     name: IMG01
@@ -496,15 +488,7 @@ entities:
     GAUGE: IMG01
     ilk_write_access_pv: BL04I-VA-GAUGE-01:ILKSETSP:NOWRITE
     relay_desc: Valve I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-08
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 1
     relay_off_desc: Valve I/L Off
     relay_off_level: 1.1e-06
@@ -513,63 +497,28 @@ entities:
     GAUGE: IMG01
     ilk_write_access_pv: BL04I-VA-GAUGE-01:ILKSETSP:NOWRITE
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 2
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     ilk_write_access_pv: BL04I-VA-GAUGE-01:ILKSETSP:NOWRITE
     relay_desc: MPS I/L 2
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 3
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     ilk_write_access_pv: BL04I-VA-GAUGE-01:ILKSETSP:NOWRITE
     relay_desc: RGA I/L
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.0001
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 4
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     ilk_write_access_pv: BL04I-VA-GAUGE-02:ILKSETSP:NOWRITE
     relay_desc: Valve I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 5
     relay_off_desc: Valve I/L Off
     relay_off_level: 1.1e-06
@@ -578,117 +527,54 @@ entities:
     GAUGE: IMG02
     ilk_write_access_pv: BL04I-VA-GAUGE-02:ILKSETSP:NOWRITE
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 6
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     ilk_write_access_pv: BL04I-VA-GAUGE-02:ILKSETSP:NOWRITE
     relay_desc: MPS I/L 2
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 7
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     ilk_write_access_pv: BL04I-VA-GAUGE-02:ILKSETSP:NOWRITE
     relay_desc: RGA I/L
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.0001
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 8
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG01
     ilk_write_access_pv: BL04I-VA-GAUGE-01:ILKSETSP:NOWRITE
     relay_desc: Ion Pump I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 9
     relay_off_desc: Ion Pump I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG01
     ilk_write_access_pv: BL04I-VA-GAUGE-01:ILKSETSP:NOWRITE
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 10
     relay_off_desc: MPS I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG02
     ilk_write_access_pv: BL04I-VA-GAUGE-02:ILKSETSP:NOWRITE
     relay_desc: Ion Pump I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 11
     relay_off_desc: Ion Pump I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG02
     ilk_write_access_pv: BL04I-VA-GAUGE-02:ILKSETSP:NOWRITE
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 12
     relay_off_desc: MPS I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bFastRelay
     GAUGE: IMG01
@@ -706,19 +592,16 @@ entities:
     device: BL04I-VA-MPC-01
     name: MPC01
     port: ty_40_2
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL04I-VA-MPC-02
     name: MPC02
     port: ty_40_3
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL04I-VA-MPC-03
     name: MPC03
     port: ty_40_4
-    unit: '01'
 
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC01

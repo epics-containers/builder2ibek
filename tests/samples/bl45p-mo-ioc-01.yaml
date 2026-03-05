@@ -18,7 +18,6 @@ entities:
     IOC: '{{ ioc_name | upper }}'
 
   - type: epics.EpicsCaMaxArrayBytes
-    max_bytes: 6000000
 
   - type: pmac.pmacAsynIPPort
     IP: 172.23.59.21:1025
@@ -54,16 +53,11 @@ entities:
     DIR: Pos
     DLLM: -10000000
     EGU: deg
-    FOFF: Variable
-    HLM: 0.0
     HOMEVISSTR: Absolute Encoder
-    LLM: 0.0
     M: :THETA:TOP
     MRES: 0.087890625
     P: BL45P-MO-STAGE-01
     PREC: 3
-    TWV: 1
-    UEIP: No
     VELO: 90
     VMAX: 1080
 
@@ -76,16 +70,11 @@ entities:
     DIR: Pos
     DLLM: -10000000
     EGU: deg
-    FOFF: Variable
-    HLM: 0.0
     HOMEVISSTR: Absolute Encoder
-    LLM: 0.0
     M: :THETA:BOT
     MRES: 0.087890625
     P: BL45P-MO-STAGE-01
     PREC: 3
-    TWV: 1
-    UEIP: No
     VELO: 90
     VMAX: 1080
 
@@ -97,17 +86,11 @@ entities:
     DIR: Pos
     DLLM: -10000000
     EGU: deg
-    FOFF: Variable
-    HLM: 0.0
     HOMEVIS: 0
     HOMEVISSTR: Absolute Encoder
-    LLM: 0.0
     M: :ENDAT
     MRES: 4.3e-05
     P: BL45P-MO-CHOP-01
-    PREC: 5
-    TWV: 1
-    UEIP: No
     VELO: 43
 
   - type: pmac.dls_pmac_asyn_motor
@@ -119,17 +102,11 @@ entities:
     DIR: Pos
     DLLM: -10000000
     EGU: deg
-    FOFF: Variable
-    HLM: 0.0
     HOMEVIS: 0
     HOMEVISSTR: Absolute Encoder
-    LLM: 0.0
     M: :BISS
     MRES: 0.000687
     P: BL45P-MO-CHOP-01
-    PREC: 5
-    TWV: 1
-    UEIP: No
     VELO: 720
 
   - type: pmac.dls_pmac_asyn_motor
@@ -140,15 +117,10 @@ entities:
     DIR: Pos
     DLLM: 0
     EGU: mm
-    FOFF: Variable
-    HLM: 0.0
-    LLM: 0.0
     M: :X
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
     PREC: 3
-    TWV: 1
-    UEIP: No
     VELO: 5
 
   - type: pmac.dls_pmac_asyn_motor
@@ -159,15 +131,10 @@ entities:
     DIR: Pos
     DLLM: -1
     EGU: mm
-    FOFF: Variable
-    HLM: 0.0
-    LLM: 0.0
     M: :Y:TOP
     MRES: 0.0005
     P: BL45P-MO-STAGE-01
     PREC: 3
-    TWV: 1
-    UEIP: No
     VELO: 5
 
   - type: pmac.dls_pmac_asyn_motor
@@ -178,15 +145,10 @@ entities:
     DIR: Pos
     DLLM: -1
     EGU: mm
-    FOFF: Variable
-    HLM: 0.0
-    LLM: 0.0
     M: :Y:BOT
     MRES: 0.0005
     P: BL45P-MO-STAGE-01
     PREC: 3
-    TWV: 1
-    UEIP: No
     VELO: 5
 
   - type: pmac.autohome
@@ -225,15 +187,11 @@ entities:
     DIR: Pos
     DLLM: -10000
     EGU: deg
-    FOFF: Variable
-    HLM: 0.0
-    LLM: 0.0
     M: :THETA:POS
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
     PREC: 3
     TWV: 5
-    UEIP: No
     VELO: 30
     is_cs: true
 
@@ -246,15 +204,11 @@ entities:
     DIR: Pos
     DLLM: -360
     EGU: deg
-    FOFF: Variable
-    HLM: 0.0
-    LLM: 0.0
     M: :THETA:SKEW
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
     PREC: 3
     TWV: 5
-    UEIP: No
     VELO: 10
     is_cs: true
 
@@ -266,15 +220,11 @@ entities:
     DIR: Pos
     DLLM: -1
     EGU: mm
-    FOFF: Variable
-    HLM: 0.0
-    LLM: 0.0
     M: :CS:Y
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
     PREC: 3
     TWV: 0.5
-    UEIP: No
     VELO: 5
     is_cs: true
 
@@ -286,15 +236,11 @@ entities:
     DIR: Pos
     DLLM: -2
     EGU: mm
-    FOFF: Variable
-    HLM: 0.0
-    LLM: 0.0
     M: :CS:Y:STRETCH
     MRES: 0.0001
     P: BL45P-MO-STAGE-01
     PREC: 3
     TWV: 0.5
-    UEIP: No
     VELO: 5
     is_cs: true
 

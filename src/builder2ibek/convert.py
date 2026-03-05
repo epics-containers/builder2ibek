@@ -10,6 +10,7 @@ from ruamel.yaml import YAML, CommentedMap
 
 from builder2ibek.builder import Builder, Element
 from builder2ibek.moduleinfos import module_infos
+from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
 
 
@@ -128,6 +129,8 @@ def do_one_element(element: Element, ioc: Generic_IOC):
     for key in list(entity.keys()):
         if entity[key] is None:
             del entity[key]
+
+    strip_defaults(entity)
 
 
 def add_defaults(entity: dict[str, Any], defaults: dict[str, dict[str, Any]]):

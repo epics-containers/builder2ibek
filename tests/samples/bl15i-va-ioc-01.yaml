@@ -37,7 +37,6 @@ entities:
     slot: 4
 
   - type: ipac.Hy8002
-    intLevel: 2
     name: BL15J-VA-IOC-01.Slot5
     slot: 5
 
@@ -2595,7 +2594,6 @@ entities:
   - type: mks937b.mks937bImg
     GCTLR: GCTLR11
     channel: 1
-    ctl_channel: 0
     device: BL15I-VA-IMG-21
     name: IMG21
     offwarn: 1
@@ -2832,21 +2830,18 @@ entities:
     relay_desc: MPS I/L 1
     relay_level: 1e-07
     relay_number: 6
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG1
     relay_desc: MPS I/L 2
     relay_level: 1e-07
     relay_number: 7
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG1
     relay_desc: 'RGA I/L '
     relay_level: 0.0001
     relay_number: 8
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG2
@@ -2861,21 +2856,18 @@ entities:
     relay_desc: MPS I/L 1
     relay_level: 1e-07
     relay_number: 2
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG2
     relay_desc: MPS I/L 2
     relay_level: 1e-07
     relay_number: 3
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG2
     relay_desc: 'RGA I/L '
     relay_level: 0.0001
     relay_number: 4
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG1
@@ -2883,7 +2875,6 @@ entities:
     relay_level: 0.01
     relay_number: 11
     relay_off_desc: 'Ion Pump I/L '
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG1
@@ -2891,7 +2882,6 @@ entities:
     relay_level: 0.01
     relay_number: 12
     relay_off_desc: 'MPS I/L '
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG2
@@ -2899,7 +2889,6 @@ entities:
     relay_level: 0.01
     relay_number: 9
     relay_off_desc: 'Ion Pump I/L '
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG2
@@ -2907,7 +2896,6 @@ entities:
     relay_level: 0.01
     relay_number: 10
     relay_off_desc: 'MPS I/L '
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG21
@@ -2922,21 +2910,18 @@ entities:
     relay_desc: MPS I/L 1
     relay_level: 1e-07
     relay_number: 6
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG21
     relay_desc: MPS I/L 2
     relay_level: 1e-07
     relay_number: 7
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG21
     relay_desc: 'RGA I/L '
     relay_level: 0.0001
     relay_number: 8
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG21
@@ -2944,7 +2929,6 @@ entities:
     relay_level: 0.01
     relay_number: 9
     relay_off_desc: 'Ion Pump I/L '
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG21
@@ -2952,7 +2936,6 @@ entities:
     relay_level: 0.01
     relay_number: 10
     relay_off_desc: 'MPS I/L '
-    relay_off_level: 0
 
   - type: mks937b.mks937bFastRelay
     GAUGE: IMG1
@@ -3267,4 +3250,3 @@ entities:
 
   - type: autosave.Autosave
     P: 'BL15I-VA-IOC-01:'
-    debug: false

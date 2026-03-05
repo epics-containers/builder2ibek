@@ -25,7 +25,6 @@ entities:
 
   - type: autosave.Autosave
     P: 'BL19I-VA-IOC-01:'
-    debug: false
 
   - type: epics.InterruptVectorVME
     name: Vec1
@@ -214,7 +213,6 @@ entities:
   - type: DLS8515.DLS8515channel
     card: BL19I-VA-IOC-01.Slot4.A
     channel: 3
-    parity: N
 
   - type: DLS8515.DLS8515channel
     card: BL19I-VA-IOC-01.Slot4.A
@@ -604,18 +602,15 @@ entities:
     GCTLR: GCTLR-03
     channel: 2
     device: BL19I-VA-IMG-06
-    offwarn: 0
 
   - type: mks937a.mks937aImg
     GCTLR: GCTLR-04
     channel: 1
     device: BL19I-VA-IMG-07
-    offwarn: 0
 
   - type: mks937b.mks937bImg
     GCTLR: GCTLR-01
     channel: 1
-    ctl_channel: 0
     device: BL19I-VA-IMG-01
     name: IMG01
     offwarn: 1
@@ -745,15 +740,7 @@ entities:
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: Valve I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-08
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 1
     relay_off_desc: Valve I/L Off
     relay_off_level: 1.1e-06
@@ -761,60 +748,25 @@ entities:
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 2
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: MPS I/L 2
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 3
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: RGA I/L
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.0001
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 4
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     relay_desc: Valve I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 5
     relay_off_desc: Valve I/L Off
     relay_off_level: 1.1e-06
@@ -822,111 +774,48 @@ entities:
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 6
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     relay_desc: MPS I/L 2
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 1e-07
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 7
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     relay_desc: RGA I/L
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.0001
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 8
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG01
     relay_desc: Ion Pump I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 9
     relay_off_desc: Ion Pump I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG01
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 10
     relay_off_desc: MPS I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG02
     relay_desc: Ion Pump I/L On
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 11
     relay_off_desc: Ion Pump I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG02
     relay_desc: MPS I/L 1
-    relay_drvh: 0.012
-    relay_drvl: 2.7e-10
-    relay_high: 1.1e-06
-    relay_hihi: 0.013
-    relay_hopr: 0.012
     relay_level: 0.01
-    relay_lolo: 2.6e-10
-    relay_lopr: 2.7e-10
-    relay_low: 9e-07
     relay_number: 12
     relay_off_desc: MPS I/L
-    relay_off_level: 0
 
   - type: mks937b.mks937bFastRelay
     GAUGE: IMG01
@@ -1023,37 +912,31 @@ entities:
     device: BL19I-VA-MPC-01
     name: MPC1
     port: ty_40_0
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL19I-VA-MPC-02
     name: MPC2
     port: ty_40_1
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL19I-VA-MPC-03
     name: MPC3
     port: ty_40_2
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL19I-VA-MPC-04
     name: MPC4
     port: ty_41_2
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL19I-VA-MPC-05
     name: MPC5
     port: ty_41_3
-    unit: '01'
 
   - type: digitelMpc.digitelMpc
     device: BL19I-VA-MPC-06
     name: MPC6
     port: ty_41_4
-    unit: '01'
 
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC1
@@ -1231,7 +1114,6 @@ entities:
     gilk4: GAUGE-05
     gilk5: GAUGE-06
     gilk6: GAUGE-07
-    gilk7: unused
     ilk0: Air Pressure OK
     ilk1: IMG1/Run Vac&V1-3 open
     ilk15: Valve OK
@@ -1254,7 +1136,6 @@ entities:
     gilk4: GAUGE-05
     gilk5: GAUGE-06
     gilk6: GAUGE-07
-    gilk7: unused
     ilk0: Air Pressure OK
     ilk1: IMG2/V2&ABSB Open
     ilk15: Valve OK
@@ -1277,7 +1158,6 @@ entities:
     gilk4: GAUGE-05
     gilk5: GAUGE-06
     gilk6: GAUGE-07
-    gilk7: unused
     ilk0: Air Pressure OK
     ilk1: IMG3/V3&ABSB Open
     ilk15: Valve OK
@@ -1300,7 +1180,6 @@ entities:
     gilk4: GAUGE-05
     gilk5: GAUGE-06
     gilk6: GAUGE-07
-    gilk7: unused
     ilk0: Air Pressure OK
     ilk1: IMG 5 OK
     ilk15: Valve OK
@@ -1323,7 +1202,6 @@ entities:
     gilk4: GAUGE-05
     gilk5: GAUGE-06
     gilk6: GAUGE-07
-    gilk7: unused
     ilk0: Air Pressure OK
     ilk1: IMG 6 OK
     ilk15: Valve OK
@@ -1339,14 +1217,6 @@ entities:
   - type: dlsPLC.vacValve
     addr: 40
     device: BL19I-DI-PHDGN-03
-    gilk0: unused
-    gilk1: unused
-    gilk2: unused
-    gilk3: unused
-    gilk4: unused
-    gilk5: unused
-    gilk6: unused
-    gilk7: unused
     ilk0: Water Flow
     ilk1: Interlock 1
     ilk15: Valve OK
@@ -1362,14 +1232,6 @@ entities:
   - type: dlsPLC.vacValve
     addr: 20
     device: BL19I-DI-QBPM-02
-    gilk0: unused
-    gilk1: unused
-    gilk2: unused
-    gilk3: unused
-    gilk4: unused
-    gilk5: unused
-    gilk6: unused
-    gilk7: unused
     ilk0: Interlock 0
     ilk1: Interlock 1
     ilk15: Valve OK
@@ -1385,14 +1247,6 @@ entities:
   - type: dlsPLC.vacValve
     addr: 50
     device: BL19I-DI-QBPM-03
-    gilk0: unused
-    gilk1: unused
-    gilk2: unused
-    gilk3: unused
-    gilk4: unused
-    gilk5: unused
-    gilk6: unused
-    gilk7: unused
     ilk0: Interlock 0
     ilk1: Interlock 1
     ilk15: Valve OK
@@ -1408,14 +1262,6 @@ entities:
   - type: dlsPLC.vacValve
     addr: 10
     device: BL19I-PS-SHTR-01
-    gilk0: unused
-    gilk1: unused
-    gilk2: unused
-    gilk3: unused
-    gilk4: unused
-    gilk5: unused
-    gilk6: unused
-    gilk7: unused
     ilk0: Air Pressure OK
     ilk1: Guard Line A
     ilk15: Valve OK
@@ -1442,12 +1288,6 @@ entities:
     device: BL19I-VA-VLVCC-01
     ilk0: A1 Water Flow
     ilk1: S1 Water Flow 1
-    ilk10: unused
-    ilk11: unused
-    ilk12: unused
-    ilk13: unused
-    ilk14: unused
-    ilk15: unused
     ilk2: S1 Water Flow 2
     ilk3: D1 Water Flow
     ilk4: GBC 2 Water Flow
@@ -1455,7 +1295,6 @@ entities:
     ilk6: DCM Water Flow 2
     ilk7: D2 Water Flow
     ilk8: GBC3 Water Flow
-    ilk9: unused
     interlock: :INT1
     port: ty_41_0
 
@@ -1469,8 +1308,6 @@ entities:
     ilk11: Cryo Temp
     ilk12: V1/2/3 Air Pressure
     ilk13: DCM Temps/Water
-    ilk14: unused
-    ilk15: unused
     ilk2: IMG2
     ilk3: A2 Relay
     ilk4: IMG3
@@ -1500,7 +1337,6 @@ entities:
     ilk5: S1 T6
     ilk6: S1 T7
     ilk7: S1 T8
-    ilk8: unused
     ilk9: GBC2 T1
     interlock: :INT1
     port: ty_41_7
@@ -1511,20 +1347,8 @@ entities:
     device: BL19I-VA-VLVCC-01
     ilk0: Run Vac 4 of IMG1-5
     ilk1: V1 open
-    ilk10: unused
-    ilk11: unused
-    ilk12: unused
-    ilk13: unused
-    ilk14: unused
-    ilk15: unused
     ilk2: V2 open
     ilk3: V3 open
-    ilk4: unused
-    ilk5: unused
-    ilk6: unused
-    ilk7: unused
-    ilk8: unused
-    ilk9: unused
     interlock: :INT3
     port: ty_41_0
 
