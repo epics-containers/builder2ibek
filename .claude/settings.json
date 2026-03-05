@@ -17,5 +17,17 @@
       "/dls_sw/prod",
       "/epics"
     ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -z \"$REMOTE_CONTAINERS\" ]; then echo 'BLOCKED: This project requires the devcontainer. Please reopen in the devcontainer before using Claude Code.'; exit 2; fi"
+          }
+        ]
+      }
+    ]
   }
 }
