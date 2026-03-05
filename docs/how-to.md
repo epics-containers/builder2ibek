@@ -6,6 +6,7 @@ Practical step-by-step guides for the more experienced user.
 :maxdepth: 1
 :glob:
 
+how-to/after-beamline-convert.md
 how-to/create-generic-ioc-repo.md
 how-to/convert-ioc-instance.md
 how-to/autosave.md
