@@ -83,6 +83,7 @@ Hy8401ipConfigure(50, $(BL04I-VA-IOC-01.Slot5), 0, $(Vec6), 0, 0, 0, 15, 0, 1, 1
 
 # Hy8402ipConfigure(cardNum, VMESlotNum, IPSlotNum, interruptVector, doRam, externalClock, clockRate, inhibit)
 Hy8402ipConfigure(51, $(BL04I-VA-IOC-01.Slot5), 1, $(Vec7), 0, 0, 13, 0)
+initHy8402ipAsyn("BL04I-VA-IOC-01.Slot5.B", 51)
 
 dbLoadRecords /ioc.db
 iocInit

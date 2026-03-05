@@ -21,3 +21,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type.startswith("auto_"):
         entity.remove("name")
+
+    if entity_type == "motorUtil":
+        entity.remove("name")

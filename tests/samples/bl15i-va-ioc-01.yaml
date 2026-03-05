@@ -2719,14 +2719,14 @@ entities:
   - type: mks937b.mks937bGauge
     GCTLR: GCTLR1
     dom: BL15I
-    id: 1
+    id: '01'
     name: GAUGE1
     plog_adc_pv: BL15I-VA-ADC-01:CH1
 
   - type: mks937b.mks937bGauge
     GCTLR: GCTLR1
     dom: BL15I
-    id: 2
+    id: '02'
     name: GAUGE2
     plog_adc_pv: BL15I-VA-ADC-01:CH0
 
@@ -2741,7 +2741,7 @@ entities:
     GCTLR: GCTLR2
     c: 50
     dom: BL15I
-    id: 3
+    id: '03'
     name: GAUGE3
     s: 2
 
@@ -2749,7 +2749,7 @@ entities:
     GCTLR: GCTLR2
     c: 50
     dom: BL15I
-    id: 4
+    id: '04'
     name: GAUGE4
     s: 3
 
@@ -2757,7 +2757,7 @@ entities:
     GCTLR: GCTLR3
     c: 51
     dom: BL15I
-    id: 5
+    id: '05'
     name: GAUGE5
     s: 0
 
@@ -2765,7 +2765,7 @@ entities:
     GCTLR: GCTLR3
     c: 51
     dom: BL15I
-    id: 6
+    id: '06'
     name: GAUGE6
     s: 1
 
@@ -2773,7 +2773,7 @@ entities:
     GCTLR: GCTLR4
     c: 51
     dom: BL15I
-    id: 7
+    id: '07'
     name: GAUGE7
     s: 2
 
@@ -2781,7 +2781,7 @@ entities:
     GCTLR: GCTLR4
     c: 51
     dom: BL15I
-    id: 8
+    id: '08'
     name: GAUGE8
     s: 3
 
@@ -2789,7 +2789,7 @@ entities:
     GCTLR: GCTLR5
     c: 51
     dom: BL15I
-    id: 9
+    id: '09'
     name: GAUGE9
     s: 4
 

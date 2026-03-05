@@ -204,6 +204,7 @@ entities:
     carrier: BL04I-VA-IOC-01.Slot5
     interrupt_vector: Vec7
     ipslot: 1
+    name: BL04I-VA-IOC-01.Slot5.B
 
   - type: cmsIon.RS4hour
     device: BL04I-VA-EVR-01
@@ -231,7 +232,7 @@ entities:
     port: ty_42_0
 
   - type: mks937b.mks937b
-    address: 1
+    address: '001'
     device: BL04I-VA-GCTLR-01
     name: GCTLR01
     port: ty_40_5
@@ -239,28 +240,28 @@ entities:
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL04I
-    id: 3
+    id: '03'
     name: GAUGE3
     s: 3
 
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL04I
-    id: 4
+    id: '04'
     name: GAUGE4
     s: 4
 
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL04I
-    id: 5
+    id: '05'
     name: GAUGE5
     s: 5
 
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL04I
-    id: 6
+    id: '06'
     name: GAUGE6
     s: 6
 
@@ -305,13 +306,13 @@ entities:
 
   - type: mks937b.mks937bGauge
     dom: BL04I
-    id: 1
+    id: '01'
     name: GAUGE1
     plog_adc_pv: BL04I-VA-ADC-01:CH1
 
   - type: mks937b.mks937bGauge
     dom: BL04I
-    id: 2
+    id: '02'
     name: GAUGE2
     plog_adc_pv: BL04I-VA-ADC-01:CH2
 
@@ -853,7 +854,7 @@ entities:
     port: ty_40_0
 
   - type: dlsPLC.interlock
-    addr: 7
+    addr: '07'
     desc: Water Flow Interlocks
     device: BL04I-VA-VLVCC-01
     ilk0: I04 Filter
@@ -876,7 +877,7 @@ entities:
     port: ty_40_0
 
   - type: dlsPLC.interlock
-    addr: 9
+    addr: '09'
     desc: Front End Permit
     device: BL04I-VA-VLVCC-01
     ilk0: Waterflows

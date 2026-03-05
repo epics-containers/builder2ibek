@@ -31,7 +31,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     }
 
     if entity_type == "Hy8402":
-        entity.remove("name")
+        # Keep name - it is used for initHy8402ipAsyn port creation
 
         # Convert numeric clockRate to enum string
         if hasattr(entity, "clockRate") and entity.clockRate is not None:

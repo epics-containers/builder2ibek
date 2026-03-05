@@ -357,7 +357,7 @@ entities:
     port: ty_41_6
 
   - type: mks937b.mks937b
-    address: 1
+    address: '001'
     device: BL19I-VA-GCTLR-01
     name: GCTLR-01
     port: ty_40_3
@@ -365,35 +365,35 @@ entities:
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL19I
-    id: 3
+    id: '03'
     name: GAUGE3
     s: 2
 
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL19I
-    id: 4
+    id: '04'
     name: GAUGE4
     s: 3
 
   - type: mks937a.mks937aGauge
     c: 52
     dom: BL19I
-    id: 5
+    id: '05'
     name: GAUGE5
     s: 0
 
   - type: mks937a.mks937aGauge
     c: 52
     dom: BL19I
-    id: 6
+    id: '06'
     name: GAUGE6
     s: 1
 
   - type: mks937a.mks937aGauge
     c: 52
     dom: BL19I
-    id: 7
+    id: '07'
     name: GAUGE7
     s: 2
 
@@ -475,13 +475,13 @@ entities:
 
   - type: mks937b.mks937bGauge
     dom: BL19I
-    id: 1
+    id: '01'
     name: GAUGE1
     plog_adc_pv: BL19I-VA-ADC-01:CH0
 
   - type: mks937b.mks937bGauge
     dom: BL19I
-    id: 2
+    id: '02'
     name: GAUGE2
     plog_adc_pv: BL19I-VA-ADC-01:CH1
 
@@ -1283,7 +1283,7 @@ entities:
     port: ty_41_0
 
   - type: dlsPLC.interlock
-    addr: 7
+    addr: '07'
     desc: Waterflow Interlocks
     device: BL19I-VA-VLVCC-01
     ilk0: A1 Water Flow
@@ -1299,7 +1299,7 @@ entities:
     port: ty_41_0
 
   - type: dlsPLC.interlock
-    addr: 9
+    addr: '09'
     desc: Front End Absorber
     device: BL19I-VA-VLVCC-01
     ilk0: Water OK
@@ -1320,7 +1320,7 @@ entities:
     port: ty_41_0
 
   - type: dlsPLC.interlock
-    addr: 1
+    addr: '01'
     desc: Temperatures Zone 1
     device: BL19I-VA-TMPCC-01
     ilk0: S1 T1
