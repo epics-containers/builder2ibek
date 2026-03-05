@@ -14,4 +14,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
         # Zero-pad id to 2 digits as builder.py does: "%02d" % int(id)
         if "id" in entity:
-            entity["id"] = "%02d" % int(entity["id"])
+            entity["id"] = f"{int(entity['id']):02d}"

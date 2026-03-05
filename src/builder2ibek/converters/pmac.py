@@ -62,8 +62,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.INIT = str(entity.INIT)
         if hasattr(entity, "HOME") and entity.HOME is not None:
             entity.HOME = str(entity.HOME)
-        # coerce numeric-looking str params to str
-        for field in ("HLM", "LLM", "VMAX", "DHLM", "DLLM", "BACC", "JAR"):
+        # HLM/LLM are type: str (can be blank), coerce numeric values to str
+        for field in ("HLM", "LLM"):
             val = entity.get(field)
             if val is not None and not isinstance(val, str):
                 entity[field] = str(val)

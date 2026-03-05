@@ -60,14 +60,14 @@ entities:
     ACCL: 0.2
     ADDR: 1
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Upstream X
-    DHLM: '7'
+    DHLM: 7
     DIR: Pos
-    DLLM: '-2'
+    DLLM: -2
     DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
@@ -75,7 +75,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :UPSTREAMX
     MRES: 5e-05
     OFF: 0
@@ -88,20 +88,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.075
-    VMAX: '0.075'
+    VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 2
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Downstream X
-    DHLM: '5'
+    DHLM: 5
     DIR: Pos
-    DLLM: '-2'
+    DLLM: -2
     DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
@@ -109,7 +109,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :DOWNSTREAMX
     MRES: 5e-05
     OFF: 0
@@ -122,20 +122,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.075
-    VMAX: '0.075'
+    VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 3
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Upstream Y
-    DHLM: '7.8'
+    DHLM: 7.8
     DIR: Pos
-    DLLM: '-10'
+    DLLM: -10
     DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
@@ -143,7 +143,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :UPSTREAMY
     MRES: 5e-05
     OFF: 0
@@ -156,20 +156,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.075
-    VMAX: '0.075'
+    VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 4
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_4
     DESC: FSWT Downstream Y
-    DHLM: '16.8'
+    DHLM: 16.8
     DIR: Pos
-    DLLM: '-10'
+    DLLM: -10
     DTYP: asynMotor
     EGU: mm
     ERES: 5e-05
@@ -177,7 +177,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-FSWT-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :DOWNSTREAMY
     MRES: 5e-05
     OFF: 0
@@ -190,20 +190,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.075
-    VMAX: '0.075'
+    VMAX: 0.075
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.08
     ADDR: 2
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_1
     DESC: Mini Beam Apertures X
-    DHLM: '5'
+    DHLM: 5
     DIR: Pos
-    DLLM: '-5'
+    DLLM: -5
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
@@ -211,7 +211,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :X
     MRES: 0.0001
     OFF: 0
@@ -224,20 +224,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 7.5
-    VMAX: '10'
+    VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 7
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_2
     DESC: Mini Beam Apertures Y
-    DHLM: '50'
+    DHLM: 50
     DIR: Neg
-    DLLM: '-50.2'
+    DLLM: -50.2
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0004
@@ -245,7 +245,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:Y
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Y
     MRES: 0.0004
     OFF: 0
@@ -258,20 +258,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 20
-    VMAX: '20'
+    VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 3
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_1
     DESC: Mini Beam Apertures Z
-    DHLM: '15.5'
+    DHLM: 15.5
     DIR: Neg
-    DLLM: '-17'
+    DLLM: -17
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
@@ -279,7 +279,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-MAPT-01:XZ
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Z
     MRES: 0.0001
     OFF: 0
@@ -292,20 +292,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 10
-    VMAX: '10'
+    VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 4
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_1
     DESC: Scatter Guard X
-    DHLM: '5'
+    DHLM: 5
     DIR: Pos
-    DLLM: '-5'
+    DLLM: -5
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
@@ -313,7 +313,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :X
     MRES: 0.0001
     OFF: 0
@@ -326,20 +326,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 5
-    VMAX: '10'
+    VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 5
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_1
     DESC: Scatter Guard Y
-    DHLM: '5'
+    DHLM: 5
     DIR: Pos
-    DLLM: '-5'
+    DLLM: -5
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
@@ -347,7 +347,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCAT-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Y
     MRES: 0.0001
     OFF: 0
@@ -360,20 +360,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 7
-    VMAX: '10'
+    VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 4
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0.1
     BVEL: 0.2
     Controller: GeoBrick_2
     DESC: S4 X Translation
-    DHLM: '0.2'
+    DHLM: 0.2
     DIR: Pos
-    DLLM: '-14.5'
+    DLLM: -14.5
     DTYP: asynMotor
     EGU: mm
     ERES: 1.00625e-05
@@ -381,7 +381,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :X
     MRES: 1.00625e-05
     OFF: 7.74383582973
@@ -394,20 +394,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.2
-    VMAX: '0.2'
+    VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 3
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0.1
     BVEL: 0.5
     Controller: GeoBrick_2
     DESC: S4 X Gap Size
-    DHLM: '0.5'
+    DHLM: 0.5
     DIR: Pos
-    DLLM: '-8.3'
+    DLLM: -8.3
     DTYP: asynMotor
     EGU: mm
     ERES: 2.540625e-05
@@ -415,7 +415,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :XGAP
     MRES: 2.540625e-05
     OFF: 6.718
@@ -428,20 +428,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.5
-    VMAX: '0.5'
+    VMAX: 0.5
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 6
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0.1
     BVEL: 0.2
     Controller: GeoBrick_2
     DESC: S4 Y Translation
-    DHLM: '0.2'
+    DHLM: 0.2
     DIR: Pos
-    DLLM: '-14'
+    DLLM: -14
     DTYP: asynMotor
     EGU: mm
     ERES: 1.00625e-05
@@ -449,7 +449,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Y
     MRES: 1.00625e-05
     OFF: 7.37141558383
@@ -462,20 +462,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.2
-    VMAX: '0.2'
+    VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 5
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0.1
     BVEL: 0.5
     Controller: GeoBrick_2
     DESC: S4 Y Gap Size
-    DHLM: '-1.721559'
+    DHLM: -1.721559
     DIR: Pos
-    DLLM: '-7.2'
+    DLLM: -7.2
     DTYP: asynMotor
     EGU: mm
     ERES: 2.540625e-05
@@ -483,7 +483,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-AL-SLITS-04
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :YGAP
     MRES: 2.540625e-05
     OFF: 6.925559
@@ -496,20 +496,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.5
-    VMAX: '0.5'
+    VMAX: 0.5
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 3
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_3
     DESC: Samp. Centering Y
-    DHLM: '4.069978'
+    DHLM: 4.069978
     DIR: Pos
-    DLLM: '0.969978'
+    DLLM: 0.969978
     DTYP: asynMotor
     EGU: mm
     ERES: 8.4375e-06
@@ -517,7 +517,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :CENTREY
     MRES: 8.4375e-06
     OFF: -2.519978
@@ -530,20 +530,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.2
-    VMAX: '0.2'
+    VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 4
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_3
     DESC: Samp. Centering Z
-    DHLM: '4.05'
+    DHLM: 4.05
     DIR: Pos
-    DLLM: '0.95'
+    DLLM: 0.95
     DTYP: asynMotor
     EGU: mm
     ERES: 8.4375e-06
@@ -551,7 +551,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:SAMP
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :CENTREZ
     MRES: 8.4375e-06
     OFF: -2.5
@@ -564,20 +564,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 0.2
-    VMAX: '0.2'
+    VMAX: 0.2
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 7
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_1
     DESC: Plate Centering Y
-    DHLM: '50'
+    DHLM: 50
     DIR: Pos
-    DLLM: '-50'
+    DLLM: -50
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
@@ -585,7 +585,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :PLATEY
     MRES: 0.0001
     OFF: 0
@@ -598,20 +598,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 10
-    VMAX: '10'
+    VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.2
     ADDR: 8
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_1
     DESC: Plate Centering Z
-    DHLM: '12.5'
+    DHLM: 12.5
     DIR: Pos
-    DLLM: '-12.5'
+    DLLM: -12.5
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
@@ -619,7 +619,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:PLATE
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :PLATEZ
     MRES: 0.0001
     OFF: 0
@@ -632,27 +632,27 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 10
-    VMAX: '10'
+    VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 1
     ADDR: 5
     ADEL: 0
-    BACC: '1'
+    BACC: 1
     BDST: 10
     BVEL: 30
     Controller: GeoBrick_3
     DESC: Phi
-    DHLM: '0'
+    DHLM: 0
     DIR: Pos
-    DLLM: '0'
+    DLLM: 0
     DTYP: asynMotor
     EGU: deg
     ERES: 0.00219727
     FOFF: Variable
     HLSV: NO_ALARM
     HOMEVIS: 0
-    JAR: '30'
+    JAR: 30
     M: :PHI
     MRES: 0.00219727
     OFF: 0
@@ -665,20 +665,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 30
-    VMAX: '30'
+    VMAX: 30
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.5
     ADDR: 6
     ADEL: 0
-    BACC: '0.5'
+    BACC: 0.5
     BDST: -3
     BVEL: 15
     Controller: GeoBrick_3
     DESC: Kappa
-    DHLM: '252.5'
+    DHLM: 252.5
     DIR: Pos
-    DLLM: '-10.5'
+    DLLM: -10.5
     DTYP: asynMotor
     EGU: deg
     ERES: 0.00054932
@@ -686,7 +686,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-GONIO-01:KAPPA
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :KAPPA
     MRES: 0.00054932
     OFF: -4
@@ -699,20 +699,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 15
-    VMAX: '15'
+    VMAX: 15
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 1
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_2
     DESC: Scintillator Y
-    DHLM: '0.5'
+    DHLM: 0.5
     DIR: Neg
-    DLLM: '-103.5'
+    DLLM: -103.5
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0003125
@@ -720,7 +720,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Y
     MRES: 0.0003125
     OFF: 0
@@ -733,20 +733,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 20
-    VMAX: '20'
+    VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 2
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_2
     DESC: Scintillator Z
-    DHLM: '0'
+    DHLM: 0
     DIR: Neg
-    DLLM: '-103.5'
+    DLLM: -103.5
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0003125
@@ -754,7 +754,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-SCIN-01
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Z
     MRES: 0.0003125
     OFF: 0
@@ -767,20 +767,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 20
-    VMAX: '20'
+    VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 1
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_1
     DESC: Beamstop X
-    DHLM: '4.5'
+    DHLM: 4.5
     DIR: Pos
-    DLLM: '-4.95'
+    DLLM: -4.95
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0001
@@ -788,7 +788,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:X
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :X
     MRES: 0.0001
     OFF: 0
@@ -801,20 +801,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 10
-    VMAX: '10'
+    VMAX: 10
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 1
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 0
     Controller: GeoBrick_3
     DESC: Beamstop Y
-    DHLM: '50'
+    DHLM: 50
     DIR: Neg
-    DLLM: '-60'
+    DLLM: -60
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0004
@@ -822,7 +822,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Y
     MRES: 0.0004
     OFF: 0
@@ -835,20 +835,20 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 20
-    VMAX: '20'
+    VMAX: 20
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
     ADDR: 2
     ADEL: 0
-    BACC: '0.1'
+    BACC: 0.1
     BDST: 0
     BVEL: 1
     Controller: GeoBrick_3
     DESC: Beamstop Z
-    DHLM: '55.5'
+    DHLM: 55.5
     DIR: Neg
-    DLLM: '-58'
+    DLLM: -58
     DTYP: asynMotor
     EGU: mm
     ERES: 0.0004
@@ -856,7 +856,7 @@ entities:
     HLSV: MAJOR
     HOME: BL04I-MO-BS-01:YZ
     HOMEVIS: 0
-    JAR: '1'
+    JAR: 1
     M: :Z
     MRES: 0.0004
     OFF: 0
@@ -869,7 +869,7 @@ entities:
     UEIP: No
     VBAS: 0
     VELO: 20
-    VMAX: '20'
+    VMAX: 20
 
   - type: BL04I.auto_asynMotorAlias
     P: BL04I-AL-SLITS-04:X

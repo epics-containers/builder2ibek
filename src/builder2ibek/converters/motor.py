@@ -14,11 +14,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     can have name stripped.
     """
     if entity_type == "basic_asyn_motor":
-        # Coerce numeric-looking str params to str
-        for field in ("VMAX", "BACC", "DHLM", "DLLM", "JAR", "ERES", "RDBD"):
-            val = entity.get(field)
-            if val is not None and not isinstance(val, str):
-                entity[field] = str(val)
+        # VMAX must stay str — its default $(VELO) references another param
+        val = entity.get("VMAX")
+        if val is not None and not isinstance(val, str):
+            entity["VMAX"] = str(val)
 
     if entity_type.startswith("auto_"):
         entity.remove("name")

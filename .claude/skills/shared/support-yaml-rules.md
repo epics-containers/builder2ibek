@@ -46,6 +46,12 @@ See [ibek-concepts](../ibek-concepts/SKILL.md) for full details. Key reminders:
 - Macros without defaults → required params; with defaults → optional params
 - Infer `type: float`/`int`/`str` from EPICS record field usage (don't default
   to str — type mismatches cause schema validation failures)
+- **Prefer fixing support YAML types over converter coercions:** when XML parses
+  a numeric value (e.g. `0.5`) but the support YAML has `type: str`, change the
+  support YAML param to `type: float` (or `int`) rather than adding a `str()`
+  coercion in the converter. Only use `type: str` with converter coercion when
+  the field genuinely needs to hold non-numeric values (e.g. VMAX default `$(VELO)`
+  references another param, HLM/LLM in pmac can be blank strings).
 - `auto_*` entities need only `parameters` + `databases` (no init sections)
 
 ## File paths
