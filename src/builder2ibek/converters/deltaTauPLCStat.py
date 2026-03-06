@@ -114,12 +114,16 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             if _is_dtps_controller(raw) and raw.get("globalHelper") == global_name:
                 # raw["type"] contains the XML attribute value (STEP/PMAC),
                 # not the ibek entity type.
-                ctrl_type = raw.get("type")
-                ctrl_num = raw.get("number")
-                if isinstance(ctrl_num, str):
-                    ctrl_num = int(ctrl_num)
-                if ctrl_type in active and 1 <= ctrl_num <= 32:
-                    active[ctrl_type][ctrl_num - 1] = True
+                ctrl_type = raw.get("type", "")
+                ctrl_num_raw = raw.get("number")
+                if isinstance(ctrl_num_raw, str):
+                    ctrl_num_raw = int(ctrl_num_raw)
+                if (
+                    ctrl_type in active
+                    and ctrl_num_raw is not None
+                    and 1 <= ctrl_num_raw <= 32
+                ):
+                    active[ctrl_type][ctrl_num_raw - 1] = True
 
         # Create ControllerGlobalPLCStatusLogic per type
         for ctrl_type in ["STEP", "PMAC"]:
@@ -161,7 +165,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
         # Recover original XML type attribute (STEP/PMAC) from raw entities
         raw = _find_raw_controller(ioc, ctrl_num, global_name)
-        ctrl_type = raw.get("type") if raw else None
+        controller_type: str | None = raw.get("type") if raw else None
 
         # Find the dom from the DTPSGlobal
         dom = _find_dom_from_global(ioc, global_name)
@@ -172,7 +176,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.add_entity(
             {
                 "type": "deltaTauPLCStat.ControllerCorrectPLCStat",
-                "controller_type": ctrl_type,
+                "controller_type": controller_type,
                 "dom": dom,
                 "number": f"{ctrl_num:02d}",
                 "lowerMask": lower_mask,
@@ -191,7 +195,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
         # Recover original XML type attribute (STEP/PMAC) from raw entities
         raw = _find_raw_controller_names(ioc, ctrl_num, global_name)
-        ctrl_type = raw.get("type") if raw else None
+        names_ctrl_type: str | None = raw.get("type") if raw else None
 
         # Find the dom from the DTPSGlobal
         dom = _find_dom_from_global(ioc, global_name)
@@ -204,7 +208,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.add_entity(
                 {
                     "type": "deltaTauPLCStat.ControllerPLCName",
-                    "controller_type": ctrl_type,
+                    "controller_type": names_ctrl_type,
                     "dom": dom,
                     "number": f"{ctrl_num:02d}",
                     "plc_num": f"{i:02d}",
