@@ -43,6 +43,10 @@ ls ibek-support-dls/$0/ ibek-support/$0/ 2>/dev/null
 If a support YAML already exists, read it — you may only need to add missing
 entity models, not create from scratch.
 
+**Before creating anything**, read
+[module-special-cases.md](../shared/module-special-cases.md) and check whether
+the module has non-standard naming or location.
+
 ## Step 2 — Locate the module
 
 If `$1` (known path) is provided, use it directly.

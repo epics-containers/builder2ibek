@@ -149,6 +149,28 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # XML uses BRICK but support YAML expects PORT
         entity.rename("BRICK", "PORT")
 
+    elif entity_type == "moveAxesToSafeMaster":
+        # name is type: id (slaves reference it via MASTER)
+        pass  # no special conversion needed
+
+    elif entity_type == "moveAxesToSafeSlave":
+        # Assign axis number N by counting preceding slaves that share the
+        # same MASTER value.  Identify "this" entity by matching AXIS + MASTER.
+        master_name = entity.MASTER
+        n = 0
+        for raw in ioc.raw_entities:
+            raw_type = raw.get("type", "")
+            if (
+                raw_type == "pmac.moveAxesToSafeSlave"
+                and raw.get("MASTER") == master_name
+            ):
+                n += 1
+                if raw.get("AXIS") == entity.AXIS:
+                    break
+        entity.N = n
+        # name is GUI-only; slaves are not cross-referenced
+        entity.remove("name")
+
     elif entity_type in ["auto_pmacStatus8Axes", "auto_pmacStatus32Axes"]:
         # These entities are auto-created by GeoBrick/PowerPMAC in builder.py
         # but arrive from XML with no attributes. Find the last controller

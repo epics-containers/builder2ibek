@@ -41,7 +41,9 @@ support YAML), do a quick pre-pass:
 1. Run `uv run builder2ibek xml2yaml` for each IOC to generate ioc.yaml files
 2. Scan all generated ioc.yaml files for entity types
 3. Deduplicate the list of modules needing support YAMLs across all IOCs
-4. Launch **one support-create subagent per unique module** (all in parallel):
+4. Read [module-special-cases.md](../shared/module-special-cases.md) — skip
+   modules that don't need support YAMLs and use correct folder names
+5. Launch **one support-create subagent per unique module** (all in parallel):
 
 > Read `/workspaces/builder2ibek/.claude/skills/support-create/SKILL.md` and
 > follow its instructions to create a support YAML for the following module.

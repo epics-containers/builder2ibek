@@ -112,11 +112,14 @@ is clean of converter-fixable issues.
 
 Parse the final ioc.yaml. For each entity type `<module>.<Entity>`:
 
-1. Check whether the support YAML already exists — **always check BOTH
+1. Read [module-special-cases.md](../shared/module-special-cases.md) — skip
+   modules that don't need support YAMLs (e.g. `epics`) and use the correct
+   folder name for case-sensitive modules (e.g. `IOCInfo` not `IOCinfo`).
+2. Check whether the support YAML already exists — **always check BOTH
    submodules** (`ibek-support-dls/<module>/` and `ibek-support/<module>/`)
    before concluding anything is missing.
-2. If it exists, check whether the specific entity model is present inside it.
-3. Collect all modules where the support YAML or entity model is missing.
+3. If it exists, check whether the specific entity model is present inside it.
+4. Collect all modules where the support YAML or entity model is missing.
 
 Also note for each module: entity type names used and sample parameter values.
 

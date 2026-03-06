@@ -9,7 +9,7 @@ def _lookup_pmac_prefix(entity, ioc):
     for check_entity in ioc.raw_entities:
         check_entity = Entity(**check_entity)
         if (
-            check_entity.type.endswith("pmacStatus")
+            "pmacStatus" in check_entity.type
             and check_entity.PORT == entity.pmacAsynPort
         ):
             entity.P = check_entity.DEVICE

@@ -14,3 +14,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "pingWait":
         entity.delete_me()
         return
+
+    if entity_type == "directoryWait":
+        entity.remove("name")
