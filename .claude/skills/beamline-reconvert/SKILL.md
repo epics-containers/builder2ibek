@@ -73,10 +73,12 @@ Report any XMLs being skipped and why.
 
 ## Step 4 — Reconvert all IOCs
 
-For each matched IOC, run:
+For each matched IOC, derive a terse description of the device it controls
+from the XML filename and contents (e.g. "Geobrick 06", "Vacuum system").
+Keep it short — a few words, no full sentences. Then run:
 
 ```bash
-uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <services-repo>/services/<ioc-name>/config/ioc.yaml
+uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <services-repo>/services/<ioc-name>/config/ioc.yaml --description "<description>"
 ```
 
 Run these sequentially (they're fast). Capture and report any conversion

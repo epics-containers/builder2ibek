@@ -4,6 +4,10 @@ This repo includes a set of Claude skills that can do an auto conversion to ibek
 
 This is a solid starting point, but it is **not** a fully converted beamline. The steps below complete the conversion — and teach you more about how epics-containers works along the way.
 
+## Update your services repo
+
+Before starting this process, update your services repo to the latest template version using `uvx copier update`.
+
 ## Work on one IOC at a time
 
 The auto-conversion branch contains many IOCs, but you should **not** try to

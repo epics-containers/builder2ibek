@@ -64,8 +64,12 @@ This table will be passed to subagents in Phases 2 and 4.
 
 ### 1c. Run the conversion
 
+Derive a terse description of the device this IOC controls from the XML
+filename and its contents (e.g. "Geobrick 06", "Vacuum system",
+"Pilatus detector"). Keep it short — a few words, no full sentences.
+
 ```bash
-uv run builder2ibek xml2yaml $0 --yaml $INSTANCE_DIR/config/ioc.yaml
+uv run builder2ibek xml2yaml $0 --yaml $INSTANCE_DIR/config/ioc.yaml --description "<description>"
 ```
 
 ### 1d. Review ioc.yaml and fix converters
