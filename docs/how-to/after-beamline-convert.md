@@ -1,9 +1,35 @@
 # After a Beamline Auto-Conversion
 
-The `beamline-convert` process gives you a set of ibek IOCs with their
-`ioc.yaml` files with compatible support in `ibek-support` and `ibek-support-dls`.
+This repo includes a set of Claude skills that can do an auto conversion to ibek for an entire beamline, ask giles to run this for you. The results will be placed in a branch called `auto-convert` in your beamline's services repo. This gives you a set of ibek IOCs with their `ioc.yaml` files and compatible support in `ibek-support` and `ibek-support-dls`.
 
 This is a solid starting point, but it is **not** a fully converted beamline. The steps below complete the conversion — and teach you more about how epics-containers works along the way.
+
+## Work on one IOC at a time
+
+The auto-conversion branch contains many IOCs, but you should **not** try to
+finish them all at once. Instead, work through them one at a time:
+
+1. **Create a work branch from `main`** in your services repo.
+2. **Extract a single IOC folder** from the auto-convert branch into your work
+   branch. The easiest way is `git checkout` with a path — this copies the
+   folder without merging anything else:
+
+   ```bash
+   # on your work branch (based on main)
+   git checkout auto-convert -- services/bl21i-va-ioc-01
+   git commit -m "import bl21i-va-ioc-01 from auto-convert"
+   ```
+
+   This stages exactly that IOC's folder from the auto-convert branch into your
+   working tree, leaving everything else untouched.
+3. **Apply the steps below** (split, re-home support, test, deploy) to that one
+   IOC.
+4. **Merge to `main`** when it is working.
+5. **Repeat** for the next IOC.
+
+This keeps each pull request small and reviewable, avoids merge conflicts
+between IOCs, and lets you deploy working IOCs to the beamline incrementally
+rather than waiting for the entire beamline to be converted.
 
 ## 1. Split IOCs by device
 
@@ -90,9 +116,21 @@ includes all the support it needs. If a suitable image already exists, point at
 its latest release tag. If not, create a new Generic IOC — see the
 [Generic IOC tutorial](https://epics-containers.github.io/main/tutorials/generic_ioc.html).
 
-(if you are making a new Generic IOC, then this stage will have to wait until 6. below when you have released the new image and can point at its tag)
+(if you are making a new Generic IOC, then this stage will have to wait until 7. below when you have released the new image and can point at its tag)
 
-## 5. Test in a devcontainer
+## 5. Add autosave request files if needed
+
+If you are using an upstream support module check to see if it already has autosave req files in its DB folder. The naming convention should be:
+- every DB template that needs autosave has one or two matching req files e.g.
+  - NDAttributeN.template <-- database template
+  - NDAttribute_settings.req <-- phase 1 autosave PV list
+  - NDAttribute_positions.req <-- phase 0 autosave PV list (typically for motor positions)
+
+If it already has these that match this convention (which is used throughout AreaDetector modules) then this is the preferred default and no further action is required.
+
+If these do not exist, you may convert from the legacy DLS approach to declaring autosave PVs, see [Autosave](autosave.md) for details on how to do that.
+
+## 6. Test in a devcontainer
 
 Before deploying, verify that your IOC works inside a devcontainer. Use
 `ibek dev instance` to point the Generic IOC's devcontainer at your IOC
@@ -105,7 +143,7 @@ ibek dev instance /path/to/ioc-instance
 This symlinks `/epics/ioc/config` to your instance config directory, letting
 you iterate quickly on the `ioc.yaml` without rebuilding the container.
 
-## 6. Release and deploy
+## 7. Release and deploy
 
 Once everything is working in the devcontainer:
 
