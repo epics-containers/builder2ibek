@@ -76,9 +76,9 @@ container images that are shared across multiple IOC instances and multiple beam
 
 ## 3. Move support YAML to public repositories
 
-The auto-conversion places new support YAML in `ibek-support-dls/` and points
-`install.yml` at the internal DLS support module. For each module, work through
-the following options in order of preference:
+The auto-conversion places any new support YAML files in `ibek-support-dls/` and points `install.yml` at the internal DLS support module. For each module, work through the following options in order of preference.
+
+Also note that the convert process made a best effort to do the conversion and make the resulting startup script and substitition file look like the original XmlBuilder based ones. But it may not be perfect and you may still need to make some changes to the support.yaml files to get things fully operational.
 
 ### 3a. Use upstream public sources
 
