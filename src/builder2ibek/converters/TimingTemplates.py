@@ -21,3 +21,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type == "defaultEVR":
         entity.type = "TimingTemplates.DefaultEVR"
         entity.remove("name")
+
+    elif entity_type == "BL_EVR_PMC":
+        entity.remove("name")
