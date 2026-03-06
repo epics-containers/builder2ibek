@@ -20,7 +20,8 @@ finish them all at once. Instead, work through them one at a time:
 
    ```bash
    # on your work branch (based on main)
-   git checkout auto-convert -- services/bl21i-va-ioc-01
+   git fetch
+   git checkout origin/auto-convert -- services/bl21i-va-ioc-01
    git commit -m "import bl21i-va-ioc-01 from auto-convert"
    ```
 
