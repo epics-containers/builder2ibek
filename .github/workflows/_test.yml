@@ -25,7 +25,9 @@ jobs:
         with:
           # Need this to get version number from last tag
           fetch-depth: 0
-          submodules: true
+
+      - name: Init ibek-support submodule
+        run: git submodule update --init ibek-support
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
