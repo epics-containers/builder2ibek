@@ -72,7 +72,7 @@ container images that are shared across multiple IOC instances and multiple beam
 
 - **Split out CA-based components.** Anything that is beamline specific and uses Channel Access to communicate — especially aSub records, should go into a separate, beamline-specific container build. This keeps your reusable Generic IOCs clean.
 
-- **Retire Beamline Support modules** if at all possible, don't keep a beamline support module. If you have asub records that cannot be refactored then you will need to make a beamline specific support Generic IOC. But note that many support modules are just DB templates and those could be dropped into individual IOC instance config folders instead of a shared support module.
+- **Retire Beamline Support modules** if at all possible, don't keep a beamline support module. If you have asub records that cannot be refactored then you will need to make a beamline specific support Generic IOC. But note that many support modules are just DB templates and those could be dropped into individual IOC instance config folders instead of a shared support module. See section "Custom Templates" below.
 
 ## 3. Move support YAML to public repositories
 
@@ -116,7 +116,7 @@ includes all the support it needs. If a suitable image already exists, point at
 its latest release tag. If not, create a new Generic IOC — see the
 [Generic IOC tutorial](https://epics-containers.github.io/main/tutorials/generic_ioc.html).
 
-(if you are making a new Generic IOC, then this stage will have to wait until 7. below when you have released the new image and can point at its tag)
+(if you are making a new Generic IOC, then this stage will have to wait until 8. below when you have released the new image and can point at its tag)
 
 ## 5. Add autosave request files if needed
 
@@ -124,13 +124,27 @@ If you are using an upstream support module check to see if it already has autos
 - every DB template that needs autosave has one or two matching req files e.g.
   - NDAttributeN.template <-- database template
   - NDAttribute_settings.req <-- phase 1 autosave PV list
-  - NDAttribute_positions.req <-- phase 0 autosave PV list (typically for motor positions)
+  - NDAttribute_positions.req <-- phase 0 autosave PV list (typically for motor positions only)
 
 If it already has these that match this convention (which is used throughout AreaDetector modules) then this is the preferred default and no further action is required.
 
 If these do not exist, you may convert from the legacy DLS approach to declaring autosave PVs, see [Autosave](autosave.md) for details on how to do that.
 
-## 6. Test in a devcontainer
+## 6. Custom templates like gdaPlugins
+
+ibek supports loading additional DB templates and entity definitions at
+**runtime** — without recompiling the Generic IOC image. These are supplied
+through the `ibek-runtime-support` folder in your services repo.
+
+This works at two levels: **facility-wide** sharing via git submodules (e.g.
+`detectorPlugins` and `gdaPlugins` for AreaDetector IOCs) and
+**beamline-specific** templates and entity models committed directly to your
+services repo for use across multiple IOCs on that beamline.
+
+See [Runtime Support](runtime-support.md) for full setup instructions,
+worked examples, and tips.
+
+## 7. Test in a devcontainer
 
 Before deploying, verify that your IOC works inside a devcontainer. Use
 `ibek dev instance` to point the Generic IOC's devcontainer at your IOC
@@ -143,7 +157,7 @@ ibek dev instance /path/to/ioc-instance
 This symlinks `/epics/ioc/config` to your instance config directory, letting
 you iterate quickly on the `ioc.yaml` without rebuilding the container.
 
-## 7. Release and deploy
+## 8. Release and deploy
 
 Once everything is working in the devcontainer:
 
