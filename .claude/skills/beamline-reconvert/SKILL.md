@@ -62,10 +62,9 @@ find <services-repo>/services -maxdepth 2 -name ioc.yaml -path '*/config/*' \
   | sed 's|/config/ioc.yaml||' | sort
 ```
 
-Match each XML to its services folder (XML stem uppercase = folder name
-lowercase). Only reconvert IOCs that have an existing folder with
-`config/ioc.yaml` — skip XMLs with no matching services folder (they haven't
-been converted yet).
+Match each XML to its services folder (XML stem **lowercased** = folder name).
+Only reconvert IOCs that have an existing folder with `config/ioc.yaml` —
+skip XMLs with no matching services folder (they haven't been converted yet).
 
 Report any XMLs being skipped and why.
 
@@ -75,7 +74,11 @@ Report any XMLs being skipped and why.
 
 For each matched IOC, derive a terse description of the device it controls
 from the XML filename and contents (e.g. "Geobrick 06", "Vacuum system").
-Keep it short — a few words, no full sentences. Then run:
+Keep it short — a few words, no full sentences.
+
+**CRITICAL: `<ioc-name>` must be lowercase** (e.g. `bl21i-mo-ioc-01`, not
+`BL21I-MO-IOC-01`). The services folder name is always the XML stem
+lowercased. Then run:
 
 ```bash
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <services-repo>/services/<ioc-name>/config/ioc.yaml --description "<description>"

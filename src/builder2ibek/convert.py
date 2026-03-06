@@ -43,6 +43,8 @@ def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
 
     ruamel.indent(mapping=2, sequence=4, offset=2)
 
+    yaml.parent.mkdir(parents=True, exist_ok=True)
+
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 
