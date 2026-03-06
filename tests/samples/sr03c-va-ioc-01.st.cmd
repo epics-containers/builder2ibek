@@ -2,7 +2,7 @@
 
 cd ""
 
-epicsEnvSet EPICS_TS_MIN_WEST 0
+epicsEnvSet EPICS_TZ GMT0BST
 epicsEnvSet STREAM_PROTOCOL_PATH /epics/runtime/protocol/
 epicsEnvSet EPICS_CA_AUTO_ADDR_LIST NO
 epicsEnvSet EPICS_CA_ADDR_LIST 172.23.207.255

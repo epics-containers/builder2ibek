@@ -2,7 +2,7 @@
 
 cd ""
 
-epicsEnvSet EPICS_TS_MIN_WEST 0
+epicsEnvSet EPICS_TZ GMT0BST
 epicsEnvSet STREAM_PROTOCOL_PATH /epics/runtime/protocol/
 epicsEnvSet Vec1 192
 epicsEnvSet Vec2 193

@@ -59,8 +59,8 @@ def dispatch(builder: Builder, filename) -> Generic_IOC:
         entities=[
             {
                 "type": "epics.EpicsEnvSet",
-                "name": "EPICS_TS_MIN_WEST",
-                "value": "0",
+                "name": "EPICS_TZ",
+                "value": "GMT0BST",
             },
             {
                 "type": "epics.EpicsEnvSet",
