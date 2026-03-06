@@ -12,6 +12,7 @@ import pytest
 
 from builder2ibek.convert import convert_file
 from builder2ibek.converters.epics_base import InterruptVector
+from tests.conftest import requires_dls
 
 SAMPLES = Path(__file__).parent / "samples"
 SAMPLE_XMLS = sorted(SAMPLES.glob("*.xml"))
@@ -31,6 +32,7 @@ def test_convert(sample_xml: Path):
     InterruptVector.reset()
 
 
+@requires_dls
 @pytest.mark.parametrize("sample_xml", SAMPLE_XMLS, ids=SAMPLE_IDS)
 def test_generate(sample_xml: Path):
     """
@@ -100,6 +102,7 @@ def test_generate(sample_xml: Path):
         )
 
 
+@requires_dls
 def test_debug(samples: Path):
     """
     A single test to debug the conversion process (a redundant test, just useful

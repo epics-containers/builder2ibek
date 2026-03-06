@@ -5,11 +5,15 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
+DLS_SUPPORT = REPO_ROOT / "ibek-support-dls"
+HAS_DLS_SUPPORT = any(DLS_SUPPORT.glob("*/*.ibek.support.yaml"))
 
 
 @pytest.fixture(scope="session", autouse=True)
 def update_schema(tmp_path_factory):
     """Regenerate the ibek schema before tests so support YAMLs stay in sync."""
+    if not HAS_DLS_SUPPORT:
+        pytest.skip("ibek-support-dls not available")
     env = os.environ.copy()
     # Use a temp dir when /epics is not writable (e.g. CI runners)
     epics_root = Path(env.get("EPICS_ROOT", "/epics"))
@@ -24,6 +28,12 @@ def update_schema(tmp_path_factory):
         env=env,
     )
     assert result.returncode == 0, f"update-schema failed:\n{result.stderr}"
+
+
+requires_dls = pytest.mark.skipif(
+    not HAS_DLS_SUPPORT,
+    reason="ibek-support-dls submodule not available",
+)
 
 
 @pytest.fixture
