@@ -1,0 +1,778 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>After a Beamline Auto-Conversion &#8212; builder2ibek 2.0.0b1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=391fd9ae"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/after-beamline-convert';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0b1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Create a Generic IOC repository" href="create-generic-ioc-repo.html" />
+    <link rel="prev" title="How-to Guides" href="../how-to.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0b1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">After a Beamline Auto-Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-generic-ioc-repo.html">Create a Generic IOC repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-instance.html">Convert a builder XML IOC instance to ibek YAML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime-support.html">Runtime Support (ibek-runtime-support)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autosave.html">Generating autosave req files from DB templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="verify-with-devcontainer.html">Verify a converted IOC using db-compare</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-converter.html">Create a builder2ibek converter for a support module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to the project</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">After a Beamline Auto-Conversion</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="after-a-beamline-auto-conversion">
+<h1>After a Beamline Auto-Conversion<a class="headerlink" href="#after-a-beamline-auto-conversion" title="Link to this heading">#</a></h1>
+<p>This repo includes a set of Claude skills that can do an auto conversion to ibek for an entire beamline, ask giles to run this for you. The results will be placed in a branch called <code class="docutils literal notranslate"><span class="pre">auto-convert</span></code> in your beamline’s services repo. This gives you a set of ibek IOCs with their <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> files and compatible support in <code class="docutils literal notranslate"><span class="pre">ibek-support</span></code> and <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>.</p>
+<p>This is a solid starting point, but it is <strong>not</strong> a fully converted beamline. The steps below complete the conversion — and teach you more about how epics-containers works along the way.</p>
+<section id="update-your-services-repo">
+<h2>Update your services repo<a class="headerlink" href="#update-your-services-repo" title="Link to this heading">#</a></h2>
+<p>Before starting this process, update your services repo to the latest template version using <code class="docutils literal notranslate"><span class="pre">uvx</span> <span class="pre">copier</span> <span class="pre">update</span></code>.</p>
+</section>
+<section id="work-on-one-ioc-at-a-time">
+<h2>Work on one IOC at a time<a class="headerlink" href="#work-on-one-ioc-at-a-time" title="Link to this heading">#</a></h2>
+<p>The auto-conversion branch contains many IOCs, but you should <strong>not</strong> try to
+finish them all at once. Instead, work through them one at a time:</p>
+<ol class="arabic">
+<li><p><strong>Create a work branch from <code class="docutils literal notranslate"><span class="pre">main</span></code></strong> in your services repo.</p></li>
+<li><p><strong>Extract a single IOC folder</strong> from the auto-convert branch into your work
+branch. The easiest way is <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span></code> with a path — this copies the
+folder without merging anything else:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># on your work branch (based on main)</span>
+git<span class="w"> </span>fetch
+git<span class="w"> </span>checkout<span class="w"> </span>origin/auto-convert<span class="w"> </span>--<span class="w"> </span>services/bl21i-va-ioc-01
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;import bl21i-va-ioc-01 from auto-convert&quot;</span>
+</pre></div>
+</div>
+<p>This stages exactly that IOC’s folder from the auto-convert branch into your
+working tree, leaving everything else untouched.</p>
+</li>
+<li><p><strong>Apply the steps below</strong> (split, re-home support, test, deploy) to that one
+IOC.</p></li>
+<li><p><strong>Merge to <code class="docutils literal notranslate"><span class="pre">main</span></code></strong> when it is working.</p></li>
+<li><p><strong>Repeat</strong> for the next IOC.</p></li>
+</ol>
+<p>This keeps each pull request small and reviewable, avoids merge conflicts
+between IOCs, and lets you deploy working IOCs to the beamline incrementally
+rather than waiting for the entire beamline to be converted.</p>
+</section>
+<section id="split-iocs-by-device">
+<h2>1. Split IOCs by device<a class="headerlink" href="#split-iocs-by-device" title="Link to this heading">#</a></h2>
+<p>The auto-conversion mirrors the original builder layout, which often packs
+many devices into a small number of IOCs (e.g. <code class="docutils literal notranslate"><span class="pre">BL21I-MO-IOC-01</span></code>). In
+epics-containers the convention is <strong>one IOC per device</strong>.</p>
+<p>Break each converted IOC into individual IOCs, one per physical device or
+logical unit. Name them after the device they serve rather than using generic
+numbering:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Before (builder)</p></th>
+<th class="head"><p>After (epics-containers)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BL21I-MO-IOC-01</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BL21I-MO-STEP-01</span></code> (geobrick 1)</p></td>
+</tr>
+<tr class="row-odd"><td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BL21I-MO-STEP-02</span></code> (geobrick 2)</p></td>
+</tr>
+<tr class="row-even"><td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BL21I-MO-STEP-03</span></code> (geobrick 3)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BL21I-EA-IOC-01</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BL21I-EA-RGA-01</span></code> (RGA analyser)</p></td>
+</tr>
+<tr class="row-even"><td><p></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BL21I-EA-CRYO-01</span></code> (cryo cooler)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Each new IOC gets its own folder in the services repo with its own <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>
+and <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code>.</p>
+</section>
+<section id="plan-the-split-around-generic-ioc-reuse">
+<h2>2. Plan the split around Generic IOC reuse<a class="headerlink" href="#plan-the-split-around-generic-ioc-reuse" title="Link to this heading">#</a></h2>
+<p>The goal of epics-containers is to have a small number of <strong>Generic IOC</strong>
+container images that are shared across multiple IOC instances and multiple beamlines. When deciding how to split your IOCs, think about which support modules each one needs:</p>
+<ul class="simple">
+<li><p><strong>Prefer existing Generic IOCs.</strong> If there is already a published Generic IOC
+that contains all the support modules your device needs, use it. Check the
+<a class="reference external" href="https://github.com/orgs/epics-containers/packages?tab=packages&amp;amp;q=ioc-">epics-containers GitHub packages</a>
+for available images.</p></li>
+<li><p><strong>Create reusable new Generic IOCs.</strong> When no existing image fits, plan to
+create a new one with a concise, coherent set of support modules that is
+likely to be useful for other IOC instances — on your beamline and others.</p></li>
+<li><p><strong>One-off containers as a last resort.</strong> For genuinely complex scenarios where
+a single IOC really does need an unusual mix of support, you can create a
+unique Generic IOC. But exhaust the options above first.</p></li>
+<li><p><strong>Split out CA-based components.</strong> Anything that is beamline specific and uses Channel Access to communicate — especially aSub records, should go into a separate, beamline-specific container build. This keeps your reusable Generic IOCs clean.</p></li>
+<li><p><strong>Retire Beamline Support modules</strong> if at all possible, don’t keep a beamline support module. If you have asub records that cannot be refactored then you will need to make a beamline specific support Generic IOC. But note that many support modules are just DB templates and those could be dropped into individual IOC instance config folders instead of a shared support module. See section “Custom Templates” below.</p></li>
+</ul>
+</section>
+<section id="move-support-yaml-to-public-repositories">
+<h2>3. Move support YAML to public repositories<a class="headerlink" href="#move-support-yaml-to-public-repositories" title="Link to this heading">#</a></h2>
+<p>The auto-conversion places any new support YAML files in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/</span></code> and points <code class="docutils literal notranslate"><span class="pre">install.yml</span></code> at the internal DLS support module. For each module, work through the following options in order of preference.</p>
+<p>Also note that the convert process made a best effort to do the conversion and make the resulting startup script and substitition file look like the original XmlBuilder based ones. But it may not be perfect and you may still need to make some changes to the support.yaml files to get things fully operational.</p>
+<section id="a-use-upstream-public-sources">
+<h3>3a. Use upstream public sources<a class="headerlink" href="#a-use-upstream-public-sources" title="Link to this heading">#</a></h3>
+<p>If the support module exists upstream (in
+<a class="reference external" href="https://github.com/epics-modules">epics-modules</a>,
+<a class="reference external" href="https://github.com/areaDetector">areaDetector</a>, or another public
+organisation), move the support YAML folder from <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/</span></code> to
+<code class="docutils literal notranslate"><span class="pre">ibek-support/</span></code> and update <code class="docutils literal notranslate"><span class="pre">install.yml</span></code> to point at the latest upstream
+release.</p>
+</section>
+<section id="b-use-diamondlightsource-github">
+<h3>3b. Use DiamondLightSource GitHub<a class="headerlink" href="#b-use-diamondlightsource-github" title="Link to this heading">#</a></h3>
+<p>If the module is already published under the
+<a class="reference external" href="https://github.com/DiamondLightSource">DiamondLightSource</a> GitHub
+organisation, use <code class="docutils literal notranslate"><span class="pre">ibek-support/</span></code> and point at that repo. <strong>Make sure the
+GitHub version is up to date with the internal GitLab version</strong> before
+switching.</p>
+</section>
+<section id="c-open-source-internal-modules">
+<h3>3c. Open-source internal modules<a class="headerlink" href="#c-open-source-internal-modules" title="Link to this heading">#</a></h3>
+<p>If a module is currently internal-only but would be useful to the wider EPICS
+community, open-source it under the DiamondLightSource organisation. See the
+<a class="reference external" href="https://epics-containers.github.io/main/tutorials/generic_ioc.html">Generic IOC tutorial</a>
+for guidance on publishing.</p>
+</section>
+<section id="d-keep-genuinely-internal-modules-in-ibek-support-dls">
+<h3>3d. Keep genuinely internal modules in ibek-support-dls<a class="headerlink" href="#d-keep-genuinely-internal-modules-in-ibek-support-dls" title="Link to this heading">#</a></h3>
+<p>Some modules are specific to DLS infrastructure and will never be useful
+externally. These stay in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/</span></code>.</p>
+</section>
+</section>
+<section id="point-each-ioc-at-a-generic-ioc-image">
+<h2>4. Point each IOC at a Generic IOC image<a class="headerlink" href="#point-each-ioc-at-a-generic-ioc-image" title="Link to this heading">#</a></h2>
+<p>Each IOC’s <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code> must reference the Generic IOC container image that
+includes all the support it needs. If a suitable image already exists, point at
+its latest release tag. If not, create a new Generic IOC — see the
+<a class="reference external" href="https://epics-containers.github.io/main/tutorials/generic_ioc.html">Generic IOC tutorial</a>.</p>
+<p>(if you are making a new Generic IOC, then this stage will have to wait until 8. below when you have released the new image and can point at its tag)</p>
+</section>
+<section id="add-autosave-request-files-if-needed">
+<h2>5. Add autosave request files if needed<a class="headerlink" href="#add-autosave-request-files-if-needed" title="Link to this heading">#</a></h2>
+<p>If you are using an upstream support module check to see if it already has autosave req files in its DB folder. The naming convention should be:</p>
+<ul class="simple">
+<li><p>every DB template that needs autosave has one or two matching req files e.g.</p>
+<ul>
+<li><p>NDAttributeN.template &lt;– database template</p></li>
+<li><p>NDAttribute_settings.req &lt;– phase 1 autosave PV list</p></li>
+<li><p>NDAttribute_positions.req &lt;– phase 0 autosave PV list (typically for motor positions only)</p></li>
+</ul>
+</li>
+</ul>
+<p>If it already has these that match this convention (which is used throughout AreaDetector modules) then this is the preferred default and no further action is required.</p>
+<p>If these do not exist, you may convert from the legacy DLS approach to declaring autosave PVs, see <a class="reference internal" href="autosave.html"><span class="std std-doc">Autosave</span></a> for details on how to do that.</p>
+</section>
+<section id="custom-templates-like-gdaplugins">
+<h2>6. Custom templates like gdaPlugins<a class="headerlink" href="#custom-templates-like-gdaplugins" title="Link to this heading">#</a></h2>
+<p>ibek supports loading additional DB templates and entity definitions at
+<strong>runtime</strong> — without recompiling the Generic IOC image. These are supplied
+through the <code class="docutils literal notranslate"><span class="pre">ibek-runtime-support</span></code> folder in your services repo.</p>
+<p>This works at two levels: <strong>facility-wide</strong> sharing via git submodules (e.g.
+<code class="docutils literal notranslate"><span class="pre">detectorPlugins</span></code> and <code class="docutils literal notranslate"><span class="pre">gdaPlugins</span></code> for AreaDetector IOCs) and
+<strong>beamline-specific</strong> templates and entity models committed directly to your
+services repo for use across multiple IOCs on that beamline.</p>
+<p>See <a class="reference internal" href="runtime-support.html"><span class="std std-doc">Runtime Support</span></a> for full setup instructions,
+worked examples, and tips.</p>
+</section>
+<section id="test-in-a-devcontainer">
+<h2>7. Test in a devcontainer<a class="headerlink" href="#test-in-a-devcontainer" title="Link to this heading">#</a></h2>
+<p>Before deploying, verify that your IOC works inside a devcontainer. Use
+<code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">dev</span> <span class="pre">instance</span></code> to point the Generic IOC’s devcontainer at your IOC
+instance’s <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> and confirm it starts correctly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ibek<span class="w"> </span>dev<span class="w"> </span>instance<span class="w"> </span>/path/to/ioc-instance
+</pre></div>
+</div>
+<p>This symlinks <code class="docutils literal notranslate"><span class="pre">/epics/ioc/config</span></code> to your instance config directory, letting
+you iterate quickly on the <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> without rebuilding the container.</p>
+</section>
+<section id="release-and-deploy">
+<h2>8. Release and deploy<a class="headerlink" href="#release-and-deploy" title="Link to this heading">#</a></h2>
+<p>Once everything is working in the devcontainer:</p>
+<ol class="arabic simple">
+<li><p><strong>Release the Generic IOC</strong> so its image is published to the container
+registry (unless one already existed).</p></li>
+<li><p><strong>Update <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code></strong> in the services repo to reference the newly
+released image tag.</p></li>
+<li><p><strong>Deploy and test on the beamline</strong> to confirm the IOC behaves correctly in
+production.</p></li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../how-to.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">How-to Guides</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="create-generic-ioc-repo.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Create a Generic IOC repository</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#update-your-services-repo">Update your services repo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#work-on-one-ioc-at-a-time">Work on one IOC at a time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#split-iocs-by-device">1. Split IOCs by device</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plan-the-split-around-generic-ioc-reuse">2. Plan the split around Generic IOC reuse</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#move-support-yaml-to-public-repositories">3. Move support YAML to public repositories</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-use-upstream-public-sources">3a. Use upstream public sources</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#b-use-diamondlightsource-github">3b. Use DiamondLightSource GitHub</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#c-open-source-internal-modules">3c. Open-source internal modules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d-keep-genuinely-internal-modules-in-ibek-support-dls">3d. Keep genuinely internal modules in ibek-support-dls</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#point-each-ioc-at-a-generic-ioc-image">4. Point each IOC at a Generic IOC image</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#add-autosave-request-files-if-needed">5. Add autosave request files if needed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#custom-templates-like-gdaplugins">6. Custom templates like gdaPlugins</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-in-a-devcontainer">7. Test in a devcontainer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-and-deploy">8. Release and deploy</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/2.0.0b1/docs/how-to/after-beamline-convert.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/how-to/after-beamline-convert.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

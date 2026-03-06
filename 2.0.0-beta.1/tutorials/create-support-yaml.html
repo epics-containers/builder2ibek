@@ -1,0 +1,1135 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 2.0.0b1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=391fd9ae"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/create-support-yaml';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0b1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ibek support YAML for a complex builder.py" href="create-support-yaml-advanced.html" />
+    <link rel="prev" title="Converting a builder XML IOC to ibek ioc.yaml" href="convert-ioc-xml.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0b1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-xml.html">Converting a builder XML IOC to ibek ioc.yaml</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating ibek support YAML from a builder.py module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-support-yaml-advanced.html">ibek support YAML for a complex builder.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Creating ibek support YAML from a builder.py module</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="creating-ibek-support-yaml-from-a-builder-py-module">
+<h1>Creating ibek support YAML from a builder.py module<a class="headerlink" href="#creating-ibek-support-yaml-from-a-builder-py-module" title="Link to this heading">#</a></h1>
+<p>This tutorial walks you through converting a DLS EPICS support module that uses
+the old XMLbuilder (<code class="docutils literal notranslate"><span class="pre">builder.py</span></code>) format into the ibek YAML files needed for a
+Generic IOC. We use the <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> support module as a concrete example.</p>
+<p>After completing this tutorial you should understand:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support-dls/&lt;module&gt;/&lt;module&gt;.ibek.support.yaml</span></code> — entity model definitions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ibek-support-dls/&lt;module&gt;/&lt;module&gt;.install.yml</span></code> — build dependencies and assets</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>This tutorial targets <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>, the DLS-internal support
+repository.</strong>  If your module could be useful to other facilities, it is
+strongly recommended to open-source it and contribute the support YAML to the
+community <code class="docutils literal notranslate"><span class="pre">ibek-support</span></code> repository on GitHub instead.  The epics-containers
+project provides a full tutorial for this approach, using the Lakeshore 340
+temperature controller as an example:</p>
+<p><a class="reference external" href="https://epics-containers.github.io/main/tutorials/generic_ioc.html#lakeshore-340-temperature-controller">epics-containers: Creating a Generic IOC — Lakeshore 340</a></p>
+<p>For a tutorial covering a more complex module and the full open-source
+contribution workflow, see
+<a class="reference internal" href="create-support-yaml-advanced.html"><span class="std std-doc">ibek support YAML for a complex builder.py</span></a>.</p>
+</div>
+<section id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Take a look at <code class="docutils literal notranslate"><span class="pre">etc/builder.py</span></code> in the support module you are converting</p></li>
+<li><p>Build a <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.install.yml</span></code> for it</p></li>
+<li><p>Build a <code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.ibek.support.yaml</span></code> for it</p></li>
+<li><p>Convert any autosave comments in templates to <code class="docutils literal notranslate"><span class="pre">.req</span></code> files</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="read-builder-py">
+<h2>1. Read builder.py<a class="headerlink" href="#read-builder-py" title="Link to this heading">#</a></h2>
+<p>Find <code class="docutils literal notranslate"><span class="pre">etc/builder.py</span></code> in the module. Each Python class becomes one <code class="docutils literal notranslate"><span class="pre">entity_model</span></code>
+in the support YAML.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> at <code class="docutils literal notranslate"><span class="pre">/dls_sw/prod/R3.14.12.7/support/hidenRGA/1-12/etc/builder.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.streamDevice</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoProtocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">Device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.arginfo</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.seq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Seq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.asyn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Asyn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">iocbuilder.modules.calc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Calc</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Generic Hiden RGA module&#39;&#39;&#39;</span>
+
+    <span class="n">Dependencies</span> <span class="o">=</span> <span class="p">(</span><span class="n">Seq</span><span class="p">,</span> <span class="n">Asyn</span><span class="p">,</span> <span class="n">Calc</span><span class="p">)</span>
+    <span class="n">WarnMacros</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_generic.db&#39;</span>
+    <span class="n">ProtocolFiles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hiden_rga.proto&#39;</span><span class="p">]</span>
+    <span class="n">LibFileList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hidenRGA&#39;</span><span class="p">]</span>
+    <span class="n">DbdFileList</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hidenRGASupport&#39;</span><span class="p">,</span> <span class="s1">&#39;sncHidenRGA&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">PostIocInitialise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="s1">&#39;seq(sncDegas, &quot;P=</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA_hpr20</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Hiden High Pressure Gas Analyser. Specialised for the Diamond High</span>
+<span class="sd">    Pressure Sample Environment project.&#39;&#39;&#39;</span>
+    <span class="o">...</span>
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_hpr20.db&#39;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA_qga</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Hiden Quad Gas Analyser&#39;&#39;&#39;</span>
+    <span class="o">...</span>
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_qga.db&#39;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">hidenRGA_HMT</span><span class="p">(</span><span class="n">AutoSubstitution</span><span class="p">,</span> <span class="n">AutoProtocol</span><span class="p">,</span> <span class="n">Device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Hiden HMT RC RGA module&#39;&#39;&#39;</span>
+    <span class="o">...</span>
+    <span class="n">TemplateFile</span> <span class="o">=</span> <span class="s1">&#39;hiden_HMT.db&#39;</span>
+</pre></div>
+</div>
+<p>Key information extracted:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Classes / entity models</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_HMT</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_hpr20</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Template files</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hiden_generic.db</span></code>, <code class="docutils literal notranslate"><span class="pre">hiden_HMT.db</span></code>, <code class="docutils literal notranslate"><span class="pre">hiden_hpr20.db</span></code>, <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Lib</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>DBDs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hidenRGASupport</span></code>, <code class="docutils literal notranslate"><span class="pre">sncHidenRGA</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Protocol file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">hiden_rga.proto</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PostIocInitialise</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">seq(sncDegas,</span> <span class="pre">&quot;P=&lt;P&gt;&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Dependencies</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Seq</span></code>, <code class="docutils literal notranslate"><span class="pre">Asyn</span></code>, <code class="docutils literal notranslate"><span class="pre">Calc</span></code> (implies asyn IP port is configured separately)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="write-the-install-yml">
+<h2>2. Write the install.yml<a class="headerlink" href="#write-the-install-yml" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">.install.yml</span></code> (note: <code class="docutils literal notranslate"><span class="pre">.yml</span></code> not <code class="docutils literal notranslate"><span class="pre">.yaml</span></code>) captures build-time dependencies.</p>
+<p>It provides instructions to ansible as to how to build this support module as part of
+of a generic IOC container build.</p>
+<p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.install.yml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=../../ibek-support/_scripts/support_install_variables.json</span>
+
+<span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
+<span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1-12</span>
+
+<span class="nt">dbds</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGASupport.dbd</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sncHidenRGA.dbd</span>
+
+<span class="nt">libs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
+
+<span class="nt">organization</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://gitlab.diamond.ac.uk/controls/support</span>
+
+<span class="nt">protocol_files</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGAApp/protocol/hiden_rga.proto</span>
+</pre></div>
+</div>
+<p>Fields map directly from builder.py:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dbds</span></code> ← <code class="docutils literal notranslate"><span class="pre">DbdFileList</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">libs</span></code> ← <code class="docutils literal notranslate"><span class="pre">LibFileList</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">protocol_files</span></code> ← <code class="docutils literal notranslate"><span class="pre">ProtocolFiles</span></code> (use the source path within the repo)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="map-builder-arguments-to-ibek-parameters">
+<h2>3. Map builder arguments to ibek parameters<a class="headerlink" href="#map-builder-arguments-to-ibek-parameters" title="Link to this heading">#</a></h2>
+<p>In builder XML, <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> appeared like this:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hidenRGA.hidenRGA_qga</span><span class="w"> </span><span class="na">BUFFER_SIZE=</span><span class="s">&quot;100&quot;</span><span class="w"> </span><span class="na">P=</span><span class="s">&quot;BL11I-EA-RGA-01&quot;</span><span class="w"> </span><span class="na">PORT=</span><span class="s">&quot;rgaPort&quot;</span><span class="w"> </span><span class="na">Q=</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ENV.RGA&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>The XML attributes become ibek parameter names.  <code class="docutils literal notranslate"><span class="pre">name</span></code> is dropped (the entity
+has no cross-references and creates no asyn port) and handled by a converter.
+<code class="docutils literal notranslate"><span class="pre">PORT</span></code> references the companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity by name.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>XML attribute</p></th>
+<th class="head"><p>ibek parameter</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>dropped; converter discards it from XML</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>PV prefix</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Q</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>PV suffix, default <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PORT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">object</span></code></p></td>
+<td><p>name of the companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p>default 1000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="determine-the-startup-script-sequence">
+<h2>4. Determine the startup script sequence<a class="headerlink" href="#determine-the-startup-script-sequence" title="Link to this heading">#</a></h2>
+<p>The canonical source for <code class="docutils literal notranslate"><span class="pre">pre_init</span></code> and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> content is <strong>builder.py
+itself</strong>.  Look at the <code class="docutils literal notranslate"><span class="pre">Initialise</span></code>, <code class="docutils literal notranslate"><span class="pre">InitialiseOnce</span></code>, and <code class="docutils literal notranslate"><span class="pre">PostIocInitialise</span></code>
+methods on each class — these are what builder emits into the boot script.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> the relevant method is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">PostIocInitialise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nb">print</span> <span class="s1">&#39;seq(sncDegas, &quot;P=</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This maps directly to the <code class="docutils literal notranslate"><span class="pre">post_init</span></code> block.  The <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> call
+comes from the <code class="docutils literal notranslate"><span class="pre">Asyn</span></code> dependency rather than from the class itself, so it does
+not appear in <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code>’s own methods.</p>
+<p>To see what the startup script should look like, see a boot script of a <strong>real
+IOC instance</strong> that builder generated for a beamline using this module.  For
+<code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> the I11 IOC at
+<code class="docutils literal notranslate"><span class="pre">/dls_sw/work/R3.14.12.7/support/BL11I-BUILDER/iocs/BL11I-CS-IOC-09/</span></code> was used;
+its generated boot script contains:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">drvAsynIPPortConfigure</span><span class="p">(</span><span class="s2">&quot;ENV.RGA&quot;</span><span class="p">,</span> <span class="s2">&quot;10.76.5.10:5025&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">epicsEnvSet</span> <span class="s2">&quot;STREAM_PROTOCOL_PATH&quot;</span><span class="p">,</span> <span class="s2">&quot;$(HIDENRGA)/data&quot;</span>
+
+<span class="n">dbLoadRecords</span><span class="p">(</span><span class="s2">&quot;db/BL11I-CS-IOC-09_expanded.db&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+
+<span class="n">iocInit</span>
+
+<span class="n">seq</span><span class="p">(</span><span class="n">sncDegas</span><span class="p">,</span> <span class="s2">&quot;P=BL11I-EA-RGA-01&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This can confirm the <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, <code class="docutils literal notranslate"><span class="pre">databases</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> content needed.</p>
+<p>Note that here drvAsynIPPortConfigure is supplied by an asyn.AsynIP object.</p>
+</section>
+<hr class="docutils" />
+<section id="write-the-ibek-support-yaml">
+<h2>5. Write the ibek.support.yaml<a class="headerlink" href="#write-the-ibek-support-yaml" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> has four builder.py classes (<code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_hpr20</span></code>,
+<code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_HMT</span></code>), each loading a different substitutions file
+but otherwise identical in structure.  To keep the tutorial focused we work
+through <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> in full detail — this is the variant deployed on I11 at
+DLS.  The other three follow exactly the same logic and their entity models are
+just repeats with the appropriate <code class="docutils literal notranslate"><span class="pre">db</span></code> filename substituted.</p>
+<section id="a-review-what-parameters-you-need">
+<h3>5a. Review what parameters you need<a class="headerlink" href="#a-review-what-parameters-you-need" title="Link to this heading">#</a></h3>
+<p>The XML element that appears in a real I11 IOC is:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;hidenRGA.hidenRGA_qga</span><span class="w"> </span><span class="na">BUFFER_SIZE=</span><span class="s">&quot;100&quot;</span><span class="w"> </span><span class="na">P=</span><span class="s">&quot;BL11I-EA-RGA-01&quot;</span><span class="w"> </span><span class="na">PORT=</span><span class="s">&quot;rgaPort&quot;</span><span class="w"> </span><span class="na">Q=</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;ENV.RGA&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>We derive the ibek parameters by investigating the purpose of each of the
+attributes of the hidenRGA_qga element.</p>
+<hr class="docutils" />
+<section id="name-drop-this-parameter">
+<h4><code class="docutils literal notranslate"><span class="pre">name</span></code> → drop this parameter<a class="headerlink" href="#name-drop-this-parameter" title="Link to this heading">#</a></h4>
+<p><strong>Source: XMLbuilder row identifier.</strong>  <em>Some</em> XMLbuilder objects carry a <code class="docutils literal notranslate"><span class="pre">name</span></code>
+attribute — not all do.  XMLbuilder uses it to auto-generate OPI/EDM GUI panels
+(irrelevant in ibek) and to allow other objects to cross-reference this one.</p>
+<p>You need to carry <code class="docutils literal notranslate"><span class="pre">name</span></code> through to ibek as a <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code> parameter only when:</p>
+<ul class="simple">
+<li><p>another entity_model in a <code class="docutils literal notranslate"><span class="pre">support.yaml</span></code> will reference this entity. This
+is common for Asyn devices that expose their Asyn port as ‘name’, <strong>or</strong></p></li>
+<li><p>you need the name as a runtime value inside the entity’s own <code class="docutils literal notranslate"><span class="pre">pre_init</span></code> or
+<code class="docutils literal notranslate"><span class="pre">databases.args</span></code>.</p></li>
+</ul>
+<p>The most common case is <strong>any object that creates
+an asyn port</strong>.  The object calls <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> (or equivalent) with
+<code class="docutils literal notranslate"><span class="pre">name</span></code> as the port identifier, and other objects reference it by that same port
+name — so <code class="docutils literal notranslate"><span class="pre">name</span></code> identifies this object and provides a cross-reference target.
+If you see a <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> or <code class="docutils literal notranslate"><span class="pre">drvAsynSerialPortConfigure</span></code> call in
+<code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, keep <code class="docutils literal notranslate"><span class="pre">name</span></code> as <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code>.</p>
+<p>If neither condition applies and this is a true <em>leaf</em> object, you can drop
+<code class="docutils literal notranslate"><span class="pre">name</span></code> entirely — but then you need a converter to discard it when reading the
+XML, so that <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> does not try to pass an unrecognised attribute to the
+entity model.  <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code> is the simplest example:
+it does nothing except call <code class="docutils literal notranslate"><span class="pre">entity.remove(&quot;name&quot;)</span></code> for its entity types.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code>, neither condition applies: the asyn port is created by the
+companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity (not by this one), and nothing in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>
+cross-references <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> by name.  We therefore <strong>drop</strong> <code class="docutils literal notranslate"><span class="pre">name</span></code> and add
+a converter that discards it when reading the XML.</p>
+</section>
+<hr class="docutils" />
+<section id="p-type-str">
+<h4><code class="docutils literal notranslate"><span class="pre">P</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code><a class="headerlink" href="#p-type-str" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro from  <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<p>The macro declarations at the top of
+<code class="docutils literal notranslate"><span class="pre">/dls_sw/prod/R3.14.12.7/support/hidenRGA/1-12/db/hiden_qga.db</span></code> are the
+definitive list of what must (or can) be passed at <code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code> time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % macro, P, Prefix</span>
+<span class="c1"># % macro, Q, Suffix</span>
+<span class="c1"># % macro, PORT, Asyn port name</span>
+<span class="c1"># % macro, MASS_RANGE, Mass range of RGA. Defaults to 100amu.</span>
+<span class="c1"># % macro, HMT_RC, Set to one for high pressure HMT RC variant. Defaults to zero</span>
+</pre></div>
+</div>
+<p>Macros <strong>without</strong> a default in the declaration must always be supplied →
+required ibek parameters.  Macros <strong>with</strong> a default (<code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code>, <code class="docutils literal notranslate"><span class="pre">HMT_RC</span></code>)
+may be omitted entirely from the call — which is why they did not need to appear
+in the builder XML.  They can still be exposed as optional ibek parameters if
+you want users to be able to override the default.</p>
+<p><code class="docutils literal notranslate"><span class="pre">P</span></code> has no default and therefore must always be supplied:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">(</span><span class="n">stringin</span><span class="p">,</span> <span class="s2">&quot;$(P,undefined)$(Q,undefined):ID-I&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">P=&quot;BL11I-EA-RGA-01&quot;</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="q-type-str-default">
+<h4><code class="docutils literal notranslate"><span class="pre">Q</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">&quot;&quot;</span></code><a class="headerlink" href="#q-type-str-default" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro, same reasoning as <code class="docutils literal notranslate"><span class="pre">P</span></code>.</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">Q</span></code> has no default in the <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code> macro declarations, however as the
+one IOC we were translating used “”, we give it the reasonable default of <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>
+in the ibek model so it can be omitted from <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> when not needed.</p>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">Q=&quot;&quot;</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="port-type-object-referencing-the-asyn-asynip-entity">
+<h4><code class="docutils literal notranslate"><span class="pre">PORT</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> referencing the <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity<a class="headerlink" href="#port-type-object-referencing-the-asyn-asynip-entity" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro in <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">PORT</span></code> is declared in the <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code> header with no default and appears in
+StreamDevice links:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="p">(</span><span class="n">stringin</span><span class="p">,</span> <span class="s2">&quot;$(P,undefined)$(Q,undefined):ID-I&quot;</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">field</span><span class="p">(</span><span class="n">DTYP</span><span class="p">,</span> <span class="s2">&quot;stream&quot;</span><span class="p">)</span>
+    <span class="n">field</span><span class="p">(</span><span class="n">INP</span><span class="p">,</span>  <span class="s2">&quot;@hiden_rga.proto getID() $(PORT,undefined)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It has no default, so it must be passed in <code class="docutils literal notranslate"><span class="pre">databases.args</span></code>.  In the builder XML, <code class="docutils literal notranslate"><span class="pre">PORT=&quot;rgaPort&quot;</span></code> matched the <code class="docutils literal notranslate"><span class="pre">PORT</span></code>
+attribute of the companion <code class="docutils literal notranslate"><span class="pre">&lt;asyn.AsynIP</span> <span class="pre">PORT=&quot;rgaPort&quot;</span> <span class="pre">.../&gt;</span></code> element — i.e.
+<code class="docutils literal notranslate"><span class="pre">PORT</span></code> is the <em>name of another entity</em>.</p>
+<p>This is a very common ibek pattern: one entity creates an asyn port (an
+<code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> or <code class="docutils literal notranslate"><span class="pre">asyn.AsynSerial</span></code> entity with <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">type:</span> <span class="pre">id</span></code>), and a second
+entity references it by name via a parameter called <code class="docutils literal notranslate"><span class="pre">PORT</span></code> (or sometimes
+<code class="docutils literal notranslate"><span class="pre">ASYN_PORT</span></code>).  In ibek the referencing parameter has <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code>, which
+ensures <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> validation catches mismatched names.</p>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">PORT=&quot;rgaPort&quot;</span></code> → ibek parameter <code class="docutils literal notranslate"><span class="pre">PORT</span></code> of <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code>, value is
+the <code class="docutils literal notranslate"><span class="pre">name</span></code> of the <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="buffer-size-type-int-default-1000">
+<h4><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">1000</span></code><a class="headerlink" href="#buffer-size-type-int-default-1000" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macro in <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code> declares it as a macro and uses it in waveform records:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % macro, BUFFER_SIZE, Number of points to allocate for results buffer</span>
+  <span class="n">field</span><span class="p">(</span><span class="n">NSAM</span><span class="p">,</span> <span class="s2">&quot;$(BUFFER_SIZE,undefined)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It has no meaningful default, so it must be passed in <code class="docutils literal notranslate"><span class="pre">databases.args</span></code>.</p>
+<p>XML value: <code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE=&quot;100&quot;</span></code>.  The ibek default is set to 1000 — a
+conservative value that works well for typical MID scan usage.</p>
+</section>
+<hr class="docutils" />
+<section id="mass-range-and-hmt-rc-type-int-with-defaults-from-the-db">
+<h4><code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code> and <code class="docutils literal notranslate"><span class="pre">HMT_RC</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code> with defaults from the <code class="docutils literal notranslate"><span class="pre">.db</span></code><a class="headerlink" href="#mass-range-and-hmt-rc-type-int-with-defaults-from-the-db" title="Link to this heading">#</a></h4>
+<p><strong>Source: database macros with defaults in <code class="docutils literal notranslate"><span class="pre">hiden_qga.db</span></code>.</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># % macro, MASS_RANGE, Mass range of RGA. Defaults to 100amu.</span>
+<span class="c1"># % macro, HMT_RC, Set to one for high pressure HMT RC variant. Defaults to zero</span>
+</pre></div>
+</div>
+<p>These were not present in the builder XML because their defaults were
+sufficient for normal use.  We add them to the ibek entity model as optional
+parameters with the same defaults, so that instances can override them if
+needed.</p>
+<p>Neither appears in the original XML — ibek defaults: <code class="docutils literal notranslate"><span class="pre">MASS_RANGE:</span> <span class="pre">100</span></code>,
+<code class="docutils literal notranslate"><span class="pre">HMT_RC:</span> <span class="pre">0</span></code>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="b-the-entity-model">
+<h3>5b. The entity model<a class="headerlink" href="#b-the-entity-model" title="Link to this heading">#</a></h3>
+<p>Each entity model has four main sections:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">parameters:</span></code></strong> — the values a user supplies in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>; ibek validates
+types</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">pre_init:</span></code></strong> — IOC shell commands emitted before <code class="docutils literal notranslate"><span class="pre">iocInit</span></code></p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">databases:</span></code></strong> — <code class="docutils literal notranslate"><span class="pre">.db</span></code> files to load via <code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code>, with their macro
+arguments</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">post_init:</span></code></strong> — IOC shell commands emitted after <code class="docutils literal notranslate"><span class="pre">iocInit</span></code></p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, <code class="docutils literal notranslate"><span class="pre">databases</span></code>, and <code class="docutils literal notranslate"><span class="pre">post_init</span></code> values are rendered as Jinja2
+templates with the entity’s parameters supplied as context, so <code class="docutils literal notranslate"><span class="pre">{{P}}</span></code> anywhere
+in those sections resolves to the value of the <code class="docutils literal notranslate"><span class="pre">P</span></code> parameter.</p>
+<p><code class="docutils literal notranslate"><span class="pre">databases.args</span></code> is a list of <code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pairs passed as macros to
+<code class="docutils literal notranslate"><span class="pre">dbLoadRecords</span></code>.  If the value is omitted (e.g. <code class="docutils literal notranslate"><span class="pre">P:</span></code> with no value), ibek
+defaults it to the value of the parameter with the same name.  Keys can also be
+regular expressions — <code class="docutils literal notranslate"><span class="pre">.*:</span></code> matches all parameters and passes them through,
+which is convenient for pure <code class="docutils literal notranslate"><span class="pre">AutoSubstitution</span></code> entities where every parameter
+maps directly to a database macro.</p>
+<p>Create <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/hidenRGA/hidenRGA.ibek.support.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json</span>
+
+<span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA</span>
+
+<span class="nt">entity_models</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA_qga</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">      </span><span class="no">Hiden QGA Quad Gas Analyser, 200 amu, Faraday detector.</span>
+<span class="w">      </span><span class="no">Loads hiden_qga.db: global controls, bar scan (1-200 amu),</span>
+<span class="w">      </span><span class="no">MID scan (24 configurable mass channels), degas control,</span>
+<span class="w">      </span><span class="no">and per-mass sensitivity array.</span>
+<span class="w">    </span><span class="nt">parameters</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">PORT</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">Name of the asyn port to use for StreamDevice communication.</span>
+<span class="w">          </span><span class="no">Must be the name of a companion asyn.AsynIP entity.</span>
+<span class="w">      </span><span class="nt">P</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">PV prefix, e.g. &quot;BL11I-EA-RGA-01&quot;. Macro passed to</span>
+<span class="w">          </span><span class="no">dbLoadRecords; present in the compiled .db as $(P).</span>
+<span class="w">      </span><span class="nt">Q</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">PV suffix appended to P in all PV names.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">      </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">          </span><span class="no">Number of samples in the MID scan rolling results buffer per</span>
+<span class="w">          </span><span class="no">mass channel.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<span class="w">      </span><span class="nt">MASS_RANGE</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Mass range of RGA in amu.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">      </span><span class="nt">HMT_RC</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set to 1 for high pressure HMT RC variant.</span>
+<span class="w">        </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+
+<span class="w">    </span><span class="nt">databases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">$(HIDENRGA)/db/hiden_qga.db</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">.*</span><span class="p">:</span>
+
+<span class="w">    </span><span class="nt">post_init</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">seq(sncDegas, &quot;P={{P}}{{Q}}&quot;)</span>
+</pre></div>
+</div>
+<p>The other three variants (<code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_hpr20</span></code>, <code class="docutils literal notranslate"><span class="pre">hidenRGA_HMT</span></code>) have
+identical parameters.  Add them as additional <code class="docutils literal notranslate"><span class="pre">entity_models</span></code> entries, changing
+only the <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>, and the <code class="docutils literal notranslate"><span class="pre">databases[].file</span></code> path to the
+appropriate <code class="docutils literal notranslate"><span class="pre">.db</span></code> file.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">name</span></code> was dropped from the entity model, a converter is needed to
+discard it when reading the XML.  Create
+<code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/hidenRGA.py</span></code> following the pattern of
+<code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.converters.globalHandler</span><span class="w"> </span><span class="kn">import</span> <span class="n">globalHandler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">Generic_IOC</span>
+
+<span class="n">xml_component</span> <span class="o">=</span> <span class="s2">&quot;hidenRGA&quot;</span>
+
+
+<span class="nd">@globalHandler</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
+    <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">moduleinfos.py</span></code> discovers all <code class="docutils literal notranslate"><span class="pre">.py</span></code> files in the <code class="docutils literal notranslate"><span class="pre">converters/</span></code> directory
+automatically — no manual registration step is needed.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="verify-with-builder2ibek">
+<h2>6. Verify with builder2ibek<a class="headerlink" href="#verify-with-builder2ibek" title="Link to this heading">#</a></h2>
+<p>Once your YAML is in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>, you can validate it by converting a
+real IOC XML that uses the module:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span>&lt;path/to/IOC.xml&gt;<span class="w"> </span>--yaml<span class="w"> </span>/tmp/test.yaml
+</pre></div>
+</div>
+<p>Then inspect <code class="docutils literal notranslate"><span class="pre">/tmp/test.yaml</span></code> and check that the entity types and parameter names
+match what you defined in the support YAML.</p>
+<p>A real I11 IOC instance (<code class="docutils literal notranslate"><span class="pre">b11i-ea-hiden-01</span></code>) was generated this way and
+illustrates the expected output:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">entities</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">epics.EpicsEnvSet</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">STREAM_PROTOCOL_PATH</span>
+<span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/epics/runtime/protocol/</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">asyn.AsynIP</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rgaPort</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.111.5.1:5025</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hidenRGA.hidenRGA_qga</span>
+<span class="w">    </span><span class="nt">BUFFER_SIZE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">    </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL11I-EA-RGA-01</span>
+<span class="w">    </span><span class="nt">PORT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rgaPort</span>
+</pre></div>
+</div>
+<p>Note the <code class="docutils literal notranslate"><span class="pre">STREAM_PROTOCOL_PATH</span></code> entry.  Rather than each StreamDevice entity
+model emitting an <code class="docutils literal notranslate"><span class="pre">epicsEnvSet</span></code> in its own <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, ibek consolidates all
+protocol files into a single directory (<code class="docutils literal notranslate"><span class="pre">/epics/runtime/protocol/</span></code>) during IOC
+startup, and <code class="docutils literal notranslate"><span class="pre">builder2ibek</span></code> always adds a single <code class="docutils literal notranslate"><span class="pre">epics.EpicsEnvSet</span></code> entity for
+<code class="docutils literal notranslate"><span class="pre">STREAM_PROTOCOL_PATH</span></code> to the generated <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>.  There is no need to handle
+this in the support YAML at all.</p>
+<p>Also note that <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> appears as a first-class entity in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> with
+its own <code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">rgaPort</span></code>, and <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> references it via <code class="docutils literal notranslate"><span class="pre">PORT:</span> <span class="pre">rgaPort</span></code> —
+the <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> pattern in action.</p>
+</section>
+<hr class="docutils" />
+<section id="summary-of-what-maps-to-what">
+<h2>Summary of what maps to what<a class="headerlink" href="#summary-of-what-maps-to-what" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>builder.py element</p></th>
+<th class="head"><p>ibek YAML field</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Class name</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity_models[].name</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Docstring</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity_models[].description</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TemplateFile</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">databases[].file</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DbdFileList</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">install.yml:</span> <span class="pre">dbds</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LibFileList</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">install.yml:</span> <span class="pre">libs</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ProtocolFiles</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">install.yml:</span> <span class="pre">protocol_files</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PostIocInitialise</span></code> print statements</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">post_init[].value</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Database macros without defaults (P, Q, PORT, BUFFER_SIZE)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">databases[].args</span></code> — required parameters</p></td>
+</tr>
+<tr class="row-even"><td><p>Database macros with defaults (MASS_RANGE, HMT_RC)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">databases[].args</span></code> — optional parameters with matching defaults</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Dependencies</span> <span class="pre">=</span> <span class="pre">(Asyn,...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pre_init</span></code> <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> call</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Dependencies</span> <span class="pre">=</span> <span class="pre">(Seq,...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">post_init</span></code> <code class="docutils literal notranslate"><span class="pre">seq(...)</span></code> call</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">when:</span> <span class="pre">first</span></code></p></td>
+<td><p>once-per-IOC commands (e.g. STREAM_PROTOCOL_PATH)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="convert-ioc-xml.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Converting a builder XML IOC to ibek ioc.yaml</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="create-support-yaml-advanced.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ibek support YAML for a complex builder.py</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#steps">Steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-builder-py">1. Read builder.py</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-install-yml">2. Write the install.yml</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#map-builder-arguments-to-ibek-parameters">3. Map builder arguments to ibek parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#determine-the-startup-script-sequence">4. Determine the startup script sequence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#write-the-ibek-support-yaml">5. Write the ibek.support.yaml</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-review-what-parameters-you-need">5a. Review what parameters you need</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#name-drop-this-parameter"><code class="docutils literal notranslate"><span class="pre">name</span></code> → drop this parameter</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#p-type-str"><code class="docutils literal notranslate"><span class="pre">P</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#q-type-str-default"><code class="docutils literal notranslate"><span class="pre">Q</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">""</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#port-type-object-referencing-the-asyn-asynip-entity"><code class="docutils literal notranslate"><span class="pre">PORT</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">object</span></code> referencing the <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#buffer-size-type-int-default-1000"><code class="docutils literal notranslate"><span class="pre">BUFFER_SIZE</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">1000</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-range-and-hmt-rc-type-int-with-defaults-from-the-db"><code class="docutils literal notranslate"><span class="pre">MASS_RANGE</span></code> and <code class="docutils literal notranslate"><span class="pre">HMT_RC</span></code> → <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">int</span></code> with defaults from the <code class="docutils literal notranslate"><span class="pre">.db</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#b-the-entity-model">5b. The entity model</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-with-builder2ibek">6. Verify with builder2ibek</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-what-maps-to-what">Summary of what maps to what</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/2.0.0b1/docs/tutorials/create-support-yaml.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorials/create-support-yaml.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

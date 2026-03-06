@@ -1,0 +1,906 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Create a builder2ibek converter for a support module &#8212; builder2ibek 2.0.0b1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=391fd9ae"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/create-converter';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0b1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contribute to the project" href="contribute.html" />
+    <link rel="prev" title="Verify a converted IOC using db-compare" href="verify-with-devcontainer.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0b1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="after-beamline-convert.html">After a Beamline Auto-Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-generic-ioc-repo.html">Create a Generic IOC repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-instance.html">Convert a builder XML IOC instance to ibek YAML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime-support.html">Runtime Support (ibek-runtime-support)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autosave.html">Generating autosave req files from DB templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="verify-with-devcontainer.html">Verify a converted IOC using db-compare</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Create a builder2ibek converter for a support module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to the project</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Create a builder2ibek converter for a support module</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="create-a-builder2ibek-converter-for-a-support-module">
+<h1>Create a builder2ibek converter for a support module<a class="headerlink" href="#create-a-builder2ibek-converter-for-a-support-module" title="Link to this heading">#</a></h1>
+<p>When <code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">xml2yaml</span></code> converts a builder XML file it applies a
+<strong>converter</strong> — a small Python module — for each XML component prefix it
+encounters.  If no converter exists, the entity is passed through unchanged
+with whatever attributes the XML had.</p>
+<p>This how-to explains when and how to write a new converter.</p>
+<hr class="docutils" />
+<section id="why-fix-builder2ibek-rather-than-editing-ioc-yaml-by-hand">
+<h2>Why fix builder2ibek rather than editing ioc.yaml by hand<a class="headerlink" href="#why-fix-builder2ibek-rather-than-editing-ioc-yaml-by-hand" title="Link to this heading">#</a></h2>
+<p>It is tempting to run <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code>, fix up the resulting <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> manually,
+and move on.  Resist this.  Writing a converter instead has important
+advantages:</p>
+<ul class="simple">
+<li><p><strong>Others benefit immediately.</strong> Anyone converting the same module gets
+correct output without knowing about the quirk.</p></li>
+<li><p><strong>Re-conversion is safe.</strong> If the original builder XML is modified (a
+device address changes, a new instance is added) you can re-run <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code>
+and get a correct result.  Manual edits to <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> would have to be
+re-applied by hand.</p></li>
+<li><p><strong>The fix is tested.</strong> Once you add a sample XML/YAML pair to
+<code class="docutils literal notranslate"><span class="pre">tests/samples/</span></code> the CI suite catches any future regressions.</p></li>
+<li><p><strong>The knowledge is captured.</strong> The converter documents exactly what
+builder.py was doing implicitly, in executable form.</p></li>
+</ul>
+<p>The rule of thumb: if you find yourself editing <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> to fix something
+that came from <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code>, ask yourself whether that fix belongs in a
+converter instead.</p>
+</section>
+<hr class="docutils" />
+<section id="when-a-converter-is-needed">
+<h2>When a converter is needed<a class="headerlink" href="#when-a-converter-is-needed" title="Link to this heading">#</a></h2>
+<p>A converter is needed when the ibek entity requires different field names,
+values, or structure from the raw XML attributes.  Common cases:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Situation</p></th>
+<th class="head"><p>Converter action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>An XML attribute has been renamed in ibek</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity.rename(&quot;old&quot;,</span> <span class="pre">&quot;new&quot;)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>An XML attribute is GUI-only or builder-only and absent from ibek</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity.remove(&quot;attr&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>An XML string <code class="docutils literal notranslate"><span class="pre">&quot;True&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code> should be a YAML boolean</p></td>
+<td><p>Already handled by <code class="docutils literal notranslate"><span class="pre">&#64;globalHandler</span></code>; check first</p></td>
+</tr>
+<tr class="row-odd"><td><p>A numeric value must be transformed (e.g. <code class="docutils literal notranslate"><span class="pre">valve</span> <span class="pre">×</span> <span class="pre">10</span> <span class="pre">=</span> <span class="pre">addr</span></code>)</p></td>
+<td><p>Arithmetic on <code class="docutils literal notranslate"><span class="pre">entity.addr</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>The entity type itself must change (module renamed in ibek)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity.type</span> <span class="pre">=</span> <span class="pre">&quot;newModule.NewClass&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>An XML element maps to a different ibek module entirely</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity.type</span> <span class="pre">=</span> <span class="pre">&quot;dlsPLC.something&quot;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>One XML element should be deleted (e.g. replaced by an ibek default)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity.delete_me()</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>One XML element should expand to two ibek entities</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entity.add_entity(Entity({...}))</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="converter-anatomy">
+<h2>Converter anatomy<a class="headerlink" href="#converter-anatomy" title="Link to this heading">#</a></h2>
+<p>Every converter is a <code class="docutils literal notranslate"><span class="pre">.py</span></code> file in <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/</span></code>.
+<code class="docutils literal notranslate"><span class="pre">moduleinfos.py</span></code> discovers them automatically at import time — no
+registration step is needed.</p>
+<p>The minimal structure is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.converters.globalHandler</span><span class="w"> </span><span class="kn">import</span> <span class="n">globalHandler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">Generic_IOC</span>
+
+<span class="c1"># Must match the XML element prefix: &lt;myModule.SomeClass .../&gt;</span>
+<span class="n">xml_component</span> <span class="o">=</span> <span class="s2">&quot;myModule&quot;</span>
+
+
+<span class="nd">@globalHandler</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert myModule XML entities to ibek YAML.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">entity_type</span> <span class="o">==</span> <span class="s2">&quot;SomeClass&quot;</span><span class="p">:</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;oldParam&quot;</span><span class="p">,</span> <span class="s2">&quot;newParam&quot;</span><span class="p">)</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;builderOnlyParam&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="required-module-level-names">
+<h3>Required module-level names<a class="headerlink" href="#required-module-level-names" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">xml_component</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code> or <code class="docutils literal notranslate"><span class="pre">list[str]</span></code></p></td>
+<td><p>XML prefix(es) this converter handles</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">handler</span></code></p></td>
+<td><p>callable</p></td>
+<td><p>Called once per matching entity during conversion</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="optional-module-level-names">
+<h3>Optional module-level names<a class="headerlink" href="#optional-module-level-names" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">yaml_component</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>Override the ibek module prefix in the output (if different from <code class="docutils literal notranslate"><span class="pre">xml_component</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">defaults</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
+<td><p>Default parameter values injected for specific entity types</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schema</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p>URL of the ibek IOC schema for the Generic IOC (informational)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="the-globalhandler-decorator">
+<h3>The <code class="docutils literal notranslate"><span class="pre">&#64;globalHandler</span></code> decorator<a class="headerlink" href="#the-globalhandler-decorator" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">&#64;globalHandler</span></code> wraps your <code class="docutils literal notranslate"><span class="pre">handler</span></code> function so that the global
+pre-processing runs first.  The global handler:</p>
+<ul class="simple">
+<li><p>Removes <code class="docutils literal notranslate"><span class="pre">gda_name</span></code> and <code class="docutils literal notranslate"><span class="pre">gda_desc</span></code> from every entity</p></li>
+<li><p>Converts string values <code class="docutils literal notranslate"><span class="pre">&quot;True&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> to Python
+<code class="docutils literal notranslate"><span class="pre">True</span></code> / <code class="docutils literal notranslate"><span class="pre">False</span></code> / <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ul>
+<p>Always use <code class="docutils literal notranslate"><span class="pre">&#64;globalHandler</span></code> unless you have a specific reason not to.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-entity-api">
+<h2>The <code class="docutils literal notranslate"><span class="pre">Entity</span></code> API<a class="headerlink" href="#the-entity-api" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Entity</span></code> is a <code class="docutils literal notranslate"><span class="pre">dict</span></code> subclass that also supports attribute-style access.
+All XML attributes arrive as string values; the global handler has already
+converted booleans and empty strings.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">entity</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;old&quot;</span><span class="p">,</span> <span class="s2">&quot;new&quot;</span><span class="p">)</span>   <span class="c1"># rename a key; no-op if absent</span>
+<span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">)</span>          <span class="c1"># delete a key; no-op if absent</span>
+<span class="n">entity</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;mod.Class&quot;</span>     <span class="c1"># change the ibek entity type</span>
+<span class="n">entity</span><span class="o">.</span><span class="n">delete_me</span><span class="p">()</span>            <span class="c1"># mark this entity for removal from output</span>
+<span class="n">entity</span><span class="o">.</span><span class="n">add_entity</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>        <span class="c1"># insert an extra entity after this one</span>
+</pre></div>
+</div>
+<p>Read-only access to the IOC-level context:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ioc</span><span class="o">.</span><span class="n">ioc_name</span>    <span class="c1"># IOC name string</span>
+<span class="n">ioc</span><span class="o">.</span><span class="n">entities</span>    <span class="c1"># list of all entity dicts already processed</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="example-1-simple-field-rename-and-removal">
+<h2>Example 1: simple field rename and removal<a class="headerlink" href="#example-1-simple-field-rename-and-removal" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">autosave</span></code> XML element has several DLS-specific attributes that do not
+exist in the ibek entity model:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;autosave.Autosave</span><span class="w"> </span><span class="na">iocName=</span><span class="s">&quot;BL11I-CS-IOC-09&quot;</span><span class="w"> </span><span class="na">bl=</span><span class="s">&quot;True&quot;</span>
+<span class="w">    </span><span class="na">path=</span><span class="s">&quot;/dls_sw/i11/epics/autosave&quot;</span><span class="w"> </span><span class="na">skip_1=</span><span class="s">&quot;True&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;AS&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p>The ibek model uses <code class="docutils literal notranslate"><span class="pre">P</span></code> for the PV prefix (derived from <code class="docutils literal notranslate"><span class="pre">iocName</span></code> with a
+trailing colon added):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># src/builder2ibek/converters/autosave.py</span>
+<span class="n">xml_component</span> <span class="o">=</span> <span class="s2">&quot;autosave&quot;</span>
+
+<span class="nd">@globalHandler</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">entity_type</span> <span class="o">==</span> <span class="s2">&quot;Autosave&quot;</span><span class="p">:</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;iocName&quot;</span><span class="p">,</span> <span class="s2">&quot;P&quot;</span><span class="p">)</span>   <span class="c1"># rename the field</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">P</span> <span class="o">+=</span> <span class="s2">&quot;:&quot;</span>                 <span class="c1"># append the colon</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;bl&quot;</span><span class="p">)</span>             <span class="c1"># DLS-only flags not in ibek model</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;skip_1&quot;</span><span class="p">)</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="example-2-type-change-and-value-transformation">
+<h2>Example 2: type change and value transformation<a class="headerlink" href="#example-2-type-change-and-value-transformation" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValve</span></code> maps to <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValve</span></code> with the <code class="docutils literal notranslate"><span class="pre">valve</span></code> number
+multiplied by 10 to get <code class="docutils literal notranslate"><span class="pre">addr</span></code>, and the <code class="docutils literal notranslate"><span class="pre">crate</span></code> short name looked up to
+obtain the full <code class="docutils literal notranslate"><span class="pre">vlvcc</span></code> PV device name:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># src/builder2ibek/converters/vacuumValve.py</span>
+<span class="n">xml_component</span> <span class="o">=</span> <span class="s2">&quot;vacuumValve&quot;</span>
+<span class="n">read100Objects</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># shared state to resolve crate name → port</span>
+
+<span class="nd">@globalHandler</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">entity_type</span> <span class="o">==</span> <span class="s2">&quot;vacuumValveRead&quot;</span><span class="p">:</span>
+        <span class="n">read100Objects</span><span class="p">[</span><span class="n">entity</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">port</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;dlsPLC.read100&quot;</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">century</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">entity_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;vacuumValve&quot;</span><span class="p">,</span> <span class="s2">&quot;vacuumValve_callback&quot;</span><span class="p">]:</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;dlsPLC.vacValve&quot;</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;crate&quot;</span><span class="p">,</span> <span class="s2">&quot;vlvcc&quot;</span><span class="p">)</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">addr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">valve</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;valve&quot;</span><span class="p">)</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">read100Objects</span><span class="p">[</span><span class="n">entity</span><span class="o">.</span><span class="n">vlvcc</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Note the module-level <code class="docutils literal notranslate"><span class="pre">read100Objects</span></code> dict: entities are processed in XML
+document order, so a <code class="docutils literal notranslate"><span class="pre">vacuumValveRead</span></code> entity always appears before any
+<code class="docutils literal notranslate"><span class="pre">vacuumValve</span></code> that references it.</p>
+</section>
+<hr class="docutils" />
+<section id="example-3-deleting-an-entity">
+<h2>Example 3: deleting an entity<a class="headerlink" href="#example-3-deleting-an-entity" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">devIocStats.devIocStatsHelper</span></code> is superseded by an ibek default that
+auto-generates the equivalent entity.  The converter simply removes it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@globalHandler</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">entity_type</span> <span class="o">==</span> <span class="s2">&quot;devIocStatsHelper&quot;</span><span class="p">:</span>
+        <span class="n">entity</span><span class="o">.</span><span class="n">delete_me</span><span class="p">()</span>
+        <span class="k">return</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="example-4-handling-multiple-xml-prefixes">
+<h2>Example 4: handling multiple XML prefixes<a class="headerlink" href="#example-4-handling-multiple-xml-prefixes" title="Link to this heading">#</a></h2>
+<p>One converter can handle several XML prefixes by setting <code class="docutils literal notranslate"><span class="pre">xml_component</span></code> to
+a list.  This is useful for support modules that were renamed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">xml_component</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vacuumValve&quot;</span><span class="p">,</span> <span class="s2">&quot;oldVacuum&quot;</span><span class="p">]</span>
+
+<span class="nd">@globalHandler</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="development-iteration-loop">
+<h2>Development iteration loop<a class="headerlink" href="#development-iteration-loop" title="Link to this heading">#</a></h2>
+<p>Open the <code class="docutils literal notranslate"><span class="pre">builder2ibek</span></code> repository in the devcontainer (first run
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">submodule</span> <span class="pre">update</span> <span class="pre">--init</span></code> to check out <code class="docutils literal notranslate"><span class="pre">ibek-support</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code>).  The typical inner loop is:</p>
+<ol class="arabic">
+<li><p>Edit <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/&lt;module&gt;.py</span></code></p></li>
+<li><p>Optionally edit the ibek support YAML in <code class="docutils literal notranslate"><span class="pre">ibek-support-dls/</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ibek-support/</span></code> if the entity model also needs updating</p></li>
+<li><p>Re-convert all sample XML files and update expected outputs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>tests/samples<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./make_samples.sh
+</pre></div>
+</div>
+</li>
+<li><p>Rebuild the global IOC YAML schema so VSCode validation reflects any
+support YAML changes:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./update-schema
+</pre></div>
+</div>
+</li>
+<li><p>Open the generated <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> files in <code class="docutils literal notranslate"><span class="pre">tests/samples/</span></code> in VSCode and check
+for schema validation errors (requires the Red Hat YAML extension).
+If the extension does not pick up schema changes immediately, toggle
+<strong>Yaml: Validate</strong> off and on in the extension settings.</p></li>
+<li><p>Once the output looks correct, commit both the converter and the updated
+sample files.</p></li>
+</ol>
+</section>
+<section id="adding-a-test">
+<h2>Adding a test<a class="headerlink" href="#adding-a-test" title="Link to this heading">#</a></h2>
+<p>Add a sample XML and the expected YAML to <code class="docutils literal notranslate"><span class="pre">tests/samples/</span></code> so the CI will
+catch regressions.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>MY-IOC.xml<span class="w"> </span>tests/samples/
+<span class="nb">cd</span><span class="w"> </span>tests/samples<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./make_samples.sh
+</pre></div>
+</div>
+<p>Review the diff carefully — <code class="docutils literal notranslate"><span class="pre">make_samples.sh</span></code> overwrites the <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> files
+from the current converter output, so only commit when the output is correct.</p>
+<p>The test suite runs all sample conversions automatically:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_file_conversion.py
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="submitting-the-converter">
+<h2>Submitting the converter<a class="headerlink" href="#submitting-the-converter" title="Link to this heading">#</a></h2>
+<p>Converters are part of the <code class="docutils literal notranslate"><span class="pre">builder2ibek</span></code> source tree, not the
+<code class="docutils literal notranslate"><span class="pre">ibek-support*</span></code> repositories.  Open a pull request against
+<a class="reference external" href="https://github.com/epics-containers/builder2ibek">epics-containers/builder2ibek</a>
+including:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/&lt;module&gt;.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tests/samples/&lt;EXAMPLE&gt;.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">tests/samples/&lt;example&gt;.yaml</span></code></p></li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="verify-with-devcontainer.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Verify a converted IOC using db-compare</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="contribute.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Contribute to the project</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-fix-builder2ibek-rather-than-editing-ioc-yaml-by-hand">Why fix builder2ibek rather than editing ioc.yaml by hand</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-a-converter-is-needed">When a converter is needed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#converter-anatomy">Converter anatomy</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-module-level-names">Required module-level names</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-module-level-names">Optional module-level names</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-globalhandler-decorator">The <code class="docutils literal notranslate"><span class="pre">@globalHandler</span></code> decorator</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-entity-api">The <code class="docutils literal notranslate"><span class="pre">Entity</span></code> API</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-1-simple-field-rename-and-removal">Example 1: simple field rename and removal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-2-type-change-and-value-transformation">Example 2: type change and value transformation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-3-deleting-an-entity">Example 3: deleting an entity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-4-handling-multiple-xml-prefixes">Example 4: handling multiple XML prefixes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-iteration-loop">Development iteration loop</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-test">Adding a test</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-the-converter">Submitting the converter</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/2.0.0b1/docs/how-to/create-converter.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/how-to/create-converter.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

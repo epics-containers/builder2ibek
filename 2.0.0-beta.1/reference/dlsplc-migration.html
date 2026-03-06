@@ -1,0 +1,1150 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>dlsPLC migration reference &#8212; builder2ibek 2.0.0b1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=391fd9ae"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/dlsplc-migration';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0b1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="builder2ibek" href="../_api/builder2ibek.html" />
+    <link rel="prev" title="Reference" href="../reference.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0b1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">dlsPLC migration reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_api/builder2ibek.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/epics-containers/builder2ibek/releases">Release Notes</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../reference.html" class="nav-link">Reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">dlsPLC migration reference</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="dlsplc-migration-reference">
+<h1>dlsPLC migration reference<a class="headerlink" href="#dlsplc-migration-reference" title="Link to this heading">#</a></h1>
+<p>This page documents which older DLS vacuum/interlock support modules are
+obsolete and how their builder XML entities map to <code class="docutils literal notranslate"><span class="pre">dlsPLC</span></code> equivalents in
+<code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">xml2yaml</span></code> performs most of these translations <strong>automatically</strong>.
+The sections below note where automatic conversion is implemented, where it is
+incomplete, and the argument transformations applied.</p>
+<p><strong>Origin</strong>: the authoritative migration guide is the DLS Confluence page
+<em>“Upgrade a Vacuum IOC to use dlsPLC”</em> (internal access required).  This page
+captures the same rules in a form usable without Confluence access.</p>
+<hr class="docutils" />
+<section id="why-these-modules-are-obsolete">
+<h2>Why these modules are obsolete<a class="headerlink" href="#why-these-modules-are-obsolete" title="Link to this heading">#</a></h2>
+<p>The older modules (<code class="docutils literal notranslate"><span class="pre">vacuumValve</span></code>, <code class="docutils literal notranslate"><span class="pre">vacuumPump</span></code>, <code class="docutils literal notranslate"><span class="pre">interlock</span></code>, <code class="docutils literal notranslate"><span class="pre">temperature</span></code>,
+<code class="docutils literal notranslate"><span class="pre">flow</span></code>) each shipped separate EPICS templates for the two PLC communication
+protocols — FINS and Hostlink — doubling maintenance burden.  <code class="docutils literal notranslate"><span class="pre">dlsPLC</span></code> provides
+a single protocol-independent layer 3, so only one device template per device
+type is needed.</p>
+</section>
+<hr class="docutils" />
+<section id="build-requirements-for-dlsplc-iocs">
+<h2>Build requirements for dlsPLC IOCs<a class="headerlink" href="#build-requirements-for-dlsplc-iocs" title="Link to this heading">#</a></h2>
+<p>Add to <code class="docutils literal notranslate"><span class="pre">configure/RELEASE</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calc</span>   <span class="o">=</span> <span class="o">...</span>
+<span class="n">busy</span>   <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>Add to the DBD file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calcSupport</span><span class="o">.</span><span class="n">dbd</span>
+<span class="n">busyRecord</span><span class="o">.</span><span class="n">dbd</span>
+</pre></div>
+</div>
+<p>If migrating from <strong>Hostlink</strong> to FINS, in the startup script replace:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">HostlinkInterposeInit</span><span class="p">(</span><span class="s2">&quot;ty_40_0&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">finsDEVInit</span><span class="p">(</span><span class="s2">&quot;VLVCC1&quot;</span><span class="p">,</span> <span class="s2">&quot;ty_40_0&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and update all references to <code class="docutils literal notranslate"><span class="pre">ty_40_0</span></code> → <code class="docutils literal notranslate"><span class="pre">VLVCC1</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="module-replacement-table">
+<h2>Module replacement table<a class="headerlink" href="#module-replacement-table" title="Link to this heading">#</a></h2>
+<section id="vacuumvalve-module">
+<h3>vacuumValve module<a class="headerlink" href="#vacuumvalve-module" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Old XML type</p></th>
+<th class="head"><p>dlsPLC replacement</p></th>
+<th class="head"><p>Auto-converted?</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveRead</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">century=0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveRead2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code></p></td>
+<td><p><strong>No</strong> — raises error</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">century</span></code> = block number (e.g. <code class="docutils literal notranslate"><span class="pre">2</span></code> reads DM200–299); see below</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValve</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValve</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">valve×10</span> <span class="pre">→</span> <span class="pre">addr</span></code>; <code class="docutils literal notranslate"><span class="pre">crate</span> <span class="pre">→</span> <span class="pre">vlvcc</span></code> (full crate name)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValve_callback</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValve</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p>Same as above</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveBistable</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveBistable</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">valve×10</span> <span class="pre">→</span> <span class="pre">addr</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveGroup</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveGroup</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p>Arguments identical</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveReadOnly</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveReadOnly</span></code></p></td>
+<td><p>No</p></td>
+<td><p>Direct replacement</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveReadExtra</span></code></p></td>
+<td><p><em>(no direct replacement)</em></p></td>
+<td><p>No</p></td>
+<td><p>Use multiple <code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code> instances</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.externalValve</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.externalValve</span></code></p></td>
+<td><p>No</p></td>
+<td><p>Direct replacement</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For valves that used <code class="docutils literal notranslate"><span class="pre">tclose</span></code> macros, use <code class="docutils literal notranslate"><span class="pre">dlsPLC_vacValveTclose.template</span></code>
+(entity type <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveTclose</span></code>).</p>
+<p>For endstation PLCs with more than 6 valves, use <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveDebounce</span></code>
+instead of <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValve</span></code>.</p>
+</section>
+<section id="vacuumpump-module">
+<h3>vacuumPump module<a class="headerlink" href="#vacuumpump-module" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Old XML type</p></th>
+<th class="head"><p>dlsPLC replacement</p></th>
+<th class="head"><p>Auto-converted?</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumPump.vacuumScrollPump</span></code> / <code class="docutils literal notranslate"><span class="pre">_asyn</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacPump</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">valve×10</span> <span class="pre">→</span> <span class="pre">addr</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumPump.vacuumTurboPump</span></code> / <code class="docutils literal notranslate"><span class="pre">_asyn</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacPump</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">valve×10</span> <span class="pre">→</span> <span class="pre">addr</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumPump.vacuumRootsPump</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.vacPump</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">valve×10</span> <span class="pre">→</span> <span class="pre">addr</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="interlock-module">
+<h3>interlock module<a class="headerlink" href="#interlock-module" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Old XML type</p></th>
+<th class="head"><p>dlsPLC replacement</p></th>
+<th class="head"><p>Auto-converted?</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.interlock</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p>See address and field-name changes below</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestMain</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestMain</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">addr</span></code>+<code class="docutils literal notranslate"><span class="pre">in</span></code>+<code class="docutils literal notranslate"><span class="pre">out</span></code> → <code class="docutils literal notranslate"><span class="pre">outaddr</span></code>; see below</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestIndividual</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestIndividual</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FIELD</span></code> argument removed</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="temperature-module">
+<h3>temperature module<a class="headerlink" href="#temperature-module" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Old XML type</p></th>
+<th class="head"><p>dlsPLC replacement</p></th>
+<th class="head"><p>Auto-converted?</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">temperature.temperaturePLCRead</span></code> / <code class="docutils literal notranslate"><span class="pre">_asyn</span></code></p></td>
+<td><p>2× <code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code></p></td>
+<td><p><strong>Partial WIP</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">century=1</span></code> (setpoints), <code class="docutils literal notranslate"><span class="pre">century=2</span></code> (readbacks)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">temperature.temperaturePLC</span></code> / <code class="docutils literal notranslate"><span class="pre">_asyn</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.temperature</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">addr</span></code>+<code class="docutils literal notranslate"><span class="pre">indx</span></code> → 2-digit <code class="docutils literal notranslate"><span class="pre">offset</span></code>; see below</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="flow-module">
+<h3>flow module<a class="headerlink" href="#flow-module" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Old XML type</p></th>
+<th class="head"><p>dlsPLC replacement</p></th>
+<th class="head"><p>Auto-converted?</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">flow.flow</span></code></p></td>
+<td><p><em>(no replacement)</em></p></td>
+<td><p>No</p></td>
+<td><p>Still works; <code class="docutils literal notranslate"><span class="pre">LOLO</span></code> PV points at <code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code> output</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flow.flow_asyn</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.flow</span></code></p></td>
+<td><p>No</p></td>
+<td><p>Address recalculation required; see below</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="other-templates">
+<h3>Other templates<a class="headerlink" href="#other-templates" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Old XML type</p></th>
+<th class="head"><p>dlsPLC replacement</p></th>
+<th class="head"><p>Auto-converted?</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.reboot_rga</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.reboot_rga</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DM</span> <span class="pre">→</span> <span class="pre">addr</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.fvg_asyn</span></code></p></td>
+<td><p><em>(remove)</em></p></td>
+<td><p>No</p></td>
+<td><p>Point GUI directly at gauge interlock bit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.overrideRequestMain</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestMain</span></code></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p>Via interlock converter</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="argument-transformation-rules">
+<h2>Argument transformation rules<a class="headerlink" href="#argument-transformation-rules" title="Link to this heading">#</a></h2>
+<section id="valve-addr">
+<h3><code class="docutils literal notranslate"><span class="pre">valve</span> <span class="pre">→</span> <span class="pre">addr</span></code><a class="headerlink" href="#valve-addr" title="Link to this heading">#</a></h3>
+<p>All valve and pump templates used a <code class="docutils literal notranslate"><span class="pre">valve</span></code> number (1-based, sometimes
+zero-padded).  dlsPLC uses <code class="docutils literal notranslate"><span class="pre">addr</span></code> = <code class="docutils literal notranslate"><span class="pre">valve</span> <span class="pre">×</span> <span class="pre">10</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>valve=1  → addr=10
+valve=2  → addr=20
+valve=12 → addr=120
+</pre></div>
+</div>
+</section>
+<section id="vlvcc-full-crate-name">
+<h3><code class="docutils literal notranslate"><span class="pre">vlvcc</span></code> — full crate name<a class="headerlink" href="#vlvcc-full-crate-name" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">vlvcc</span></code> argument in dlsPLC templates must be the <strong>full</strong> PV device name of
+the valve crate controller, not a short alias:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old</span>
+<span class="n">vlvcc</span><span class="o">=</span><span class="s2">&quot;VLVCC01&quot;</span>
+
+<span class="c1"># New</span>
+<span class="n">vlvcc</span><span class="o">=</span><span class="s2">&quot;BL04I-VA-VLVCC-01&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="interlock-field-names-and-addresses">
+<h3><code class="docutils literal notranslate"><span class="pre">interlock</span></code> — field names and addresses<a class="headerlink" href="#interlock-field-names-and-addresses" title="Link to this heading">#</a></h3>
+<p>Interlock bit labels <code class="docutils literal notranslate"><span class="pre">ilkA</span></code>–<code class="docutils literal notranslate"><span class="pre">ilkF</span></code> become <code class="docutils literal notranslate"><span class="pre">ilk10</span></code>–<code class="docutils literal notranslate"><span class="pre">ilk15</span></code> (decimal):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ilkA → ilk10
+ilkB → ilk11
+ilkC → ilk12
+ilkD → ilk13
+ilkE → ilk14
+ilkF → ilk15
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">addr</span></code> argument is used <strong>directly</strong> (not multiplied by 10). However, if
+your original interlock used a reduced address because <code class="docutils literal notranslate"><span class="pre">vacuumValveRead2</span></code> was
+subtracting an offset, <strong>add that offset back</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old: addr=07 with vacuumValveRead2 READFROM2=800 → effective DM=807</span>
+<span class="c1"># New: addr=807</span>
+</pre></div>
+</div>
+</section>
+<section id="overriderequestmain-outaddr">
+<h3><code class="docutils literal notranslate"><span class="pre">overrideRequestMain</span></code> — <code class="docutils literal notranslate"><span class="pre">outaddr</span></code><a class="headerlink" href="#overriderequestmain-outaddr" title="Link to this heading">#</a></h3>
+<p>The three arguments <code class="docutils literal notranslate"><span class="pre">addr</span></code>, <code class="docutils literal notranslate"><span class="pre">in</span></code>, <code class="docutils literal notranslate"><span class="pre">out</span></code> collapse into a single <code class="docutils literal notranslate"><span class="pre">outaddr</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>outaddr = (addr × 10) + in
+</pre></div>
+</div>
+<p>The input address is always <code class="docutils literal notranslate"><span class="pre">outaddr</span> <span class="pre">+</span> <span class="pre">1</span></code>.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">addr=08,</span> <span class="pre">in=1,</span> <span class="pre">out=0</span></code> → writes DM80, reads DM81 → <code class="docutils literal notranslate"><span class="pre">outaddr=80</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">in</span></code>, <code class="docutils literal notranslate"><span class="pre">out</span></code>, and <code class="docutils literal notranslate"><span class="pre">addr</span></code> arguments are removed; <code class="docutils literal notranslate"><span class="pre">name</span></code> is also removed.</p>
+</section>
+<section id="temperatureplc-offset">
+<h3><code class="docutils literal notranslate"><span class="pre">temperaturePLC</span></code> — <code class="docutils literal notranslate"><span class="pre">offset</span></code><a class="headerlink" href="#temperatureplc-offset" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">addr</span></code> and <code class="docutils literal notranslate"><span class="pre">indx</span></code> arguments are combined into a 2-digit <code class="docutils literal notranslate"><span class="pre">offset</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>offset = (addr × 10) + indx
+</pre></div>
+</div>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">addr=3,</span> <span class="pre">indx=4</span></code> → reads from DM234, writes to DM134 → <code class="docutils literal notranslate"><span class="pre">offset=34</span></code>.</p>
+</section>
+<section id="flow-asyn-address-recalculation">
+<h3><code class="docutils literal notranslate"><span class="pre">flow_asyn</span></code> — address recalculation<a class="headerlink" href="#flow-asyn-address-recalculation" title="Link to this heading">#</a></h3>
+<p>If your <code class="docutils literal notranslate"><span class="pre">flow_asyn.template</span></code> had non-zero <code class="docutils literal notranslate"><span class="pre">loarea</span></code>/<code class="docutils literal notranslate"><span class="pre">loloarea</span></code>, look up the
+<code class="docutils literal notranslate"><span class="pre">READFROM2</span></code> value in the corresponding <code class="docutils literal notranslate"><span class="pre">vacuumValveRead2_asyn.template</span></code> and add
+it to <code class="docutils literal notranslate"><span class="pre">loaddress</span></code>/<code class="docutils literal notranslate"><span class="pre">loloaddress</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old: loloarea=2, loloaddress=12, READFROM2=800</span>
+<span class="c1"># New: loloaddress=812  (loloarea removed)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ioc-yaml-examples">
+<h2>ioc.yaml examples<a class="headerlink" href="#ioc-yaml-examples" title="Link to this heading">#</a></h2>
+<section id="vacuumvalveread-dlsplc-read100">
+<h3>vacuumValveRead → dlsPLC.read100<a class="headerlink" href="#vacuumvalveread-dlsplc-read100" title="Link to this heading">#</a></h3>
+<p><strong>Old XML:</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;vacuumValve.vacuumValveRead</span><span class="w"> </span><span class="na">device=</span><span class="s">&quot;BL04I-VA-VLVCC-01&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;VLVCC01&quot;</span><span class="w"> </span><span class="na">port=</span><span class="s">&quot;ty_40_0&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p><strong>New ioc.yaml:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlsPLC.read100</span>
+<span class="w">  </span><span class="nt">century</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-VLVCC-01</span>
+<span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ty_40_0</span>
+</pre></div>
+</div>
+<p>Note: <code class="docutils literal notranslate"><span class="pre">name</span></code> is removed (it was only used to cross-reference other components
+in builder XML; ibek uses the <code class="docutils literal notranslate"><span class="pre">device</span></code> PV name instead).</p>
+</section>
+<section id="vacuumvalve-dlsplc-vacvalve">
+<h3>vacuumValve → dlsPLC.vacValve<a class="headerlink" href="#vacuumvalve-dlsplc-vacvalve" title="Link to this heading">#</a></h3>
+<p><strong>Old XML:</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;vacuumValve.vacuumValve_callback</span>
+<span class="w">    </span><span class="na">crate=</span><span class="s">&quot;VLVCC01&quot;</span>
+<span class="w">    </span><span class="na">device=</span><span class="s">&quot;BL04I-VA-VALVE-01&quot;</span>
+<span class="w">    </span><span class="na">valve=</span><span class="s">&quot;01&quot;</span>
+<span class="w">    </span><span class="na">ilk0=</span><span class="s">&quot;Air Healthy&quot;</span><span class="w"> </span><span class="na">ilk1=</span><span class="s">&quot;IMG 03 Healthy&quot;</span><span class="w"> </span><span class="na">ilk2=</span><span class="s">&quot;IMG 04 Healthy&quot;</span>
+<span class="w">    </span><span class="na">ilk3=</span><span class="s">&quot;PIRG 03 Healthy&quot;</span><span class="w"> </span><span class="na">ilk4=</span><span class="s">&quot;PIRG 04 Healthy&quot;</span><span class="w"> </span><span class="na">ilk5=</span><span class="s">&quot;QBPM1 Out/V1 Open&quot;</span>
+<span class="w">    </span><span class="na">ilk6=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilk7=</span><span class="s">&quot;QBPM3 Out/V1 Open&quot;</span><span class="w"> </span><span class="na">ilk8=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilk9=</span><span class="s">&quot;Unused&quot;</span>
+<span class="w">    </span><span class="na">ilkA=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkB=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkC=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkD=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkE=</span><span class="s">&quot;Unused&quot;</span>
+<span class="w">    </span><span class="na">ilkF=</span><span class="s">&quot;Valve OK&quot;</span>
+<span class="w">    </span><span class="na">gilk0=</span><span class="s">&quot;GAUGE-01&quot;</span><span class="w"> </span><span class="na">gilk1=</span><span class="s">&quot;GAUGE-02&quot;</span><span class="w"> </span><span class="na">gilk2=</span><span class="s">&quot;GAUGE-03&quot;</span>
+<span class="w">    </span><span class="na">gilk3=</span><span class="s">&quot;GAUGE-04&quot;</span><span class="w"> </span><span class="na">gilk4=</span><span class="s">&quot;GAUGE-05&quot;</span><span class="w"> </span><span class="na">gilk5=</span><span class="s">&quot;GAUGE-06&quot;</span>
+<span class="w">    </span><span class="na">name=</span><span class="s">&quot;VALVE1&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p><strong>New ioc.yaml</strong> (blank <code class="docutils literal notranslate"><span class="pre">ilk</span></code> fields are dropped automatically):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlsPLC.vacValve</span>
+<span class="w">  </span><span class="nt">addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-VALVE-01</span>
+<span class="w">  </span><span class="nt">vlvcc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-VLVCC-01</span>
+<span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ty_40_0</span>
+<span class="w">  </span><span class="nt">ilk0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Air Healthy</span>
+<span class="w">  </span><span class="nt">ilk1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMG 03 Healthy</span>
+<span class="w">  </span><span class="nt">ilk2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">IMG 04 Healthy</span>
+<span class="w">  </span><span class="nt">ilk3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PIRG 03 Healthy</span>
+<span class="w">  </span><span class="nt">ilk4</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PIRG 04 Healthy</span>
+<span class="w">  </span><span class="nt">ilk5</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QBPM1 Out/V1 Open</span>
+<span class="w">  </span><span class="nt">ilk7</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">QBPM3 Out/V1 Open</span>
+<span class="w">  </span><span class="nt">ilk15</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Valve OK</span>
+<span class="w">  </span><span class="nt">gilk0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GAUGE-01</span>
+<span class="w">  </span><span class="nt">gilk1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GAUGE-02</span>
+<span class="w">  </span><span class="nt">gilk2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GAUGE-03</span>
+<span class="w">  </span><span class="nt">gilk3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GAUGE-04</span>
+<span class="w">  </span><span class="nt">gilk4</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GAUGE-05</span>
+<span class="w">  </span><span class="nt">gilk5</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GAUGE-06</span>
+</pre></div>
+</div>
+</section>
+<section id="interlock-dlsplc-interlock">
+<h3>interlock → dlsPLC.interlock<a class="headerlink" href="#interlock-dlsplc-interlock" title="Link to this heading">#</a></h3>
+<p><strong>Old XML:</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;interlock.interlock</span>
+<span class="w">    </span><span class="na">addr=</span><span class="s">&quot;07&quot;</span>
+<span class="w">    </span><span class="na">desc=</span><span class="s">&quot;Water Flow Interlocks&quot;</span>
+<span class="w">    </span><span class="na">device=</span><span class="s">&quot;BL04I-VA-VLVCC-01&quot;</span>
+<span class="w">    </span><span class="na">ilk0=</span><span class="s">&quot;I04 Filter&quot;</span><span class="w"> </span><span class="na">ilk1=</span><span class="s">&quot;X+ Slit Water Flow&quot;</span><span class="w"> </span><span class="na">ilk2=</span><span class="s">&quot;X- Slit Water Flow&quot;</span>
+<span class="w">    </span><span class="na">ilk3=</span><span class="s">&quot;Y+ Slit Water Flow&quot;</span><span class="w"> </span><span class="na">ilk4=</span><span class="s">&quot;Y- Slit Water Flow&quot;</span><span class="w"> </span><span class="na">ilk5=</span><span class="s">&quot;Screen Water Flow&quot;</span>
+<span class="w">    </span><span class="na">ilk6=</span><span class="s">&quot;I04-1 Filter&quot;</span><span class="w"> </span><span class="na">ilk7=</span><span class="s">&quot;DCM Water Flow&quot;</span>
+<span class="w">    </span><span class="na">ilk8=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilk9=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkA=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkB=</span><span class="s">&quot;Unused&quot;</span>
+<span class="w">    </span><span class="na">ilkC=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkD=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkE=</span><span class="s">&quot;Unused&quot;</span><span class="w"> </span><span class="na">ilkF=</span><span class="s">&quot;Unused&quot;</span>
+<span class="w">    </span><span class="na">interlock=</span><span class="s">&quot;:INT1&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;INT1&quot;</span><span class="w"> </span><span class="na">port=</span><span class="s">&quot;ty_40_0&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p><strong>New ioc.yaml</strong> (ilkA–ilkF → ilk10–ilk15; blank fields dropped):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlsPLC.interlock</span>
+<span class="w">  </span><span class="nt">addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span>
+<span class="w">  </span><span class="nt">desc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Water Flow Interlocks</span>
+<span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-VLVCC-01</span>
+<span class="w">  </span><span class="nt">ilk0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">I04 Filter</span>
+<span class="w">  </span><span class="nt">ilk1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X+ Slit Water Flow</span>
+<span class="w">  </span><span class="nt">ilk2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">X- Slit Water Flow</span>
+<span class="w">  </span><span class="nt">ilk3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Y+ Slit Water Flow</span>
+<span class="w">  </span><span class="nt">ilk4</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Y- Slit Water Flow</span>
+<span class="w">  </span><span class="nt">ilk5</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Screen Water Flow</span>
+<span class="w">  </span><span class="nt">ilk6</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">I04-1 Filter</span>
+<span class="w">  </span><span class="nt">ilk7</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DCM Water Flow</span>
+<span class="w">  </span><span class="nt">interlock</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;:INT1&#39;</span>
+<span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ty_40_0</span>
+</pre></div>
+</div>
+</section>
+<section id="overriderequestmain-dlsplc-overriderequestmain">
+<h3>overrideRequestMain → dlsPLC.overrideRequestMain<a class="headerlink" href="#overriderequestmain-dlsplc-overriderequestmain" title="Link to this heading">#</a></h3>
+<p><strong>Old XML:</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;interlock.overrideRequestMain</span>
+<span class="w">    </span><span class="na">P=</span><span class="s">&quot;BL04I-VA-VLVCC-01&quot;</span><span class="w"> </span><span class="na">Q=</span><span class="s">&quot;:OVERRIDE&quot;</span>
+<span class="w">    </span><span class="na">addr=</span><span class="s">&quot;08&quot;</span><span class="w"> </span><span class="na">in=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">out=</span><span class="s">&quot;0&quot;</span>
+<span class="w">    </span><span class="na">name=</span><span class="s">&quot;ITLK&quot;</span><span class="w"> </span><span class="na">port=</span><span class="s">&quot;ty_40_0&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p><strong>New ioc.yaml</strong> (<code class="docutils literal notranslate"><span class="pre">outaddr</span> <span class="pre">=</span> <span class="pre">08×10</span> <span class="pre">=</span> <span class="pre">80</span></code>; <code class="docutils literal notranslate"><span class="pre">in</span></code>, <code class="docutils literal notranslate"><span class="pre">out</span></code>, <code class="docutils literal notranslate"><span class="pre">addr</span></code>, <code class="docutils literal notranslate"><span class="pre">name</span></code> removed):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlsPLC.overrideRequestMain</span>
+<span class="w">  </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-VLVCC-01</span>
+<span class="w">  </span><span class="nt">Q</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">:OVERRIDE</span>
+<span class="w">  </span><span class="nt">outaddr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ty_40_0</span>
+</pre></div>
+</div>
+</section>
+<section id="overriderequestindividual-dlsplc-overriderequestindividual">
+<h3>overrideRequestIndividual → dlsPLC.overrideRequestIndividual<a class="headerlink" href="#overriderequestindividual-dlsplc-overriderequestindividual" title="Link to this heading">#</a></h3>
+<p><strong>Old XML:</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;interlock.overrideRequestIndividual</span>
+<span class="w">    </span><span class="na">BIT=</span><span class="s">&quot;1&quot;</span><span class="w"> </span><span class="na">DESC=</span><span class="s">&quot;HFM Piezo Override&quot;</span><span class="w"> </span><span class="na">FIELD=</span><span class="s">&quot;B&quot;</span>
+<span class="w">    </span><span class="na">OVERRIDE=</span><span class="s">&quot;BL04I-VA-VLVCC-01:OVERRIDE&quot;</span>
+<span class="w">    </span><span class="na">P=</span><span class="s">&quot;BL04I-OP-HFM-01:ILK&quot;</span>
+<span class="w">    </span><span class="na">PRESSURE1=</span><span class="s">&quot;BL04I-VA-GAUGE-04:P&quot;</span><span class="w"> </span><span class="na">PRESSURE2=</span><span class="s">&quot;BL04I-VA-GAUGE-04:P&quot;</span>
+<span class="w">    </span><span class="na">SETPOINT=</span><span class="s">&quot;500&quot;</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;HFMOR&quot;</span><span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<p><strong>New ioc.yaml</strong> (<code class="docutils literal notranslate"><span class="pre">FIELD</span></code> removed):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlsPLC.overrideRequestIndividual</span>
+<span class="w">  </span><span class="nt">BIT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">DESC</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HFM Piezo Override</span>
+<span class="w">  </span><span class="nt">OVERRIDE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-VLVCC-01:OVERRIDE</span>
+<span class="w">  </span><span class="nt">P</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-OP-HFM-01:ILK</span>
+<span class="w">  </span><span class="nt">PRESSURE1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-GAUGE-04:P</span>
+<span class="w">  </span><span class="nt">PRESSURE2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-GAUGE-04:P</span>
+<span class="w">  </span><span class="nt">SETPOINT</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="what-xml2yaml-handles-automatically">
+<h2>What xml2yaml handles automatically<a class="headerlink" href="#what-xml2yaml-handles-automatically" title="Link to this heading">#</a></h2>
+<p>The following conversions happen without manual intervention when you run
+<code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">xml2yaml</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Conversion</p></th>
+<th class="head"><p>Source converter</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveRead</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code> (century=0)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/vacuumValve.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValve</span></code> / <code class="docutils literal notranslate"><span class="pre">vacuumValve_callback</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValve</span></code> with <code class="docutils literal notranslate"><span class="pre">valve×10</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/vacuumValve.py</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveGroup</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveGroup</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/vacuumValve.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.interlock</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code> with hex→int on ilk fields</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/interlock.py</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestMain</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestMain</span></code> with outaddr</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/interlock.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestIndividual</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestIndividual</span></code> (FIELD dropped)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/interlock.py</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Blank <code class="docutils literal notranslate"><span class="pre">ilk*</span></code> fields dropped from all dlsPLC entities</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/dlsPLC.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.fastVacuumChannel</span></code> id zero-padded to 2 digits</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/dlsPLC.py</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="what-requires-manual-attention-after-xml2yaml">
+<h2>What requires manual attention after xml2yaml<a class="headerlink" href="#what-requires-manual-attention-after-xml2yaml" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Case</p></th>
+<th class="head"><p>Action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveRead2</span></code></p></td>
+<td><p>Raises <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code>; manually add <code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code> with correct <code class="docutils literal notranslate"><span class="pre">century</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">temperature.*</span></code></p></td>
+<td><p>Converter is partial WIP; verify output and add <code class="docutils literal notranslate"><span class="pre">dlsPLC.temperature</span></code> / <code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code> manually</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumPump.*</span></code></p></td>
+<td><p>No converter; add <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacPump</span></code> with <code class="docutils literal notranslate"><span class="pre">valve×10</span> <span class="pre">→</span> <span class="pre">addr</span></code> manually</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">flow.flow_asyn</span></code></p></td>
+<td><p>No converter; add <code class="docutils literal notranslate"><span class="pre">dlsPLC.flow</span></code> with recalculated addresses manually</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveBistable</span></code></p></td>
+<td><p>No converter; add <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveBistable</span></code> with <code class="docutils literal notranslate"><span class="pre">valve×10</span> <span class="pre">→</span> <span class="pre">addr</span></code> manually</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.fvg_asyn</span></code></p></td>
+<td><p>Remove from ioc.yaml; update GUI to point at gauge interlock bit directly</p></td>
+</tr>
+<tr class="row-even"><td><p>Hostlink → FINS protocol</p></td>
+<td><p>Update startup script manually; see <a class="reference external" href="https://docs.python.org/3/using/configure.html#build-requirements" title="Python 3.14"><span class="xref myst">Build requirements</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="reference-i04-beamline-conversion">
+<h2>Reference: I04 beamline conversion<a class="headerlink" href="#reference-i04-beamline-conversion" title="Link to this heading">#</a></h2>
+<p>I04 (<code class="docutils literal notranslate"><span class="pre">BL04I-VA-IOC-01</span></code>) was fully migrated in March 2025 and serves as the
+reference example.  The before/after can be seen in the builder2ibek test
+samples:</p>
+<ul class="simple">
+<li><p>Before: <code class="docutils literal notranslate"><span class="pre">tests/samples/BL04I-VA-IOC-01.xml</span></code></p></li>
+<li><p>After: <code class="docutils literal notranslate"><span class="pre">tests/samples/bl04i-va-ioc-01.yaml</span></code></p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../reference.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Reference</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../_api/builder2ibek.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">builder2ibek</span></code></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-these-modules-are-obsolete">Why these modules are obsolete</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-requirements-for-dlsplc-iocs">Build requirements for dlsPLC IOCs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-replacement-table">Module replacement table</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vacuumvalve-module">vacuumValve module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vacuumpump-module">vacuumPump module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interlock-module">interlock module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#temperature-module">temperature module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#flow-module">flow module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-templates">Other templates</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#argument-transformation-rules">Argument transformation rules</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#valve-addr"><code class="docutils literal notranslate"><span class="pre">valve</span> <span class="pre">→</span> <span class="pre">addr</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vlvcc-full-crate-name"><code class="docutils literal notranslate"><span class="pre">vlvcc</span></code> — full crate name</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interlock-field-names-and-addresses"><code class="docutils literal notranslate"><span class="pre">interlock</span></code> — field names and addresses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overriderequestmain-outaddr"><code class="docutils literal notranslate"><span class="pre">overrideRequestMain</span></code> — <code class="docutils literal notranslate"><span class="pre">outaddr</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#temperatureplc-offset"><code class="docutils literal notranslate"><span class="pre">temperaturePLC</span></code> — <code class="docutils literal notranslate"><span class="pre">offset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#flow-asyn-address-recalculation"><code class="docutils literal notranslate"><span class="pre">flow_asyn</span></code> — address recalculation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ioc-yaml-examples">ioc.yaml examples</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vacuumvalveread-dlsplc-read100">vacuumValveRead → dlsPLC.read100</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vacuumvalve-dlsplc-vacvalve">vacuumValve → dlsPLC.vacValve</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interlock-dlsplc-interlock">interlock → dlsPLC.interlock</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overriderequestmain-dlsplc-overriderequestmain">overrideRequestMain → dlsPLC.overrideRequestMain</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overriderequestindividual-dlsplc-overriderequestindividual">overrideRequestIndividual → dlsPLC.overrideRequestIndividual</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-xml2yaml-handles-automatically">What xml2yaml handles automatically</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-requires-manual-attention-after-xml2yaml">What requires manual attention after xml2yaml</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-i04-beamline-conversion">Reference: I04 beamline conversion</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/2.0.0b1/docs/reference/dlsplc-migration.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/reference/dlsplc-migration.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
