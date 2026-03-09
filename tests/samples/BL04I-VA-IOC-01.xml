@@ -147,5 +147,5 @@
 	<vacuumSpace.spaceTemplate device="BL04I-VA-SPACE-98" gauge="BL04I-VA-GGAUG-98" img="BL04I-VA-GIMG-98" ionp="BL04I-VA-GIONP-98" name="SPACE98" pirg="BL04I-VA-GPIRG-98" valve="BL04I-VA-GVALV-98"/>
 	<vacuumSpace.spaceTemplate device="BL04I-VA-SPACE-99" gauge="BL04I-VA-GGAUG-99" img="BL04I-VA-GIMG-99" ionp="BL04I-VA-GIONP-99" name="SPACE99" pirg="BL04I-VA-GPIRG-99" valve="BL04I-VA-GVALV-99"/>
 	<vacuumSpace.space_bTemplate device="BL04I-VA-SPACE-01" gauge="BL04I-VA-GGAUG-01" img="BL04I-VA-GIMG-01" ionp="BL04I-VA-GIONP-01" name="SPACE1" pirg="BL04I-VA-GPIRG-01" valve="FE04I-VA-VALVE-02"/>
-	<leybold.centerOne HIGH="0.0005" HIHI="0.0008" LOLO="0.000001" LOW="0.000002" P="BL04I-VA-ESVG-01" PORT="LPORT" SCAN="5 second" name="LB1"/>
+	<!-- <leybold.centerOne HIGH="0.0005" HIHI="0.0008" LOLO="0.000001" LOW="0.000002" P="BL04I-VA-ESVG-01" PORT="LPORT" SCAN="5 second" name="LB1"/> -->
 </components>
