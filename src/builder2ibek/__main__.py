@@ -37,11 +37,15 @@ def xml2yaml(
         "/epics/ibek-defs/ioc.schema.json",
         help="Generic IOC schema (added to top of the yaml output)",
     ),
+    description: str = typer.Option(
+        "",
+        help="Short description of the IOC's device (e.g. 'Geobrick 06')",
+    ),
 ):
     if not yaml:
         yaml = xml.absolute().with_suffix("yaml")
 
-    convert_file(xml, yaml, schema)
+    convert_file(xml, yaml, schema, description=description)
 
 
 @cli.command()
