@@ -1,9 +1,10 @@
 #!/bin/bash
 
 THISDIR=$(dirname $0)
+EPICS_ROOT="${EPICS_ROOT:-/epics}"
 
 # set up the generic IOC-like environment for ibek
-mkdir -p /epics/ibek-defs/
-ln -srf $THISDIR/ibek-support*/*/*.ibek.support.yaml /epics/ibek-defs/
+mkdir -p "$EPICS_ROOT/ibek-defs/"
+ln -srf $THISDIR/ibek-support*/*/*.ibek.support.yaml "$EPICS_ROOT/ibek-defs/"
 
-ibek ioc generate-schema > /epics/ibek-defs/ioc.schema.json
+ibek ioc generate-schema > "$EPICS_ROOT/ibek-defs/ioc.schema.json"
