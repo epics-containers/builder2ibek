@@ -16,7 +16,8 @@
         "UV_PROJECT_ENVIRONMENT": "/cache/venv-for${localWorkspaceFolder}",
         // Do the equivalent of "activate" the venv so we don't have to "uv run" everything
         "VIRTUAL_ENV": "/cache/venv-for${localWorkspaceFolder}",
-        "PATH": "/cache/venv-for${localWorkspaceFolder}/bin:${containerEnv:PATH}"
+        "PATH": "/cache/venv-for${localWorkspaceFolder}/bin:${containerEnv:PATH}",
+        "BUILDER2IBEK_DEVCONTAINER": "1"
     },
     "customizations": {
         "vscode": {
@@ -29,7 +30,10 @@
                 "python.terminal.activateEnvironment": false,
                 // Workaround to prevent garbled python REPL in the terminal
                 // https://github.com/microsoft/vscode-python/issues/25505
-                "python.terminal.shellIntegration.enabled": false
+                "python.terminal.shellIntegration.enabled": false,
+                // Only forward explicitly listed ports — auto-detection races with
+                // sphinx-autobuild and steals the port on restart
+                "remote.autoForwardPorts": false
             },
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
@@ -49,8 +53,12 @@
             ]
         }
     },
+    // Explicitly forward sphinx-autobuild port (auto-detection disabled above)
+    "forwardPorts": [
+        8000
+    ],
     // Create the config folder for the bash-config feature, uv cache, and claude settings
-    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config ${localEnv:HOME}/.claude",
+    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config",
     "runArgs": [
         // Allow the container to access the host X11 display and EPICS CA
         "--net=host",
@@ -69,12 +77,6 @@
             "source": "devcontainer-shared-cache",
             "target": "/cache",
             "type": "volume"
-        },
-        // Mount host ~/.claude so Claude Code settings and memory persist in the container
-        {
-            "source": "${localEnv:HOME}/.claude",
-            "target": "/root/.claude",
-            "type": "bind"
         },
         // Mount /dls_sw readonly; slave propagation ensures autofs submounts on the host
         // are visible inside the container without needing to trigger them from within it

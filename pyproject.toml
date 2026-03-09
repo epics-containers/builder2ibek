@@ -7,8 +7,6 @@ name = "builder2ibek"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
 description = "Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml"
@@ -16,7 +14,7 @@ dependencies = ["ibek"] # Add project dependencies here, e.g. ["click", "numpy"]
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 
 [dependency-groups]
 dev = [

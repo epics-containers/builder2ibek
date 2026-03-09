@@ -7,9 +7,9 @@
     },
     "files.insertFinalNewline": true,
     "[python]": {
-        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "python.testing.pytestArgs": [
         "tests"
-    ],
+    ]
 }
