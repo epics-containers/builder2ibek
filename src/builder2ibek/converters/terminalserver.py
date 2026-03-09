@@ -15,3 +15,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.type = "terminalServer.Moxa32"
         else:
             entity.type = "terminalServer.Moxa16"
+
+    if entity_type == "Acs":
+        if entity.NCHANS > 16:
+            entity.type = "terminalServer.Acs32"
+        else:
+            entity.type = "terminalServer.Acs16"
