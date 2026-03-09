@@ -19,3 +19,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         vec = add_interrupt_vector()
         entity.add_entity(vec)
         entity.interrupt_vector = vec.name
+        entity.rename("sampleSize", "triggered")
