@@ -36,6 +36,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             if check_entity.type.endswith("GeoBrick"):
                 if check_entity.Port == entity.PORT:
                     entity.PORT = check_entity.name
+            elif check_entity.type.endswith(".PMAC"):
+                if check_entity.Port == entity.PORT:
+                    entity.PORT = check_entity.name
 
     # conversions are identical to pmac from this point
     pmacHandler(entity, entity_type, ioc)

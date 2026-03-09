@@ -21,3 +21,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type == "quadEM_TimeSeries":
         entity.remove("P")
         entity.remove("R")
+        entity.rename("DEVICE", "NDARRAY_PORT")

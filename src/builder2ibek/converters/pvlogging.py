@@ -3,9 +3,7 @@ import re
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
-default_acf = re.compile(
-    r"/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf"
-)
+default_acf = re.compile(r"/dls_sw/.*/.*/support/pvlogging/1-4/data/access.acf")
 
 xml_component = "pvlogging"
 
@@ -30,6 +28,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
 
     if entity_type == "BlacklistPv":
+        entity.type = "pvlogging.BlacklistPvs"
         if not blacklist:
             # blacklistFile and headers definitions
             global filename
@@ -41,7 +40,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         else:
             # remove previous blacklist entity, we only need one with all PVs
             for ent in ioc.entities:
-                if ent["type"] == "pvlogging.BlacklistPv":
+                if ent["type"] == "pvlogging.BlacklistPvs":
                     ioc.entities.remove(ent)
                     break
 
