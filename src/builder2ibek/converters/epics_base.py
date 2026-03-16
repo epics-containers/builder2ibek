@@ -59,5 +59,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.delete_me()
 
     elif entity_type == "dbpf":
-        entity.value = str({entity.value})
+        entity.value = str(entity.value)
         entity.remove("name")

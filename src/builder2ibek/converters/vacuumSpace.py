@@ -21,6 +21,9 @@ _OBJECT_PARAMS = [
     "pirg1",
     "pirg2",
     "pirg3",
+    "valve1",
+    "valve2",
+    "valve3",
 ]
 
 

@@ -23,3 +23,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("vx_gid")
         entity.remove("vx_uid")
         entity.debug = bool(entity.debug)
+
+    elif entity_type == "auto_save_restoreStatus":
+        # save_restoreStatus.db is already loaded by the Autosave entity
+        entity.delete_me()
