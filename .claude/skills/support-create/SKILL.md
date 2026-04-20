@@ -96,6 +96,29 @@ use that same location. Never create a second copy in the other submodule.
   write to `ibek-support/<module>/`
 - When uncertain, default to `ibek-support-dls/`
 
+## Step 5b — Handle XML template entities
+
+If a builder.py class inherits from `Xml` (or uses `XmlFile`), it is an **XML
+template entity** — it expands an XML file into child entities from other
+modules. These should **not** be expanded by a converter. Instead:
+
+1. Read the XML template file (in `etc/makeIocs/<TemplateName>.xml`).
+2. Create a support YAML entity model with:
+   - **Parameters** matching only the macro arguments the XML template accepts
+     (e.g. `dom`, `plc_ip`, `ts_ip`) — keep the ioc.yaml minimal.
+   - **`sub_entities`** list: for each non-commented child element in the XML
+     template, add an entry that references the existing entity type from the
+     other module (e.g. `ether_ip.EtherIPInit`, `dlsPLC.NX102_vacValveDebounce`).
+     Hardcoded values from the template become literals; macro references like
+     `$(dom)` become `{{ dom }}` Jinja2 expressions.
+   - **No `pre_init` / `post_init` / `databases`** — the sub_entities handle all
+     init commands and db instantiation via their own entity definitions.
+3. Do NOT create a converter for XML template entities.
+
+Reference example: `ibek-support-dls/SR-VA/SR-VA.ibek.support.yaml` —
+`d2PumpCart` entity using `sub_entities` to compose ether_ip, asyn, mks937a,
+dlsPLC, and userIO entities.
+
 ## Step 6 — Write the support YAML
 
 Create `<module>.ibek.support.yaml` following the rules in
@@ -105,6 +128,7 @@ Use existing support YAMLs as templates:
 - `ibek-support-dls/hidenRGA/` — standard module with multiple entity variants
 - `ibek-support-dls/cmsIon/` — leaf entity (name dropped)
 - `ibek-support/ffmpegServer/` — port-creating entity with `when: first`
+- `ibek-support-dls/SR-VA/` — XML template entity using `sub_entities`
 
 ## Step 7 — Write the install.yml
 

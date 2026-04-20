@@ -5,6 +5,7 @@ EPICS_ROOT="${EPICS_ROOT:-/epics}"
 
 # set up the generic IOC-like environment for ibek
 mkdir -p "$EPICS_ROOT/ibek-defs/"
+rm $EPICS_ROOT/ibek-defs/*
 ln -srf $THISDIR/ibek-support*/*/*.ibek.support.yaml "$EPICS_ROOT/ibek-defs/"
 
 ibek ioc generate-schema > "$EPICS_ROOT/ibek-defs/ioc.schema.json"

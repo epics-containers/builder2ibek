@@ -103,6 +103,28 @@ produce more than one ibek entity, use `entity.add_entity(extra)` and
 `db/` directory of the support module. These need a support YAML entity model
 with just parameters and a `databases` section — no `pre_init` or `post_init`.
 
+**XML template entities** — some builder modules use XML template files (the
+entity class inherits from `Xml` in builder.py) that expand into many child
+entities from other modules. Examples: `SR-VA.d2PumpCart`, `SR-VA.gaugeSet`.
+These should **not** be expanded by a converter into individual child entities.
+Instead:
+
+1. Keep the single template entity in `ioc.yaml` with only the macro
+   parameters (e.g. `dom`, `plc_ip`, `ts_ip`).
+2. Create a support YAML entity model that uses `sub_entities` to instantiate
+   the child entities from the existing entity models of the other modules
+   (ether_ip, asyn, dlsPLC, etc.), passing the macro parameters via Jinja2
+   templating. This re-uses the existing entity definitions rather than
+   duplicating `pre_init` / `databases` logic.
+3. Do NOT create a converter that expands the XML — the support YAML handles
+   everything.
+
+To build the `sub_entities` list: read the XML template file from the module's
+`etc/makeIocs/` directory, and for each non-commented child element, add a
+corresponding sub_entity entry using the existing entity type. Hardcoded
+values from the template become literal values in the sub_entity; macro
+references like `$(dom)` become `{{ dom }}` Jinja2 expressions.
+
 **ethercat IOCs** — the `ethercat` support module requires migration to
 `fastcs-catio` and cannot be converted with a standard support YAML. If an IOC
 uses ethercat entities, emit a TODO stub in the ioc.yaml and report to the
