@@ -6,6 +6,7 @@ from builder2ibek import __version__
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
+from builder2ibek.reconvert import reconvert_cli
 
 cli = typer.Typer()
 
@@ -98,6 +99,47 @@ def db_compare(
         ignore=ignore,
         remove_duplicates=remove_duplicates,
         output=output,
+    )
+
+
+@cli.command()
+def reconvert(
+    beamline: str = typer.Argument(..., help="Beamline prefix (e.g. 'i21' or 'BL21I')"),
+    services_repo: Path = typer.Option(
+        ..., "--services-repo", help="Path to the beamline services repo"
+    ),
+    validate: bool = typer.Option(
+        True,
+        "--validate/--no-validate",
+        help="Schema-validate each reconverted ioc.yaml with ibek generate2",
+    ),
+    descriptions_json: Path | None = typer.Option(
+        None,
+        "--descriptions-json",
+        help="Optional JSON object mapping ioc-name -> one-line description. "
+        "Overrides descriptions read from existing ioc.yaml files.",
+    ),
+    only: list[str] = typer.Option(
+        [],
+        "--only",
+        help="Limit to specific ioc-names (repeatable, case-insensitive)",
+    ),
+    json_out: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON on stdout"
+    ),
+):
+    """
+    Re-run xml2yaml on all IOCs for a beamline's services repo and
+    optionally schema-validate each result with ibek generate2. Sequential
+    inside one EPICS_ROOT tempdir.
+    """
+    reconvert_cli(
+        beamline,
+        services_repo,
+        validate=validate,
+        descriptions_json=descriptions_json,
+        only=list(only) or None,
+        json_out=json_out,
     )
 
 
