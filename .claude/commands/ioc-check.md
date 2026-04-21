@@ -1,8 +1,6 @@
 ---
-name: ioc-check
-description: Run ibek generate on an existing converted IOC and report errors, or validate st.cmd and ioc.subst against the original boot script.
 argument-hint: <path/to/IOC.xml> [<path/to/services-repo>]
-disable-model-invocation: true
+description: Run ibek generate on an existing converted IOC and report errors, or validate st.cmd and ioc.subst against the original boot script.
 ---
 
 # IOC Check Workflow
@@ -11,22 +9,22 @@ Check an already-converted IOC instance: run `ibek runtime generate2` and
 report any errors. If generation succeeds, compare the generated `st.cmd`
 against the original VxWorks boot script and validate `ioc.subst`.
 
-**This skill is read-only.** It makes no changes to converters, support YAMLs,
+**This command is read-only.** It makes no changes to converters, support YAMLs,
 ioc.yaml, or any other file.
 
 ---
 
 ## Step 1 — Resolve services repo and IOC name
 
-Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
-using `$1` (if provided) or the IOC prefix from `$0`.
+Follow [services-repo-resolution.md](../skills/shared/services-repo-resolution.md)
+using `$2` (if provided) or the IOC prefix from `$1`.
 
 Derive `IOC_NAME` = lowercase XML filename without extension.
 
 `INSTANCE_DIR` = `<services-repo>/services/$IOC_NAME`
 
 **Pre-check**: if `$INSTANCE_DIR/config/ioc.yaml` does not exist, stop and
-tell the user to run `/ioc-convert $0` first.
+tell the user to run `/ioc-convert $1` first.
 
 ---
 
@@ -53,7 +51,7 @@ uvx --python 3.13 ibek runtime generate2 --no-pvi <services-repo>/services/$IOC_
 ```
 
 **If generation fails**, categorise and report the errors using the table in
-[error-categorization.md](../shared/error-categorization.md), then **stop** —
+[error-categorization.md](../skills/shared/error-categorization.md), then **stop** —
 do not make any fixes.
 
 **If generation succeeds**, continue to Steps 4–5.
@@ -65,12 +63,12 @@ do not make any fixes.
 Read `$EPICS_ROOT/runtime/st.cmd`.
 
 Find the original VxWorks boot script following
-[find-boot-script.md](../shared/find-boot-script.md).
+[find-boot-script.md](../skills/shared/find-boot-script.md).
 
 Compare the original and generated scripts. For each meaningful command in the
 original, report whether the equivalent is present in `st.cmd`. Flag any
 command that is absent from `st.cmd` and is **not** in the expected-differences
-table: [vxworks-to-rtems-differences.md](../shared/vxworks-to-rtems-differences.md).
+table: [vxworks-to-rtems-differences.md](../skills/shared/vxworks-to-rtems-differences.md).
 
 ---
 
@@ -119,4 +117,4 @@ Report to the user:
    any unexpected missing commands highlighted
 3. **ioc.subst validation** — number of db file blocks, any macro concerns,
    db-compare summary if run
-4. **No files changed** — confirm this skill made no modifications
+4. **No files changed** — confirm this command made no modifications

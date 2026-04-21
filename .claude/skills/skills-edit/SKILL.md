@@ -1,27 +1,52 @@
 ---
 name: skills-edit
-description: Create, edit, or review the Claude skills in this repo. Use when asked to add a skill, update a skill's instructions, review skill quality, or refactor shared skill docs.
-argument-hint: [<skill-name>]
+description: Create, edit, or review the Claude skills and slash commands in this repo. Use when asked to add a skill or command, update their instructions, review quality, or refactor shared docs.
+argument-hint: [<skill-or-command-name>]
 ---
 
-# Skills Editor
+# Skills and Commands Editor
 
-This repo's `.claude/skills/` directory contains the domain knowledge that
-drives all AI-assisted IOC conversion. Editing skills well is as important as
-editing code.
+This repo's `.claude/` directory holds the domain knowledge that drives all
+AI-assisted IOC conversion. It splits into two parts:
+
+- **Skills** (`.claude/skills/<name>/SKILL.md`) — reference knowledge that
+  Claude auto-loads when a task's context matches the skill description.
+  Currently: `ibek-concepts`, `ibek-support-ansible`, `skills-edit`.
+- **Commands** (`.claude/commands/<name>.md`) — explicit user workflows
+  invoked via `/<name>` with arguments. Currently: `ioc-convert`, `ioc-check`,
+  `ioc-inspect`, `beamline-convert`, `beamline-check`, `beamline-reconvert`,
+  `support-create`, `support-fix`, `support-inspect`, `memo`.
+
+Editing either well is as important as editing code.
 
 ---
 
-## Skill system layout
+## Layout
 
 ```
-.claude/skills/
-  <skill-name>/SKILL.md      # One dir per user-invocable skill
-  shared/<topic>.md          # Reference docs shared across skills
+.claude/
+  commands/<name>.md         # User-invoked slash commands — take $1, $2 args
+  skills/
+    <skill-name>/SKILL.md    # Auto-invoked reference knowledge (no args)
+    shared/<topic>.md        # Reference docs shared across skills/commands
 ```
 
-Skills are discovered automatically — no registration needed. Each `SKILL.md`
+Both kinds are discovered automatically — no registration needed. Each file
 must have YAML frontmatter.
+
+---
+
+## Choosing skill vs command
+
+Use a **command** when:
+- The file takes positional arguments (IOC name, beamline prefix, paths)
+- The user invokes it explicitly as a workflow (`/ioc-convert foo.xml`)
+- It orchestrates subagents or runs a procedure
+
+Use a **skill** when:
+- It's reference material (concepts, rule tables, build system docs)
+- It has no arguments and should be auto-loaded when the topic comes up
+- Its description is a trigger condition for Claude's skill picker
 
 ---
 
@@ -59,17 +84,17 @@ key rules inline in the subagent prompt over chains of "see shared/foo.md"
 indirection. Exception: long reference docs (like ibek-concepts) that subagents
 should read in full — pass those as "read this file first" instructions.
 
-### Subagents read skills directly
-When an orchestrator skill spawns a subagent to run another skill, it passes
-the skill file path for the subagent to read:
+### Subagents read command files directly
+When an orchestrator command spawns a subagent to run another command, it
+passes the command file path for the subagent to read:
 ```
-Read /workspaces/builder2ibek/.claude/skills/support-create/SKILL.md
+Read /workspaces/builder2ibek/.claude/commands/support-create.md
 and follow its instructions for module: <name>
 ```
-This keeps the orchestrator lean — it doesn't need to inline the full skill.
+This keeps the orchestrator lean — it doesn't need to inline the full command.
 
 ### EPICS_ROOT isolation for parallel subagents
-Any skill that runs `ibek` commands must create an isolated EPICS_ROOT:
+Any command that runs `ibek` must create an isolated EPICS_ROOT:
 ```bash
 export EPICS_ROOT=$(mktemp -d)
 ./update-schema
@@ -77,7 +102,7 @@ export EPICS_ROOT=$(mktemp -d)
 This prevents parallel subagents from clobbering each other's schema state.
 
 ### Batch size
-Beamline-scale skills (beamline-convert, beamline-check) run up to **10
+Beamline-scale commands (beamline-convert, beamline-check) run up to **10
 subagents in parallel** per batch. Wait for each batch before launching the
 next.
 
@@ -87,20 +112,29 @@ next.
 
 | Content | Where |
 |---|---|
-| Reused across 3+ skills | `shared/<topic>.md` |
-| Used in one skill only | Inline in that skill's SKILL.md |
-| Conceptual reference (long) | `shared/` + "read this file first" in skill |
+| Reused across 3+ skills or commands | `skills/shared/<topic>.md` |
+| Used in one file only | Inline in that skill/command |
+| Conceptual reference (long) | `skills/shared/` + "read this file first" in file |
 | Brief reminder of a rule | Inline with a link to the authoritative source |
+
+Relative path from a command file (`.claude/commands/foo.md`) into shared docs
+is `../skills/shared/<topic>.md`. From a skill file
+(`.claude/skills/<name>/SKILL.md`) it's `../shared/<topic>.md`.
 
 ---
 
-## Quality checklist for a skill
+## Quality checklist
 
-- [ ] Frontmatter `description` clearly states when to trigger it
-- [ ] No concept duplicated from another skill — links instead
-- [ ] Subagent skills include EPICS_ROOT isolation instructions
-- [ ] Shared docs referenced by path (relative from skills root)
-- [ ] `disable-model-invocation: true` set if skill spawns subagents
+Skills:
+- [ ] Frontmatter `description` clearly states when to auto-trigger it
+- [ ] No arguments — skills are reference, not workflows
+- [ ] No concept duplicated elsewhere — links instead
+
+Commands:
+- [ ] Frontmatter `description` + `argument-hint` shown in the `/` picker
+- [ ] Uses positional placeholders (`$1`, `$2`) matching the argument-hint
+- [ ] Subagent-spawning commands include EPICS_ROOT isolation instructions
+- [ ] Shared docs referenced by `../skills/shared/<topic>.md`
 - [ ] Steps are numbered and ordered — Claude follows them sequentially
 
 ---

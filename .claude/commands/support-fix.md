@@ -1,18 +1,16 @@
 ---
-name: support-fix
-description: Fix support YAML or converter errors based on ibek generate2 error output.
 argument-hint: <module-name>
-disable-model-invocation: true
+description: Fix support YAML or converter errors based on ibek generate2 error output.
 ---
 
 # Support YAML Error Fixer
 
-Fix errors in the ibek support YAML (or converter) for module `$0` based on
+Fix errors in the ibek support YAML (or converter) for module `$1` based on
 `ibek runtime generate2` error output.
 
 Before starting, read these reference documents:
-- [support-yaml-rules.md](../shared/support-yaml-rules.md) — rules for ibek support YAML
-- [error-categorization.md](../shared/error-categorization.md) — error diagnosis table
+- [support-yaml-rules.md](../skills/shared/support-yaml-rules.md) — rules for ibek support YAML
+- [error-categorization.md](../skills/shared/error-categorization.md) — error diagnosis table
 
 ---
 
@@ -29,7 +27,7 @@ The orchestrator provides in the prompt:
 
 ## Step 1 — Categorize errors
 
-Read [error-categorization.md](../shared/error-categorization.md). For each
+Read [error-categorization.md](../skills/shared/error-categorization.md). For each
 error, determine the fix type:
 
 - **Support YAML only** — entity model needs a parameter added, type changed,
@@ -47,7 +45,7 @@ error, determine the fix type:
   ```
 - Compare parameter names, types, and defaults against what generate2 expects
 - Apply the type inference rules from
-  [ibek-concepts](../ibek-concepts/SKILL.md)
+  [ibek-concepts](../skills/ibek-concepts/SKILL.md).
 
 **For converter errors:**
 - Read the current converter (if any):
@@ -56,7 +54,7 @@ error, determine the fix type:
 
 ## Step 3 — Apply fixes
 
-Follow the rules in [support-yaml-rules.md](../shared/support-yaml-rules.md)
+Follow the rules in [support-yaml-rules.md](../skills/shared/support-yaml-rules.md)
 when modifying the support YAML. For converter fixes, follow the pattern in
 existing converters.
 

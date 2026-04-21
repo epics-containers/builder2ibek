@@ -1,23 +1,21 @@
 ---
-name: beamline-check
-description: Run ioc-check on all IOCs in a beamline's services repo in parallel.
 argument-hint: <beamline-prefix> [<path/to/services-repo>]
-disable-model-invocation: true
+description: Run /ioc-check on all IOCs in a beamline's services repo in parallel.
 ---
 
 # Beamline Check Workflow
 
-Validate all converted IOCs for beamline `$0` (e.g. `i19` or `BL19I`) by
+Validate all converted IOCs for beamline `$1` (e.g. `i19` or `BL19I`) by
 running `/ioc-check` on each one in parallel.
 
-**This skill is read-only.** It makes no changes to any files.
+**This command is read-only.** It makes no changes to any files.
 
 ---
 
 ## Step 1 — Resolve services repo
 
-Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
-using `$1` (if provided) or the beamline prefix `$0`.
+Follow [services-repo-resolution.md](../skills/shared/services-repo-resolution.md)
+using `$2` (if provided) or the beamline prefix `$1`.
 
 Accept both short (`i19`) and full (`BL19I`) prefix formats — normalize as
 needed to locate the services repo.
@@ -45,7 +43,7 @@ the lowercase IOC stem — convert to uppercase to find the XML:
 
 `bl19i-mo-ioc-03` → `BL19I-MO-IOC-03.xml`
 
-Use [find-ioc-xmls.md](../shared/find-ioc-xmls.md) to locate the BUILDER
+Use [find-ioc-xmls.md](../skills/shared/find-ioc-xmls.md) to locate the BUILDER
 module for the beamline, then match each IOC stem to its XML file.
 
 If an IOC folder has no matching XML (e.g. infrastructure IOCs not from
@@ -57,7 +55,7 @@ XMLbuilder), note it and skip.
 
 For each IOC with a matching XML, spawn a `general-purpose` subagent:
 
-> Read `/workspaces/builder2ibek/.claude/skills/ioc-check/SKILL.md` and
+> Read `/workspaces/builder2ibek/.claude/commands/ioc-check.md` and
 > follow its instructions to check:
 >
 > XML: `<full-path-to-xml>`
@@ -81,4 +79,4 @@ After all checks complete, report:
 4. **generate2 results** — how many passed, how many failed (with error categories)
 5. **st.cmd comparison** — IOCs with unexpected missing commands
 6. **ioc.subst validation** — IOCs with macro concerns or db-compare issues
-7. **No files changed** — confirm this skill made no modifications
+7. **No files changed** — confirm this command made no modifications

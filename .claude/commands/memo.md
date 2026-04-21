@@ -1,5 +1,4 @@
 ---
-name: memo
 description: Save current task state to auto-memory, then promote reusable lessons to skills and trim memory.
 ---
 

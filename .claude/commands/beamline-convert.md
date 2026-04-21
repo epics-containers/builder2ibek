@@ -1,28 +1,26 @@
 ---
-name: beamline-convert
-description: Convert all builder XML IOCs for a beamline to ibek ioc.yaml.
 argument-hint: <beamline-prefix> [<path/to/services-repo>]
-disable-model-invocation: true
+description: Convert all builder XML IOCs for a beamline to ibek ioc.yaml.
 ---
 
 # Beamline Convert Workflow
 
-Convert all builder XML IOCs for beamline `$0` (e.g. `BL19I`) to ibek
-`ioc.yaml` in the services repo `$1`.
+Convert all builder XML IOCs for beamline `$1` (e.g. `BL19I`) to ibek
+`ioc.yaml` in the services repo `$2`.
 
-This skill orchestrates multiple `/ioc-convert` runs — one per IOC.
+This command orchestrates multiple `/ioc-convert` runs — one per IOC.
 
 ---
 
 ## Step 1 — Resolve services repo
 
-Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
-using `$1` (if provided) or the beamline prefix `$0`.
+Follow [services-repo-resolution.md](../skills/shared/services-repo-resolution.md)
+using `$2` (if provided) or the beamline prefix `$1`.
 
 ## Step 2 — Discover all IOC XMLs
 
-Follow [find-ioc-xmls.md](../shared/find-ioc-xmls.md) to find all IOC XML
-files for beamline `$0`.
+Follow [find-ioc-xmls.md](../skills/shared/find-ioc-xmls.md) to find all IOC XML
+files for beamline `$1`.
 
 List all XMLs found. Ask the user to confirm which ones to convert (default:
 all).
@@ -41,11 +39,11 @@ support YAML), do a quick pre-pass:
 1. Run `uv run builder2ibek xml2yaml` for each IOC to generate ioc.yaml files
 2. Scan all generated ioc.yaml files for entity types
 3. Deduplicate the list of modules needing support YAMLs across all IOCs
-4. Read [module-special-cases.md](../shared/module-special-cases.md) — skip
+4. Read [module-special-cases.md](../skills/shared/module-special-cases.md) — skip
    modules that don't need support YAMLs and use correct folder names
 5. Launch **one support-create subagent per unique module** (all in parallel):
 
-> Read `/workspaces/builder2ibek/.claude/skills/support-create/SKILL.md` and
+> Read `/workspaces/builder2ibek/.claude/commands/support-create.md` and
 > follow its instructions to create a support YAML for the following module.
 >
 > Module name: `<module>`
@@ -58,7 +56,7 @@ support YAML), do a quick pre-pass:
 
 For each IOC XML, spawn a `general-purpose` subagent:
 
-> Read `/workspaces/builder2ibek/.claude/skills/ioc-convert/SKILL.md` and
+> Read `/workspaces/builder2ibek/.claude/commands/ioc-convert.md` and
 > follow its instructions to convert:
 >
 > XML: `<full-path-to-xml>`

@@ -1,13 +1,11 @@
 ---
-name: beamline-reconvert
-description: Re-run xml2yaml on all IOCs for a beamline and validate with generate2 into a temp folder.
 argument-hint: <beamline-prefix> [<path/to/services-repo>]
-disable-model-invocation: true
+description: Re-run xml2yaml on all IOCs for a beamline and validate with generate2 into a temp folder.
 ---
 
 # Beamline Reconvert Workflow
 
-Re-convert all builder XML IOCs for beamline `$0` (e.g. `BL21I` or `i21`)
+Re-convert all builder XML IOCs for beamline `$1` (e.g. `BL21I` or `i21`)
 using the latest ibek-support definitions. This is a fast, single-agent
 operation.
 
@@ -18,16 +16,16 @@ files in the services repo and validate them.
 
 ## Step 1 — Resolve services repo
 
-Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
-using `$1` (if provided) or the beamline prefix `$0`.
+Follow [services-repo-resolution.md](../skills/shared/services-repo-resolution.md)
+using `$2` (if provided) or the beamline prefix `$1`.
 
 ---
 
 ## Step 2 — Discover all IOC XMLs
 
-Normalize the beamline prefix `$0` to the full `BLXXY` form used in paths:
+Normalize the beamline prefix `$1` to the full `BLXXY` form used in paths:
 - `i21` → `BL21I`, `i19` → `BL19I`, `b07` → `BL07B`, etc.
-- If `$0` is already in `BL…` form, use it directly.
+- If `$1` is already in `BL…` form, use it directly.
 
 The BUILDER module is at a **fixed, specific path**. Check work area first,
 fall back to prod:

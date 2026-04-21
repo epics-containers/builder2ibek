@@ -1,20 +1,18 @@
 ---
-name: support-create
-description: Create or update ibek support YAML and install.yml for a single EPICS support module.
 argument-hint: <module-name> [<module-path>]
-disable-model-invocation: true
+description: Create or update ibek support YAML and install.yml for a single EPICS support module.
 ---
 
 # Support YAML Creator
 
-Create or update the ibek support YAML for module `$0`.
+Create or update the ibek support YAML for module `$1`.
 
 Before starting, read these reference documents:
-- [support-yaml-rules.md](../shared/support-yaml-rules.md) — rules for ibek support YAML
-- [builder-py-analysis.md](../shared/builder-py-analysis.md) — how to read builder.py
+- [support-yaml-rules.md](../skills/shared/support-yaml-rules.md) — rules for ibek support YAML
+- [builder-py-analysis.md](../skills/shared/builder-py-analysis.md) — how to read builder.py
 
 For deeper conceptual background, refer to
-[ibek-concepts](../ibek-concepts/SKILL.md) as needed.
+[ibek-concepts](../skills/ibek-concepts/SKILL.md) as needed.
 
 ---
 
@@ -23,8 +21,8 @@ For deeper conceptual background, refer to
 When spawned by an orchestrator (e.g. `/ioc-convert`), additional context may
 be provided in the prompt:
 
-- **Module name**: `$0` (always provided)
-- **Known path from _RELEASE**: `$1` (optional — if provided, use it to find
+- **Module name**: `$1` (always provided)
+- **Known path from _RELEASE**: `$2` (optional — if provided, use it to find
   `etc/builder.py` and `db/` files directly)
 - **Entity types needed**: list of `<module>.<Entity>` types used in the IOC
   (optional — if not provided, create entity models for all user-facing classes)
@@ -37,29 +35,29 @@ be provided in the prompt:
 
 **Always check both submodules before creating anything:**
 ```bash
-ls ibek-support-dls/$0/ ibek-support/$0/ 2>/dev/null
+ls ibek-support-dls/$1/ ibek-support/$1/ 2>/dev/null
 ```
 
 If a support YAML already exists, read it — you may only need to add missing
 entity models, not create from scratch.
 
 **Before creating anything**, read
-[module-special-cases.md](../shared/module-special-cases.md) and check whether
+[module-special-cases.md](../skills/shared/module-special-cases.md) and check whether
 the module has non-standard naming or location.
 
 ## Step 2 — Locate the module
 
-If `$1` (known path) is provided, use it directly.
+If `$2` (known path) is provided, use it directly.
 
-Otherwise, follow [find-module-path.md](../shared/find-module-path.md) or
+Otherwise, follow [find-module-path.md](../skills/shared/find-module-path.md) or
 discover the module version:
 ```bash
-ls /dls_sw/prod/R3.14.12.7/support/$0/
+ls /dls_sw/prod/R3.14.12.7/support/$1/
 ```
 
 ## Step 3 — Read builder.py
 
-Follow [builder-py-analysis.md](../shared/builder-py-analysis.md) systematically.
+Follow [builder-py-analysis.md](../skills/shared/builder-py-analysis.md) systematically.
 
 Read all Python files in the module's `etc/` directory:
 ```bash
@@ -82,7 +80,7 @@ grep "^# % macro" <module-path>/db/<file>.db
 
 Match macros to parameters. Determine required vs optional.
 Apply the **type inference rules** from
-[ibek-concepts](../ibek-concepts/SKILL.md).
+[ibek-concepts](../skills/ibek-concepts/SKILL.md).
 
 ## Step 5 — Determine DLS-specific vs community
 
@@ -122,7 +120,7 @@ dlsPLC, and userIO entities.
 ## Step 6 — Write the support YAML
 
 Create `<module>.ibek.support.yaml` following the rules in
-[support-yaml-rules.md](../shared/support-yaml-rules.md).
+[support-yaml-rules.md](../skills/shared/support-yaml-rules.md).
 
 Use existing support YAMLs as templates:
 - `ibek-support-dls/hidenRGA/` — standard module with multiple entity variants
@@ -142,7 +140,7 @@ Note: install files use `.yml` extension, not `.yaml`.
 ## Step 8 — Create converter if needed
 
 Follow the `name` parameter rules in
-[support-yaml-rules.md](../shared/support-yaml-rules.md) to determine whether
+[support-yaml-rules.md](../skills/shared/support-yaml-rules.md) to determine whether
 `name` should be kept or dropped.
 
 If `name` must be dropped (confirmed leaf entity), create or update
