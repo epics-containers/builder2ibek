@@ -22,7 +22,9 @@ Do NOT create a duplicate `IOCinfo/` folder — always use `IOCInfo/`.
 `pmacCoord` has its own support YAML in `ibek-support-dls/pmacCoord/`, distinct
 from the `pmac` module in `ibek-support/pmac/`. Do not merge them.
 
-## `devIocStats` — lives in `ibek-support-dls`
+## `devIocStats` — use the public `ibek-support/iocStats`
 
-Despite being a community module, the DLS support YAML is at
-`ibek-support-dls/devIocStats/`. Do not create a second copy in `ibek-support/`.
+The public module at `ibek-support/iocStats/` defines
+`module: devIocStats` with `iocAdminSoft` using the `$(IOCSTATS)` macro.
+Do **not** create a `ibek-support-dls/devIocStats/` — the DLS-specific
+copy was removed as redundant.
