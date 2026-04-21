@@ -51,15 +51,18 @@ uv run pytest
 ./update-schema                   # rebuild global ioc schema
 ```
 
-## On-Demand Knowledge
+## Slash Commands
 
 - `/support-inspect <module>` — analyze a support module's builder.py
+- `/support-create <module> [path]` — create or update support YAML and install.yml
+- `/support-fix` — fix support YAML errors from ibek generate2 output
 - `/ioc-inspect <ioc-name>` — inspect an IOC's XML and support modules
 - `/ioc-convert <xml> [services-repo]` — full conversion workflow with parallel subagents
 - `/ioc-check <xml> [services-repo]` — validate a converted IOC's runtime assets
+- `/beamline-convert <beamline> [services-repo]` — convert all builder XML IOCs for a beamline
 - `/beamline-reconvert <beamline> [services-repo]` — re-run xml2yaml on all IOCs and validate schema
-- Use `/ibek-concepts` for ibek entity model patterns (type: id/object, databases.args,
-  Jinja2, when: first, auto_* entities, port references, database macros).
+- `/beamline-check <beamline> [services-repo]` — run ioc-check on all IOCs in a beamline
+- `/ibek-concepts` — ibek entity model patterns (type: id/object, databases.args, Jinja2, auto_* entities, port references)
 - See [docs/tutorials/create-support-yaml.md](docs/tutorials/create-support-yaml.md)
   and [docs/tutorials/create-support-yaml-advanced.md](docs/tutorials/create-support-yaml-advanced.md)
   for full support YAML guides.
