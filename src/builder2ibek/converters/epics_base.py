@@ -38,6 +38,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.type = "epics.EpicsCaMaxArrayBytes"
         else:
             entity.rename("key", "name")
+            # EpicsEnvSet value must be a string
+            entity.value = str(entity.value)
             # remove IOCSH settings as epics-containers makes the iocsh prompt
             if "IOCSH" in entity.name:
                 entity.delete_me()

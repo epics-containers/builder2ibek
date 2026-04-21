@@ -21,6 +21,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type == "defaultEVR":
         entity.type = "TimingTemplates.DefaultEVR"
         entity.remove("name")
+        # Map card="<N>" to event_receiver reference to the EventReceiverPMC
+        # that mrfTiming creates with name "EVR<N>".
+        card = entity.get("card")
+        if card is not None:
+            entity.event_receiver = f"EVR{card}"
+            entity.remove("card")
 
     elif entity_type == "BL_EVR_PMC":
         entity.remove("name")
