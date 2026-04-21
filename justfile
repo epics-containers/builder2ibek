@@ -10,4 +10,4 @@ gh-auth:
 
 # Start Claude Code in sandbox mode (uses container-local SSH agent only)
 claude:
-    SSH_AUTH_SOCK="/tmp/ssh-agent.sock" IS_SANDBOX=1 claude --dangerously-skip-permissions --chrome
+    SSH_AUTH_SOCK= IS_SANDBOX=1 claude --dangerously-skip-permissions --chrome

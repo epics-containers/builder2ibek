@@ -5,11 +5,22 @@
         "dockerfile": "../Dockerfile",
         "target": "developer"
     },
+    // Tell VS Code the remote user is root so copyGitConfig writes to
+    // /root/.gitconfig (matching $HOME in the shell); otherwise it falls back
+    // to the base image's USER and the copy lands in the wrong home.
+    "remoteUser": "root",
     "remoteEnv": {
         // Allow X11 apps to run inside the container
         "DISPLAY": "${localEnv:DISPLAY}",
         // Disable SSH agent forwarding — prevents Claude from using host SSH keys
         "SSH_AUTH_SOCK": "",
+        // Disable VS Code git credential injection — prevents askpass from
+        // relaying host GitHub credentials into the container over the IPC socket
+        "GIT_ASKPASS": "",
+        "VSCODE_GIT_IPC_HANDLE": "",
+        "VSCODE_GIT_ASKPASS_MAIN": "",
+        "VSCODE_GIT_ASKPASS_NODE": "",
+        "VSCODE_GIT_ASKPASS_EXTRA_ARGS": "",
         // Put things that allow it in the persistent cache
         "PRE_COMMIT_HOME": "/cache/pre-commit",
         "UV_CACHE_DIR": "/cache/uv",
