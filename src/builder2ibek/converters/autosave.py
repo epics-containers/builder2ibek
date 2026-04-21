@@ -15,9 +15,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.P += ":"
         # TODO if this is a motor then set entity.postions_req_period = 5
         entity.remove("bl")
+        entity.remove("db_suffix")
         entity.remove("ip")
         entity.remove("name")
         entity.remove("path")
+        entity.remove("req_prefix")
         entity.remove("server")
         entity.remove("skip_1")
         entity.remove("vx_gid")
