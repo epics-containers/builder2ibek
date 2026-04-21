@@ -6,136 +6,80 @@ description: Re-run xml2yaml on all IOCs for a beamline and validate with genera
 # Beamline Reconvert Workflow
 
 Re-convert all builder XML IOCs for beamline `$1` (e.g. `BL21I` or `i21`)
-using the latest ibek-support definitions. This is a fast, single-agent
-operation.
+using the latest ibek-support definitions. Use this after changing support
+YAMLs or converters.
 
-Use this after changing support YAMLs or converters to refresh all ioc.yaml
-files in the services repo and validate them.
+`reconvert` runs `generate2` calls sequentially in a single EPICS_ROOT
+tempdir; parallelisation is out of scope for this command.
+
+If `xml2yaml` fails, fix the converter in `src/builder2ibek/converters/`
+and re-run `reconvert`. If `generate2` fails, do NOT re-run `xml2yaml` —
+invoke `/support-fix`.
 
 ---
 
 ## Step 1 — Resolve services repo
 
 Follow [services-repo-resolution.md](../skills/shared/services-repo-resolution.md)
-using `$2` (if provided) or the beamline prefix `$1`.
+using `$2` (if provided) or the beamline prefix `$1`. Tell the user which
+services repo is being used.
 
 ---
 
-## Step 2 — Discover all IOC XMLs
-
-Normalize the beamline prefix `$1` to the full `BLXXY` form used in paths:
-- `i21` → `BL21I`, `i19` → `BL19I`, `b07` → `BL07B`, etc.
-- If `$1` is already in `BL…` form, use it directly.
-
-The BUILDER module is at a **fixed, specific path**. Check work area first,
-fall back to prod:
+## Step 2 — Run the reconvert subcommand
 
 ```bash
-# Try work area first (most current):
-ls /dls_sw/work/R3.14.12.7/support/BL21I-BUILDER/etc/makeIocs/*.xml 2>/dev/null
-
-# If empty, fall back to prod (use latest version):
-ls /dls_sw/prod/R3.14.12.7/support/BL21I-BUILDER/*/etc/makeIocs/*.xml 2>/dev/null
+uv run builder2ibek reconvert $1 --services-repo <services-repo> --json
 ```
 
-Replace `BL21I` with the actual normalized prefix.
+Discovers BUILDER XMLs (work area first, prod fallback), matches lowercased
+XML stems to `<services-repo>/services/<ioc-name>/config/ioc.yaml`,
+re-runs `xml2yaml` for each match (preserving the existing `description`
+field), then schema-validates every reconverted ioc.yaml with
+`ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir.
 
-**Do NOT search or `find` across `/dls_sw/`** — the path is deterministic
-from the beamline prefix as shown above.
+Flags: `--no-validate` skips the generate2 pass; `--only <ioc-name>`
+(repeatable) limits the run.
 
-Filter out template XMLs (files containing `$(macro)` syntax) — these are not
-standalone IOC definitions.
-
-List all XMLs found with a count.
+Exit codes: `0` clean · `2` ≥1 `xml2yaml` error · `3` ≥1 `generate2`
+failure · `1` hard failure. If the subcommand exits with code ≥ 4 or
+emits no JSON, fall back to Appendix A. Do not silently skip validation.
 
 ---
 
-## Step 3 — Discover existing IOC folders
+## Step 3 — Report
 
-List all subdirectories under `<services-repo>/services/` that contain
-`config/ioc.yaml`:
+Parse the JSON on stdout and summarise: reconverted count, skipped
+(grouped by `reason`), each conversion error's message, validation
+pass/fail counts with stderr tails for any failure. Then run
+`git -C <services-repo> diff --stat` to show the file delta.
 
-```bash
-find <services-repo>/services -maxdepth 2 -name ioc.yaml -path '*/config/*' \
-  | sed 's|/config/ioc.yaml||' | sort
-```
-
-Match each XML to its services folder (XML stem **lowercased** = folder name).
-Only reconvert IOCs that have an existing folder with `config/ioc.yaml` —
-skip XMLs with no matching services folder (they haven't been converted yet).
-
-Report any XMLs being skipped and why.
-
----
-
-## Step 4 — Reconvert all IOCs
-
-For each matched IOC, derive a terse description of the device it controls
-from the XML filename and contents (e.g. "Geobrick 06", "Vacuum system").
-Keep it short — a few words, no full sentences.
-
-**CRITICAL: `<ioc-name>` must be lowercase** (e.g. `bl21i-mo-ioc-01`, not
-`BL21I-MO-IOC-01`). The services folder name is always the XML stem
-lowercased. Then run:
-
-```bash
-uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <services-repo>/services/<ioc-name>/config/ioc.yaml --description "<description>"
-```
-
-Run these sequentially (they're fast). Capture and report any conversion
-errors. Continue with the remaining IOCs if one fails.
-
----
-
-## Step 5 — Schema-validate with generate2
-
-Create a temporary `EPICS_ROOT` and set up ibek definitions:
-
-```bash
-export EPICS_ROOT=$(mktemp -d /tmp/epics-reconvert-XXXXXX)
-./update-schema
-```
-
-`ibek runtime generate2` requires a **config directory** (not a file) that
-contains `ioc.yaml`. Create a temp config dir, copy each ioc.yaml into it,
-and run generate2:
-
-```bash
-TMPCONFIG=$(mktemp -d /tmp/reconvert-config-XXXXXX)
-
-for ioc_yaml in <services-repo>/services/*/config/ioc.yaml; do
-  ioc_name=$(basename $(dirname $(dirname "$ioc_yaml")))
-  cp "$ioc_yaml" "$TMPCONFIG/ioc.yaml"
-  echo "--- Validating $ioc_name ---"
-  ibek runtime generate2 --no-pvi "$TMPCONFIG" 2>&1 || true
-done
-
-rm -rf "$TMPCONFIG" "$EPICS_ROOT"
-```
-
-Only loop over the IOCs that were reconverted in Step 4 (not all services
-folders). The generated runtime output goes to `$EPICS_ROOT` and is
-discarded — only the schema validation matters.
-
-Report all validation/generation errors grouped by IOC. Continue with the
-remaining IOCs if one fails.
-
----
-
-## Step 6 — Report
-
-Summarize:
-
-1. **Reconverted** — number of IOCs reconverted successfully
-2. **Skipped** — XMLs with no matching services folder
-3. **Conversion errors** — IOCs where xml2yaml failed (with error messages)
-4. **Validation** — pass/fail count per IOC, details of any generate2 failures
-5. **Files changed** — run `git -C <services-repo> diff --stat` to show what
-   changed
-
-Do not commit anything. Suggest git commands:
+Do not commit anything. Suggest:
 
 ```bash
 git -C <services-repo> add services/
 git -C <services-repo> commit -m "Reconvert IOCs with latest ibek-support"
+```
+
+---
+
+## Appendix A — Manual procedure (fallback)
+
+```bash
+# 1. Discover XMLs (work first, then prod — use <BLXXY> normalized form)
+ls /dls_sw/work/R3.14.12.7/support/<BLXXY>-BUILDER/etc/makeIocs/*.xml \
+  || ls /dls_sw/prod/R3.14.12.7/support/<BLXXY>-BUILDER/*/etc/makeIocs/*.xml
+
+# 2. For each XML whose lowercased stem matches a services folder:
+uv run builder2ibek xml2yaml <xml> --yaml <services-repo>/services/<ioc-name>/config/ioc.yaml
+
+# 3. Schema-validate each one:
+export EPICS_ROOT=$(mktemp -d /tmp/epics-reconvert-XXXXXX)
+./update-schema
+TMPCONFIG=$(mktemp -d /tmp/reconvert-config-XXXXXX)
+for ioc_yaml in <services-repo>/services/*/config/ioc.yaml; do
+  cp "$ioc_yaml" "$TMPCONFIG/ioc.yaml"
+  ibek runtime generate2 --no-pvi "$TMPCONFIG" 2>&1 || true
+done
+rm -rf "$TMPCONFIG" "$EPICS_ROOT"
 ```
