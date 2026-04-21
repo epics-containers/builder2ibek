@@ -1,15 +1,14 @@
 ---
-name: support-inspect
-description: Analyze a support module's builder.py and report its classes, parameters, databases, st.cmd commands, and dependencies.
 argument-hint: <module-name>
+description: Analyze a support module's builder.py and report its classes, parameters, databases, st.cmd commands, and dependencies.
 ---
 
 # Support Module Inspector
 
-Analyze the DLS EPICS support module `$0` by reading its builder.py and related
+Analyze the DLS EPICS support module `$1` by reading its builder.py and related
 source files, then produce a structured report.
 
-This skill has **no knowledge of ibek** — it reports what builder.py defines,
+This command has **no knowledge of ibek** — it reports what builder.py defines,
 not how to translate it. Use `/ioc-convert` for the ibek translation workflow.
 
 ---
@@ -23,11 +22,11 @@ then trying other EPICS versions if not found:
 
 ```bash
 # Check R3.14.12.7 first
-ls /dls_sw/prod/R3.14.12.7/support/$0/
+ls /dls_sw/prod/R3.14.12.7/support/$1/
 
 # If not found, discover all EPICS versions and try each
 for v in $(ls -d /dls_sw/prod/R* | sort -rV | xargs -n1 basename); do
-  ls /dls_sw/prod/$v/support/$0/ 2>/dev/null && break
+  ls /dls_sw/prod/$v/support/$1/ 2>/dev/null && break
 done
 ```
 
@@ -38,7 +37,7 @@ If the module is not found in any EPICS version, report this and stop.
 ### 2. Read all source files
 
 ```bash
-ls /dls_sw/prod/R3.14.12.7/support/$0/<version>/etc/*.py
+ls /dls_sw/prod/R3.14.12.7/support/$1/<version>/etc/*.py
 ```
 
 Read every `.py` file found. The primary file is `builder.py` but some modules
@@ -53,7 +52,7 @@ references.
 ### 3. Analyze using the shared methodology
 
 Follow the step-by-step procedure in
-[builder-py-analysis.md](../shared/builder-py-analysis.md) to extract:
+[builder-py-analysis.md](../skills/shared/builder-py-analysis.md) to extract:
 
 - XML template files and their child entities (Step 1b)
 - Classes and their base types (Step 2)
@@ -78,9 +77,9 @@ through all others in a single command. Stop as soon as a match is found.
 ```bash
 # Search work and prod for all known EPICS versions in one go
 for v in $(ls -d /dls_sw/prod/R* | sort -rV | xargs -n1 basename); do
-  result=$(grep -rl "$0" $(find /dls_sw/work/$v/support/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml" 2>/dev/null) 2>/dev/null | head -3)
+  result=$(grep -rl "$1" $(find /dls_sw/work/$v/support/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml" 2>/dev/null) 2>/dev/null | head -3)
   if [ -n "$result" ]; then echo "=== work/$v ==="; echo "$result"; break; fi
-  result=$(grep -rl "$0" $(find /dls_sw/prod/$v/support/*/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml" 2>/dev/null) 2>/dev/null | head -3)
+  result=$(grep -rl "$1" $(find /dls_sw/prod/$v/support/*/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml" 2>/dev/null) 2>/dev/null | head -3)
   if [ -n "$result" ]; then echo "=== prod/$v ==="; echo "$result"; break; fi
 done
 ```

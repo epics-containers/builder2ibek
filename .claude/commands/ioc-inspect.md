@@ -1,23 +1,22 @@
 ---
-name: ioc-inspect
-description: Inspect an IOC's XML definition, support modules, and component arguments
 argument-hint: <ioc-name>
+description: Inspect an IOC's XML definition, support modules, and component arguments.
 ---
 
 # IOC Inspector
 
-Inspect the DLS EPICS IOC `$0` by locating its builder XML definition,
+Inspect the DLS EPICS IOC `$1` by locating its builder XML definition,
 resolving support module paths, and reporting what components it uses with
 their arguments.
 
-This skill is **read-only** — it makes no changes to any files.
+This command is **read-only** — it makes no changes to any files.
 
 ---
 
 ## Step 1 — Locate the IOC XML
 
 Extract the beamline prefix from the IOC name:
-- Input: `$0`
+- Input: `$1`
 - Uppercase the name: e.g. `bl21i-va-ioc-01` → `BL21I-VA-IOC-01`
 - Prefix = segment before the first `-`: `BL21I`
 - BUILDER dir = `<PREFIX>-BUILDER`: `BL21I-BUILDER`

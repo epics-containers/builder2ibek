@@ -5,9 +5,22 @@
         "dockerfile": "../Dockerfile",
         "target": "developer"
     },
+    // Tell VS Code the remote user is root so copyGitConfig writes to
+    // /root/.gitconfig (matching $HOME in the shell); otherwise it falls back
+    // to the base image's USER and the copy lands in the wrong home.
+    "remoteUser": "root",
     "remoteEnv": {
         // Allow X11 apps to run inside the container
         "DISPLAY": "${localEnv:DISPLAY}",
+        // Disable SSH agent forwarding — prevents Claude from using host SSH keys
+        "SSH_AUTH_SOCK": "",
+        // Disable VS Code git credential injection — prevents askpass from
+        // relaying host GitHub credentials into the container over the IPC socket
+        "GIT_ASKPASS": "",
+        "VSCODE_GIT_IPC_HANDLE": "",
+        "VSCODE_GIT_ASKPASS_MAIN": "",
+        "VSCODE_GIT_ASKPASS_NODE": "",
+        "VSCODE_GIT_ASKPASS_EXTRA_ARGS": "",
         // Put things that allow it in the persistent cache
         "PRE_COMMIT_HOME": "/cache/pre-commit",
         "UV_CACHE_DIR": "/cache/uv",
@@ -57,8 +70,8 @@
     "forwardPorts": [
         8000
     ],
-    // Create the config folder for the bash-config feature, uv cache, and claude settings
-    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config",
+    // Create host-side dirs needed for bind mounts before the container starts
+    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config ${localEnv:HOME}/.claude",
     "runArgs": [
         // Allow the container to access the host X11 display and EPICS CA
         "--net=host",
@@ -78,12 +91,24 @@
             "target": "/cache",
             "type": "volume"
         },
+        // Persist gh auth across container rebuilds with per-repo scoped PAT
+        {
+            "source": "gh-auth-${localWorkspaceFolderBasename}",
+            "target": "/root/.config/gh",
+            "type": "volume"
+        },
+        // Mount Claude config from host (settings, memory, skills)
+        {
+            "source": "${localEnv:HOME}/.claude",
+            "target": "/root/.claude",
+            "type": "bind"
+        },
         // Mount /dls_sw readonly; slave propagation ensures autofs submounts on the host
         // are visible inside the container without needing to trigger them from within it
         "type=bind,source=/dls_sw,target=/dls_sw,readonly,bind-propagation=slave"
     ],
     // Mount the parent as /workspaces so we can pip install peers as editable
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
-    // After the container is created, recreate the venv then make pre-commit first run faster
-    "postCreateCommand": "uv venv --clear && uv sync && pre-commit install --install-hooks; git submodule update --init"
+    "postCreateCommand": ".devcontainer/postCreate.sh",
+    "postStartCommand": ".devcontainer/postStart.sh"
 }

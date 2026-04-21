@@ -1,17 +1,15 @@
 ---
-name: ioc-convert
-description: Convert a builder XML IOC to ibek ioc.yaml, validate schema, generate runtime assets, and iterate until correct.
 argument-hint: <path/to/IOC.xml> [<path/to/services-repo>]
-disable-model-invocation: true
+description: Convert a builder XML IOC to ibek ioc.yaml, validate schema, generate runtime assets, and iterate until correct.
 ---
 
 # IOC Convert and Validate Workflow
 
-Convert builder XML `$0` to ibek `ioc.yaml` in the services repo `$1`, fix any
+Convert builder XML `$1` to ibek `ioc.yaml` in the services repo `$2`, fix any
 support YAML or converter issues, generate runtime assets, and verify `st.cmd`
 and `ioc.subst` are correct.
 
-This skill uses **parallel subagents** for support YAML creation and error
+This command uses **parallel subagents** for support YAML creation and error
 fixing, to keep the main context small and speed up large IOCs.
 
 ---
@@ -35,8 +33,8 @@ subagent prompts) must have `EPICS_ROOT` set to this value.
 
 ### 1a. Resolve the services repo
 
-Follow [services-repo-resolution.md](../shared/services-repo-resolution.md)
-using `$1` (if provided) or the IOC prefix from `$0`.
+Follow [services-repo-resolution.md](../skills/shared/services-repo-resolution.md)
+using `$2` (if provided) or the IOC prefix from `$1`.
 
 - If `INSTANCE_DIR` already exists:
   - Check `$INSTANCE_DIR/values.yaml` — if it contains `dev-c7:`, this is a
@@ -53,7 +51,7 @@ using `$1` (if provided) or the IOC prefix from `$0`.
 ### 1b. Resolve support module paths
 
 Read the `_RELEASE` file next to the XML following
-[find-module-path.md](../shared/find-module-path.md). Record a **module path
+[find-module-path.md](../skills/shared/find-module-path.md). Record a **module path
 table** mapping module name → resolved path, e.g.:
 ```
 ethercat → /dls_sw/prod/R3.14.12.7/support/ethercat/7-2
@@ -69,7 +67,7 @@ filename and its contents (e.g. "Geobrick 06", "Vacuum system",
 "Pilatus detector"). Keep it short — a few words, no full sentences.
 
 ```bash
-uv run builder2ibek xml2yaml $0 --yaml $INSTANCE_DIR/config/ioc.yaml --description "<description>"
+uv run builder2ibek xml2yaml $1 --yaml $INSTANCE_DIR/config/ioc.yaml --description "<description>"
 ```
 
 ### 1d. Review ioc.yaml and fix converters
@@ -80,7 +78,7 @@ that work is delegated to subagents in Phase 2.
 Scan quickly for converter issues that must be fixed before support YAML work:
 
 **Spurious `name:` fields** — follow the `name` parameter rules in
-[support-yaml-rules.md](../shared/support-yaml-rules.md). When in doubt,
+[support-yaml-rules.md](../skills/shared/support-yaml-rules.md). When in doubt,
 **keep `name: type: id`**. If a converter is needed, create
 `src/builder2ibek/converters/<module>.py` (auto-discovered, no registration).
 
@@ -89,7 +87,7 @@ transformation, or removal before ibek sees them. Add or update the converter
 rather than editing ioc.yaml by hand.
 
 **dlsPLC entities** — read
-[docs/reference/dlsplc-migration.md](../../../docs/reference/dlsplc-migration.md)
+[docs/reference/dlsplc-migration.md](../../docs/reference/dlsplc-migration.md)
 and check the "What requires manual attention" table. Every case listed there
 should be fixed by implementing or improving the relevant converter.
 
@@ -138,7 +136,7 @@ is clean of converter-fixable issues.
 
 Parse the final ioc.yaml. For each entity type `<module>.<Entity>`:
 
-1. Read [module-special-cases.md](../shared/module-special-cases.md) — skip
+1. Read [module-special-cases.md](../skills/shared/module-special-cases.md) — skip
    modules that don't need support YAMLs (e.g. `epics`) and use the correct
    folder name for case-sensitive modules (e.g. `IOCInfo` not `IOCinfo`).
 2. Check whether the support YAML already exists — **always check BOTH
@@ -163,7 +161,7 @@ or entity model. Launch all in a single message so they run in parallel.
 
 For each module, construct a prompt:
 
-> Read `/workspaces/builder2ibek/.claude/skills/support-create/SKILL.md` and
+> Read `/workspaces/builder2ibek/.claude/commands/support-create.md` and
 > follow its instructions to create a support YAML for the following module.
 >
 > Module name: `<module>`
@@ -223,7 +221,7 @@ Group all errors by the module they implicate. For each group, launch one
 
 ### Fix subagent prompt template
 
-> Read `/workspaces/builder2ibek/.claude/skills/support-fix/SKILL.md` and
+> Read `/workspaces/builder2ibek/.claude/commands/support-fix.md` and
 > follow its instructions to fix the following errors.
 >
 > Module: `<module>`
@@ -262,12 +260,12 @@ Group all errors by the module they implicate. For each group, launch one
 Read `$EPICS_ROOT/runtime/st.cmd`.
 
 Find the original VxWorks boot script following
-[find-boot-script.md](../shared/find-boot-script.md).
+[find-boot-script.md](../skills/shared/find-boot-script.md).
 
 Compare the original and generated scripts. For each meaningful command in the
 original, check whether the equivalent is present in `st.cmd`. Flag any
 command that is absent and is **not** in the expected-differences table:
-[vxworks-to-rtems-differences.md](../shared/vxworks-to-rtems-differences.md).
+[vxworks-to-rtems-differences.md](../skills/shared/vxworks-to-rtems-differences.md).
 
 ### 5b. Validate ioc.subst
 
