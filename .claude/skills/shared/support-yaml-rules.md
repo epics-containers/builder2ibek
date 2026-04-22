@@ -35,10 +35,20 @@ topics. Key reminders:
   builder.py; if it uses `Ident(...)` it must be `type: object` in the support YAML.
 - `.*:` in `databases.args` passes all parameters through.
 
-## STREAM_PROTOCOL_PATH
+## Globally-managed entities — don't re-add in entity models
 
-Handled globally by the conversion framework — do **not** add
-`STREAM_PROTOCOL_PATH` setup to any entity model's `pre_init`.
+The following are injected as defaults by `src/builder2ibek/convert.py` (or set
+by the epics-containers runtime). Do **not** add them to any entity model's
+`pre_init` or `sub_entities` — doing so causes duplicates or stale values:
+
+| Entity / env var | Managed by |
+|---|---|
+| `devIocStats.iocAdminSoft` | `convert.py` default injection (filtered from XML by `deviocstats.py`) |
+| `STREAM_PROTOCOL_PATH` | `convert.py` default injection (filtered from XML by `epics_base.py`) |
+| `EPICS_TZ` | `convert.py` default injection |
+| `IOCSH_PS1` (and any `IOCSH*`) | epics-containers runtime (filtered from XML by `epics_base.py`) |
+
+If you find one of these in a `sub_entities:` list, delete it.
 
 ## Database macros, parameter types, auto_* entities
 
