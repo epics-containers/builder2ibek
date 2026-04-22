@@ -16,11 +16,18 @@ XML attribute names, and ibek validates them against the support YAML.
 
 | builder.py | ibek support YAML |
 |---|---|
-| `TemplateFile = 'foo.db'` | `databases[].file: $(<MODULE>)/db/foo.db` |
+| `TemplateFile = 'foo.db'` | `databases[].file: $(<MACRO>)/db/foo.db` |
 | `Initialise()` method | `pre_init` section |
 | `InitialiseOnce()` method | `pre_init` with `when: first` |
 | `PostIocInitialise()` method | `post_init` section |
 | `AutoSubstitution` base class | `databases` section only (no init) |
+
+**`<MACRO>` is the module name with `-` replaced by `_` and then upper-cased**
+— matches `macro: "{{ module | replace('-', '_') | upper }}"` in
+`ibek-support/_ansible/roles/support/vars/main.yml`. Examples: `dlsPLC` →
+`$(DLSPLC)`, `SR-VA` → `$(SR_VA)`, `Hy8401ip-asyn` → `$(HY8401IP_ASYN)`.
+**Never** write `$(SR-VA)` — msi macro names forbid hyphens, so the ref is
+left literal and msi dies with `No template file` at container startup.
 
 ## Jinja2 rendering, databases.args, name parameter, PORT parameter
 
