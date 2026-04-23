@@ -97,6 +97,12 @@
             "target": "/root/.config/gh",
             "type": "volume"
         },
+        // Persist glab auth across container rebuilds (GitLab CLI, for ibek-support-dls)
+        {
+            "source": "glab-auth-${localWorkspaceFolderBasename}",
+            "target": "/root/.config/glab-cli",
+            "type": "volume"
+        },
         // Mount Claude config from host (settings, memory, skills)
         {
             "source": "${localEnv:HOME}/.claude",
