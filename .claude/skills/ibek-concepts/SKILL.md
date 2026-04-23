@@ -106,6 +106,46 @@ float, `42` becomes int. Type mismatch → schema validation failure.
 
 ---
 
+## Leading-zero int params (gauge ids, controller addresses)
+
+XML attributes like `id="02"` or `address="001"` are zero-padded because the
+builder XML used them as raw PV-name segments. In ibek, these should almost
+always be `type: int` — the zero padding is a *rendering* concern for the db
+substitution, not a property of the parameter itself.
+
+Three-part pattern:
+
+1. **Support YAML** — declare `type: int`, render padded in `databases.args`:
+   ```yaml
+   id:
+     type: int
+     description: Gauge ID. Rendered zero-padded to 2 digits in PV
+       substitutions (e.g. 1 -> "01").
+   ...
+   databases:
+     - file: $(MOD)/db/foo.template
+       args:
+         id: "{{ '%02d' % id }}"
+   ```
+2. **Converter** — coerce the string to int in the module's converter. The
+   generic `convert.py::_has_leading_zero` deliberately preserves
+   zero-padded strings (so PV-name segments survive), so per-module
+   converters must override:
+   ```python
+   if entity_type == "mks937aGauge" and entity.id is not None:
+       entity.id = int(entity.id)
+   ```
+3. **Result** — ioc.yaml holds `id: 2` (bare int), and ibek's Jinja step
+   renders `"02"` in ioc.subst. st.cmd / ioc.subst output is unchanged
+   byte-for-byte.
+
+**When to keep them as strings instead**: if the value is a PV-name
+quadrant code or a string enum (e.g. `SR-VA.gaugeSetA.q` = "S" / "A" / "SS",
+`dlsPLC.fastVacuumChannel.id` declared `type: enum` with string values like
+"01"), leave it as `type: str` / `type: enum`.
+
+---
+
 ## Reference examples
 
 | Module | Path | Notes |

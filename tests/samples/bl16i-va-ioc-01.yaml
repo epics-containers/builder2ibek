@@ -411,49 +411,49 @@ entities:
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL16I
-    id: '02'
+    id: 2
     name: GAUGE02
     s: 2
 
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL16I
-    id: '04'
+    id: 4
     name: GAUGE04
     s: 4
 
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL16I
-    id: '05'
+    id: 5
     name: GAUGE05
     s: 3
 
   - type: mks937a.mks937aGauge
     c: 50
     dom: BL16I
-    id: '06'
+    id: 6
     name: GAUGE06
     s: 5
 
   - type: mks937a.mks937aGauge
     c: 51
     dom: BL16I
-    id: '07'
+    id: 7
     name: GAUGE07
     s: 0
 
   - type: mks937a.mks937aGauge
     c: 51
     dom: BL16I
-    id: '08'
+    id: 8
     name: GAUGE08
     s: 1
 
   - type: mks937a.mks937aGauge
     c: 51
     dom: BL16I
-    id: '09'
+    id: 9
     name: GAUGE09
     s: 2
 
@@ -516,7 +516,7 @@ entities:
     low: 0.1
 
   - type: mks937b.mks937b
-    address: '001'
+    address: 1
     device: BL16I-VA-GCTLR-01
     name: GCTRL1
     port: ty_40_4
@@ -549,13 +549,13 @@ entities:
 
   - type: mks937b.mks937bGauge
     dom: BL16I
-    id: '01'
+    id: 1
     name: GAUGE01
     plog_adc_pv: BL16I-VA-ADC-01:CH0
 
   - type: mks937b.mks937bGauge
     dom: BL16I
-    id: '03'
+    id: 3
     name: GAUGE03
     plog_adc_pv: BL16I-VA-ADC-01:CH1
 

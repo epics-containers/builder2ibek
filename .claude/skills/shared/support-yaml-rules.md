@@ -34,6 +34,11 @@ topics. Key reminders:
   module — it is not always `PORT`. Always check the `ArgInfo` declaration in
   builder.py; if it uses `Ident(...)` it must be `type: object` in the support YAML.
 - `.*:` in `databases.args` passes all parameters through.
+- Zero-padded numeric params (gauge ids like `"02"`, controller addresses
+  like `"001"`) → `type: int` in the support YAML, render padded in
+  `databases.args` with `{{ '%02d' % id }}`, and add a per-module
+  converter coercion `entity.id = int(entity.id)` so ioc.yaml holds a bare
+  int. See [ibek-concepts](../ibek-concepts/SKILL.md) for the full pattern.
 
 ## STREAM_PROTOCOL_PATH
 
