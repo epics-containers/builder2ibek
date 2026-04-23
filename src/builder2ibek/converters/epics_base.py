@@ -43,6 +43,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             # remove IOCSH settings as epics-containers makes the iocsh prompt
             if "IOCSH" in entity.name:
                 entity.delete_me()
+            # STREAM_PROTOCOL_PATH is injected as a default by convert.py
+            elif entity.name == "STREAM_PROTOCOL_PATH":
+                entity.delete_me()
     elif entity_type == "StartupCommand":
         if entity.post_init:
             entity.type = "epics.PostStartupCommand"

@@ -22,14 +22,3 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     # Drop it so ibek doesn't reject it as extra.
     if entity_type in ("common", "gaugeSet", "gaugeSetA"):
         entity.remove("name")
-
-    # SR-VA.common's sub_entities include devIocStats.devIocStatsHelper,
-    # which already loads iocAdminSoft.db and iocAdminScanMon.db.  Drop the
-    # default devIocStats.iocAdminSoft entity that convert.dispatch inserts
-    # to avoid loading those db files twice.
-    if entity_type == "common":
-        ioc.entities = [
-            e
-            for e in ioc.entities
-            if not (isinstance(e, dict) and e.get("type") == "devIocStats.iocAdminSoft")
-        ]

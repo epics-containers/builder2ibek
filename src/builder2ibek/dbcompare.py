@@ -13,6 +13,30 @@ regex_field = re.compile(
     re.MULTILINE,
 )
 
+# Record-name patterns that differ between the DLS-legacy devIocStats and the
+# upstream version now shipped with ibek. Same set of differences appears in
+# every converted IOC, so --skip-known folds them in.
+KNOWN_DEVIOCSTATS_IGNORE = [
+    # Removed: DLS-local extensions dropped by upstream.
+    r":SRHEARTBT\b",
+    r":(DLSVER|IOC_LOG_PORT|TIMEZONE)\b",
+    # Removed: old naming for system-reset / reboot history slots.
+    r":\d+:(STATUSST|STATUS|STATE|NAME|TIME)\b",
+    r":(RR|SR)(STATUSST|STATUS|RECENTST|TIME)\b",
+    # Added: upstream devIocStats system-reset history (SR_*).
+    r":SR_\w+",
+    # Added: callback queue and scan-once queue monitoring.
+    r":CB(HIGH|MEDIUM|LOW)?_Q_\w+",
+    r":SCANONCE_Q_\w+",
+    # Added: CA server, IOC log file, misc diagnostics.
+    r":CAS_\w+",
+    r":IOC_LOG_FILE_\w+",
+    r":(ABORT_ON_ASSERT|TZ)\b",
+    # Present in both DBs but with template-level field differences.
+    r":(STARTTOD|TOD)\b",
+    r":\d*HZ_(MODE|UPD_TIME)\b",
+]
+
 
 @dataclass
 class EpicsDb:
@@ -57,6 +81,7 @@ def compare_dbs(
     new_path: Path,
     ignore: list[str],
     remove_duplicates: bool = False,
+    skip_known: bool = True,
     output: Path | None = None,
 ):
     """
@@ -65,6 +90,9 @@ def compare_dbs(
     used to ensure that an IOC converted to epics-containers has the same
     records as the original builder IOC
     """
+    if skip_known:
+        ignore = [*ignore, *KNOWN_DEVIOCSTATS_IGNORE]
+
     old = EpicsDb(old_path)
     new = EpicsDb(new_path)
 

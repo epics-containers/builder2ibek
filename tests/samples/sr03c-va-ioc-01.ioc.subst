@@ -20,7 +20,7 @@ pattern
 	{ "SR03C-VA-IOC-01:" }
 }
 
-file "$(ETHER_IP)/db/ether_ip_plcInfo.template" {
+file "ether_ip_plcInfo.template" {
 pattern 
 	{ "port",         "device"            }
 	{ "VLVCC_01_EIP", "SR03C-VA-VLVCC-01" }
@@ -28,14 +28,14 @@ pattern
 
 file "$(DLSPLC)/db/NX102_readReal.template" {
 pattern 
-	{ "type",                  "entity_enabled", "device",                "port",         "tag",                                    "desc", "scan",     "egu", "prec" }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GAUGE-01:RAW", "VLVCC_01_EIP", "SR03S_VC1_GCTLR_01_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2"    }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GAUGE-02:RAW", "VLVCC_01_EIP", "SR03S_VC1_GCTLR_01_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2"    }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-01:RAW", "VLVCC_01_EIP", "SR03A_VC1_GCTLR_01_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2"    }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-02:RAW", "VLVCC_01_EIP", "SR03A_VC1_GCTLR_01_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2"    }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-03:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_02_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2"    }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-31:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_03_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2"    }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-04:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_03_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2"    }
+	{ "type",                  "entity_enabled", "device",                "port",         "tag",                                    "desc", "scan",     "egu", "prec", "name" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GAUGE-01:RAW", "VLVCC_01_EIP", "SR03S_VC1_GCTLR_01_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2",    ""     }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GAUGE-02:RAW", "VLVCC_01_EIP", "SR03S_VC1_GCTLR_01_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-01:RAW", "VLVCC_01_EIP", "SR03A_VC1_GCTLR_01_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2",    ""     }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-02:RAW", "VLVCC_01_EIP", "SR03A_VC1_GCTLR_01_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-03:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_02_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-31:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_03_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2",    ""     }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-04:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_03_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
 }
 
 file "$(MKS937A)/db/mks937a.template" {
@@ -134,11 +134,11 @@ pattern
 
 file "$(DLSPLC)/db/NX102_vacValveDebounce.template" {
 pattern 
-	{ "type",                          "entity_enabled", "mode1",       "mode2",   "ilksta_sv0", "ilksta_sv1", "ilksta_sv2", "ilksta_sv3", "ilksta_sv4", "ilksta_sv5", "ilksta_label0", "ilksta_label1", "ilksta_label2", "ilksta_label3", "ilksta_label4", "ilksta_label5", "sta_sv0", "sta_sv1",  "sta_sv2",  "sta_sv3",  "sta_sv4",  "sta_sv5",  "sta_sv6",  "sta_label0", "sta_label1", "sta_label2", "sta_label3", "sta_label4", "sta_label5", "sta_label6", "con_label0", "con_label1", "con_label2", "con_label3", "con_label4", "con_label5", "con_label6", "whylocked",                "allowpv", "tagidx", "tag", "ILKNUM", "device",            "port",         "con_label7", "sta_label7", "sta_sv7",  "ilksta_label6", "ilksta_label7", "ilksta_sv6", "ilksta_sv7", "DIRILK1", "DIRILK2", "desc"      }
-	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "1",      "V",   "1",      "SR03A-VA-VALVE-01", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)" }
-	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "2",      "V",   "1",      "SR03A-VA-VALVE-02", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)" }
-	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "3",      "V",   "1",      "SR03A-VA-VALVE-03", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)" }
-	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "4",      "V",   "1",      "SR03A-VA-VALVE-04", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)" }
+	{ "type",                          "entity_enabled", "mode1",       "mode2",   "ilksta_sv0", "ilksta_sv1", "ilksta_sv2", "ilksta_sv3", "ilksta_sv4", "ilksta_sv5", "ilksta_label0", "ilksta_label1", "ilksta_label2", "ilksta_label3", "ilksta_label4", "ilksta_label5", "sta_sv0", "sta_sv1",  "sta_sv2",  "sta_sv3",  "sta_sv4",  "sta_sv5",  "sta_sv6",  "sta_label0", "sta_label1", "sta_label2", "sta_label3", "sta_label4", "sta_label5", "sta_label6", "con_label0", "con_label1", "con_label2", "con_label3", "con_label4", "con_label5", "con_label6", "whylocked",                "allowpv", "tagidx", "tag", "ILKNUM", "device",            "port",         "con_label7", "sta_label7", "sta_sv7",  "ilksta_label6", "ilksta_label7", "ilksta_sv6", "ilksta_sv7", "DIRILK1", "DIRILK2", "desc",      "name" }
+	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "1",      "V",   "1",      "SR03A-VA-VALVE-01", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)", ""     }
+	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "2",      "V",   "1",      "SR03A-VA-VALVE-02", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)", ""     }
+	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "3",      "V",   "1",      "SR03A-VA-VALVE-03", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)", ""     }
+	{ "dlsPLC.NX102_vacValveDebounce", "True",           "Operational", "Service", "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "Open command not allowed", "",        "4",      "V",   "1",      "SR03A-VA-VALVE-04", "VLVCC_01_EIP", "",           "",           "NO_ALARM", "",              "",              "NO_ALARM",   "NO_ALARM",   "",        "ILK2",    "$(device)", ""     }
 }
 
 file "$(RGA)/db/rga.template" {
@@ -225,9 +225,9 @@ pattern
 
 file "$(DLSPLC)/db/NX102_digitalIn.template" {
 pattern 
-	{ "type",                   "entity_enabled", "tagidx", "device",                      "port",         "tag"        }
-	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03C-VA-VLVCC-01:DIGITAL01", "VLVCC_01_EIP", "Digital_In" }
-	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03C-VA-VLVCC-01:DIGITAL02", "VLVCC_01_EIP", "Digital_In" }
+	{ "type",                   "entity_enabled", "tagidx", "device",                      "port",         "tag",        "name" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03C-VA-VLVCC-01:DIGITAL01", "VLVCC_01_EIP", "Digital_In", ""     }
+	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03C-VA-VLVCC-01:DIGITAL02", "VLVCC_01_EIP", "Digital_In", ""     }
 }
 
 file "$(USERIO)/db/bi.template" {
@@ -242,11 +242,11 @@ pattern
 
 file "$(DLSPLC)/db/NX102_powerSupply.template" {
 pattern 
-	{ "type",                     "entity_enabled", "tagidx", "device",            "port",         "tag" }
-	{ "dlsPLC.NX102_powerSupply", "True",           "1",      "SR03C-VA-PSU-01:1", "VLVCC_01_EIP", "PSU" }
-	{ "dlsPLC.NX102_powerSupply", "True",           "2",      "SR03C-VA-PSU-01:2", "VLVCC_01_EIP", "PSU" }
-	{ "dlsPLC.NX102_powerSupply", "True",           "3",      "SR03C-VA-PSU-02:1", "VLVCC_01_EIP", "PSU" }
-	{ "dlsPLC.NX102_powerSupply", "True",           "4",      "SR03C-VA-PSU-02:2", "VLVCC_01_EIP", "PSU" }
+	{ "type",                     "entity_enabled", "tagidx", "device",            "port",         "tag", "name" }
+	{ "dlsPLC.NX102_powerSupply", "True",           "1",      "SR03C-VA-PSU-01:1", "VLVCC_01_EIP", "PSU", ""     }
+	{ "dlsPLC.NX102_powerSupply", "True",           "2",      "SR03C-VA-PSU-01:2", "VLVCC_01_EIP", "PSU", ""     }
+	{ "dlsPLC.NX102_powerSupply", "True",           "3",      "SR03C-VA-PSU-02:1", "VLVCC_01_EIP", "PSU", ""     }
+	{ "dlsPLC.NX102_powerSupply", "True",           "4",      "SR03C-VA-PSU-02:2", "VLVCC_01_EIP", "PSU", ""     }
 }
 
 file "$(DLSPLC)/db/NX102_IRVacuum.template" {

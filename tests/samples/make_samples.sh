@@ -30,8 +30,10 @@ for x in ${XMLS}; do
 
   if ibek runtime generate2 "$tmpdir" --output "$tmpdir" --no-pvi 2>/dev/null; then
     echo "  generate2 → ${stem}.st.cmd, ${stem}.ioc.subst"
-    cp "$tmpdir/st.cmd" "${stem}.st.cmd"
-    cp "$tmpdir/ioc.subst" "${stem}.ioc.subst"
+    # ibek leaves a trailing blank line on generated files; strip it so the
+    # pre-commit end-of-file-fixer doesn't show phantom diffs.
+    printf '%s\n' "$(cat "$tmpdir/st.cmd")" > "${stem}.st.cmd"
+    printf '%s\n' "$(cat "$tmpdir/ioc.subst")" > "${stem}.ioc.subst"
   else
     echo " ERROR SKIPPING !!! generate2 SKIP (validation failed)"
     rm -f "${stem}.st.cmd" "${stem}.ioc.subst"
