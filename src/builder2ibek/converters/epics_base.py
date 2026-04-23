@@ -28,6 +28,24 @@ def add_interrupt_vector():
     return vec
 
 
+# EpicsEnvSet keys that SR-VA.common already emits via its sub_entities.
+# When an XML IOC contains SR-VA.common, flat copies of these keys in the XML
+# are redundant and produce duplicate epicsEnvSet lines in the generated
+# st.cmd — drop them so SR-VA.common is the single source of truth.
+_SR_VA_COMMON_ENV_KEYS = frozenset(
+    {
+        "EPICS_CA_AUTO_ADDR_LIST",
+        "EPICS_CA_ADDR_LIST",
+        "EPICS_CAS_AUTO_BEACON_ADDR_LIST",
+        "EPICS_CAS_BEACON_ADDR_LIST",
+    }
+)
+
+
+def _has_sr_va_common(ioc: Generic_IOC) -> bool:
+    return any(e.get("type") == "SR-VA.common" for e in ioc.raw_entities)
+
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "EpicsEnvSet":
@@ -45,6 +63,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
                 entity.delete_me()
             # STREAM_PROTOCOL_PATH is injected as a default by convert.py
             elif entity.name == "STREAM_PROTOCOL_PATH":
+                entity.delete_me()
+            elif entity.name in _SR_VA_COMMON_ENV_KEYS and _has_sr_va_common(ioc):
                 entity.delete_me()
     elif entity_type == "StartupCommand":
         if entity.post_init:

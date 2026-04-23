@@ -26,16 +26,109 @@ pattern
 	{ "VLVCC_01_EIP", "SR03C-VA-VLVCC-01" }
 }
 
-file "$(DLSPLC)/db/NX102_readReal.template" {
+file "$(SR_VA)/db/rgaPowerCycle.template" {
 pattern 
-	{ "type",                  "entity_enabled", "device",                "port",         "tag",                                    "desc", "scan",     "egu", "prec", "name" }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GAUGE-01:RAW", "VLVCC_01_EIP", "SR03S_VC1_GCTLR_01_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2",    ""     }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GAUGE-02:RAW", "VLVCC_01_EIP", "SR03S_VC1_GCTLR_01_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-01:RAW", "VLVCC_01_EIP", "SR03A_VC1_GCTLR_01_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2",    ""     }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-02:RAW", "VLVCC_01_EIP", "SR03A_VC1_GCTLR_01_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-03:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_02_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-31:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_03_COMB_A_C1_Comb_mBar", "",     "1 second", "",    "2",    ""     }
-	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GAUGE-04:RAW", "VLVCC_01_EIP", "SR03A_VC2_GCTLR_03_COMB_B_C2_Comb_mBar", "",     "1 second", "",    "2",    ""     }
+	{ "type",                     "entity_enabled", "device",          "PORT",         "TAG"            }
+	{ "SR-VA.auto_rgaPowerCycle", "True",           "SR03S-VA-RGA-01", "VLVCC_01_EIP", "RGA_S_01_RESET" }
+	{ "SR-VA.auto_rgaPowerCycle", "True",           "SR03A-VA-RGA-01", "VLVCC_01_EIP", "RGA_A_01_RESET" }
+	{ "SR-VA.auto_rgaPowerCycle", "True",           "SR03A-VA-RGA-02", "VLVCC_01_EIP", "RGA_A_02_RESET" }
+}
+
+file "$(DLSPLC)/db/NX102_digitalIn.template" {
+pattern 
+	{ "type",                   "entity_enabled", "tagidx", "device",                      "port",         "tag",                "name"             }
+	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03C-VA-VLVCC-01:DIGITAL01", "VLVCC_01_EIP", "Digital_In",         "DIG_01"           }
+	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03C-VA-VLVCC-01:DIGITAL02", "VLVCC_01_EIP", "Digital_In",         "DIG_02"           }
+	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03S-VA-GCTLR-01:DIG01",     "VLVCC_01_EIP", "GCTLR_S_01.Digital", "GCTLR_S_01.DIG01" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03S-VA-GCTLR-01:DIG02",     "VLVCC_01_EIP", "GCTLR_S_01.Digital", "GCTLR_S_01.DIG02" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03A-VA-GCTLR-01:DIG01",     "VLVCC_01_EIP", "GCTLR_A_01.Digital", "GCTLR_A_01.DIG01" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03A-VA-GCTLR-01:DIG02",     "VLVCC_01_EIP", "GCTLR_A_01.Digital", "GCTLR_A_01.DIG02" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03A-VA-GCTLR-02:DIG01",     "VLVCC_01_EIP", "GCTLR_A_02.Digital", "GCTLR_A_02.DIG01" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03A-VA-GCTLR-02:DIG02",     "VLVCC_01_EIP", "GCTLR_A_02.Digital", "GCTLR_A_02.DIG02" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03A-VA-GCTLR-03:DIG01",     "VLVCC_01_EIP", "GCTLR_A_03.Digital", "GCTLR_A_03.DIG01" }
+	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03A-VA-GCTLR-03:DIG02",     "VLVCC_01_EIP", "GCTLR_A_03.Digital", "GCTLR_A_03.DIG02" }
+}
+
+file "$(USERIO)/db/bi.template" {
+pattern 
+	{ "P",                "R",    "DTYP",         "INP",                                      "SCAN",    "ZNAM", "ONAM",    "ZSV",   "OSV",      "COSV", "DESC",                      "archiver_rate" }
+	{ "SR03C-VA-FANC-01", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B0 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Fan Status",        "3600 Monitor"  }
+	{ "SR03C-VA-FANC-02", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B1 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Fan Status",        "3600 Monitor"  }
+	{ "SR03C-VA-FANC-03", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B2 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 03 Fan Status",        "3600 Monitor"  }
+	{ "SR03C-VA-PSU-01",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B3 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Duplex PSU Status", "3600 Monitor"  }
+	{ "SR03C-VA-PSU-02",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B4 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Duplex PSU Status", "3600 Monitor"  }
+}
+
+file "$(DLSPLC)/db/NX102_powerSupply.template" {
+pattern 
+	{ "type",                     "entity_enabled", "tagidx", "device",            "port",         "tag", "name"    }
+	{ "dlsPLC.NX102_powerSupply", "True",           "1",      "SR03C-VA-PSU-01:1", "VLVCC_01_EIP", "PSU", "PSU01.1" }
+	{ "dlsPLC.NX102_powerSupply", "True",           "2",      "SR03C-VA-PSU-01:2", "VLVCC_01_EIP", "PSU", "PSU01.2" }
+	{ "dlsPLC.NX102_powerSupply", "True",           "3",      "SR03C-VA-PSU-02:1", "VLVCC_01_EIP", "PSU", "PSU02.1" }
+	{ "dlsPLC.NX102_powerSupply", "True",           "4",      "SR03C-VA-PSU-02:2", "VLVCC_01_EIP", "PSU", "PSU02.2" }
+}
+
+file "$(DLSPLC)/db/NX102_IRVacuum.template" {
+pattern 
+	{ "type",                  "entity_enabled", "P",                 "port"         }
+	{ "dlsPLC.NX102_IRVacuum", "True",           "SR03A-VA-VALVE-01", "VLVCC_01_EIP" }
+}
+
+file "$(TERMINALSERVER)/db/TerminalServer16.template" {
+pattern 
+	{ "name",   "P",                 "R" }
+	{ "TSERV1", "SR03C-VA-TSERV-01", ""  }
+	{ "TSERV2", "SR03C-VA-TSERV-02", ""  }
+}
+
+file "$(TERMINALSERVER)/db/Moxa.template" {
+pattern 
+	{ "name",       "P",                 "R", "HOST"         }
+	{ "TSERV1_top", "SR03C-VA-TSERV-01", "",  "192.168.3.11" }
+	{ "TSERV2_top", "SR03C-VA-TSERV-02", "",  "192.168.3.12" }
+}
+
+file "$(TERMINALSERVER)/db/MoxaChannel.template" {
+pattern 
+	{ "name",      "P",                 "R", "CHAN", "HOST"         }
+	{ "TSERV1_1",  "SR03C-VA-TSERV-01", "",  "1",    "192.168.3.11" }
+	{ "TSERV1_2",  "SR03C-VA-TSERV-01", "",  "2",    "192.168.3.11" }
+	{ "TSERV1_3",  "SR03C-VA-TSERV-01", "",  "3",    "192.168.3.11" }
+	{ "TSERV1_4",  "SR03C-VA-TSERV-01", "",  "4",    "192.168.3.11" }
+	{ "TSERV1_5",  "SR03C-VA-TSERV-01", "",  "5",    "192.168.3.11" }
+	{ "TSERV1_6",  "SR03C-VA-TSERV-01", "",  "6",    "192.168.3.11" }
+	{ "TSERV1_7",  "SR03C-VA-TSERV-01", "",  "7",    "192.168.3.11" }
+	{ "TSERV1_8",  "SR03C-VA-TSERV-01", "",  "8",    "192.168.3.11" }
+	{ "TSERV1_9",  "SR03C-VA-TSERV-01", "",  "9",    "192.168.3.11" }
+	{ "TSERV1_10", "SR03C-VA-TSERV-01", "",  "10",   "192.168.3.11" }
+	{ "TSERV1_11", "SR03C-VA-TSERV-01", "",  "11",   "192.168.3.11" }
+	{ "TSERV1_12", "SR03C-VA-TSERV-01", "",  "12",   "192.168.3.11" }
+	{ "TSERV1_13", "SR03C-VA-TSERV-01", "",  "13",   "192.168.3.11" }
+	{ "TSERV1_14", "SR03C-VA-TSERV-01", "",  "14",   "192.168.3.11" }
+	{ "TSERV1_15", "SR03C-VA-TSERV-01", "",  "15",   "192.168.3.11" }
+	{ "TSERV1_16", "SR03C-VA-TSERV-01", "",  "16",   "192.168.3.11" }
+	{ "TSERV2_1",  "SR03C-VA-TSERV-02", "",  "1",    "192.168.3.12" }
+	{ "TSERV2_2",  "SR03C-VA-TSERV-02", "",  "2",    "192.168.3.12" }
+	{ "TSERV2_3",  "SR03C-VA-TSERV-02", "",  "3",    "192.168.3.12" }
+	{ "TSERV2_4",  "SR03C-VA-TSERV-02", "",  "4",    "192.168.3.12" }
+	{ "TSERV2_5",  "SR03C-VA-TSERV-02", "",  "5",    "192.168.3.12" }
+	{ "TSERV2_6",  "SR03C-VA-TSERV-02", "",  "6",    "192.168.3.12" }
+	{ "TSERV2_7",  "SR03C-VA-TSERV-02", "",  "7",    "192.168.3.12" }
+	{ "TSERV2_8",  "SR03C-VA-TSERV-02", "",  "8",    "192.168.3.12" }
+	{ "TSERV2_9",  "SR03C-VA-TSERV-02", "",  "9",    "192.168.3.12" }
+	{ "TSERV2_10", "SR03C-VA-TSERV-02", "",  "10",   "192.168.3.12" }
+	{ "TSERV2_11", "SR03C-VA-TSERV-02", "",  "11",   "192.168.3.12" }
+	{ "TSERV2_12", "SR03C-VA-TSERV-02", "",  "12",   "192.168.3.12" }
+	{ "TSERV2_13", "SR03C-VA-TSERV-02", "",  "13",   "192.168.3.12" }
+	{ "TSERV2_14", "SR03C-VA-TSERV-02", "",  "14",   "192.168.3.12" }
+	{ "TSERV2_15", "SR03C-VA-TSERV-02", "",  "15",   "192.168.3.12" }
+	{ "TSERV2_16", "SR03C-VA-TSERV-02", "",  "16",   "192.168.3.12" }
+}
+
+file "$(DLSPLC)/db/NX102_controller_status.template" {
+pattern 
+	{ "type",                           "entity_enabled", "device",            "port",         "name"   }
+	{ "dlsPLC.NX102_controller_status", "True",           "SR03C-VA-VLVCC-01", "VLVCC_01_EIP", "PLC_CS" }
 }
 
 file "$(MKS937A)/db/mks937a.template" {
@@ -47,6 +140,21 @@ pattern
 	{ "SR03A-VA-GCTLR-03", "GCTLR_A_03_PORT" }
 }
 
+file "$(DLSPLC)/db/NX102_readReal.template" {
+pattern 
+	{ "type",                  "entity_enabled", "device",                   "port",         "tag",                "desc", "scan",     "egu", "prec", "name"        }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GCTLR-01:C1_RAW", "VLVCC_01_EIP", "GCTLR_S_01.Comb[1]", "",     "1 second", "",    "2",    "PLC_COMBS01" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03S-VA-GCTLR-01:C2_RAW", "VLVCC_01_EIP", "GCTLR_S_01.Comb[2]", "",     "1 second", "",    "2",    "PLC_COMBS02" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GCTLR-01:C1_RAW", "VLVCC_01_EIP", "GCTLR_A_01.Comb[1]", "",     "1 second", "",    "2",    "PLC_COMBA01" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GCTLR-01:C2_RAW", "VLVCC_01_EIP", "GCTLR_A_01.Comb[2]", "",     "1 second", "",    "2",    "PLC_COMBA02" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GCTLR-02:C1_RAW", "VLVCC_01_EIP", "GCTLR_A_02.Comb[1]", "",     "1 second", "",    "2",    "PLC_COMBA71" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GCTLR-02:C2_RAW", "VLVCC_01_EIP", "GCTLR_A_02.Comb[2]", "",     "1 second", "",    "2",    "PLC_COMBA03" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GCTLR-03:C1_RAW", "VLVCC_01_EIP", "GCTLR_A_03.Comb[1]", "",     "1 second", "",    "2",    "PLC_COMBA31" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03A-VA-GCTLR-03:C2_RAW", "VLVCC_01_EIP", "GCTLR_A_03.Comb[2]", "",     "1 second", "",    "2",    "PLC_COMBA04" }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03I-VA-GCTLR-02:C1_RAW", "VLVCC_01_EIP", "GCTLR_I_02.Comb[1]", "",     "1 second", "",    "2",    ""            }
+	{ "dlsPLC.NX102_readReal", "True",           "SR03I-VA-GCTLR-02:C2_RAW", "VLVCC_01_EIP", "GCTLR_I_02.Comb[2]", "",     "1 second", "",    "2",    ""            }
+}
+
 file "$(MKS937A)/db/mks937aGauge.template" {
 pattern 
 	{ "dom",   "id", "c", "s", "name",       "aitype",       "aiinp"                           }
@@ -54,21 +162,27 @@ pattern
 	{ "SR03S", "02", "",  "",  "GAUGE_S_02", "Soft Channel", "SR03S-VA-GAUGE-02:PLOG_CALC  CP" }
 	{ "SR03A", "01", "",  "",  "GAUGE_A_01", "Soft Channel", "SR03A-VA-GAUGE-01:PLOG_CALC  CP" }
 	{ "SR03A", "02", "",  "",  "GAUGE_A_02", "Soft Channel", "SR03A-VA-GAUGE-02:PLOG_CALC  CP" }
+	{ "SR03A", "71", "",  "",  "GAUGE_A_71", "Soft Channel", "SR03A-VA-GAUGE-71:PLOG_CALC  CP" }
 	{ "SR03A", "03", "",  "",  "GAUGE_A_03", "Soft Channel", "SR03A-VA-GAUGE-03:PLOG_CALC  CP" }
-	{ "SR03A", "04", "",  "",  "GAUGE_A_04", "Soft Channel", "SR03A-VA-GAUGE-04:PLOG_CALC  CP" }
 	{ "SR03A", "31", "",  "",  "GAUGE_A_31", "Soft Channel", "SR03A-VA-GAUGE-31:PLOG_CALC  CP" }
+	{ "SR03A", "04", "",  "",  "GAUGE_A_04", "Soft Channel", "SR03A-VA-GAUGE-04:PLOG_CALC  CP" }
+	{ "SR03I", "02", "",  "",  "GAUGE_I_02", "Soft Channel", "SR03I-VA-GAUGE-02:PLOG_CALC  CP" }
+	{ "SR03I", "03", "",  "",  "GAUGE_I_03", "Soft Channel", "SR03I-VA-GAUGE-03:PLOG_CALC  CP" }
 }
 
 file "$(MKS937A)/db/mks937aPlogEGU.template" {
 pattern 
-	{ "device",                      "p_egu_pv"              }
-	{ "SR03S-VA-GAUGE-01:PLOG_CALC", "SR03S-VA-GAUGE-01:RAW" }
-	{ "SR03S-VA-GAUGE-02:PLOG_CALC", "SR03S-VA-GAUGE-02:RAW" }
-	{ "SR03A-VA-GAUGE-01:PLOG_CALC", "SR03A-VA-GAUGE-01:RAW" }
-	{ "SR03A-VA-GAUGE-02:PLOG_CALC", "SR03A-VA-GAUGE-02:RAW" }
-	{ "SR03A-VA-GAUGE-03:PLOG_CALC", "SR03A-VA-GAUGE-03:RAW" }
-	{ "SR03A-VA-GAUGE-04:PLOG_CALC", "SR03A-VA-GAUGE-04:RAW" }
-	{ "SR03A-VA-GAUGE-31:PLOG_CALC", "SR03A-VA-GAUGE-31:RAW" }
+	{ "device",                      "p_egu_pv"                 }
+	{ "SR03S-VA-GAUGE-01:PLOG_CALC", "SR03S-VA-GCTLR-01:C1_RAW" }
+	{ "SR03S-VA-GAUGE-02:PLOG_CALC", "SR03S-VA-GCTLR-01:C2_RAW" }
+	{ "SR03A-VA-GAUGE-01:PLOG_CALC", "SR03A-VA-GCTLR-01:C1_RAW" }
+	{ "SR03A-VA-GAUGE-02:PLOG_CALC", "SR03A-VA-GCTLR-01:C2_RAW" }
+	{ "SR03A-VA-GAUGE-71:PLOG_CALC", "SR03A-VA-GCTLR-02:C1_RAW" }
+	{ "SR03A-VA-GAUGE-03:PLOG_CALC", "SR03A-VA-GCTLR-02:C2_RAW" }
+	{ "SR03A-VA-GAUGE-31:PLOG_CALC", "SR03A-VA-GCTLR-03:C1_RAW" }
+	{ "SR03A-VA-GAUGE-04:PLOG_CALC", "SR03A-VA-GCTLR-03:C2_RAW" }
+	{ "SR03I-VA-GAUGE-02:PLOG_CALC", "SR03I-VA-GCTLR-02:C1_RAW" }
+	{ "SR03I-VA-GAUGE-03:PLOG_CALC", "SR03I-VA-GCTLR-02:C2_RAW" }
 }
 
 file "$(MKS937A)/db/mks937aImg.template" {
@@ -78,21 +192,23 @@ pattern
 	{ "SR03S-VA-IMG-02", "GCTLR_S_01_PORT", "2",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03S-VA-GAUGE-02:ILKSETSP:NOWRITE" }
 	{ "SR03A-VA-IMG-01", "GCTLR_A_01_PORT", "1",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-01:ILKSETSP:NOWRITE" }
 	{ "SR03A-VA-IMG-02", "GCTLR_A_01_PORT", "2",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-02:ILKSETSP:NOWRITE" }
+	{ "SR03A-VA-IMG-71", "GCTLR_A_02_PORT", "1",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-71:ILKSETSP:NOWRITE" }
 	{ "SR03A-VA-IMG-03", "GCTLR_A_02_PORT", "2",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-03:ILKSETSP:NOWRITE" }
-	{ "SR03A-VA-IMG-04", "GCTLR_A_03_PORT", "2",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-04:ILKSETSP:NOWRITE" }
 	{ "SR03A-VA-IMG-31", "GCTLR_A_03_PORT", "1",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-31:ILKSETSP:NOWRITE" }
+	{ "SR03A-VA-IMG-04", "GCTLR_A_03_PORT", "2",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-04:ILKSETSP:NOWRITE" }
 }
 
 file "$(MKS937A)/db/mks937aPirg.template" {
 pattern 
-	{ "device",           "port",            "channel", "rlysp_level", "rlysp_drvh", "rlysp_drvl", "rlysp_hopr", "rlysp_lopr", "rlysp_hihi", "rlysp_lolo", "rlysp_high", "rlysp_low", "rlysp_desc",   "ilk_write_access_pv"                }
-	{ "SR03S-VA-PIRG-01", "GCTLR_S_01_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "SR03S-VA-GAUGE-01:ILKSETSP:NOWRITE" }
-	{ "SR03S-VA-PIRG-02", "GCTLR_S_01_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "SR03S-VA-GAUGE-02:ILKSETSP:NOWRITE" }
-	{ "SR03A-VA-PIRG-01", "GCTLR_A_01_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "SR03A-VA-GAUGE-01:ILKSETSP:NOWRITE" }
-	{ "SR03A-VA-PIRG-02", "GCTLR_A_01_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "SR03A-VA-GAUGE-02:ILKSETSP:NOWRITE" }
-	{ "SR03A-VA-PIRG-03", "GCTLR_A_02_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "SR03A-VA-GAUGE-03:ILKSETSP:NOWRITE" }
-	{ "SR03A-VA-PIRG-04", "GCTLR_A_03_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "SR03A-VA-GAUGE-04:ILKSETSP:NOWRITE" }
-	{ "SR03A-VA-PIRG-31", "GCTLR_A_03_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "SR03A-VA-GAUGE-31:ILKSETSP:NOWRITE" }
+	{ "device",           "port",            "channel", "rlysp_level", "rlysp_drvh", "rlysp_drvl", "rlysp_hopr", "rlysp_lopr", "rlysp_hihi", "rlysp_lolo", "rlysp_high", "rlysp_low", "rlysp_desc",   "ilk_write_access_pv"     }
+	{ "SR03S-VA-PIRG-01", "GCTLR_S_01_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
+	{ "SR03S-VA-PIRG-02", "GCTLR_S_01_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
+	{ "SR03A-VA-PIRG-01", "GCTLR_A_01_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
+	{ "SR03A-VA-PIRG-02", "GCTLR_A_01_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
+	{ "SR03A-VA-PIRG-71", "GCTLR_A_02_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
+	{ "SR03A-VA-PIRG-03", "GCTLR_A_02_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
+	{ "SR03A-VA-PIRG-31", "GCTLR_A_03_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
+	{ "SR03A-VA-PIRG-04", "GCTLR_A_03_PORT", "5",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpc.template" {
@@ -223,38 +339,6 @@ pattern
 	{ "SR03S-VA-MIMG-02", "SR-DI-DCCT-01:SIGNAL", "9",     "SR03S-VA-IMG-01", "SR03S-VA-IMG-02", "SR03A-VA-IMG-01", "SR03A-VA-IMG-02", "SR02A-VA-IMG-13", "SR02A-VA-IMG-14", "SR03I-VA-IMG-01", "SR03I-VA-IMG-02", "SR03I-VA-IMG-03", "SR03A-VA-IMG-01" }
 }
 
-file "$(DLSPLC)/db/NX102_digitalIn.template" {
-pattern 
-	{ "type",                   "entity_enabled", "tagidx", "device",                      "port",         "tag",        "name" }
-	{ "dlsPLC.NX102_digitalIn", "True",           "1",      "SR03C-VA-VLVCC-01:DIGITAL01", "VLVCC_01_EIP", "Digital_In", ""     }
-	{ "dlsPLC.NX102_digitalIn", "True",           "2",      "SR03C-VA-VLVCC-01:DIGITAL02", "VLVCC_01_EIP", "Digital_In", ""     }
-}
-
-file "$(USERIO)/db/bi.template" {
-pattern 
-	{ "P",                "R",    "DTYP",         "INP",                                      "SCAN",    "ZNAM", "ONAM",    "ZSV",   "OSV",      "COSV", "DESC",                      "archiver_rate" }
-	{ "SR03C-VA-FANC-01", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B0 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Fan Status",        "3600 Monitor"  }
-	{ "SR03C-VA-FANC-02", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B1 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Fan Status",        "3600 Monitor"  }
-	{ "SR03C-VA-FANC-03", ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B2 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 03 Fan Status",        "3600 Monitor"  }
-	{ "SR03C-VA-PSU-01",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B3 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 01 Duplex PSU Status", "3600 Monitor"  }
-	{ "SR03C-VA-PSU-02",  ":STA", "Soft Channel", "SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B4 CP", "Passive", "FAIL", "HEALTHY", "MAJOR", "NO_ALARM", "",     "Rack 02 Duplex PSU Status", "3600 Monitor"  }
-}
-
-file "$(DLSPLC)/db/NX102_powerSupply.template" {
-pattern 
-	{ "type",                     "entity_enabled", "tagidx", "device",            "port",         "tag", "name" }
-	{ "dlsPLC.NX102_powerSupply", "True",           "1",      "SR03C-VA-PSU-01:1", "VLVCC_01_EIP", "PSU", ""     }
-	{ "dlsPLC.NX102_powerSupply", "True",           "2",      "SR03C-VA-PSU-01:2", "VLVCC_01_EIP", "PSU", ""     }
-	{ "dlsPLC.NX102_powerSupply", "True",           "3",      "SR03C-VA-PSU-02:1", "VLVCC_01_EIP", "PSU", ""     }
-	{ "dlsPLC.NX102_powerSupply", "True",           "4",      "SR03C-VA-PSU-02:2", "VLVCC_01_EIP", "PSU", ""     }
-}
-
-file "$(DLSPLC)/db/NX102_IRVacuum.template" {
-pattern 
-	{ "type",                  "entity_enabled", "P",                 "port"         }
-	{ "dlsPLC.NX102_IRVacuum", "True",           "SR03A-VA-VALVE-01", "VLVCC_01_EIP" }
-}
-
 file "$(DLSPLC)/db/dlsPLC_fastVacuumMaster.template" {
 pattern 
 	{ "device",            "eip_port"     }
@@ -287,53 +371,8 @@ pattern
 	{ "SR03C-VA-VFAST-01", "SR03I-VA-IMG-03", "VLVCC_01_FINS", "VLVCC_01_EIP", "8",      "08", "0",  "500",           "21000",      "21500",      "22000",      "22500",      "23000",      "23500",      "3000",          "0"       }
 }
 
-file "$(TERMINALSERVER)/db/TerminalServer16.template" {
+file "$(DLSPLC)/db/NX102_readBool.template" {
 pattern 
-	{ "name",   "P",                 "R" }
-	{ "TSERV1", "SR03C-VA-TSERV-01", ""  }
-	{ "TSERV2", "SR03C-VA-TSERV-02", ""  }
-}
-
-file "$(TERMINALSERVER)/db/Moxa.template" {
-pattern 
-	{ "name",       "P",                 "R", "HOST"         }
-	{ "TSERV1_top", "SR03C-VA-TSERV-01", "",  "192.168.3.11" }
-	{ "TSERV2_top", "SR03C-VA-TSERV-02", "",  "192.168.3.12" }
-}
-
-file "$(TERMINALSERVER)/db/MoxaChannel.template" {
-pattern 
-	{ "name",      "P",                 "R", "CHAN", "HOST"         }
-	{ "TSERV1_1",  "SR03C-VA-TSERV-01", "",  "1",    "192.168.3.11" }
-	{ "TSERV1_2",  "SR03C-VA-TSERV-01", "",  "2",    "192.168.3.11" }
-	{ "TSERV1_3",  "SR03C-VA-TSERV-01", "",  "3",    "192.168.3.11" }
-	{ "TSERV1_4",  "SR03C-VA-TSERV-01", "",  "4",    "192.168.3.11" }
-	{ "TSERV1_5",  "SR03C-VA-TSERV-01", "",  "5",    "192.168.3.11" }
-	{ "TSERV1_6",  "SR03C-VA-TSERV-01", "",  "6",    "192.168.3.11" }
-	{ "TSERV1_7",  "SR03C-VA-TSERV-01", "",  "7",    "192.168.3.11" }
-	{ "TSERV1_8",  "SR03C-VA-TSERV-01", "",  "8",    "192.168.3.11" }
-	{ "TSERV1_9",  "SR03C-VA-TSERV-01", "",  "9",    "192.168.3.11" }
-	{ "TSERV1_10", "SR03C-VA-TSERV-01", "",  "10",   "192.168.3.11" }
-	{ "TSERV1_11", "SR03C-VA-TSERV-01", "",  "11",   "192.168.3.11" }
-	{ "TSERV1_12", "SR03C-VA-TSERV-01", "",  "12",   "192.168.3.11" }
-	{ "TSERV1_13", "SR03C-VA-TSERV-01", "",  "13",   "192.168.3.11" }
-	{ "TSERV1_14", "SR03C-VA-TSERV-01", "",  "14",   "192.168.3.11" }
-	{ "TSERV1_15", "SR03C-VA-TSERV-01", "",  "15",   "192.168.3.11" }
-	{ "TSERV1_16", "SR03C-VA-TSERV-01", "",  "16",   "192.168.3.11" }
-	{ "TSERV2_1",  "SR03C-VA-TSERV-02", "",  "1",    "192.168.3.12" }
-	{ "TSERV2_2",  "SR03C-VA-TSERV-02", "",  "2",    "192.168.3.12" }
-	{ "TSERV2_3",  "SR03C-VA-TSERV-02", "",  "3",    "192.168.3.12" }
-	{ "TSERV2_4",  "SR03C-VA-TSERV-02", "",  "4",    "192.168.3.12" }
-	{ "TSERV2_5",  "SR03C-VA-TSERV-02", "",  "5",    "192.168.3.12" }
-	{ "TSERV2_6",  "SR03C-VA-TSERV-02", "",  "6",    "192.168.3.12" }
-	{ "TSERV2_7",  "SR03C-VA-TSERV-02", "",  "7",    "192.168.3.12" }
-	{ "TSERV2_8",  "SR03C-VA-TSERV-02", "",  "8",    "192.168.3.12" }
-	{ "TSERV2_9",  "SR03C-VA-TSERV-02", "",  "9",    "192.168.3.12" }
-	{ "TSERV2_10", "SR03C-VA-TSERV-02", "",  "10",   "192.168.3.12" }
-	{ "TSERV2_11", "SR03C-VA-TSERV-02", "",  "11",   "192.168.3.12" }
-	{ "TSERV2_12", "SR03C-VA-TSERV-02", "",  "12",   "192.168.3.12" }
-	{ "TSERV2_13", "SR03C-VA-TSERV-02", "",  "13",   "192.168.3.12" }
-	{ "TSERV2_14", "SR03C-VA-TSERV-02", "",  "14",   "192.168.3.12" }
-	{ "TSERV2_15", "SR03C-VA-TSERV-02", "",  "15",   "192.168.3.12" }
-	{ "TSERV2_16", "SR03C-VA-TSERV-02", "",  "16",   "192.168.3.12" }
+	{ "type",                  "entity_enabled", "device",                        "port",         "tag",          "desc", "scan",     "onam", "znam", "name" }
+	{ "dlsPLC.NX102_readBool", "True",           "SR03C-VA-VLVCC-01:SWITCH:STAT", "VLVCC_01_EIP", "switch_power", "",     "1 second", "On",   "Off",  ""     }
 }

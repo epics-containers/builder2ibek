@@ -15,26 +15,14 @@ entities:
     value: /epics/runtime/protocol/
 
   - type: devIocStats.iocAdminSoft
-    IOC: '{{ ioc_name | upper }}'
-
-  - type: epics.EpicsEnvSet
-    name: EPICS_CA_AUTO_ADDR_LIST
-    value: NO
-
-  - type: epics.EpicsEnvSet
-    name: EPICS_CA_ADDR_LIST
-    value: 172.23.207.255
-
-  - type: epics.EpicsEnvSet
-    name: EPICS_CAS_AUTO_BEACON_ADDR_LIST
-    value: NO
-
-  - type: epics.EpicsEnvSet
-    name: EPICS_CAS_BEACON_ADDR_LIST
-    value: 172.23.194.105
+    IOC: "{{ ioc_name | upper }}"
 
   - type: autosave.Autosave
-    P: 'SR03C-VA-IOC-01:'
+    P: "SR03C-VA-IOC-01:"
+
+  - type: asyn.AsynIP
+    name: GCTLR_SS_01_PORT
+    port: 192.168.3.11:7001
 
   - type: asyn.AsynIP
     name: GCTLR_A_01_PORT
@@ -59,6 +47,10 @@ entities:
   - type: asyn.AsynIP
     name: RGA_PC_01_PORT
     port: 192.168.3.12:7001
+
+  - type: asyn.AsynIP
+    name: GCTLR_KS_01_PORT
+    port: 192.168.3.12:7002
 
   - type: asyn.AsynIP
     name: GCTLR_A_02_PORT
@@ -101,186 +93,59 @@ entities:
     ip: 192.168.3.10
     port: VLVCC_01_EIP
 
-  - type: dlsPLC.NX102_readReal
-    device: SR03S-VA-GAUGE-01:RAW
-    port: VLVCC_01_EIP
-    tag: SR03S_VC1_GCTLR_01_COMB_A_C1_Comb_mBar
+  - type: SR-VA.common
+    dom: SR03C
+    serverip: 172.23.194.157 172.23.194.216 172.23.194.105
 
-  - type: dlsPLC.NX102_readReal
-    device: SR03S-VA-GAUGE-02:RAW
-    port: VLVCC_01_EIP
-    tag: SR03S_VC1_GCTLR_01_COMB_B_C2_Comb_mBar
-
-  - type: dlsPLC.NX102_readReal
-    device: SR03A-VA-GAUGE-01:RAW
-    port: VLVCC_01_EIP
-    tag: SR03A_VC1_GCTLR_01_COMB_A_C1_Comb_mBar
-
-  - type: dlsPLC.NX102_readReal
-    device: SR03A-VA-GAUGE-02:RAW
-    port: VLVCC_01_EIP
-    tag: SR03A_VC1_GCTLR_01_COMB_B_C2_Comb_mBar
-
-  - type: dlsPLC.NX102_readReal
-    device: SR03A-VA-GAUGE-03:RAW
-    port: VLVCC_01_EIP
-    tag: SR03A_VC2_GCTLR_02_COMB_B_C2_Comb_mBar
-
-  - type: dlsPLC.NX102_readReal
-    device: SR03A-VA-GAUGE-31:RAW
-    port: VLVCC_01_EIP
-    tag: SR03A_VC2_GCTLR_03_COMB_A_C1_Comb_mBar
-
-  - type: dlsPLC.NX102_readReal
-    device: SR03A-VA-GAUGE-04:RAW
-    port: VLVCC_01_EIP
-    tag: SR03A_VC2_GCTLR_03_COMB_B_C2_Comb_mBar
-
-  - type: mks937a.mks937a
-    device: SR03S-VA-GCTLR-01
-    name: GCTLR_S_01
-    port: GCTLR_S_01_PORT
-
-  - type: mks937a.mks937a
-    device: SR03A-VA-GCTLR-01
-    name: GCTLR_A_01
-    port: GCTLR_A_01_PORT
-
-  - type: mks937a.mks937a
-    device: SR03A-VA-GCTLR-02
-    name: GCTLR_A_02
-    port: GCTLR_A_02_PORT
-
-  - type: mks937a.mks937a
-    device: SR03A-VA-GCTLR-03
-    name: GCTLR_A_03
-    port: GCTLR_A_03_PORT
-
-  - type: mks937a.mks937aGaugeEGU
+  - type: SR-VA.gaugeSetA
     dom: SR03S
-    id: 1
-    input: SR03S-VA-GAUGE-01:RAW
-    name: GAUGE_S_01
+    gc_no: "01"
+    id_a: "01"
+    id_b: "02"
+    q: S
 
-  - type: mks937a.mks937aGaugeEGU
-    dom: SR03S
-    id: 2
-    input: SR03S-VA-GAUGE-02:RAW
-    name: GAUGE_S_02
-
-  - type: mks937a.mks937aGaugeEGU
+  - type: SR-VA.gaugeSetA
     dom: SR03A
-    id: 1
-    input: SR03A-VA-GAUGE-01:RAW
-    name: GAUGE_A_01
+    gc_no: "01"
+    id_a: "01"
+    id_b: "02"
+    q: A
+
+  - type: SR-VA.gaugeSetA
+    dom: SR03A
+    gc_no: "02"
+    id_a: "71"
+    id_b: "03"
+    q: A
+
+  - type: SR-VA.gaugeSetA
+    dom: SR03A
+    gc_no: "03"
+    id_a: "31"
+    id_b: "04"
+    q: A
+
+  - type: dlsPLC.NX102_readReal
+    device: SR03I-VA-GCTLR-02:C1_RAW
+    port: VLVCC_01_EIP
+    tag: GCTLR_I_02.Comb[1]
+
+  - type: dlsPLC.NX102_readReal
+    device: SR03I-VA-GCTLR-02:C2_RAW
+    port: VLVCC_01_EIP
+    tag: GCTLR_I_02.Comb[2]
 
   - type: mks937a.mks937aGaugeEGU
-    dom: SR03A
-    id: 2
-    input: SR03A-VA-GAUGE-02:RAW
-    name: GAUGE_A_02
+    dom: SR03I
+    id: "02"
+    input: SR03I-VA-GCTLR-02:C1_RAW
+    name: GAUGE_I_02
 
   - type: mks937a.mks937aGaugeEGU
-    dom: SR03A
-    id: 3
-    input: SR03A-VA-GAUGE-03:RAW
-    name: GAUGE_A_03
-
-  - type: mks937a.mks937aGaugeEGU
-    dom: SR03A
-    id: 4
-    input: SR03A-VA-GAUGE-04:RAW
-    name: GAUGE_A_04
-
-  - type: mks937a.mks937aGaugeEGU
-    dom: SR03A
-    id: 31
-    input: SR03A-VA-GAUGE-31:RAW
-    name: GAUGE_A_31
-
-  - type: mks937a.mks937aImg
-    GCTLR: GCTLR_S_01
-    channel: 1
-    device: SR03S-VA-IMG-01
-    ilk_write_access_pv: SR03S-VA-GAUGE-01:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aImg
-    GCTLR: GCTLR_S_01
-    channel: 2
-    device: SR03S-VA-IMG-02
-    ilk_write_access_pv: SR03S-VA-GAUGE-02:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aImg
-    GCTLR: GCTLR_A_01
-    channel: 1
-    device: SR03A-VA-IMG-01
-    ilk_write_access_pv: SR03A-VA-GAUGE-01:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aImg
-    GCTLR: GCTLR_A_01
-    channel: 2
-    device: SR03A-VA-IMG-02
-    ilk_write_access_pv: SR03A-VA-GAUGE-02:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aImg
-    GCTLR: GCTLR_A_02
-    channel: 2
-    device: SR03A-VA-IMG-03
-    ilk_write_access_pv: SR03A-VA-GAUGE-03:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aImg
-    GCTLR: GCTLR_A_03
-    channel: 2
-    device: SR03A-VA-IMG-04
-    ilk_write_access_pv: SR03A-VA-GAUGE-04:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aImg
-    GCTLR: GCTLR_A_03
-    channel: 1
-    device: SR03A-VA-IMG-31
-    ilk_write_access_pv: SR03A-VA-GAUGE-31:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aPirg
-    GCTLR: GCTLR_S_01
-    channel: 4
-    device: SR03S-VA-PIRG-01
-    ilk_write_access_pv: SR03S-VA-GAUGE-01:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aPirg
-    GCTLR: GCTLR_S_01
-    channel: 5
-    device: SR03S-VA-PIRG-02
-    ilk_write_access_pv: SR03S-VA-GAUGE-02:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aPirg
-    GCTLR: GCTLR_A_01
-    channel: 4
-    device: SR03A-VA-PIRG-01
-    ilk_write_access_pv: SR03A-VA-GAUGE-01:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aPirg
-    GCTLR: GCTLR_A_01
-    channel: 5
-    device: SR03A-VA-PIRG-02
-    ilk_write_access_pv: SR03A-VA-GAUGE-02:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aPirg
-    GCTLR: GCTLR_A_02
-    channel: 5
-    device: SR03A-VA-PIRG-03
-    ilk_write_access_pv: SR03A-VA-GAUGE-03:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aPirg
-    GCTLR: GCTLR_A_03
-    channel: 5
-    device: SR03A-VA-PIRG-04
-    ilk_write_access_pv: SR03A-VA-GAUGE-04:ILKSETSP:NOWRITE
-
-  - type: mks937a.mks937aPirg
-    GCTLR: GCTLR_A_03
-    channel: 4
-    device: SR03A-VA-PIRG-31
-    ilk_write_access_pv: SR03A-VA-GAUGE-31:ILKSETSP:NOWRITE
+    dom: SR03I
+    id: "03"
+    input: SR03I-VA-GCTLR-02:C2_RAW
+    name: GAUGE_I_03
 
   - type: digitelMpc.digitelMpc
     device: SR03S-VA-MPC-01
@@ -342,10 +207,10 @@ entities:
     device: SR03S-VA-IONP-03
     pump: 2
     size: 300
-    sp1off: 2e-08
-    sp1on: 1e-08
-    sp2off: 2e-08
-    sp2on: 1e-08
+    sp1off: 2e-8
+    sp1on: 1e-8
+    sp2off: 2e-8
+    sp2on: 1e-8
 
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_01
@@ -392,10 +257,10 @@ entities:
     device: SR03A-VA-IONP-05
     pump: 1
     size: 500
-    sp1off: 2e-08
-    sp1on: 1e-08
-    sp2off: 2e-08
-    sp2on: 1e-08
+    sp1off: 2e-8
+    sp1on: 1e-8
+    sp2off: 2e-8
+    sp2on: 1e-8
 
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_03
@@ -462,10 +327,10 @@ entities:
     device: SR03A-VA-IONP-12
     pump: 2
     size: 500
-    sp1off: 2e-08
-    sp1on: 1e-08
-    sp2off: 2e-08
-    sp2on: 1e-08
+    sp1off: 2e-8
+    sp1on: 1e-8
+    sp2off: 2e-8
+    sp2on: 1e-8
 
   - type: digitelMpc.digitelMpcIonp
     MPC: MPC_A_07
@@ -502,10 +367,10 @@ entities:
     device: SR03A-VA-IONP-16
     pump: 2
     size: 300
-    sp1off: 2e-08
-    sp1on: 1e-08
-    sp2off: 2e-08
-    sp2on: 1e-08
+    sp1off: 2e-8
+    sp1on: 1e-8
+    sp2off: 2e-8
+    sp2on: 1e-8
 
   - type: dlsPLC.NX102_vacValveDebounce
     ILKNUM: 1
@@ -869,105 +734,6 @@ entities:
     img9: SR03I-VA-IMG-03
     nimgs: 9
 
-  - type: dlsPLC.NX102_digitalIn
-    device: SR03C-VA-VLVCC-01:DIGITAL01
-    port: VLVCC_01_EIP
-    tagidx: 1
-
-  - type: dlsPLC.NX102_digitalIn
-    device: SR03C-VA-VLVCC-01:DIGITAL02
-    port: VLVCC_01_EIP
-    tagidx: 2
-
-  - type: userIO.bi
-    DESC: Rack 01 Fan Status
-    DTYP: Soft Channel
-    INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B0 CP
-    ONAM: HEALTHY
-    OSV: NO_ALARM
-    P: SR03C-VA-FANC-01
-    R: :STA
-    SCAN: Passive
-    ZNAM: FAIL
-    ZSV: MAJOR
-    archiver_rate: 3600 Monitor
-
-  - type: userIO.bi
-    DESC: Rack 02 Fan Status
-    DTYP: Soft Channel
-    INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B1 CP
-    ONAM: HEALTHY
-    OSV: NO_ALARM
-    P: SR03C-VA-FANC-02
-    R: :STA
-    SCAN: Passive
-    ZNAM: FAIL
-    ZSV: MAJOR
-    archiver_rate: 3600 Monitor
-
-  - type: userIO.bi
-    DESC: Rack 03 Fan Status
-    DTYP: Soft Channel
-    INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B2 CP
-    ONAM: HEALTHY
-    OSV: NO_ALARM
-    P: SR03C-VA-FANC-03
-    R: :STA
-    SCAN: Passive
-    ZNAM: FAIL
-    ZSV: MAJOR
-    archiver_rate: 3600 Monitor
-
-  - type: userIO.bi
-    DESC: Rack 01 Duplex PSU Status
-    DTYP: Soft Channel
-    INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B3 CP
-    ONAM: HEALTHY
-    OSV: NO_ALARM
-    P: SR03C-VA-PSU-01
-    R: :STA
-    SCAN: Passive
-    ZNAM: FAIL
-    ZSV: MAJOR
-    archiver_rate: 3600 Monitor
-
-  - type: userIO.bi
-    DESC: Rack 02 Duplex PSU Status
-    DTYP: Soft Channel
-    INP: SR03C-VA-VLVCC-01:DIGITAL01:RAWBIT.B4 CP
-    ONAM: HEALTHY
-    OSV: NO_ALARM
-    P: SR03C-VA-PSU-02
-    R: :STA
-    SCAN: Passive
-    ZNAM: FAIL
-    ZSV: MAJOR
-    archiver_rate: 3600 Monitor
-
-  - type: dlsPLC.NX102_powerSupply
-    device: SR03C-VA-PSU-01:1
-    port: VLVCC_01_EIP
-    tagidx: 1
-
-  - type: dlsPLC.NX102_powerSupply
-    device: SR03C-VA-PSU-01:2
-    port: VLVCC_01_EIP
-    tagidx: 2
-
-  - type: dlsPLC.NX102_powerSupply
-    device: SR03C-VA-PSU-02:1
-    port: VLVCC_01_EIP
-    tagidx: 3
-
-  - type: dlsPLC.NX102_powerSupply
-    device: SR03C-VA-PSU-02:2
-    port: VLVCC_01_EIP
-    tagidx: 4
-
-  - type: dlsPLC.NX102_IRVacuum
-    P: SR03A-VA-VALVE-01
-    port: VLVCC_01_EIP
-
   - type: dlsPLC.fastVacuumMaster
     dom: SR03C
     eip_port: VLVCC_01_EIP
@@ -975,53 +741,46 @@ entities:
     name: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '01'
+    id: "01"
     img: SR03S-VA-IMG-01
     master: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '02'
+    id: "02"
     img: SR03S-VA-IMG-02
     master: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '03'
+    id: "03"
     img: SR03A-VA-IMG-01
     master: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '04'
+    id: "04"
     img: SR03A-VA-IMG-02
     master: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '05'
+    id: "05"
     img: SR03A-VA-IMG-03
     master: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '06'
+    id: "06"
     img: SR03A-VA-IMG-04
     master: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '07'
+    id: "07"
     img: SR03I-VA-IMG-02
     master: FV.MASTER
 
   - type: dlsPLC.fastVacuumChannel
-    id: '08'
+    id: "08"
     img: SR03I-VA-IMG-03
     master: FV.MASTER
 
-  - type: terminalServer.Moxa16
-    HOST: 192.168.3.11
-    NCHANS: 16
-    P: SR03C-VA-TSERV-01
-    name: TSERV1
-
-  - type: terminalServer.Moxa16
-    HOST: 192.168.3.12
-    NCHANS: 16
-    P: SR03C-VA-TSERV-02
-    name: TSERV2
+  - type: dlsPLC.NX102_readBool
+    device: SR03C-VA-VLVCC-01:SWITCH:STAT
+    port: VLVCC_01_EIP
+    tag: switch_power
