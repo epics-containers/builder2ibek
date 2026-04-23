@@ -87,6 +87,12 @@ def db_compare(
     remove_duplicates: bool = typer.Option(
         False, help="Remove duplicate records in the original DB"
     ),
+    skip_known: bool = typer.Option(
+        True,
+        "--skip-known/--no-skip-known",
+        help="Ignore record differences known to come from the devIocStats "
+        "upgrade (common to all ibek conversions)",
+    ),
     output: Path | None = typer.Option(None, help="Output file"),
 ):
     """
@@ -98,6 +104,7 @@ def db_compare(
         new,
         ignore=ignore,
         remove_duplicates=remove_duplicates,
+        skip_known=skip_known,
         output=output,
     )
 
