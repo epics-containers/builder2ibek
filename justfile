@@ -8,6 +8,15 @@ gh-auth:
     gh auth status
 
 
+# Authenticate glab CLI with a GitLab PAT (token not stored in shell history). --git-protocol https prevents glab's SSH insteadOf rewrite.
+glab-auth hostname="gitlab.diamond.ac.uk":
+    #!/bin/bash
+    read -sp "GitLab PAT for {{ hostname }}: " t && echo
+    echo "$t" | glab auth login --stdin --hostname {{ hostname }} --git-protocol https
+    unset t
+    glab auth status
+
+
 # Start Claude Code in sandbox mode (uses container-local SSH agent only)
 claude:
     SSH_AUTH_SOCK= IS_SANDBOX=1 claude --dangerously-skip-permissions --chrome

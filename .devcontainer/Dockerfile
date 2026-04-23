@@ -19,6 +19,13 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
     apt-get update && apt-get install -y gh && \
     rm -rf /var/lib/apt/lists/*
 
+# Install glab (GitLab CLI) — no apt repo, use the release tarball from gitlab.com
+ARG GLAB_VERSION=1.92.1
+RUN curl -fsSL "https://gitlab.com/gitlab-org/cli/-/releases/v${GLAB_VERSION}/downloads/glab_${GLAB_VERSION}_linux_amd64.tar.gz" \
+      | tar -xz -C /tmp bin/glab && \
+    install -m 0755 /tmp/bin/glab /usr/local/bin/glab && \
+    rm -rf /tmp/bin
+
 FROM base as developer
 
 WORKDIR /workspace

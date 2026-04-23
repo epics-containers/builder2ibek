@@ -78,3 +78,4 @@ lockfiles/
 .claude/commands/ioc-convert/last-services-repo
 .claude/commands/ioc-check/last-services-repo
 DONE
+.claude/scheduled_tasks.lock
