@@ -20,3 +20,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         "mks937bCap",
     ):
         entity.remove("name")
+
+    # mks937bGauge.id and mks937b.address are type: int in the support YAML,
+    # but XML encodes them zero-padded ("02", "001") which the generic
+    # converter preserves. Coerce to int; the support YAML re-pads with Jinja
+    # (`{{ '%02d' % id }}`, `{{ '%03d' % address }}`) when rendering.
+    if entity_type == "mks937bGauge" and entity.id is not None:
+        entity.id = int(entity.id)
+    if entity_type == "mks937b" and entity.address is not None:
+        entity.address = int(entity.address)

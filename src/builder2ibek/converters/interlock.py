@@ -20,6 +20,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.type = "dlsPLC.interlock"
         entity.remove("name")
         hex_to_int(entity, "ilk")
+        # addr is type: int in the support YAML; XML can encode it zero-padded
+        # ("07"), which the generic converter preserves as a string. Coerce.
+        if entity.addr is not None:
+            entity.addr = int(entity.addr)
 
     if entity_type == "overrideRequestMain":
         entity.type = "dlsPLC.overrideRequestMain"
