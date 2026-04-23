@@ -7,7 +7,7 @@ epicsEnvSet STREAM_PROTOCOL_PATH /epics/runtime/protocol/
 epicsEnvSet EPICS_CA_AUTO_ADDR_LIST NO
 epicsEnvSet EPICS_CA_ADDR_LIST 172.23.207.255
 epicsEnvSet EPICS_CAS_AUTO_BEACON_ADDR_LIST NO
-epicsEnvSet EPICS_CAS_BEACON_ADDR_LIST 172.23.194.105
+epicsEnvSet EPICS_CAS_BEACON_ADDR_LIST 172.23.194.157 172.23.194.216 172.23.194.105
 
 dbLoadDatabase dbd/ioc.dbd
 ioc_registerRecordDeviceDriver pdbbase
@@ -26,12 +26,14 @@ set_pass0_restoreFile autosave_positions.sav
 set_pass1_restoreFile autosave_settings.sav
 
 # drvAsynIPPortConfigure(name, port, priority, noAutoConnect, noProcessEos)
+drvAsynIPPortConfigure(GCTLR_SS_01_PORT, 192.168.3.11:7001, 100, 0, 0)
 drvAsynIPPortConfigure(GCTLR_A_01_PORT, 192.168.3.11:7002, 100, 0, 0)
 drvAsynIPPortConfigure(GCTLR_S_01_PORT, 192.168.3.11:7003, 100, 0, 0)
 drvAsynIPPortConfigure(MPC_S_01_PORT, 192.168.3.11:7004, 100, 0, 0)
 drvAsynIPPortConfigure(MPC_A_01_PORT, 192.168.3.11:7005, 100, 0, 0)
 drvAsynIPPortConfigure(MPC_A_02_PORT, 192.168.3.11:7006, 100, 0, 0)
 drvAsynIPPortConfigure(RGA_PC_01_PORT, 192.168.3.12:7001, 100, 0, 0)
+drvAsynIPPortConfigure(GCTLR_KS_01_PORT, 192.168.3.12:7002, 100, 0, 0)
 drvAsynIPPortConfigure(GCTLR_A_02_PORT, 192.168.3.12:7003, 100, 0, 0)
 drvAsynIPPortConfigure(GCTLR_A_03_PORT, 192.168.3.12:7004, 100, 0, 0)
 drvAsynIPPortConfigure(MPC_A_03_PORT, 192.168.3.12:7005, 100, 0, 0)
@@ -48,6 +50,9 @@ finsUDPInit("VLVCC_01_FINS", "192.168.3.10")
 drvEtherIP_init()
 # Define EtherIP to PLC connection
 drvEtherIP_define_PLC("VLVCC_01_EIP", "192.168.3.10", 0)
+asSetFilename $(PVLOGGING)/src/access.acf
+set_logging_enable 1
+set_max_array_length 10
 
 dbLoadRecords /ioc.db
 iocInit
