@@ -137,15 +137,13 @@ entities:
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03I
-    id: '02'
+    id: 2
     input: SR03I-VA-GCTLR-02:C1_RAW
-    name: GAUGE_I_02
 
   - type: mks937a.mks937aGaugeEGU
     dom: SR03I
-    id: '03'
+    id: 3
     input: SR03I-VA-GCTLR-02:C2_RAW
-    name: GAUGE_I_03
 
   - type: digitelMpc.digitelMpc
     device: SR03S-VA-MPC-01

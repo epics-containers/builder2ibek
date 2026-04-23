@@ -157,17 +157,17 @@ pattern
 
 file "$(MKS937A)/db/mks937aGauge.template" {
 pattern 
-	{ "dom",   "id", "c", "s", "name",       "aitype",       "aiinp"                          }
-	{ "SR03S", "01", "",  "",  "GAUGE_S_01", "Soft Channel", "SR03S-VA-GAUGE-01:PLOG_CALC CP" }
-	{ "SR03S", "02", "",  "",  "GAUGE_S_02", "Soft Channel", "SR03S-VA-GAUGE-02:PLOG_CALC CP" }
-	{ "SR03A", "01", "",  "",  "GAUGE_A_01", "Soft Channel", "SR03A-VA-GAUGE-01:PLOG_CALC CP" }
-	{ "SR03A", "02", "",  "",  "GAUGE_A_02", "Soft Channel", "SR03A-VA-GAUGE-02:PLOG_CALC CP" }
-	{ "SR03A", "71", "",  "",  "GAUGE_A_71", "Soft Channel", "SR03A-VA-GAUGE-71:PLOG_CALC CP" }
-	{ "SR03A", "03", "",  "",  "GAUGE_A_03", "Soft Channel", "SR03A-VA-GAUGE-03:PLOG_CALC CP" }
-	{ "SR03A", "31", "",  "",  "GAUGE_A_31", "Soft Channel", "SR03A-VA-GAUGE-31:PLOG_CALC CP" }
-	{ "SR03A", "04", "",  "",  "GAUGE_A_04", "Soft Channel", "SR03A-VA-GAUGE-04:PLOG_CALC CP" }
-	{ "SR03I", "02", "",  "",  "GAUGE_I_02", "Soft Channel", "SR03I-VA-GAUGE-02:PLOG_CALC CP" }
-	{ "SR03I", "03", "",  "",  "GAUGE_I_03", "Soft Channel", "SR03I-VA-GAUGE-03:PLOG_CALC CP" }
+	{ "dom",   "id", "c", "s", "aitype",       "aiinp"                          }
+	{ "SR03S", "01", "",  "",  "Soft Channel", "SR03S-VA-GAUGE-01:PLOG_CALC CP" }
+	{ "SR03S", "02", "",  "",  "Soft Channel", "SR03S-VA-GAUGE-02:PLOG_CALC CP" }
+	{ "SR03A", "01", "",  "",  "Soft Channel", "SR03A-VA-GAUGE-01:PLOG_CALC CP" }
+	{ "SR03A", "02", "",  "",  "Soft Channel", "SR03A-VA-GAUGE-02:PLOG_CALC CP" }
+	{ "SR03A", "71", "",  "",  "Soft Channel", "SR03A-VA-GAUGE-71:PLOG_CALC CP" }
+	{ "SR03A", "03", "",  "",  "Soft Channel", "SR03A-VA-GAUGE-03:PLOG_CALC CP" }
+	{ "SR03A", "31", "",  "",  "Soft Channel", "SR03A-VA-GAUGE-31:PLOG_CALC CP" }
+	{ "SR03A", "04", "",  "",  "Soft Channel", "SR03A-VA-GAUGE-04:PLOG_CALC CP" }
+	{ "SR03I", "02", "",  "",  "Soft Channel", "SR03I-VA-GAUGE-02:PLOG_CALC CP" }
+	{ "SR03I", "03", "",  "",  "Soft Channel", "SR03I-VA-GAUGE-03:PLOG_CALC CP" }
 }
 
 file "$(MKS937A)/db/mks937aPlogEGU.template" {
