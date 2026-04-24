@@ -12,6 +12,7 @@ git config --global --unset-all url.ssh://git@github.com/.insteadOf 2>/dev/null 
 # auth. This keeps the container SSH-key-free (Claude stays sandboxed) while
 # still allowing push/pull on repos whose remotes are set to git@github.com:.
 git config --global url."https://github.com/".insteadOf "git@github.com:"
+git config --global url."https://gitlab.diamond.ac.uk/".insteadOf "git@gitlab.diamond.ac.uk:"
 
 # If gh CLI has cached credentials (survive container rebuild), re-register
 # its git credential helper so HTTPS remotes authenticate automatically.
