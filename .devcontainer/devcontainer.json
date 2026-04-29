@@ -21,6 +21,8 @@
         "VSCODE_GIT_ASKPASS_MAIN": "",
         "VSCODE_GIT_ASKPASS_NODE": "",
         "VSCODE_GIT_ASKPASS_EXTRA_ARGS": "",
+        // Mark this shell as running inside the devcontainer
+        "IN_DEVCONTAINER": "1",
         // Put things that allow it in the persistent cache
         "PRE_COMMIT_HOME": "/cache/pre-commit",
         "UV_CACHE_DIR": "/cache/uv",
@@ -61,8 +63,8 @@
                 "streetsidesoftware.code-spell-checker",
                 "moshfeu.compare-folders",
                 "nsd.vscode-epics",
-                "anthropic.claude-code",
-                "github.copilot-chat"
+                "ms-azuretools.vscode-docker",
+                "anthropic.claude-code"
             ]
         }
     },

@@ -1,3 +1,8 @@
+# Start Claude Code in sandbox mode (no SSH agent, skip permission prompts)
+claude:
+    SSH_AUTH_SOCK= IS_SANDBOX=1 claude --dangerously-skip-permissions
+
+
 # Authenticate gh CLI with a GitHub PAT (token not stored in shell history)
 gh-auth:
     #!/bin/bash
@@ -15,8 +20,3 @@ glab-auth hostname="gitlab.diamond.ac.uk":
     echo "$t" | glab auth login --stdin --hostname {{ hostname }} --git-protocol https
     unset t
     glab auth status
-
-
-# Start Claude Code in sandbox mode (uses container-local SSH agent only)
-claude:
-    SSH_AUTH_SOCK= IS_SANDBOX=1 claude --dangerously-skip-permissions --chrome

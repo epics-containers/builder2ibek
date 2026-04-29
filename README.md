@@ -8,8 +8,9 @@
 A tool suite for converting DLS XMLbuilder IOC projects to
 [epics-containers](https://github.com/epics-containers) ibek.
 
-Source          | <https://github.com/epics-containers/builder2ibek>
+What            | Where
 :---:           | :---:
+Source          | <https://github.com/epics-containers/builder2ibek>
 PyPI            | `pip install builder2ibek`
 Documentation   | <https://epics-containers.github.io/builder2ibek>
 Releases        | <https://github.com/epics-containers/builder2ibek/releases>
