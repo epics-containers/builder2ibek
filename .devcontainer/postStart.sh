@@ -8,9 +8,9 @@ set -euo pipefail
 git config --global credential.helper ''
 git config --global --unset-all url.ssh://git@github.com/.insteadOf 2>/dev/null || true
 
-# Force all GitHub SSH URLs to use HTTPS so the gh credential helper handles
-# auth. This keeps the container SSH-key-free (Claude stays sandboxed) while
-# still allowing push/pull on repos whose remotes are set to git@github.com:.
+# Force all SSH-style remotes to use HTTPS so the gh/glab credential helpers
+# handle auth. This keeps the container SSH-key-free (Claude stays sandboxed)
+# while still allowing push/pull on repos whose remotes are set to git@...:.
 git config --global url."https://github.com/".insteadOf "git@github.com:"
 git config --global url."https://gitlab.diamond.ac.uk/".insteadOf "git@gitlab.diamond.ac.uk:"
 

@@ -8,4 +8,6 @@ curl -fsSL https://claude.ai/install.sh | bash
 uv venv --clear
 uv sync
 pre-commit install --install-hooks
-git submodule update --init
+
+# Initialise git submodules if any are declared
+[ -f .gitmodules ] && git submodule update --init || true
