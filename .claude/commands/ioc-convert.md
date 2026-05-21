@@ -283,7 +283,26 @@ To check what macros a db file expects:
 grep "^# % macro" /dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/<file>.db
 ```
 
-### 5c. Report and suggest commits
+### 5c. Refresh the global schema
+
+The isolated `EPICS_ROOT` from Phase 0 keeps this run's schema separate, but it
+also means the **global** schema at `/epics/ibek-defs/ioc.schema.json` (which
+the editor's yaml-language-server reads — see line 1 of every `ioc.yaml`) is
+unaware of any new support YAMLs created during this run. The result is
+spurious "unknown type" warnings in the IDE on freshly-converted ioc.yaml
+files, even though `ibek runtime generate2` succeeded.
+
+If any support YAMLs were created or modified during this run, refresh the
+global schema so the editor sees the new entity types:
+
+```bash
+EPICS_ROOT=/epics ./update-schema
+```
+
+If no support YAMLs changed (pure ioc.yaml-only conversion), this step can be
+skipped.
+
+### 5d. Report and suggest commits
 
 Once clean, **do not commit anything**. Report to the user:
 
