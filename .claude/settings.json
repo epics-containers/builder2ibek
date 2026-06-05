@@ -41,7 +41,19 @@
             "command": "if [ -z \"$REMOTE_CONTAINERS\" ]; then echo 'BLOCKED: This project requires the devcontainer. Please reopen in the devcontainer before using Claude Code.'; exit 2; fi; if [ -n \"$SSH_AUTH_SOCK\" ]; then echo 'BLOCKED: SSH_AUTH_SOCK is set — agent forwarding must be disabled in the devcontainer.'; exit 2; fi"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/sandbox-check.sh"
+          }
+        ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": ".claude/statusline-command.sh"
   }
 }
