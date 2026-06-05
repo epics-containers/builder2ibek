@@ -117,11 +117,11 @@ entity model — the carrier/vector/ipslot/channel bookkeeping is intricate.
 
 | Old verb (st.cmd) | Entity |
 |---|---|
-| interrupt vector number (`192`, `193`, …) referenced by carriers/cards | `epics.InterruptVectorVME` (`Vec1`, `Vec2`, …) |
+| interrupt vector number (`192`, `193`, …) | one `epics.InterruptVectorVME` (`Vec1`, `Vec2`, …) **per distinct vector number**, in appearance order. Carrier vectors get a reserved `Vec` that **nothing references** (Hy8002 has no `interrupt_vector`) → defs > refs |
 | `Hy8001Configure(card, slot, vec, …, scan, 0, invertin, invertout)` | `ipac.Hy8001` (`slot`, `interrupt_vector`, `scan`, `invertin`/`invertout` bools, `direction`) |
-| `IPACn = ipacEXTAddCarrier(&EXTHy8002, "<slot> 2 <vec>")` | `ipac.Hy8002` (`slot`); `IPACn` is the carrier ref |
-| `DLS8515Configure(card, IPACn, vec, "ty")` / `DLS8516Configure(...)` | `DLS8515.DLS8515` / `DLS8515.DLS8516` (`carrier`, `interrupt_vector`, `ipslot`) |
-| `Hy8401ipConfigure(cardid, IPACn, ipslot, vec, …)` | `Hy8401ip.Hy8401` (`cardid`, `carrier`, `ipslot`, `interrupt_vector`) |
+| `IPACn = ipacEXTAddCarrier(&EXTHy8002, "<slot> <intLevel> <vec>")` | `ipac.Hy8002` (`slot`=first token); `IPACn` is the carrier ref; `<vec>` dropped |
+| `DLS8515Configure(cardid, IPACn, vec, "ty")` / `DLS8516Configure(...)` | `DLS8515.DLS8515` / `.DLS8516` (`carrier`=IPACn, `interrupt_vector`=vec). **`ipslot = cardid − 10·carrier.slot`** (model defines `cardid = 10·slot + ipslot`); `name` = `<carrier.name>Module<ipslot>` |
+| `Hy8401ipConfigure(cardid, IPACn, ipslot, vec, …)` | `Hy8401ip.Hy8401` — `ipslot` is **explicit** (arg 3), equals `cardid − 10·carrier.slot` |
 | `drvAsynSerialPortConfigure("<port>", "/ty/N/M", …)` | `asyn.AsynSerial` (`name`=`<port>`, `port`=`/dev/ttyNM` — deterministic `/ty/N/M`→`/dev/ttyNM` rewrite) |
-| `DLS8515DevConfigure("/ty/N/M", baud, data, stop, parity, …)` | `DLS8515.DLS8515channel` (`card`, `channel`=M); emit `baud`/`data`/`stop`/`parity` **only when non-default** `9600`/`8`/`1`/`N` |
+| `DLS8515DevConfigure("/ty/N/M", baud, data, stop, parity, …)` | `DLS8515.DLS8515channel` (`card`=entity with `cardid`=N, `channel`=M); emit `baud`/`data`/`stop`/`parity` **only when non-default** `9600`/`8`/`1`/`N` |
 | `HostlinkInterposeInit("<port>")` + `finsDEVInit("<name>.Hostlink", "<port>")` | FINS interpose/port entity bound to asyn `<port>` |

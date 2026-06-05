@@ -202,35 +202,46 @@ Then classify the real calls per
 
 These map to **real entities that ibek re-emits** — do **not** drop them, and do
 **not** route serial through a terminal server. The container runs with the
-serial hardware **passed through** as `/dev/tty*` devices. Verify the exact
-parameter names against each module's entity model before emitting (the bookkeeping
-below — interrupt-vector objects, carrier refs, ipslot/channel derivation — is
-intricate; flag anything you cannot map confidently).
+serial hardware **passed through** as `/dev/tty*` devices. The derivations below
+are exact (verified against `tests/samples/bl15i-va-ioc-01.yaml`); the key insight
+is that the entity models compute `cardid = 10·carrier.slot + ipslot`, so the
+reverse direction recovers `ipslot` from the `cardid` in the boot script.
 
-- **IP carriers are kept.** Each VxWorks interrupt vector number (e.g. `192`,
-  `193`, `194`…) becomes an `epics.InterruptVectorVME` entity (named `Vec1`,
-  `Vec2`, …) referenced by the carrier/card entities:
-  - `Hy8001Configure(60, 6, 192, …, scan, 0, invertin, invertout)` →
-    `ipac.Hy8001` (`slot`, `interrupt_vector`, `scan`, `invertin`/`invertout` as
-    bools, `direction`).
-  - `IPACn = ipacEXTAddCarrier(&EXTHy8002, "<slot> 2 <vec>")` → `ipac.Hy8002`
-    (`slot`); the `IPACn` variable is the **carrier** referenced below.
-  - `DLS8515Configure(card, IPACn, vec, "ty")` / `DLS8516Configure(...)` →
-    `DLS8515.DLS8515` / `DLS8515.DLS8516` (`carrier` = the Hy8002 entity,
-    `interrupt_vector`, `ipslot`). Each physical `card` number becomes a distinct
-    module (the known-good names them `<carrier>Module0/1/2/3`).
-  - `Hy8401ipConfigure(cardid, IPACn, ipslot, vec, …)` → `Hy8401ip.Hy8401`.
+- **Carriers.** `IPACn = ipacEXTAddCarrier(&EXTHy8002, "<slot> <intLevel> <vec>")`
+  → `ipac.Hy8002` with `slot` = first token. The `IPACn` variable is the
+  **carrier reference** used by the cards below. (`ipac.Hy8002` has **no**
+  `interrupt_vector` param — its `<vec>` is dropped; see the vector rule.)
+- **IO card.** `Hy8001Configure(cardid, slot, vec, …, scan, 0, invertin, invertout)`
+  → `ipac.Hy8001` (`slot` = arg 2, `interrupt_vector` = the `Vec` for arg 3,
+  `scan`, `invertin`/`invertout` as bools, `direction`).
+- **Serial IP modules.** `DLS8515Configure(cardid, IPACn, vec, "ty")` /
+  `DLS8516Configure(...)` → `DLS8515.DLS8515` / `DLS8515.DLS8516`:
+  - `carrier` = the `ipac.Hy8002` for `IPACn`
+  - **`ipslot = cardid − 10·carrier.slot`** (e.g. card `42`, slot `4` → ipslot `2`)
+  - `name` = `<carrier.name>Module<ipslot>` (e.g. `…Slot4Module2`)
+  - `interrupt_vector` = the `Vec` for `vec`
+- **ADC IP modules.** `Hy8401ipConfigure(cardid, IPACn, ipslot, vec, …)` →
+  `Hy8401ip.Hy8401`: here `ipslot` is **explicit** (arg 3) and equals
+  `cardid − 10·carrier.slot` (use it as a consistency check); remaining args
+  (`intEnable`, `aiType`, `externalClock`, `clockRate`, `inhibit`, `samples`,
+  `spacing`, `triggered`) map positionally.
+- **Interrupt vectors.** Create **one `epics.InterruptVectorVME` per distinct
+  vector number** in the boot script, in order of first appearance → `Vec1`,
+  `Vec2`, …. Each card references the `Vec` whose number matches its original
+  `vec` arg. **The carrier vector still gets a reserved `Vec` entity even though
+  no entity references it** (because `ipac.Hy8002` has no `interrupt_vector`) —
+  this is why the count of `InterruptVectorVME` exceeds the count of references.
 - **Serial ports → `asyn.AsynSerial` with `/dev/tty` passthrough.**
   `drvAsynSerialPortConfigure("ty_40_0", "/ty/40/0", …)` →
-  `asyn.AsynSerial name: ty_40_0  port: /dev/tty400`. The device path is a
-  **deterministic rewrite**: `/ty/<card>/<line>` → `/dev/tty<card><line>` (e.g.
-  `/ty/41/7` → `/dev/tty417`). No host:port, no external info needed.
+  `asyn.AsynSerial name: ty_40_0  port: /dev/tty400`. Deterministic rewrite
+  `/ty/<card>/<line>` → `/dev/tty<card><line>` (e.g. `/ty/41/7` → `/dev/tty417`).
+  No host:port, no external info.
 - **Serial line params → `DLS8515.DLS8515channel`.**
-  `DLS8515DevConfigure("/ty/40/0", baud, data, stop, parity, …)` →
-  `DLS8515.DLS8515channel` with `card` = the DLS8515 module for that card number
-  and `channel` = the line number (last component of `/ty/card/line`). **Emit
-  `baud`/`data`/`stop`/`parity` only when they differ from the defaults**
-  (`9600`/`8`/`1`/`N`) — the known-good omits default-valued fields.
+  `DLS8515DevConfigure("/ty/<cardid>/<line>", baud, data, stop, parity, …)` →
+  `DLS8515.DLS8515channel` with `card` = the `DLS8515`/`DLS8516` entity whose
+  `cardid` matches, `channel` = `<line>`. **Emit `baud`/`data`/`stop`/`parity`
+  only when non-default** (`9600`/`8`/`1`/`N`) — the model's `pre_init` guards
+  each with `{% if … %}` so defaults produce no output.
 - `HostlinkInterposeInit` + `finsDEVInit("<name>.Hostlink", "<port>")` → the FINS
   module's interpose/port entity, bound to the asyn port `<port>`.
 
