@@ -100,4 +100,21 @@ entities or are dropped — never matched against module `pre_init`:
 | `epicsEnvSet "EPICS_TS_MIN_WEST", 0` | covered by `epics.EpicsEnvSet EPICS_TZ` |
 | `save_restoreSet_*`, `set_pass*_restoreFile`, `set_*file_path`, `directoryWait` | one `autosave.Autosave` |
 | `dbpf "<pv>", "<val>"` | runtime puts — usually captured by autosave/db defaults; preserve as `epics.dbpf`/`StartupCommand` only if functionally required |
+| `tyBackspaceSet`, `putenv`, `ld`, `calloc`/`malloc`/`strcpy`/`strcat`, `< file`, bare `VAR = "..."` | IOC-shell / VxWorks housekeeping — drop unless the value feeds a standard entity |
+| `STREAM_PROTOCOL_PATH = calloc(...) … strcat(...)` block | drop entirely — global protocol path handled by the standard `STREAM_PROTOCOL_PATH` env entity (per CLAUDE.md) |
 | other unrecognised but required calls (e.g. `callbackSetQueueSize(N)`) | `epics.StartupCommand` |
+
+---
+
+## VxWorks serial & IP-carrier setup (no soft-IOC equivalent)
+
+These configure **physical hardware** that does not exist in a containerised
+soft IOC. Their container replacement (a terminal server) is **not in the boot
+script** — see the `/ioc-convert-raw` Phase 2c-i handling.
+
+| Old verb (st.cmd) | Action |
+|---|---|
+| `Hy8001Configure`, `ipacEXTAddCarrier(&EXTHy8002,…)`, `DLS8515Configure`, `DLS8516Configure`, `Hy8401ipConfigure` | **drop** — physical IP carrier / ADC cards |
+| `drvAsynSerialPortConfigure("<port>", "/ty/N/M", …)` | physical tty → must become `drvAsynIPPortConfigure("<port>", "<host>:<port>", …)` to a **terminal server**; the address is external — **flag the port for the user**, do not invent |
+| `DLS8515DevConfigure("/ty/N/M", baud, bits, stop, parity, …)` | serial **line params** → asyn port options, joined to the port by the `/ty/N/M` device path |
+| `HostlinkInterposeInit("<port>")` + `finsDEVInit("<name>.Hostlink", "<port>")` | FINS interpose/port entity bound to asyn `<port>` |

@@ -16,8 +16,9 @@ source of truth is the **built artifacts on disk**:
 | Source in `$1` | Yields |
 |---|---|
 | `configure/RELEASE` | module set + versions + **old DLS module names** |
-| `iocBoot/ioc*/st*.src` | driver/config calls (verb + args) + boilerplate |
-| `db/*_expanded.db` (compiled) | record macros (P, R, sizes…) joined to st.cmd by **port name** |
+| `*App/Db/*_expanded.substitutions` (when present) | **device entities** — template→type, `pattern` columns→params (best source; may be absent) |
+| `iocBoot/ioc*/st*.src` | plumbing — asyn ports, serial/IP setup, driver instantiation, boilerplate |
+| `db/*_expanded.db` (compiled) | record macros + **fallback device source** when no substitutions; joined by **port name** |
 
 > **Do not defer to `/ioc-convert` even if a `.xml` reference appears in the
 > RELEASE header.** This command exists to handle IOCs with no XML; an existing
@@ -71,14 +72,26 @@ auto-generated header and `SUPPORT`/`EPICS_BASE` lines. These are the **old DLS
 module names** and pinned versions — keep both; the version disambiguates which
 db/template files to read later.
 
-### 1c. Locate the startup script and compiled db
+### 1c. Locate the startup script, substitutions, and compiled db
 
 - Startup script: `$1/iocBoot/ioc<IOC-PREFIX>/st<IOC-PREFIX>.src`. Use the
   `.src` (the actual command sequence), **not** the `.sh` wrapper.
+- **Expanded substitutions (use if present):**
+  `$1/<IOC-PREFIX>App/Db/<IOC-PREFIX>_expanded.substitutions`. When it exists
+  this is the **best device-entity source** — see Track A in Phase 2. It may be
+  absent (e.g. a hand-written IOC that loads `.db` files directly); fall back to
+  the compiled db in that case.
 - Compiled db: read the `dbLoadRecords` lines at the end of the `.src` — they
   point at `db/<IOC-PREFIX>_expanded.db` (and sometimes `db/<IOC-PREFIX>.db`).
   These compiled files in `$1/db/` are the **authoritative source of record
-  macros** (per CLAUDE.md: macros come from the compiled `.db`, never `.subst`).
+  macros** and the **fallback device source** when no substitutions exist.
+
+> **Substitutions vs the CLAUDE.md `.subst` rule.** CLAUDE.md says "macros come
+> from the compiled `.db`, never `.subst`" — that is about choosing
+> `databases.args` when *authoring a support YAML*. It does **not** forbid using
+> the IOC's own post-msi `_expanded.substitutions` to recover which **entity
+> instances** exist and their macro **values**. Those are different tasks; using
+> the expanded substitutions here is correct.
 
 ### 1d. Derive a terse description
 
@@ -90,58 +103,130 @@ motion"). No full sentences.
 
 ## Phase 2 — Reconstruct entities (main agent)
 
-This is the heart of the command. Work through the `.src` top to bottom.
+This is the heart of the command. Entities come from **two tracks that fuse on
+the asyn port name**:
+
+- **Track A — devices** (gauges, pumps, valves, PLC, temperature…): the records
+  loaded into the IOC. Recover from the **`_expanded.substitutions`** when
+  present (best), else from the **compiled `_expanded.db`**.
+- **Track B — plumbing** (asyn ports, serial/IP setup, interpose/FINS init,
+  driver instantiation): recover from the **st.cmd `.src`**.
+
+A pure camera/driver IOC may have only Track B; a vacuum/temperature/PLC IOC is
+mostly Track A with Track B supplying the ports its devices bind to. Do both,
+then join.
 
 ### 2a. Build the command index
 
 Across **both** support dirs, extract every entity's `pre_init`/`post_init`
-template and the leading function-name token:
+template and the leading function-name token, and note every module's
+`databases:` template filename(s):
 
 ```bash
-grep -rn "pre_init\|post_init" ibek-support*/*/*.ibek.support.yaml
+grep -rn "pre_init\|post_init\|\.template" ibek-support*/*/*.ibek.support.yaml
 ```
 
-For each module the IOC actually uses (from the RELEASE table), read its support
-YAML so you have the full `pre_init` Jinja templates and parameter lists ready.
-**Always check BOTH `ibek-support/` and `ibek-support-dls/`** — a module lives in
-exactly one (no duplicates).
+For each module the IOC uses (from the RELEASE table), read its support YAML so
+you have the full `pre_init` Jinja templates, parameter lists, **and which
+`.template` each entity loads**. **Always check BOTH `ibek-support/` and
+`ibek-support-dls/`** — a module lives in exactly one (no duplicates).
 
-### 2b. Classify and match each st.cmd line
+### 2b. Track A — recover device entities
 
-Tokenize each non-comment, non-blank line into `(verb, args[])`, respecting
-quotes. Then classify per
+**If `_expanded.substitutions` exists (preferred):** each block maps almost 1:1
+to ibek entities:
+
+```
+file $(DIGITELMPC)/db/digitelMpcIonp.template
+pattern { device, port, unit, pump, size, name, ... }
+    { "BL15I-VA-IONP-01", "ty_40_0", "01", "1", "300", "IONP1", ... }   # one entity
+    { "BL15I-VA-IONP-02", "ty_40_0", "01", "2", "300", "IONP2", ... }   # one entity
+```
+
+For each block:
+1. **Template file → entity type.** Find the entity whose `databases:` loads that
+   `.template` (from the 2a index). If a module exposes it only as an `auto_*`
+   entity, the type is `module.auto_<templatebasename>` (see CLAUDE.md `auto_*`
+   rule). If no entity model loads it yet, record the module+template for a
+   support-YAML subagent (Phase 3).
+2. **`pattern { … }` columns → entity parameter names**, one entity per data row,
+   values taken positionally. Drop columns the entity model doesn't declare;
+   keep `port` (the join key to Track B).
+3. Apply the usual `name` rules ([support-yaml-rules.md](../skills/shared/support-yaml-rules.md)).
+
+**If there is no substitutions file:** recover from the compiled `_expanded.db`
+instead — group records by their streamDevice/asyn binding
+(`@<proto> <args> <port>` or `@asyn(<port>,…)`) and by record-name prefix (the
+device `P`), then map each cluster to its module entity via the `.template` it
+came from. This is lossier (macro *names* must come from the module `.template`,
+not the records) — flag any cluster you cannot confidently map.
+
+### 2c. Track B — recover plumbing from the st.cmd
+
+Tokenize each non-comment, non-blank line. **The tokenizer must handle more than
+`verb(args)`:**
+
+- **Assignment form** `VAR = func(args)` (e.g. `IPAC4 = ipacEXTAddCarrier(...)`)
+  — strip the `VAR =`, keep the call; remember `VAR` may be referenced later as
+  an arg.
+- **Bare assignments / shell-isms** `ASPATH = "..."`, `calloc`, `malloc`,
+  `strcpy`, `strcat`, `< file`, `putenv`, `ld`, `tyBackspaceSet` — IOC-shell
+  housekeeping; drop unless they carry a value a standard entity needs.
+- The `STREAM_PROTOCOL_PATH = calloc(...) … strcat(...)` block is the **global
+  protocol path** — drop it entirely (handled by the standard entity in 2d; do
+  **not** add per CLAUDE.md).
+
+Then classify the real calls per
 [module-rename-map.md](../skills/shared/module-rename-map.md):
 
 1. **Boilerplate** (`cd`, `dbLoadDatabase`, `*_registerRecordDeviceDriver`,
    `iocInit`, `save_restore*`, `set_*restoreFile`, `directoryWait`,
-   `epicsEnvSet`) → map to standard entities or drop, per the boilerplate table
-   in module-rename-map.md.
+   `epicsEnvSet`) → standard entities or drop.
 2. **Driver/config calls** → match the verb to a `module.entity`:
-   - **Direct match first**: the verb appears verbatim in exactly one entity's
-     `pre_init`/`post_init`. Use it.
-   - **On a miss**: the verb was renamed in migration. Consult the verb-rename
-     table in module-rename-map.md. Find the old module in the RELEASE table,
-     look up the new module, pick the entity whose `pre_init` has the same
-     **argument shape** (count + quoted-vs-int positions).
-   - **Still unresolved**: resolve manually, then **append the new row to
-     module-rename-map.md** so future runs are deterministic.
+   - **Direct match** in exactly one entity's `pre_init`/`post_init`. Use it.
+   - **On a miss** the verb was renamed — consult the verb-rename table in
+     module-rename-map.md (old module from RELEASE → new module, pick by
+     argument shape).
+   - **Still unresolved** → resolve manually and **append the row** to
+     module-rename-map.md.
+3. **VxWorks serial / IP-carrier setup has no soft-IOC equivalent** — see the
+   dedicated handling below.
 
-### 2c. Reverse the template to recover parameters
+#### 2c-i. VxWorks serial & IP carriers → terminal servers
 
-For each matched entity, align the st.cmd args to the `{{ param }}` slots of its
-`pre_init` template. Watch for **lossy** transforms that cannot be inverted from
-the st.cmd alone:
+Physical-hardware setup that does **not** carry over to a containerised soft
+IOC, and whose container replacement is **not present in the st.cmd**:
+
+- IP carrier / card init: `Hy8001Configure`, `ipacEXTAddCarrier(&EXTHy8002,…)`,
+  `DLS8515Configure`, `DLS8516Configure`, `Hy8401ipConfigure` → **drop** (no
+  physical cards in a container).
+- `drvAsynSerialPortConfigure("ty_40_0", "/ty/40/0", …)` binds an asyn port to a
+  **physical** tty (`/ty/40/0`). In epics-containers the device is reached over a
+  **terminal server**: `drvAsynIPPortConfigure("ty_40_0", "<host>:<port>", …)`.
+  The host:port is **external information not in the boot script** — see
+  [find-boot-script.md](../skills/shared/find-boot-script.md) and CLAUDE.md
+  ("find dependency init calls in real boot scripts"). **Flag every physical
+  serial port for the user** with its current asyn port name so the terminal
+  server address can be supplied; do not invent one.
+- `DLS8515DevConfigure("/ty/40/0", 9600, 8, 1, 'N', 'N')` carries the serial
+  **line parameters** (baud, data bits, stop bits, parity). Attach these as asyn
+  port options to the matching port (join on the `/ty/..` device path → the
+  `drvAsynSerialPortConfigure` port name).
+- `HostlinkInterposeInit` + `finsDEVInit("<name>.Hostlink", "<port>")` → the FINS
+  module's interpose/port entity, bound to the asyn port `<port>`.
+
+### 2c-ii. Reverse `pre_init` templates (Track B params)
+
+For each matched Track B entity, align args to the `{{ param }}` slots of its
+`pre_init`. Watch for **lossy** transforms not invertible from the st.cmd alone:
 
 - `{{ x.split(' : ')[0] }}` — st.cmd holds only the first fragment.
-- `{{ x | int }}` / `%02d` — formatting, leading zeros may be lost.
-- `{% if y %}…{% else %}…{% endif %}` — arg **count** signals which branch
-  fired; recover `y`'s presence from that.
+- `{{ x | int }}` / `%02d` — formatting; leading zeros may be lost.
+- `{% if y %}…{% else %}…{% endif %}` — arg **count** signals which branch fired.
 
-Resolve every lossy or missing parameter by **joining to the compiled
-`_expanded.db` on the shared port name**: the `PORT` string (e.g. `D1.cam`)
-appears in both the config call and the db records, so its `P`, `R`, and sizing
-macros (`XSIZE`, `NELEMENTS`, `HIST_SIZE`, …) come straight from the db. Read the
-module's `.template` (at its RELEASE path) to know which macros each entity needs
+Resolve lossy/missing params by joining to the device source (Track A
+substitutions, or the compiled `_expanded.db`) on the shared **port name**. Read
+the module `.template` at its RELEASE path to know which macros each entity needs
 — see [ibek-concepts](../skills/ibek-concepts/SKILL.md) for `databases.args`.
 
 ### 2d. Inject standard boilerplate entities
@@ -197,9 +282,12 @@ dropped or unmatched entity.
 
 ### 5b. db / ioc.subst equivalence
 
-Compare the records produced by the generated `ioc.subst`/db against the original
-`$1/db/<IOC-PREFIX>_expanded.db`. The record names (PV `P`+`R`) and key macros
-must match. Mismatched or missing records indicate a wrong reversed parameter in
+The strongest check for db-driven IOCs: compare the generated `ioc.subst` (or db)
+against the original device source. If `_expanded.substitutions` existed, diff
+the generated substitutions against it block-for-block — same template files,
+same row count per block, same macro values. Otherwise compare record names
+(PV `P`+`R`) and key macros against `$1/db/<IOC-PREFIX>_expanded.db`.
+Mismatched or missing records indicate a wrong reversed parameter in
 Phase 2c.
 
 ### 5c. Optional XML cross-check
@@ -225,10 +313,15 @@ EPICS_ROOT=/epics ./update-schema
 
 Do **not** commit. Report:
 
-1. **Reconstruction summary** — entities recovered, verbs matched directly vs via
-   rename table, any new rename rows appended to module-rename-map.md.
-2. **Unmatched / lossy items** — st.cmd calls with no entity match, parameters
-   that could not be recovered from the db, anything needing manual review.
-3. **Round-trip results** — st.cmd and db equivalence findings from Phase 5.
-4. **Files changed** and **suggested git commands** (same form as `/ioc-convert`
+1. **Reconstruction summary** — Track A device entities recovered (and from
+   which source: substitutions vs db) and Track B plumbing entities; verbs
+   matched directly vs via the rename table; any new rename rows appended to
+   module-rename-map.md.
+2. **Physical serial ports needing terminal-server addresses** (2c-i) — list
+   each asyn port (e.g. `ty_40_0`) and its old `/ty/..` device path so the user
+   can supply the `host:port`. These are **blockers** for a runnable IOC.
+3. **Unmatched / lossy items** — st.cmd calls or db clusters with no entity
+   match, parameters that could not be recovered, anything needing manual review.
+4. **Round-trip results** — st.cmd and substitutions/db equivalence from Phase 5.
+5. **Files changed** and **suggested git commands** (same form as `/ioc-convert`
    Phase 5d).
