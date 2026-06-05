@@ -22,7 +22,7 @@ source of truth is the **built artifacts on disk**:
 
 > **Do not defer to `/ioc-convert` even if a `.xml` reference appears in the
 > RELEASE header.** This command exists to handle IOCs with no XML; an existing
-> XML is only ever useful as an optional ground-truth cross-check (Phase 6b).
+> XML is only ever useful as an optional ground-truth cross-check (Phase 5c).
 
 This command reuses `/ioc-convert`'s **back half** (support-YAML subagents,
 generate2, fix loop) verbatim — only Phases 1–2 below are new.
@@ -349,9 +349,10 @@ Do **not** commit. Report:
    which source: substitutions vs db) and Track B plumbing entities; verbs
    matched directly vs via the rename table; any new rename rows appended to
    module-rename-map.md.
-2. **Physical serial ports needing terminal-server addresses** (2c-i) — list
-   each asyn port (e.g. `ty_40_0`) and its old `/ty/..` device path so the user
-   can supply the `host:port`. These are **blockers** for a runnable IOC.
+2. **Serial / IP-carrier entities** (2c-i) — confirm each `asyn.AsynSerial`
+   (`/ty/N/M` → `/dev/ttyNM`), `DLS8515channel`, and the `ipac`/`DLS8515`/
+   `Hy8401ip` carrier/card entities were emitted. These run with `/dev/tty`
+   passthrough — **not** a terminal server — so they are **not** blockers.
 3. **Unmatched / lossy items** — st.cmd calls or db clusters with no entity
    match, parameters that could not be recovered, anything needing manual review.
 4. **Round-trip results** — st.cmd and substitutions/db equivalence from Phase 5.
