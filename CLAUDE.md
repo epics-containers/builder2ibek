@@ -58,6 +58,7 @@ uv run pytest
 - `/support-fix` — fix support YAML errors from ibek generate2 output
 - `/ioc-inspect <ioc-name>` — inspect an IOC's XML and support modules
 - `/ioc-convert <xml> [services-repo]` — full conversion workflow with parallel subagents
+- `/ioc-convert-raw <built-ioc-dir> [services-repo]` — convert a raw (non-XMLbuilder) built IOC by reverse-engineering its st.cmd + compiled db
 - `/ioc-check <xml> [services-repo]` — validate a converted IOC's runtime assets
 - `/beamline-convert <beamline> [services-repo]` — convert all builder XML IOCs for a beamline
 - `/beamline-reconvert <beamline> [services-repo]` — re-run xml2yaml on all IOCs and validate schema
