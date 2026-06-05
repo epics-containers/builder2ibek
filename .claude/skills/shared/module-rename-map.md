@@ -106,15 +106,22 @@ entities or are dropped — never matched against module `pre_init`:
 
 ---
 
-## VxWorks serial & IP-carrier setup (no soft-IOC equivalent)
+## VxWorks serial & IP-carrier setup (kept as entities)
 
-These configure **physical hardware** that does not exist in a containerised
-soft IOC. Their container replacement (a terminal server) is **not in the boot
-script** — see the `/ioc-convert-raw` Phase 2c-i handling.
+These configure VxWorks IP-carrier/serial hardware. The conversion **keeps**
+them as real entities and runs the serial hardware **passed through** as
+`/dev/tty*` — there is **no terminal server**. (A `terminalServer`/Moxa module
+exists for devices that are genuinely network-attached, but that is unrelated to
+physical `/ty` serial ports.) Verify parameter names against each module's
+entity model — the carrier/vector/ipslot/channel bookkeeping is intricate.
 
-| Old verb (st.cmd) | Action |
+| Old verb (st.cmd) | Entity |
 |---|---|
-| `Hy8001Configure`, `ipacEXTAddCarrier(&EXTHy8002,…)`, `DLS8515Configure`, `DLS8516Configure`, `Hy8401ipConfigure` | **drop** — physical IP carrier / ADC cards |
-| `drvAsynSerialPortConfigure("<port>", "/ty/N/M", …)` | physical tty → must become `drvAsynIPPortConfigure("<port>", "<host>:<port>", …)` to a **terminal server**; the address is external — **flag the port for the user**, do not invent |
-| `DLS8515DevConfigure("/ty/N/M", baud, bits, stop, parity, …)` | serial **line params** → asyn port options, joined to the port by the `/ty/N/M` device path |
+| interrupt vector number (`192`, `193`, …) referenced by carriers/cards | `epics.InterruptVectorVME` (`Vec1`, `Vec2`, …) |
+| `Hy8001Configure(card, slot, vec, …, scan, 0, invertin, invertout)` | `ipac.Hy8001` (`slot`, `interrupt_vector`, `scan`, `invertin`/`invertout` bools, `direction`) |
+| `IPACn = ipacEXTAddCarrier(&EXTHy8002, "<slot> 2 <vec>")` | `ipac.Hy8002` (`slot`); `IPACn` is the carrier ref |
+| `DLS8515Configure(card, IPACn, vec, "ty")` / `DLS8516Configure(...)` | `DLS8515.DLS8515` / `DLS8515.DLS8516` (`carrier`, `interrupt_vector`, `ipslot`) |
+| `Hy8401ipConfigure(cardid, IPACn, ipslot, vec, …)` | `Hy8401ip.Hy8401` (`cardid`, `carrier`, `ipslot`, `interrupt_vector`) |
+| `drvAsynSerialPortConfigure("<port>", "/ty/N/M", …)` | `asyn.AsynSerial` (`name`=`<port>`, `port`=`/dev/ttyNM` — deterministic `/ty/N/M`→`/dev/ttyNM` rewrite) |
+| `DLS8515DevConfigure("/ty/N/M", baud, data, stop, parity, …)` | `DLS8515.DLS8515channel` (`card`, `channel`=M); emit `baud`/`data`/`stop`/`parity` **only when non-default** `9600`/`8`/`1`/`N` |
 | `HostlinkInterposeInit("<port>")` + `finsDEVInit("<name>.Hostlink", "<port>")` | FINS interpose/port entity bound to asyn `<port>` |

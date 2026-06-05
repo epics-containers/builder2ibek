@@ -192,26 +192,39 @@ Then classify the real calls per
 3. **VxWorks serial / IP-carrier setup has no soft-IOC equivalent** — see the
    dedicated handling below.
 
-#### 2c-i. VxWorks serial & IP carriers → terminal servers
+#### 2c-i. VxWorks serial & IP carriers (kept as entities)
 
-Physical-hardware setup that does **not** carry over to a containerised soft
-IOC, and whose container replacement is **not present in the st.cmd**:
+These map to **real entities that ibek re-emits** — do **not** drop them, and do
+**not** route serial through a terminal server. The container runs with the
+serial hardware **passed through** as `/dev/tty*` devices. Verify the exact
+parameter names against each module's entity model before emitting (the bookkeeping
+below — interrupt-vector objects, carrier refs, ipslot/channel derivation — is
+intricate; flag anything you cannot map confidently).
 
-- IP carrier / card init: `Hy8001Configure`, `ipacEXTAddCarrier(&EXTHy8002,…)`,
-  `DLS8515Configure`, `DLS8516Configure`, `Hy8401ipConfigure` → **drop** (no
-  physical cards in a container).
-- `drvAsynSerialPortConfigure("ty_40_0", "/ty/40/0", …)` binds an asyn port to a
-  **physical** tty (`/ty/40/0`). In epics-containers the device is reached over a
-  **terminal server**: `drvAsynIPPortConfigure("ty_40_0", "<host>:<port>", …)`.
-  The host:port is **external information not in the boot script** — see
-  [find-boot-script.md](../skills/shared/find-boot-script.md) and CLAUDE.md
-  ("find dependency init calls in real boot scripts"). **Flag every physical
-  serial port for the user** with its current asyn port name so the terminal
-  server address can be supplied; do not invent one.
-- `DLS8515DevConfigure("/ty/40/0", 9600, 8, 1, 'N', 'N')` carries the serial
-  **line parameters** (baud, data bits, stop bits, parity). Attach these as asyn
-  port options to the matching port (join on the `/ty/..` device path → the
-  `drvAsynSerialPortConfigure` port name).
+- **IP carriers are kept.** Each VxWorks interrupt vector number (e.g. `192`,
+  `193`, `194`…) becomes an `epics.InterruptVectorVME` entity (named `Vec1`,
+  `Vec2`, …) referenced by the carrier/card entities:
+  - `Hy8001Configure(60, 6, 192, …, scan, 0, invertin, invertout)` →
+    `ipac.Hy8001` (`slot`, `interrupt_vector`, `scan`, `invertin`/`invertout` as
+    bools, `direction`).
+  - `IPACn = ipacEXTAddCarrier(&EXTHy8002, "<slot> 2 <vec>")` → `ipac.Hy8002`
+    (`slot`); the `IPACn` variable is the **carrier** referenced below.
+  - `DLS8515Configure(card, IPACn, vec, "ty")` / `DLS8516Configure(...)` →
+    `DLS8515.DLS8515` / `DLS8515.DLS8516` (`carrier` = the Hy8002 entity,
+    `interrupt_vector`, `ipslot`). Each physical `card` number becomes a distinct
+    module (the known-good names them `<carrier>Module0/1/2/3`).
+  - `Hy8401ipConfigure(cardid, IPACn, ipslot, vec, …)` → `Hy8401ip.Hy8401`.
+- **Serial ports → `asyn.AsynSerial` with `/dev/tty` passthrough.**
+  `drvAsynSerialPortConfigure("ty_40_0", "/ty/40/0", …)` →
+  `asyn.AsynSerial name: ty_40_0  port: /dev/tty400`. The device path is a
+  **deterministic rewrite**: `/ty/<card>/<line>` → `/dev/tty<card><line>` (e.g.
+  `/ty/41/7` → `/dev/tty417`). No host:port, no external info needed.
+- **Serial line params → `DLS8515.DLS8515channel`.**
+  `DLS8515DevConfigure("/ty/40/0", baud, data, stop, parity, …)` →
+  `DLS8515.DLS8515channel` with `card` = the DLS8515 module for that card number
+  and `channel` = the line number (last component of `/ty/card/line`). **Emit
+  `baud`/`data`/`stop`/`parity` only when they differ from the defaults**
+  (`9600`/`8`/`1`/`N`) — the known-good omits default-valued fields.
 - `HostlinkInterposeInit` + `finsDEVInit("<name>.Hostlink", "<port>")` → the FINS
   module's interpose/port entity, bound to the asyn port `<port>`.
 
