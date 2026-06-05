@@ -153,6 +153,12 @@ For each block:
    values taken positionally. Drop columns the entity model doesn't declare;
    keep `port` (the join key to Track B).
 3. Apply the usual `name` rules ([support-yaml-rules.md](../skills/shared/support-yaml-rules.md)).
+   **A missing/empty `name` is acceptable** — `name` is rarely used in the
+   epics-containers world and is only needed as a `type: id` when another entity
+   cross-references this one. If the substitutions `name` column is empty (the
+   id came from an XML object name that a raw IOC does not have), just omit it;
+   only synthesise an id if a later entity actually refers to it. Do **not**
+   report dropped names as a loss.
 
 **If there is no substitutions file:** recover from the compiled `_expanded.db`
 instead — group records by their streamDevice/asyn binding
