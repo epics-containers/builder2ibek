@@ -117,7 +117,7 @@ entity model — the carrier/vector/ipslot/channel bookkeeping is intricate.
 
 | Old verb (st.cmd) | Entity |
 |---|---|
-| interrupt vector number (`192`, `193`, …) | one `epics.InterruptVectorVME` (`Vec1`, `Vec2`, …) **per distinct vector number**, in appearance order. Carrier vectors get a reserved `Vec` that **nothing references** (Hy8002 has no `interrupt_vector`) → defs > refs |
+| interrupt vector (the absolute number **does not matter** — reserved at runtime) | one `epics.InterruptVectorVME` (`Vec1`, `Vec2`, …) per card that takes a vector (`Hy8001`, each `DLS8515`/`DLS8516`, each `Hy8401`), referenced by that card. Don't reverse-map the original numbers or reproduce extra reserved vectors |
 | `Hy8001Configure(card, slot, vec, …, scan, 0, invertin, invertout)` | `ipac.Hy8001` (`slot`, `interrupt_vector`, `scan`, `invertin`/`invertout` bools, `direction`) |
 | `IPACn = ipacEXTAddCarrier(&EXTHy8002, "<slot> <intLevel> <vec>")` | `ipac.Hy8002` (`slot`=first token); `IPACn` is the carrier ref; `<vec>` dropped |
 | `DLS8515Configure(cardid, IPACn, vec, "ty")` / `DLS8516Configure(...)` | `DLS8515.DLS8515` / `.DLS8516` (`carrier`=IPACn, `interrupt_vector`=vec). **`ipslot = cardid − 10·carrier.slot`** (model defines `cardid = 10·slot + ipslot`); `name` = `<carrier.name>Module<ipslot>` |

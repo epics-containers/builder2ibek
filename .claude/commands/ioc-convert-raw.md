@@ -225,12 +225,14 @@ reverse direction recovers `ipslot` from the `cardid` in the boot script.
   `cardid − 10·carrier.slot` (use it as a consistency check); remaining args
   (`intEnable`, `aiType`, `externalClock`, `clockRate`, `inhibit`, `samples`,
   `spacing`, `triggered`) map positionally.
-- **Interrupt vectors.** Create **one `epics.InterruptVectorVME` per distinct
-  vector number** in the boot script, in order of first appearance → `Vec1`,
-  `Vec2`, …. Each card references the `Vec` whose number matches its original
-  `vec` arg. **The carrier vector still gets a reserved `Vec` entity even though
-  no entity references it** (because `ipac.Hy8002` has no `interrupt_vector`) —
-  this is why the count of `InterruptVectorVME` exceeds the count of references.
+- **Interrupt vectors.** The **absolute vector numbers in the boot script do not
+  matter** — `epics.InterruptVectorVME` reserves a vector dynamically at runtime.
+  Just create one `InterruptVectorVME` (`Vec1`, `Vec2`, …) for each card that
+  takes a vector and have the card reference it (`Hy8001` → 1, each `DLS8515`/
+  `DLS8516` → 1, each `Hy8401` → 1). Do not reverse-map the original numbers and
+  do not fuss over reproducing any extra reserved/unreferenced vectors the XML
+  path happened to emit — only the card→vector references are functionally
+  significant.
 - **Serial ports → `asyn.AsynSerial` with `/dev/tty` passthrough.**
   `drvAsynSerialPortConfigure("ty_40_0", "/ty/40/0", …)` →
   `asyn.AsynSerial name: ty_40_0  port: /dev/tty400`. Deterministic rewrite
