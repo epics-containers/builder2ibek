@@ -5,24 +5,9 @@
         "dockerfile": "../Dockerfile",
         "target": "developer"
     },
-    // Tell VS Code the remote user is root so copyGitConfig writes to
-    // /root/.gitconfig (matching $HOME in the shell); otherwise it falls back
-    // to the base image's USER and the copy lands in the wrong home.
-    "remoteUser": "root",
     "remoteEnv": {
         // Allow X11 apps to run inside the container
         "DISPLAY": "${localEnv:DISPLAY}",
-        // Disable SSH agent forwarding — prevents Claude from using host SSH keys
-        "SSH_AUTH_SOCK": "",
-        // Disable VS Code git credential injection — prevents askpass from
-        // relaying host GitHub credentials into the container over the IPC socket
-        "GIT_ASKPASS": "",
-        "VSCODE_GIT_IPC_HANDLE": "",
-        "VSCODE_GIT_ASKPASS_MAIN": "",
-        "VSCODE_GIT_ASKPASS_NODE": "",
-        "VSCODE_GIT_ASKPASS_EXTRA_ARGS": "",
-        // Mark this shell as running inside the devcontainer
-        "IN_DEVCONTAINER": "1",
         // Put things that allow it in the persistent cache
         "PRE_COMMIT_HOME": "/cache/pre-commit",
         "UV_CACHE_DIR": "/cache/uv",
@@ -45,10 +30,7 @@
                 "python.terminal.activateEnvironment": false,
                 // Workaround to prevent garbled python REPL in the terminal
                 // https://github.com/microsoft/vscode-python/issues/25505
-                "python.terminal.shellIntegration.enabled": false,
-                // Only forward explicitly listed ports — auto-detection races with
-                // sphinx-autobuild and steals the port on restart
-                "remote.autoForwardPorts": false
+                "python.terminal.shellIntegration.enabled": false
             },
             // Add the IDs of extensions you want installed when the container is created.
             "extensions": [
@@ -58,22 +40,13 @@
                 "redhat.vscode-yaml",
                 "tamasfe.even-better-toml",
                 "ryanluker.vscode-coverage-gutters",
-                "github.vscode-pull-request-github",
-                "ms-vscode.makefile-tools",
-                "streetsidesoftware.code-spell-checker",
-                "moshfeu.compare-folders",
-                "nsd.vscode-epics",
-                "ms-azuretools.vscode-docker",
-                "anthropic.claude-code"
+                "charliermarsh.ruff",
+                "ms-azuretools.vscode-docker"
             ]
         }
     },
-    // Explicitly forward sphinx-autobuild port (auto-detection disabled above)
-    "forwardPorts": [
-        8000
-    ],
-    // Create host-side dirs needed for bind mounts before the container starts
-    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config ${localEnv:HOME}/.claude",
+    // Create the config folder for the bash-config feature and uv cache
+    "initializeCommand": "mkdir -p ${localEnv:HOME}/.config/terminal-config",
     "runArgs": [
         // Allow the container to access the host X11 display and EPICS CA
         "--net=host",
@@ -117,6 +90,7 @@
     ],
     // Mount the parent as /workspaces so we can pip install peers as editable
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
+    // After the container is created, recreate the venv then make pre-commit first run faster
     "postCreateCommand": ".devcontainer/postCreate.sh",
-    "postStartCommand": ".devcontainer/postStart.sh"
+    "initializeCommand": ".devcontainer/initializeCommand.sh"
 }

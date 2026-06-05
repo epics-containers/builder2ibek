@@ -1,7 +1,6 @@
 # Changes here will be overwritten by Copier
-_commit: 5.0.3-3-gd645eb3
+_commit: 5.1.0
 _src_path: gh:diamondlightsource/python-copier-template
-add_claude: true
 author_email: giles.knap@diamond.ac.uk
 author_name: Giles Knap
 description: Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml
@@ -10,8 +9,6 @@ docker: false
 docs_type: sphinx
 git_platform: github.com
 github_org: epics-containers
-install_gh: true
-install_glab: true
 package_name: builder2ibek
 pypi: true
 repo_name: builder2ibek
