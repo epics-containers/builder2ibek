@@ -17,6 +17,11 @@ class ModuleInfo:
 
 module_infos: dict[str, ModuleInfo] = {}
 
+# optional whole-IOC post-processing hooks. A converter module may define a
+# `finalize(ioc)` function which runs once after every element has been
+# converted, allowing cross-entity fix-ups that need the complete entity list.
+finalizers: list[Callable] = []
+
 
 # automatically load all of the convert handlers in ./converters into the
 # module_infos list using importlib
@@ -25,6 +30,10 @@ for converter in converters:
     if not converter.name.startswith("_"):
         module = import_module(f"builder2ibek.converters.{converter.stem}")
         if module is not None:
+            finalize = getattr(module, "finalize", None)
+            if callable(finalize):
+                finalizers.append(finalize)
+
             xml_component = module.xml_component
             info = ModuleInfo(
                 getattr(module, "handler", lambda *args: None),

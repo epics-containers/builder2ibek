@@ -9,7 +9,7 @@ from typing import Any
 from ruamel.yaml import YAML, CommentedMap
 
 from builder2ibek.builder import Builder, Element
-from builder2ibek.moduleinfos import module_infos
+from builder2ibek.moduleinfos import finalizers, module_infos
 from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
 
@@ -78,7 +78,13 @@ def dispatch(builder: Builder, filename, description: str = "") -> Generic_IOC:
         source_file=filename,
     )
 
-    return do_dispatch(builder, ioc)
+    do_dispatch(builder, ioc)
+
+    # whole-IOC post-processing once every element has been converted
+    for finalize in finalizers:
+        finalize(ioc)
+
+    return ioc
 
 
 def do_dispatch(builder: Builder, ioc: Generic_IOC):
