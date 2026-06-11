@@ -72,14 +72,29 @@ drvAsynSerialPortConfigure("ty_42_0", "/dev/tty420" , 0, 0, 0)
 # serial port settings from DL8515Channel
 asynSetOption("ty_40_0",0,"baud",57600)
 asynSetOption("ty_40_0",0,"bits",7)
+asynSetOption("ty_40_0",0,"parity","even")
 asynSetOption("ty_40_0",0,"stop",2)
+
+asynSetOption("ty_40_5",0,"parity","even")
+
+asynSetOption("ty_40_6",0,"parity","even")
+
+asynSetOption("ty_40_7",0,"parity","even")
 
 asynSetOption("ty_41_0",0,"baud",57600)
 asynSetOption("ty_41_0",0,"bits",7)
+asynSetOption("ty_41_0",0,"parity","even")
 asynSetOption("ty_41_0",0,"stop",2)
+
+asynSetOption("ty_41_4",0,"parity","even")
+
+asynSetOption("ty_41_5",0,"parity","even")
+
+asynSetOption("ty_41_6",0,"parity","even")
 
 asynSetOption("ty_41_7",0,"baud",57600)
 asynSetOption("ty_41_7",0,"bits",7)
+asynSetOption("ty_41_7",0,"parity","even")
 asynSetOption("ty_41_7",0,"stop",2)
 
 
