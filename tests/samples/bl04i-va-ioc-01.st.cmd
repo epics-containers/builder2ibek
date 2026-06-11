@@ -75,9 +75,22 @@ asynOctetSetInputEos(LPORT, 0, "\r\n")
 # serial port settings from DL8515Channel
 asynSetOption("ty_40_0",0,"baud",57600)
 asynSetOption("ty_40_0",0,"bits",7)
+asynSetOption("ty_40_0",0,"parity","even")
 asynSetOption("ty_40_0",0,"stop",2)
 
 asynSetOption("ty_40_1",0,"baud",38400)
+
+asynSetOption("ty_40_2",0,"parity","even")
+
+asynSetOption("ty_40_3",0,"parity","even")
+
+asynSetOption("ty_40_4",0,"parity","even")
+
+asynSetOption("ty_40_6",0,"parity","even")
+
+asynSetOption("ty_40_7",0,"parity","even")
+
+asynSetOption("ty_42_0",0,"parity","even")
 
 
 # serial port settings from DL8516Channel

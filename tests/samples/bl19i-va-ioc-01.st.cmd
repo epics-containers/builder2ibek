@@ -92,22 +92,32 @@ HostlinkInterposeInit("ty_40_5")
 finsDEVInit("ty_40_5.Hostlink", "ty_40_5")
 
 # serial port settings from DL8515Channel
+asynSetOption("ty_40_4",0,"parity","even")
+
 asynSetOption("ty_40_5",0,"baud",57600)
 asynSetOption("ty_40_5",0,"bits",7)
+asynSetOption("ty_40_5",0,"parity","even")
 asynSetOption("ty_40_5",0,"stop",2)
 
 asynSetOption("ty_40_7",0,"baud",38400)
 
 asynSetOption("ty_41_0",0,"baud",57600)
 asynSetOption("ty_41_0",0,"bits",7)
+asynSetOption("ty_41_0",0,"parity","even")
 asynSetOption("ty_41_0",0,"stop",2)
 
 asynSetOption("ty_41_1",0,"baud",57600)
 asynSetOption("ty_41_1",0,"bits",7)
+asynSetOption("ty_41_1",0,"parity","even")
 asynSetOption("ty_41_1",0,"stop",2)
+
+asynSetOption("ty_41_5",0,"parity","even")
+
+asynSetOption("ty_41_6",0,"parity","even")
 
 asynSetOption("ty_41_7",0,"baud",57600)
 asynSetOption("ty_41_7",0,"bits",7)
+asynSetOption("ty_41_7",0,"parity","even")
 asynSetOption("ty_41_7",0,"stop",2)
 
 

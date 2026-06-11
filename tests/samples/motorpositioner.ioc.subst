@@ -40,6 +40,6 @@ pattern
 
 file "$(POSITIONER)/db/motorpositioner.template" {
 pattern 
-	{ "type",                       "entity_enabled", "Q",    "MP",    "motor",              "DESC",            "EGU", "PREC", "VALA",  "VALB",    "VALC",    "VALD", "VALE",     "VALF", "VALG", "VALH", "VALI", "VALJ", "VALK", "VALL", "VALM", "VALN", "VALO", "VALP", "P"                }
-	{ "positioner.motorpositioner", "True",           ":Y:P", ":Y:MP", "BL04I-MO-MAPT-01:Y", "Mini Aperture Y", "mm",  "5",    "41.81", "45.2448", "41.8096", "24.9", "-48.9496", "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "BL04I-MO-MAPT-01" }
+	{ "type",                       "entity_enabled", "Q",    "MP",    "motor",              "DESC",            "EGU", "PREC", "VALA",  "VALB",    "VALC",    "VALD", "VALE",     "VALF", "VALG", "VALH", "VALI", "VALJ", "VALK", "VALL", "VALM", "VALN", "VALO", "VALP", "pos", "P"                }
+	{ "positioner.motorpositioner", "True",           ":Y:P", ":Y:MP", "BL04I-MO-MAPT-01:Y", "Mini Aperture Y", "mm",  "5",    "41.81", "45.2448", "41.8096", "24.9", "-48.9496", "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "A",   "BL04I-MO-MAPT-01" }
 }
