@@ -637,7 +637,7 @@ entities:
     ilk4: DCM Man Closed/Abs Open
     ilk5: "(Can't shut: beam on)"
     port: ty_40_3.Hostlink
-    vlvcc: VLVCC1
+    vlvcc: BL11I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 20
@@ -655,7 +655,7 @@ entities:
     ilk5: DCM Man Closed/Abs Open
     ilk6: "(Can't shut: beam on)"
     port: ty_40_3.Hostlink
-    vlvcc: VLVCC1
+    vlvcc: BL11I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 40
@@ -672,7 +672,7 @@ entities:
     ilk4: PIRG5 Healthy
     ilk5: FE ABSB Open
     port: ty_40_3.Hostlink
-    vlvcc: VLVCC1
+    vlvcc: BL11I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 50
@@ -685,7 +685,7 @@ entities:
     ilk4: PIRG6 Healthy
     ilk5: FE ABSB Open
     port: ty_40_3.Hostlink
-    vlvcc: VLVCC1
+    vlvcc: BL11I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 20
@@ -698,7 +698,7 @@ entities:
     ilk4: PIRG7 Healthy
     ilk5: SHTR1 Open
     port: ty_41_3.Hostlink
-    vlvcc: VLVCC2
+    vlvcc: BL11I-VA-VLVCC-02
 
   - type: dlsPLC.vacValve
     addr: 30
@@ -711,7 +711,7 @@ entities:
     ilk4: PIRG8 Healthy
     ilk5: SHTR1 Open
     port: ty_41_3.Hostlink
-    vlvcc: VLVCC2
+    vlvcc: BL11I-VA-VLVCC-02
 
   - type: dlsPLC.vacValve
     addr: 10
@@ -725,28 +725,28 @@ entities:
     ilk5: BStop config OK
     ilk7: BStop not overridden
     port: ty_41_3.Hostlink
-    vlvcc: VLVCC2
+    vlvcc: BL11I-VA-VLVCC-02
 
   - type: dlsPLC.vacValve
     addr: 30
     device: BL11I-DI-PHDGN-02
     ilk15: Valve Fault
     port: ty_40_3.Hostlink
-    vlvcc: VLVCC1
+    vlvcc: BL11I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 60
     device: BL11I-DI-PHDGN-03
     ilk15: Valve Fault
     port: ty_40_3.Hostlink
-    vlvcc: VLVCC1
+    vlvcc: BL11I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 40
     device: BL11I-DI-PHDGN-04
     ilk15: Valve Fault
     port: ty_41_3.Hostlink
-    vlvcc: VLVCC2
+    vlvcc: BL11I-VA-VLVCC-02
 
   - type: dlsPLC.vacValve
     addr: 60
@@ -756,7 +756,7 @@ entities:
     ilk15: Valve Fault
     ilk2: Guardline B
     port: ty_41_3.Hostlink
-    vlvcc: VLVCC2
+    vlvcc: BL11I-VA-VLVCC-02
 
   - type: dlsPLC.interlock
     addr: 7

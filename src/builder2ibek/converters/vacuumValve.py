@@ -3,8 +3,9 @@ from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "vacuumValve"
 
-# records the port names of the read100 entities keyed by name
-read100Objects = {}
+# records the port name and device prefix of each read100 entity, keyed by the
+# builder object name (which the vacuumValve `crate` attribute references)
+read100Objects: dict[str, dict[str, str]] = {}
 # records devices already claimed by vacValve entities
 vacValveDevices: set[str] = set()
 
@@ -19,16 +20,22 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
 
     if entity_type == "vacuumValveRead":
-        # record the port name of this entity
-        read100Objects[entity.name] = entity.port
+        # record the port and device prefix of this entity
+        read100Objects[entity.name] = {
+            "port": entity.port,
+            "device": entity.device,
+        }
 
         entity.type = "dlsPLC.read100"
         entity.century = 0
         entity.remove("name")
 
     if entity_type == "vacuumValveRead2":
-        # record the port name of this entity
-        read100Objects[entity.name] = entity.port
+        # record the port and device prefix of this entity
+        read100Objects[entity.name] = {
+            "port": entity.port,
+            "device": entity.device,
+        }
 
         # TODO need an example to work out how to do this, we probably need
         # to record in read100Objects, which centry this entity is associated
@@ -43,7 +50,13 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("valve")
         entity.remove("name")
 
-        entity.port = read100Objects[entity.vlvcc]
+        # `crate` referenced the read100 by its builder object name; ibek's
+        # `vlvcc` must instead be the read100 device prefix (e.g.
+        # BL19I-VA-VLVCC-01) so the valve status links resolve to the real
+        # :DMxXX records that read100 creates.
+        read100 = read100Objects[entity.vlvcc]
+        entity.port = read100["port"]
+        entity.vlvcc = read100["device"]
         vacValveDevices.add(entity.device)
 
         # tclose_* fields came from builder but dlsPLC.vacValve does not support
