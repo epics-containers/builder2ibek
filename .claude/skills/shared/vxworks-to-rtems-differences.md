@@ -14,4 +14,10 @@ ibek-generated `st.cmd` are expected and should **not** be flagged as problems.
 | `asSetFilename` with absolute prod path | `/epics/support/pvlogging/src/access.acf` | ibek-relative path |
 | `taskDelete(taskNameToId(...))` | Not present | VxWorks-specific housekeeping |
 | `dbLoadRecords "db/..._expanded.db"` | `dbLoadRecords /ioc.db` | ibek-standard single db file |
-| VxWorks autosave paths and `create_monitor_set` with `.req` file names | ibek-standard autosave setup | Normal translation |
+| VxWorks autosave paths and `create_monitor_set` with `.req` file names | ibek-standard autosave setup | Mostly normal — but see caveat below |
+
+> **Autosave caveat:** the `save_restore*` translation is *not* always clean.
+> DLS level-1 PVs must be restored at pass 0 **and** pass 1; a pass-1-only
+> settings restore silently corrupts records that self-initialise at PINI (e.g.
+> `dlsPLC_temperature` `:HIGH` → 0). See
+> [autosave-conversion.md](autosave-conversion.md).

@@ -272,7 +272,9 @@ repo):
   (global — do **not** also add to entity `pre_init`, per CLAUDE.md)
 - `devIocStats.iocAdminSoft IOC: '{{ ioc_name | upper }}'`
 - `epics.EpicsCaMaxArrayBytes` (from the `EPICS_CA_MAX_ARRAY_BYTES` envSet)
-- `autosave.Autosave P: '<prefix>:'` (collapsing all `save_restore*` lines)
+- `autosave.Autosave P: '<prefix>:'` (collapsing all `save_restore*` lines).
+  Beware the pass-0/pass-1 restore gotcha —
+  [autosave-conversion.md](../skills/shared/autosave-conversion.md)
 - `pvlogging.PvLogging` if the IOC used pvlogging
 
 ### 2e. Assemble and enumerate
