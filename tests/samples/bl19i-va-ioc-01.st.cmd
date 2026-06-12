@@ -41,6 +41,12 @@ epicsEnvSet BL19I-VA-IOC-01.Slot5 1
 
 #  Hy8001Configure(cardNum, vmeslotNum, vectorNum, itrLevel, debounce, clock, scan, direction, invertin, invertout)
 Hy8001Configure(60, 6, $(Vec2), 0, 0, 0, 100, 0, 1, 1)
+# Register the Hy8001 as an IPAC carrier so the card is mapped into VME
+# address space - the VxWorks build did this with
+# ipacEXTAddCarrier(&EXTHy8001, "<slot>"). Without it the Hy8001 bi/bo
+# records (e.g. the VLVCC valve-crate interlocks on #C60) never
+# reach the hardware. ipacAddHy8001 is the RTEMS wrapper (cf ipacAddHy8002).
+ipacAddHy8001("6")
 
 # DLS8515Configure(card id, carrier_index, interrupt_vector)
 DLS8515Configure(40, $(BL19I-VA-IOC-01.Slot4), $(Vec3))

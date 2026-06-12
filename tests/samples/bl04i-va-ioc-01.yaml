@@ -741,7 +741,7 @@ entities:
     ilk8: Unused
     ilk9: Unused
     port: ty_40_0.Hostlink
-    vlvcc: VLVCC01
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 20
@@ -769,7 +769,7 @@ entities:
     ilk8: Unused
     ilk9: Unused
     port: ty_40_0.Hostlink
-    vlvcc: VLVCC01
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 30
@@ -797,7 +797,7 @@ entities:
     ilk8: Unused
     ilk9: Unused
     port: ty_40_0.Hostlink
-    vlvcc: VLVCC01
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 50
@@ -825,7 +825,7 @@ entities:
     ilk8: QBPM1 Out/V11 Open
     ilk9: Unused
     port: ty_40_0.Hostlink
-    vlvcc: VLVCC01
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 40
@@ -847,7 +847,7 @@ entities:
     ilk8: Unused
     ilk9: Unused
     port: ty_40_0.Hostlink
-    vlvcc: VLVCC01
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: vacuumValve.vacuumValveReadExtra
     B1: 39
