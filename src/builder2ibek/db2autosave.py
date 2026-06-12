@@ -10,18 +10,10 @@ regex_autosave = [
 def write_req_file(f: Path, record_set: set[str]):
     print(f"writing file {f}")
 
-    fields = ""
-    for record in record_set:
-        record_fields = record.split()
-
-        record = record_fields[0]
-        if len(record_fields) == 1:
-            fields += record
-        else:
-            fields_list = [f"{record}.{field}" for field in record_fields[1:]]
-            fields += "\n".join(fields_list)
-
-    f.write_text(fields)
+    # Each record_set entry is already a canonical autosave req line of the form
+    # "recordname FIELD [FIELD ...]" (space separated). Write one per line,
+    # sorted for deterministic output.
+    f.write_text("\n".join(sorted(record_set)) + "\n")
 
 
 def parse_templates(out_folder: Path, db_list: list[Path]):
