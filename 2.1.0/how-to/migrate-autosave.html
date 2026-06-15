@@ -1,0 +1,781 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Migrating saved autosave values to an ibek IOC &#8212; builder2ibek 2.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=20623aea"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/migrate-autosave';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://epics-containers.github.io/builder2ibek/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.1.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Verify a converted IOC using db-compare" href="verify-with-devcontainer.html" />
+    <link rel="prev" title="Generating autosave req files from DB templates" href="autosave.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.1.0" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">builder2ibek</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/epics-containers/builder2ibek" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/builder2ibek" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="after-beamline-convert.html">After a Beamline Auto-Conversion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-generic-ioc-repo.html">Create a Generic IOC repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convert-ioc-instance.html">Convert a builder XML IOC instance to ibek YAML</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runtime-support.html">Runtime Support (ibek-runtime-support)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autosave.html">Generating autosave req files from DB templates</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Migrating saved autosave values to an ibek IOC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="verify-with-devcontainer.html">Verify a converted IOC using db-compare</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-converter.html">Create a builder2ibek converter for a support module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute to the project</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../how-to.html" class="nav-link">How-to Guides</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Migrating saved autosave values to an ibek IOC</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="migrating-saved-autosave-values-to-an-ibek-ioc">
+<h1>Migrating saved autosave values to an ibek IOC<a class="headerlink" href="#migrating-saved-autosave-values-to-an-ibek-ioc" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">migrate-autosave</span></code> converts the <strong>saved values</strong> from a legacy DLS
+IOC’s autosave files into the two <code class="docutils literal notranslate"><span class="pre">.sav</span></code> files an ibek Generic IOC restores at
+startup.</p>
+<p>This is the companion to <a class="reference internal" href="autosave.html"><span class="std std-doc">Generating autosave req files from DB templates</span></a>: that command generates the <code class="docutils literal notranslate"><span class="pre">.req</span></code>
+files (which PVs to save); this command migrates the last-saved <strong>data</strong> so the
+new IOC boots with the old IOC’s setpoints already in place.</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
+<p>A legacy DLS IOC writes its autosave data to per-set files named
+<code class="docutils literal notranslate"><span class="pre">&lt;IOC&gt;_0.sav</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;IOC&gt;_1.sav</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;IOC&gt;_2.sav</span></code>, each line carrying an explicit
+field name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># autosave R5.3	Automatically generated - DO NOT MODIFY</span>
+<span class="n">BL19I</span><span class="o">-</span><span class="n">VA</span><span class="o">-</span><span class="n">GAUGE</span><span class="o">-</span><span class="mi">05</span><span class="p">:</span><span class="n">ILKSETSP</span><span class="p">:</span><span class="n">NOWRITE</span><span class="o">.</span><span class="n">VAL</span> <span class="mi">1</span>
+<span class="o">&lt;</span><span class="n">END</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>An ibek IOC instead restores from <code class="docutils literal notranslate"><span class="pre">autosave_positions.sav</span></code> (pass 0) and
+<code class="docutils literal notranslate"><span class="pre">autosave_settings.sav</span></code> (pass 1), using the bare record name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BL19I</span><span class="o">-</span><span class="n">VA</span><span class="o">-</span><span class="n">GAUGE</span><span class="o">-</span><span class="mi">05</span><span class="p">:</span><span class="n">ILKSETSP</span><span class="p">:</span><span class="n">NOWRITE</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">migrate-autosave</span></code> reformats the legacy set into these two files following the
+DLS pass convention — <strong>set 0 → positions, sets 1+ → settings</strong> — dropping a
+trailing <code class="docutils literal notranslate"><span class="pre">.VAL</span></code> from each line.</p>
+</section>
+<section id="why-this-is-a-safe-naive-conversion">
+<h2>Why this is a safe, naive conversion<a class="headerlink" href="#why-this-is-a-safe-naive-conversion" title="Link to this heading">#</a></h2>
+<p>The conversion needs <strong>no knowledge of the new IOC’s PV set</strong> (its <code class="docutils literal notranslate"><span class="pre">.req</span></code>
+files). At restore, autosave applies whatever <code class="docutils literal notranslate"><span class="pre">PV</span> <span class="pre">value</span></code> lines it finds and
+silently ignores any PV the IOC does not have, then re-saves its own set on the
+first save pass. So:</p>
+<ul class="simple">
+<li><p>PVs the new IOC no longer carries are restored harmlessly and drop out of the
+<code class="docutils literal notranslate"><span class="pre">.sav</span></code> files by themselves on the first save.</p></li>
+<li><p>PVs the new IOC has but the legacy file lacks simply keep their default value.</p></li>
+</ul>
+</section>
+<section id="expected-errors-on-the-first-boot">
+<h2>Expected errors on the first boot<a class="headerlink" href="#expected-errors-on-the-first-boot" title="Link to this heading">#</a></h2>
+<p>The first time the IOC boots with a migrated <code class="docutils literal notranslate"><span class="pre">.sav</span></code> file you will see
+<code class="docutils literal notranslate"><span class="pre">reboot_restore</span></code> log a <code class="docutils literal notranslate"><span class="pre">dbFindRecord</span> <span class="pre">...</span> <span class="pre">failed</span></code> line for every PV (or field)
+that was in the legacy file but does not exist in the new IOC, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">***</span> <span class="n">restoring</span> <span class="kn">from</span><span class="w"> </span><span class="s1">&#39;/autosave/autosave_positions.sav&#39;</span> <span class="o">...</span> <span class="o">***</span>
+<span class="n">dbFindRecord</span> <span class="k">for</span> <span class="s1">&#39;BL19I-VA-IOC-01:MEM_BLK_FREE.HOPR&#39;</span> <span class="n">failed</span>
+<span class="n">dbFindRecord</span> <span class="k">for</span> <span class="s1">&#39;BL19I-VA-IOC-01:SYS_MBUF_FREE.LOLO&#39;</span> <span class="n">failed</span>
+<span class="n">dbFindRecord</span> <span class="k">for</span> <span class="s1">&#39;BL19I-VA-IOC-01:IFI_ERR_CNT.HIHI&#39;</span> <span class="n">failed</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p><strong>These errors are expected and harmless.</strong> They are simply autosave reporting
+the legacy-only PVs it could not restore (commonly VxWorks <code class="docutils literal notranslate"><span class="pre">devIocStats</span></code>
+records such as <code class="docutils literal notranslate"><span class="pre">MEM_BLK_FREE</span></code>, <code class="docutils literal notranslate"><span class="pre">SYS_MBUF_FREE</span></code>, <code class="docutils literal notranslate"><span class="pre">IFI_ERR_CNT</span></code> that have no
+equivalent on the new platform).</p>
+<p>They appear <strong>only on the first boot</strong>. The set of PVs autosave <em>saves</em> is
+driven by the IOC’s <code class="docutils literal notranslate"><span class="pre">.req</span></code> files, not by the migrated <code class="docutils literal notranslate"><span class="pre">.sav</span></code> file, so the legacy
+-only PVs are not in any <code class="docutils literal notranslate"><span class="pre">.req</span></code> file. As soon as the first save cycle runs
+(after <code class="docutils literal notranslate"><span class="pre">create_monitor_set</span></code>, e.g. 5 s for positions / 30 s for settings) autosave
+rewrites <code class="docutils literal notranslate"><span class="pre">autosave_positions.sav</span></code> / <code class="docutils literal notranslate"><span class="pre">autosave_settings.sav</span></code> with only the PVs
+the IOC actually has. From then on the stale PVs are gone and subsequent reboots
+restore cleanly with no <code class="docutils literal notranslate"><span class="pre">dbFindRecord</span></code> errors.</p>
+<p>In short: the migrated file is a one-shot seed for the first restore; the IOC
+takes ownership of its <code class="docutils literal notranslate"><span class="pre">.sav</span></code> files on the first save and the legacy cruft
+evaporates.</p>
+</section>
+<section id="finding-the-legacy-set">
+<h2>Finding the legacy set<a class="headerlink" href="#finding-the-legacy-set" title="Link to this heading">#</a></h2>
+<p>Only the <strong>current</strong> save of each set is used: files matching <code class="docutils literal notranslate"><span class="pre">&lt;stem&gt;_&lt;N&gt;.sav</span></code>
+exactly. Autosave’s rolling backups are deliberately excluded because they carry
+extra characters after <code class="docutils literal notranslate"><span class="pre">.sav</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Used?</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BL19I-VA-IOC-01_0.sav</span></code></p></td>
+<td><p>yes — the live save of set 0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BL19I-VA-IOC-01_0.sav0</span></code>, <code class="docutils literal notranslate"><span class="pre">...savB</span></code></p></td>
+<td><p>no — round-robin sequence backups</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BL19I-VA-IOC-01_0.sav_260611-091551</span></code></p></td>
+<td><p>no — dated restart archive</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">...SBAD...</span></code></p></td>
+<td><p>no — flagged-bad save</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If the input folder holds more than one stem the command stops and asks you to
+pick one with <code class="docutils literal notranslate"><span class="pre">--from</span></code>.</p>
+</section>
+<section id="running-the-command">
+<h2>Running the command<a class="headerlink" href="#running-the-command" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>migrate-autosave<span class="w"> </span><span class="o">[</span>INPUT_FOLDER<span class="o">]</span><span class="w"> </span><span class="o">[</span>OUTPUT_FOLDER<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p>Both folders default to the current directory, so run it inside the folder
+holding the legacy <code class="docutils literal notranslate"><span class="pre">.sav</span></code> files for the simplest folder-in / folder-out case.</p>
+<section id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">INPUT_FOLDER</span></code></p></td>
+<td><p>Folder holding the legacy <code class="docutils literal notranslate"><span class="pre">&lt;IOC&gt;_N.sav</span></code> set (default: cwd)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OUTPUT_FOLDER</span></code></p></td>
+<td><p>Folder to write <code class="docutils literal notranslate"><span class="pre">autosave_{positions,settings}.sav</span></code> into (default: cwd)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="options">
+<h3>Options<a class="headerlink" href="#options" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--from</span></code>, <code class="docutils literal notranslate"><span class="pre">-f</span> <span class="pre">STEM</span></code></p></td>
+<td><p>IOC stem (e.g. <code class="docutils literal notranslate"><span class="pre">BL19I-VA-IOC-01</span></code>) selecting which set to use; only needed when the input folder holds more than one stem</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--backup</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-backup</span></code></p></td>
+<td><p>Copy an existing destination to <code class="docutils literal notranslate"><span class="pre">&lt;file&gt;.bak</span></code> before overwriting (default: backup)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">--clean</span></code> / <code class="docutils literal notranslate"><span class="pre">--no-clean</span></code></p></td>
+<td><p>Remove round-robin sibling files (<code class="docutils literal notranslate"><span class="pre">.sav0</span></code>/<code class="docutils literal notranslate"><span class="pre">.savB</span></code>/…) of each written target so the IOC cannot restore a stale one — dated archives are kept (default: clean)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">--dry-run</span></code></p></td>
+<td><p>Report what would happen but write nothing</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="output-files">
+<h3>Output files<a class="headerlink" href="#output-files" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">autosave_positions.sav</span></code> — from legacy set <code class="docutils literal notranslate"><span class="pre">0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">autosave_settings.sav</span></code> — from legacy sets <code class="docutils literal notranslate"><span class="pre">1</span></code> and above (de-duplicated, last value wins)</p></li>
+</ul>
+</section>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
+<p>Preview the conversion without writing anything:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>migrate-autosave<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>/srv/software/bl19i/epics/autosave/BL19I-VA-IOC-01<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>./BL19I-VA-IOC-01/autosave<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--dry-run
+</pre></div>
+</div>
+<p>When the plan looks right, drop <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> to write the two <code class="docutils literal notranslate"><span class="pre">.sav</span></code> files.</p>
+</section>
+<section id="where-to-place-the-output">
+<h2>Where to place the output<a class="headerlink" href="#where-to-place-the-output" title="Link to this heading">#</a></h2>
+<p>Write the two <code class="docutils literal notranslate"><span class="pre">.sav</span></code> files into the IOC instance’s autosave location — the same
+directory the running ibek IOC mounts and restores from at boot (for an RTEMS
+hybrid IOC this is the NFS autosave mount; see the rtems-proxy autosave
+notes). Commit them alongside the IOC instance if you want the migrated values
+under version control.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="autosave.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Generating autosave req files from DB templates</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="verify-with-devcontainer.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Verify a converted IOC using db-compare</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-this-is-a-safe-naive-conversion">Why this is a safe, naive conversion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#expected-errors-on-the-first-boot">Expected errors on the first boot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#finding-the-legacy-set">Finding the legacy set</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-command">Running the command</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arguments">Arguments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#options">Options</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-files">Output files</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-place-the-output">Where to place the output</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/epics-containers/builder2ibek/edit/2.1.0/docs/how-to/migrate-autosave.md">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/how-to/migrate-autosave.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
