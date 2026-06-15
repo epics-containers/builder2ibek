@@ -46,6 +46,12 @@ class EpicsDb:
     fields: dict[str, set[str]] = field(default_factory=lambda: {})
 
 
+@dataclass
+class EpicsField:
+    field_names: set[str] = field(default_factory=lambda: set())
+    values: dict[str, str] = field(default_factory=lambda: {})
+
+
 def normalize_float_records(s: set[str]) -> set[str]:
     normalised = set()
     for item in s:
@@ -140,8 +146,30 @@ def compare_dbs(
         old_norm = normalize_float_records(old.fields[record_str])
         new_norm = normalize_float_records(new.fields[record_str])
         if old_norm != new_norm:
+            old_ef = EpicsField()
+            new_ef = EpicsField()
+            for ef, norm in [(old_ef, old_norm), (new_ef, new_norm)]:
+                for entry in norm:
+                    name, _, value = entry.partition(" ")
+                    ef.field_names.add(name)
+                    ef.values[name] = value
+
+            field_old_only = sorted(old_ef.field_names - new_ef.field_names)
+            field_new_only = sorted(new_ef.field_names - old_ef.field_names)
+            field_both = sorted(old_ef.field_names & new_ef.field_names)
+            value_diffs = [
+                f"{name} ('{old_ef.values[name]}' -> '{new_ef.values[name]}')"
+                for name in field_both
+                if old_ef.values[name] != new_ef.values[name]
+            ]
+
             result += f"\nfields for '{record_str}' are different between the two DBs"
-            # result += f"\ndiff: {old_norm.difference(new_norm)}"
+            if field_old_only:
+                result += f"\n  only in original: {', '.join(field_old_only)}"
+            if field_new_only:
+                result += f"\n  only in new: {', '.join(field_new_only)}"
+            if value_diffs:
+                result += f"\n  different values: {', '.join(value_diffs)}"
 
     if not output:
         print(result)

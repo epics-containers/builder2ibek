@@ -36,11 +36,20 @@ records in original:    8136
 *******************************************************************
 
 fields for 'ai SR03A-VA-GAUGE-01:PLOG' are different between the two DBs
+  different values: INP ('SR03A-VA-GAUGE-01:PLOG_CALC CP' -> 'SR03A-VA-GAUGE-01:RAW:EGU  CP')
 fields for 'ai SR03A-VA-GAUGE-02:PLOG' are different between the two DBs
+  different values: INP ('SR03A-VA-GAUGE-02:PLOG_CALC CP' -> 'SR03A-VA-GAUGE-02:RAW:EGU  CP')
 fields for 'ai SR03A-VA-GAUGE-03:PLOG' are different between the two DBs
+  different values: INP ('SR03A-VA-GAUGE-03:PLOG_CALC CP' -> 'SR03A-VA-GAUGE-03:RAW:EGU  CP')
 fields for 'ai SR03A-VA-GAUGE-04:PLOG' are different between the two DBs
+  different values: INP ('SR03A-VA-GAUGE-04:PLOG_CALC CP' -> 'SR03A-VA-GAUGE-04:RAW:EGU  CP')
 fields for 'ai SR03A-VA-GAUGE-31:PLOG' are different between the two DBs
+  different values: INP ('SR03A-VA-GAUGE-31:PLOG_CALC CP' -> 'SR03A-VA-GAUGE-31:RAW:EGU  CP')
 fields for 'ai SR03S-VA-GAUGE-01:PLOG' are different between the two DBs
+  different values: INP ('SR03S-VA-GAUGE-01:PLOG_CALC CP' -> 'SR03S-VA-GAUGE-01:RAW:EGU  CP')
 fields for 'ai SR03S-VA-GAUGE-02:PLOG' are different between the two DBs
+  different values: INP ('SR03S-VA-GAUGE-02:PLOG_CALC CP' -> 'SR03S-VA-GAUGE-02:RAW:EGU  CP')
 fields for 'fanout SR03C-VA-VFAST-01:FAN_01' are different between the two DBs
+  different values: LNK6 ('SR03C-VA-VFAST-01:GAUGE06_0' -> 'SR03C-VA-VFAST-01:GAUGE:06_0')
 fields for 'fanout SR03C-VA-VFAST-01:FAN_02' are different between the two DBs
+  different values: LNK2 ('SR03C-VA-VFAST-01:GAUGE08_0' -> 'SR03C-VA-VFAST-01:GAUGE:08_0')
