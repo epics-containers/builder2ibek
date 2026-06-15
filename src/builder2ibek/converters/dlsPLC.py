@@ -63,7 +63,7 @@ def finalize(ioc: Generic_IOC):
     for e in entities:
         if str(e.get("type", "")).startswith("dlsPLC."):
             port = e.get("port")
-            if port in serial_ports:
+            if isinstance(port, str) and port in serial_ports:
                 if port not in fins_ports:
                     fins_ports.append(port)
                 e["port"] = f"{port}.Hostlink"
