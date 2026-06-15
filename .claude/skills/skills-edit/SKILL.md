@@ -13,9 +13,10 @@ AI-assisted IOC conversion. It splits into two parts:
   Claude auto-loads when a task's context matches the skill description.
   Currently: `ibek-concepts`, `ibek-support-ansible`, `skills-edit`.
 - **Commands** (`.claude/commands/<name>.md`) — explicit user workflows
-  invoked via `/<name>` with arguments. Currently: `ioc-convert`, `ioc-check`,
-  `ioc-inspect`, `beamline-convert`, `beamline-check`, `beamline-reconvert`,
-  `support-create`, `support-fix`, `support-inspect`, `memo`.
+  invoked via `/<name>` with arguments. Currently: `ioc-convert`,
+  `ioc-convert-raw`, `ioc-check`, `ioc-inspect`, `beamline-convert`,
+  `beamline-check`, `beamline-reconvert`, `support-create`, `support-fix`,
+  `support-inspect`, `memo`.
 
 Editing either well is as important as editing code.
 
@@ -74,6 +75,8 @@ Each concept should live in exactly one place:
 - `shared/find-*.md` — filesystem search patterns (module path, boot script, IOC XMLs)
 - `shared/builder-py-analysis.md` — how to read a builder.py systematically
 - `shared/vxworks-to-rtems-differences.md` — VxWorks vs RTEMS API differences
+- `shared/module-rename-map.md` — old DLS → epics-containers module/verb renames
+  for raw-IOC conversion (`/ioc-convert-raw`)
 
 When adding a concept, ask: does it already exist in one of the above? If so,
 link to it rather than repeating it.

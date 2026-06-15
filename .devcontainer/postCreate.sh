@@ -11,3 +11,6 @@ pre-commit install --install-hooks
 
 # Initialise git submodules if any are declared
 [ -f .gitmodules ] && git submodule update --init || true
+
+# claude-sandbox: bring up the sandbox (added by just promote).
+bash .devcontainer/claude-sandbox/install.sh

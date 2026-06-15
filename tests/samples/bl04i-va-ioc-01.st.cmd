@@ -44,6 +44,12 @@ epicsEnvSet BL04I-VA-IOC-01.Slot5 1
 
 #  Hy8001Configure(cardNum, vmeslotNum, vectorNum, itrLevel, debounce, clock, scan, direction, invertin, invertout)
 Hy8001Configure(60, 6, $(Vec2), 0, 0, 0, 100, 0, 1, 1)
+# Register the Hy8001 as an IPAC carrier so the card is mapped into VME
+# address space - the VxWorks build did this with
+# ipacEXTAddCarrier(&EXTHy8001, "<slot>"). Without it the Hy8001 bi/bo
+# records (e.g. the VLVCC valve-crate interlocks on #C60) never
+# reach the hardware. ipacAddHy8001 is the RTEMS wrapper (cf ipacAddHy8002).
+ipacAddHy8001("6")
 
 # DLS8515Configure(card id, carrier_index, interrupt_vector)
 DLS8515Configure(40, $(BL04I-VA-IOC-01.Slot4), $(Vec3))
@@ -63,6 +69,10 @@ drvAsynSerialPortConfigure("ty_40_6", "/dev/tty406" , 0, 0, 0)
 drvAsynSerialPortConfigure("ty_40_7", "/dev/tty407" , 0, 0, 0)
 drvAsynSerialPortConfigure("ty_41_0", "/dev/tty410" , 0, 0, 0)
 drvAsynSerialPortConfigure("ty_42_0", "/dev/tty420" , 0, 0, 0)
+# HostlinkInterposeInit(asyn_port)
+HostlinkInterposeInit("ty_40_0")
+# finsDEVInit(FINS_port_name, asyn_port)
+finsDEVInit("ty_40_0.Hostlink", "ty_40_0")
 
 # drvAsynIPPortConfigure(name, port, priority, noAutoConnect, noProcessEos)
 drvAsynIPPortConfigure(LPORT, 172.23.226.231:7016, 100, 0, 0)
@@ -71,9 +81,22 @@ asynOctetSetInputEos(LPORT, 0, "\r\n")
 # serial port settings from DL8515Channel
 asynSetOption("ty_40_0",0,"baud",57600)
 asynSetOption("ty_40_0",0,"bits",7)
+asynSetOption("ty_40_0",0,"parity","even")
 asynSetOption("ty_40_0",0,"stop",2)
 
 asynSetOption("ty_40_1",0,"baud",38400)
+
+asynSetOption("ty_40_2",0,"parity","even")
+
+asynSetOption("ty_40_3",0,"parity","even")
+
+asynSetOption("ty_40_4",0,"parity","even")
+
+asynSetOption("ty_40_6",0,"parity","even")
+
+asynSetOption("ty_40_7",0,"parity","even")
+
+asynSetOption("ty_42_0",0,"parity","even")
 
 
 # serial port settings from DL8516Channel

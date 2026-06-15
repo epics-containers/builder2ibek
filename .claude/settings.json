@@ -1,36 +1,7 @@
 {
-  "permissions": {
-    "allow": [
-      "Edit(/workspaces/**)",
-      "Write(/workspaces/**)",
-      "Read(/workspaces/**)",
-      "Read(/dls_sw/**)",
-      "Read(//dls_sw/**)",
-      "Edit(/epics/**)",
-      "Read(/epics/**)",
-      "Write(/epics/**)",
-      "Bash(*)"
-    ],
-    "deny": [
-      "Bash(git push --force *)",
-      "Bash(git reset --hard*)",
-      "Bash(ssh *)",
-      "Bash(ssh-agent *)",
-      "Bash(*ssh-agent*)",
-      "Bash(scp *)",
-      "Bash(rsync *)",
-      "Bash(sftp *)",
-      "Bash(wget --post* *)",
-      "Bash(telnet *)",
-      "Bash(mail *)",
-      "Bash(sendmail *)"
-    ],
-    "additionalDirectories": [
-      "/workspaces/**",
-      "/dls_sw/work",
-      "/dls_sw/prod",
-      "/epics"
-    ]
+  "statusLine": {
+    "type": "command",
+    "command": ".claude/statusline-command.sh"
   },
   "hooks": {
     "UserPromptSubmit": [
@@ -38,7 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -z \"$REMOTE_CONTAINERS\" ]; then echo 'BLOCKED: This project requires the devcontainer. Please reopen in the devcontainer before using Claude Code.'; exit 2; fi; if [ -n \"$SSH_AUTH_SOCK\" ]; then echo 'BLOCKED: SSH_AUTH_SOCK is set — agent forwarding must be disabled in the devcontainer.'; exit 2; fi"
+            "command": ".claude/hooks/sandbox-check.sh"
           }
         ]
       }

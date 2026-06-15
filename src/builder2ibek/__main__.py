@@ -6,6 +6,7 @@ from builder2ibek import __version__
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
+from builder2ibek.migrate_autosave import migrate_folder
 from builder2ibek.reconvert import reconvert_cli
 
 cli = typer.Typer()
@@ -75,6 +76,62 @@ def autosave(
     Convert DLS autosave DB template comments into autosave req files
     """
     parse_templates(out_folder, db_list)
+
+
+@cli.command()
+def migrate_autosave(
+    input_folder: Path = typer.Argument(
+        Path("."),
+        help="Folder holding the legacy <IOC>_N.sav set (default: cwd)",
+    ),
+    output_folder: Path = typer.Argument(
+        Path("."),
+        help="Folder to write autosave_{positions,settings}.sav into (default: cwd)",
+    ),
+    from_stem: str = typer.Option(
+        None,
+        "--from",
+        "-f",
+        help="IOC stem (e.g. BL19I-VA-IOC-01) selecting which <stem>_N.sav set "
+        "to use. Only needed when the input folder holds more than one stem.",
+    ),
+    backup: bool = typer.Option(
+        True,
+        "--backup/--no-backup",
+        help="Copy an existing destination to <file>.bak before overwriting",
+    ),
+    clean: bool = typer.Option(
+        True,
+        "--clean/--no-clean",
+        help="Remove round-robin sibling files (.sav0/.savB/...) of each target "
+        "so the IOC cannot restore a stale one (dated archives are kept)",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Report changes without writing any files"
+    ),
+):
+    """
+    Convert the legacy DLS autosave save set into the ibek
+    autosave_positions.sav / autosave_settings.sav files.
+
+    The legacy set (<stem>_0.sav, _1.sav, _2.sav -- most recent save of each) is
+    found automatically in the input folder and reformatted (a trailing .VAL is
+    dropped) following the DLS pass convention: set 0 -> positions, sets 1+ ->
+    settings. At restore the IOC applies the values it recognises and ignores
+    the rest, so the new IOC's PV set is not needed.
+    """
+    try:
+        migrate_folder(
+            input_folder,
+            output_folder,
+            stem=from_stem,
+            backup=backup,
+            clean=clean,
+            dry_run=dry_run,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(1) from exc
 
 
 @cli.command()

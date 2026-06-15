@@ -30,6 +30,12 @@ set_pass1_restoreFile autosave_settings.sav
 
 #  Hy8001Configure(cardNum, vmeslotNum, vectorNum, itrLevel, debounce, clock, scan, direction, invertin, invertout)
 Hy8001Configure(60, 6, $(Vec1), 0, 0, 0, 100, 0, 1, 1)
+# Register the Hy8001 as an IPAC carrier so the card is mapped into VME
+# address space - the VxWorks build did this with
+# ipacEXTAddCarrier(&EXTHy8001, "<slot>"). Without it the Hy8001 bi/bo
+# records (e.g. the VLVCC valve-crate interlocks on #C60) never
+# reach the hardware. ipacAddHy8001 is the RTEMS wrapper (cf ipacAddHy8002).
+ipacAddHy8001("6")
 
 # ipacAddHy8002("slot, intLevel")
 ipacAddHy8002("4, 2")
@@ -72,14 +78,29 @@ drvAsynSerialPortConfigure("ty_42_0", "/dev/tty420" , 0, 0, 0)
 # serial port settings from DL8515Channel
 asynSetOption("ty_40_0",0,"baud",57600)
 asynSetOption("ty_40_0",0,"bits",7)
+asynSetOption("ty_40_0",0,"parity","even")
 asynSetOption("ty_40_0",0,"stop",2)
+
+asynSetOption("ty_40_5",0,"parity","even")
+
+asynSetOption("ty_40_6",0,"parity","even")
+
+asynSetOption("ty_40_7",0,"parity","even")
 
 asynSetOption("ty_41_0",0,"baud",57600)
 asynSetOption("ty_41_0",0,"bits",7)
+asynSetOption("ty_41_0",0,"parity","even")
 asynSetOption("ty_41_0",0,"stop",2)
+
+asynSetOption("ty_41_4",0,"parity","even")
+
+asynSetOption("ty_41_5",0,"parity","even")
+
+asynSetOption("ty_41_6",0,"parity","even")
 
 asynSetOption("ty_41_7",0,"baud",57600)
 asynSetOption("ty_41_7",0,"bits",7)
+asynSetOption("ty_41_7",0,"parity","even")
 asynSetOption("ty_41_7",0,"stop",2)
 
 

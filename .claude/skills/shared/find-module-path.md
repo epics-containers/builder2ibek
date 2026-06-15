@@ -2,6 +2,21 @@
 
 How to resolve a support module's absolute path from the IOC's `_RELEASE` file.
 
+> **NEVER run a broad `find`/`grep` over `/dls_sw`** — it is enormous and
+> hammers the fileserver. Always resolve the exact module path from a RELEASE
+> file first, then open the one file you need (e.g. a specific `.template`).
+
+## Quick path for the generic vacuum IOC
+
+The generic vacuum IOC's RELEASE already lists every support module path:
+```
+/dls_sw/work/R7.0.7/ioc/BL/bl-va-ioc-01/configure/RELEASE
+```
+`grep DLSPLC ...` →  `DLSPLC = $(SUPPORT)/dlsPLC/<ver>-RTEMS`, with
+`SUPPORT = /dls_sw/prod/R7.0.7/support`. Substitute to get the absolute path
+and read the template directly (e.g.
+`$(DLSPLC)/db/dlsPLC_temperature.template`).
+
 ## Algorithm
 
 1. **Read the IOC's _RELEASE file** — located next to the XML:

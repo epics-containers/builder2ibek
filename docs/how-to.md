@@ -11,6 +11,7 @@ how-to/create-generic-ioc-repo.md
 how-to/convert-ioc-instance.md
 how-to/runtime-support.md
 how-to/autosave.md
+how-to/migrate-autosave.md
 how-to/verify-with-devcontainer.md
 how-to/create-converter
 how-to/contribute

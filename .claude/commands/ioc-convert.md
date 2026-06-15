@@ -266,6 +266,8 @@ Compare the original and generated scripts. For each meaningful command in the
 original, check whether the equivalent is present in `st.cmd`. Flag any
 command that is absent and is **not** in the expected-differences table:
 [vxworks-to-rtems-differences.md](../skills/shared/vxworks-to-rtems-differences.md).
+For autosave specifically, also check the pass-0/pass-1 restore gotcha in
+[autosave-conversion.md](../skills/shared/autosave-conversion.md).
 
 ### 5b. Validate ioc.subst
 

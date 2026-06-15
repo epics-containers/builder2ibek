@@ -132,6 +132,10 @@ entities:
     port: /dev/tty420
     priority: 0
 
+  - type: FINS.FINSHostlink
+    asyn_port: ty_40_0
+    name: ty_40_0.Hostlink
+
   - type: asyn.AsynIP
     input_eos: \r\n
     name: LPORT
@@ -709,7 +713,7 @@ entities:
   - type: dlsPLC.read100
     century: 0
     device: BL04I-VA-VLVCC-01
-    port: ty_40_0
+    port: ty_40_0.Hostlink
 
   - type: dlsPLC.vacValve
     addr: 10
@@ -736,8 +740,8 @@ entities:
     ilk7: QBPM3 Out/V1 Open
     ilk8: Unused
     ilk9: Unused
-    port: ty_40_0
-    vlvcc: VLVCC01
+    port: ty_40_0.Hostlink
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 20
@@ -764,8 +768,8 @@ entities:
     ilk7: QBPM3 Out/V2 Open
     ilk8: Unused
     ilk9: Unused
-    port: ty_40_0
-    vlvcc: VLVCC01
+    port: ty_40_0.Hostlink
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 30
@@ -792,8 +796,8 @@ entities:
     ilk7: QBPM3 Out/V3 Open
     ilk8: Unused
     ilk9: Unused
-    port: ty_40_0
-    vlvcc: VLVCC01
+    port: ty_40_0.Hostlink
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 50
@@ -820,8 +824,8 @@ entities:
     ilk7: Close Rq & ABSB Ope
     ilk8: QBPM1 Out/V11 Open
     ilk9: Unused
-    port: ty_40_0
-    vlvcc: VLVCC01
+    port: ty_40_0.Hostlink
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: dlsPLC.vacValve
     addr: 40
@@ -842,8 +846,8 @@ entities:
     ilk7: Unused
     ilk8: Unused
     ilk9: Unused
-    port: ty_40_0
-    vlvcc: VLVCC01
+    port: ty_40_0.Hostlink
+    vlvcc: BL04I-VA-VLVCC-01
 
   - type: vacuumValve.vacuumValveReadExtra
     B1: 39
@@ -874,7 +878,7 @@ entities:
     ilk8: Unused
     ilk9: Unused
     interlock: :INT1
-    port: ty_40_0
+    port: ty_40_0.Hostlink
 
   - type: dlsPLC.interlock
     addr: 9
@@ -897,7 +901,7 @@ entities:
     ilk8: Valve 1 Open
     ilk9: Valve 2 Open
     interlock: :INT2
-    port: ty_40_0
+    port: ty_40_0.Hostlink
 
   - type: dlsPLC.interlock
     addr: 39
@@ -920,7 +924,7 @@ entities:
     ilk8: Unused
     ilk9: Unused
     interlock: :INT4
-    port: ty_40_0
+    port: ty_40_0.Hostlink
 
   - type: rga.rga
     channel: 4
@@ -1042,7 +1046,7 @@ entities:
     P: BL04I-VA-VLVCC-01
     Q: :OVERRIDE
     outaddr: 81
-    port: ty_40_0
+    port: ty_40_0.Hostlink
 
   - type: dlsPLC.overrideRequestIndividual
     BIT: 1
