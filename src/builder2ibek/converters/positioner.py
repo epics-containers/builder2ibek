@@ -49,7 +49,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             motor_pv = motor.get("P", "") + motor.get("Q", "")
         else:
             try:
-                motor_pv = motor["P"] + motor["M"]
+                motor_pv = motor["M"]
             except KeyError as ex:
                 raise ValueError(
                     f"Motor '{motor['name']}' missing required attribute {ex!s}"
