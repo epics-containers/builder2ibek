@@ -22,8 +22,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # Find the dls_pmac_asyn_motor whose name = original motorpositioner.motor.
         # There is also dls_pmac_cs_asyn_motor but I don't need it for B21 IOCs,
         # so leave it out of the search for now.
-        # Get the motor's PV and EGU, the motor's PV is calculated by concatenating
-        # its P and M params.
+        # Get the motor's PV and EGU, the motor's PV is its M param.
         # Set motorpositioner.motor = motor's PV.
         # Set motorpositioner.EGU = motor's EGU.
         motor_types = (
@@ -44,9 +43,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             )
 
         motor = motors[0]
-        # softMotorForPiezo uses P+Q; pmac/basic motors use P+M
+        # softMotorForPiezo uses Q; pmac/basic motors use M
         if motor.get("type", "").endswith("softMotorForPiezo"):
-            motor_pv = motor.get("P", "") + motor.get("Q", "")
+            motor_pv = motor.get("Q", "")
         else:
             try:
                 motor_pv = motor["M"]
