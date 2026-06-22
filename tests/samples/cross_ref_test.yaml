@@ -19,65 +19,35 @@ entities:
 
   - type: epics.EpicsCaMaxArrayBytes
 
-  - type: autosave.Autosave
-    P: 'BL03I-MO-IOC-11:'
-
   - type: pmac.pmacAsynSSHPort
     IP: 10.0.0.0
     PASSWORD: pytest
     name: PPMAC01_PORT
 
   - type: pmac.PowerPMAC
-    P: BL03I-MO-PPMAC-01
+    P: BL999-MO-PPMAC-01
     name: PPMAC01
     pmacAsynSSHPort: PPMAC01_PORT
 
   - type: pmac.dls_pmac_asyn_motor
     ACCL: 0.1
-    ADDR: 5
+    ADDR: '{{ JAR | int }}'
     BACC: 0.5
     BVEL: 0.2
     Controller: PPMAC01
-    DESC: QBPM1 Y Translation
+    DESC: '{{ M | string }}'
     DHLM: 1.1
     DIR: Pos
     DLLM: -41
     EGU: mm
     ERES: '{{ MRES | float }}'
-    HOME: BL03I-DI-QBPM-01
+    HOME: '012345'
+    HOMEVIS: '{{ JAR | int }}'
     JAR: 1
     M: :Y
     MRES: 0.0001
-    P: BL03I-DI-QBPM-01
+    P: '{{ HOME | string }}'
     PREC: 4
     SREV: 200
     VELO: 2.5
-    VMAX: 3
-
-  - type: pmac.autohome
-    GRP2: QBPM1
-    P: BL03I-DI-QBPM-01
-    PLC: 12
-    PmacController: PPMAC01
-
-  - type: positioner.multipositioner
-    DESC: Pre-HFM QBPM
-    MP: :Y:MP
-    P: BL03I-DI-QBPM-01
-    STRA: Interlock
-    STRB: Out of the Beam
-    STRC: Lower Foil
-    STRD: Upper Foil
-    name: QBPM1.MP
-
-  - type: positioner.motorpositioner
-    DESC: Pre-HFM QBPM
-    EGU: mm
-    MP: QBPM1.MP
-    PREC: 5
-    Q: :Y:P
-    VALA: 1.1
-    VALB: -0.0025
-    VALC: -18.752
-    VALD: -37.855
-    motor: BL03I-DI-QBPM-01:Y
+    VMAX: '{{ VELO | float }}'
