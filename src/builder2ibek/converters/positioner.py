@@ -22,9 +22,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # Find the dls_pmac_asyn_motor whose name = original motorpositioner.motor.
         # There is also dls_pmac_cs_asyn_motor but I don't need it for B21 IOCs,
         # so leave it out of the search for now.
-        # Get the motor's PV and EGU, the motor's PV is its M param.
-        # Set motorpositioner.motor = motor's PV.
-        # Set motorpositioner.EGU = motor's EGU.
+        # Get the motor's PV and EGU
+        # Set motorpositioner.motor based on motor type
+        # Set motorpositioner.EGU to the motor's EGU
         motor_types = (
             "dls_pmac_asyn_motor",
             "basic_asyn_motor",
