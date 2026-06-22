@@ -45,7 +45,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         motor = motors[0]
         # softMotorForPiezo uses Q; pmac/basic motors use M
         if motor.get("type", "").endswith("softMotorForPiezo"):
-            motor_pv = motor.get("Q", "")
+            try:
+                motor_pv = motor["Q"]
+            except KeyError as ex:
+                raise ValueError(
+                    f"Motor '{motor['name']}' missing required attribute {ex!s}"
+                ) from ex
         else:
             try:
                 motor_pv = motor["M"]
