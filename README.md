@@ -17,8 +17,7 @@ Releases        | <https://github.com/epics-containers/builder2ibek/releases>
 
 # Claude
 
-For claude agentic conversions add in the claude sandbox guest project
-https://github.com/gilesknap/claude-sandbox
+For Claude agentic conversions, use the [claude-sandbox guest project](https://github.com/gilesknap/claude-sandbox) as a peer workspace.
 
 ## Testing
 
