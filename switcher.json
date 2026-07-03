@@ -4,6 +4,10 @@
     "url": "https://epics-containers.github.io/builder2ibek/main/"
   },
   {
+    "version": "2.2.0",
+    "url": "https://epics-containers.github.io/builder2ibek/2.2.0/"
+  },
+  {
     "version": "2.1.0",
     "url": "https://epics-containers.github.io/builder2ibek/2.1.0/"
   },
