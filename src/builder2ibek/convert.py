@@ -163,6 +163,20 @@ def _has_leading_zero(val: str) -> bool:
     return len(val) > 1 and val[0] == "0" and val[1] != "."
 
 
+_CROSS_REF_RE = re.compile(r"^\$\(([^)]+)\)$")
+
+
+def _jinja_type_filter(raw_value: str | None) -> str:
+    """Return the Jinja2 type filter for a raw XML attribute value."""
+    try:
+        f = float(raw_value)  # type: ignore
+        if _has_leading_zero(raw_value):  # type: ignore
+            return "string"
+        return "int" if f.is_integer() else "float"
+    except (ValueError, TypeError):
+        return "string"
+
+
 def make_entity(element: Element) -> Entity:
     """
     default Entity creation is a direct mapping
@@ -174,6 +188,15 @@ def make_entity(element: Element) -> Entity:
     entity.type = f"{element.module}.{element.name}"
 
     for attribute_name, attribute_val in element.attributes.items():
+        # detect cross-references like $(MRES) and convert to Jinja2 templates
+        m = _CROSS_REF_RE.match(attribute_val)
+        if m:
+            ref_name = m.group(1)
+            ref_val = element.attributes.get(ref_name)
+            type_filter = _jinja_type_filter(ref_val)
+            entity[attribute_name] = f"{{{{ {ref_name} | {type_filter} }}}}"
+            continue
+
         # convert to numeric type if appropriate, otherwise Serialize will
         # put quotes around numbers in the YAML
         try:

@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="IOCSH_PS1" name="prompt" value="BL03I-MO-IOC-11 -&gt;"/>
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_MAX_ARRAY_BYTES" name="maxArrayBytes" value="6000000"/>
+	<devIocStats.devIocStatsHelper guiTags="True" ioc="BL03I-MO-IOC-11" name="MO11" scanMonitor="True" screen="ioc_stats_softdls.edl"/>
+	<autosave.Autosave bl="False" debug="0" iocName="BL03I-MO-IOC-11" ip="None" path="/dls_sw/i03/epics/autosave" server="None" skip_1="False" vx_gid="500" vx_uid="37134"/>
+	<pmac.pmacAsynSSHPort IP="10.0.0.0" PASSWORD="pytest" name="PPMAC01_PORT"/>
+	<pmac.PowerPMAC P="BL03I-MO-PPMAC-01" Port="PPMAC01_PORT" name="PPMAC01"/>
+	<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="5" BACC="0.5" BVEL="0.2" DESC="QBPM1 Y Translation" DHLM="1.1" DLLM="-41" EGU="mm" ERES="$(MRES)" HOME="BL03I-DI-QBPM-01" HOMEVIS="" JAR="1" M=":Y" MRES="0.0001" OFF="0" P="BL03I-DI-QBPM-01" PORT="PPMAC01" PREC="4" SPORT="PPMAC01_PORT" SREV="200" TWV="1" VELO="2.5" VMAX="3" gda_desc="Pre-HFM QBPM Y" gda_name="QBPM1.Y" name="QBPM1.Y"/>
+	<!--<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="1" BACC="0.5" BVEL="0.1" DESC="S1 X Inboard Blade" DHLM="9" DLLM="-27" EGU="mm" ERES="$(MRES)" HOME="BL03I-AL-SLITS-01" HOMEVIS="" JAR="1" M=":X:MINUS" MRES="0.001" P="BL03I-AL-SLITS-01" PORT="PPMAC01" PREC="4" SPORT="PPMAC01_PORT" SREV="200" TWV="1" VELO="2" gda_desc="White Beam Slits XM" gda_name="S1.XM" name="S1.XMINUS"/>-->
+	<!--<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="2" BACC="0.5" BVEL="0.1" DESC="S1 X Outboard Blade" DHLM="27" DLLM="-9" EGU="mm" ERES="$(MRES)" HOME="BL03I-AL-SLITS-01" HOMEVIS="" JAR="1" M=":X:PLUS" MRES="0.001" P="BL03I-AL-SLITS-01" PORT="PPMAC01" PREC="4" SPORT="PPMAC01_PORT" SREV="200" TWV="1" VELO="2" gda_desc="White Beam Slits XP" gda_name="S1.XP" name="S1.XPLUS"/>-->
+	<!--<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="3" BACC="0.5" BVEL="0.1" DESC="S1 Y Top Blade" DHLM="27" DLLM="-9" EGU="mm" ERES="$(MRES)" HOME="BL03I-AL-SLITS-01" HOMEVIS="" JAR="1" M=":Y:PLUS" MRES="0.001" P="BL03I-AL-SLITS-01" PORT="PPMAC01" PREC="4" SPORT="PPMAC01_PORT" SREV="200" TWV="1" VELO="2" gda_desc="White Beam Slits YP" gda_name="S1.YP" name="S1.YPLUS"/>-->
+	<!--<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="4" BACC="0.5" BVEL="0.1" DESC="S1 Y Bottom Blade" DHLM="9" DLLM="-27" EGU="mm" ERES="$(MRES)" HOME="BL03I-AL-SLITS-01" HOMEVIS="" JAR="1" M=":Y:MINUS" MRES="0.001" P="BL03I-AL-SLITS-01" PORT="PPMAC01" PREC="4" SPORT="PPMAC01_PORT" SREV="200" TWV="1" VELO="2" gda_desc="White Beam Slits YM" gda_name="S1.YM" name="S1.YMINUS"/>-->
+	<pmac.autohome GRP1="" GRP2="QBPM1" P="BL03I-DI-QBPM-01" PLC="12" PORT="PPMAC01" name="QBPM1"/>
+	<!--<pmac.autohome GRP2="X Translations" GRP3="Y Translations" P="BL03I-AL-SLITS-01" PLC="11" PORT="PPMAC01" name="S1"/>-->
+	<positioner.multipositioner DESC="Pre-HFM QBPM" MP=":Y:MP" P="BL03I-DI-QBPM-01" STRA="Interlock" STRB="Out of the Beam" STRC="Lower Foil" STRD="Upper Foil" gda_desc="QBPM1 Pre-HFM QBPM" gda_name="QBPM1.APOSN" name="QBPM1.MP"/>
+	<positioner.motorpositioner DESC="Pre-HFM QBPM" MP="QBPM1.MP" PREC="5" Q=":Y:P" VALA="1.1" VALB="-0.0025" VALC="-18.752" VALD="-37.855" motor="QBPM1.Y" name="QBPM1.MP.M1"/>
+	<!--<pmac.CS CS="2" Controller="PPMAC01" PLCNum="10" name="PPMAC01_CS2"/>-->
+	<!--<pmac.CS CS="3" Controller="PPMAC01" PLCNum="10" name="PPMAC01_CS3"/>-->
+	<!--<pmac.dls_pmac_cs_asyn_motor ADDR="7" DESC="X Centre" DHLM="12.25" DLLM="-12.25" EGU="mm" ERES="$(MRES)" HOMEVIS="0" HOMEVISSTR="" JAR="1" M=":X:CENTRE" MRES="0.0001" P="BL03I-AL-SLITS-01" PORT="PPMAC01_CS2" PREC="5" RDBD="0.0001" TWV="1" VELO="2" gda_desc="S1 X Centre" gda_name="S1.XCENTRE" name="S1.XCENTRE"/>-->
+	<!--<pmac.dls_pmac_cs_asyn_motor ADDR="8" DESC="X Size" DHLM="49.937" DLLM="-14.935" EGU="mm" ERES="$(MRES)" HOMEVIS="0" HOMEVISSTR="" JAR="1" M=":X:SIZE" MRES="0.0001" OFF="0.499" P="BL03I-AL-SLITS-01" PORT="PPMAC01_CS2" PREC="5" RDBD="0.0001" TWV="1" VELO="2" gda_desc="S1 X Size" gda_name="S1.XSIZE" name="S1.XSIZE"/>-->
+	<!--<pmac.dls_pmac_cs_asyn_motor/>-->
+	<!--<pmac.dls_pmac_cs_asyn_motor ADDR="7" DESC="Y Centre" DHLM="10.8755" DLLM="-10.8755" EGU="mm" ERES="$(MRES)" HOMEVIS="0" HOMEVISSTR="" JAR="1" M=":Y:CENTRE" MRES="0.0001" P="BL03I-AL-SLITS-01" PORT="PPMAC01_CS3" PREC="5" RDBD="0.0001" TWV="1" VELO="2" gda_desc="S1 Y Centre" gda_name="S1.YCENTRE" name="S1.YCENTRE"/>-->
+	<!--<pmac.dls_pmac_cs_asyn_motor ADDR="8" DESC="Y Size" DHLM="50.521" DLLM="-17.021" EGU="mm" ERES="$(MRES)" HOMEVIS="0" HOMEVISSTR="" JAR="1" M=":Y:SIZE" MRES="0.0001" OFF="1.25" P="BL03I-AL-SLITS-01" PORT="PPMAC01_CS3" PREC="5" RDBD="0.0001" TWV="1" VELO="2" gda_desc="S1 Y Size" gda_name="S1.YSIZE" name="S1.YSIZE"/>-->
+	<!--<BL03I.auto_asynMotorAlias P="BL03I-AL-SLITS-01:X:CENTRE" alias="BL03I-AL-SLITS-01:X:CENTER"/>-->
+	<!--<BL03I.auto_asynMotorAlias P="BL03I-AL-SLITS-01:Y:CENTRE" alias="BL03I-AL-SLITS-01:Y:CENTER"/>-->
+</components>

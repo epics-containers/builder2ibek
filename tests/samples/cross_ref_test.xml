@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="IOCSH_PS1" name="prompt" value="BL999-MO-PPMAC-01 -&gt;"/>
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_MAX_ARRAY_BYTES" name="maxArrayBytes" value="6000000"/>
+	<pmac.pmacAsynSSHPort IP="10.0.0.0" PASSWORD="pytest" name="PPMAC01_PORT"/>
+	<pmac.PowerPMAC P="BL999-MO-PPMAC-01" Port="PPMAC01_PORT" name="PPMAC01"/>
+	<pmac.dls_pmac_asyn_motor ACCL="0.1" ADDR="$(JAR)" BACC="0.5" BVEL="0.2" DESC="$(M)" DHLM="1.1" DLLM="-41" EGU="mm" 
+	ERES="$(MRES)" HOME="012345" HOMEVIS="$(JAR)" JAR="1" M=":Y" MRES="0.0001" OFF="0" P="$(HOME)" PORT="PPMAC01" 
+	PREC="4" SPORT="PPMAC01_PORT" SREV="200" TWV="1" VELO="2.5" VMAX="$(VELO)" gda_desc="" gda_name="QBPM1.Y" name="QBPM1.Y"/>
+</components>
