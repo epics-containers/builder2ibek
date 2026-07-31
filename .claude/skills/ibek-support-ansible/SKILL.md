@@ -61,3 +61,81 @@ Then add the corresponding ansible task in `pre_build.yml` and/or `post_build.ym
 - **Complex ansible steps:** use `tasks` entries pointing to separate `*_task.yml` files
   (useful when you need ansible features like `creates`, `register`, `failed_when`)
 - **Module discovery for `all`:** parses `RUN ansible.sh` lines from the Dockerfile
+
+### `patch_lines` appends at EOF — beware Makefiles
+
+`patch_lines` is ansible `lineinfile`, so when its `regexp` matches nothing it
+**appends the line at the end of the file** rather than failing. That is silent
+and usually harmless, but it is wrong whenever position matters.
+
+Most EPICS Makefiles end with `include $(TOP)/configure/RULES*`, and make
+expands many variables *while processing that include* — `<dir>_DEPEND_DIRS` in
+`RULES_DIRS`, for example. A line appended after it has no effect at all, and
+the build fails somewhere unrelated.
+
+Use `patch_blocks` when the line must land in a particular place; it supports
+`insertafter`, so anchor on something stable near the top:
+
+```yaml
+patch_blocks:
+  - path: <module>App/Makefile
+    insertafter: '^include \$\(TOP\)/configure/CONFIG$'
+    marker: "# {mark} <why>"
+    block: |
+      Db_DEPEND_DIRS = src
+```
+
+Verify the anchor matches exactly once — `blockinfile` inserts after the *last*
+match.
+
+### Installing a tool rather than a support module
+
+Some entries under `ibek-support/` install a build time tool with no repo to
+clone and no `make` to run — `vdct` (VisualDCT) is the first. The role has no
+"skip build" switch and `build.yml` runs `make clean` unconditionally, so run
+only the phases you need by tag:
+
+```dockerfile
+COPY ibek-support/vdct/ vdct
+RUN ansible.sh vdct --tags system,pre_build_tasks
+```
+
+`ansible.sh` passes trailing arguments through to `ansible-playbook` untouched.
+The `system` tag gives you `apt_developer` and `download_extras`;
+`pre_build_tasks` gives you `tasks` entries. Clone, release, build and the
+runtime phases are all skipped.
+
+Do the real work in a `tasks` file, not `bash`/`scripts` entries — those run
+with `chdir: local_path`, which does not exist when nothing was cloned.
+
+Put such tools immediately after the `COPY ibek-support/_ansible` line so every
+later module can use them.
+
+---
+
+## Generic IOC image publishing — on GitHub, tags only
+
+A generic IOC repo's `.github/workflows/build.yml` builds and tests on every
+push, but both the "Push developer image" and "Push runtime image" steps are
+gated on:
+
+```yaml
+if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+```
+
+So on GitHub **a branch push publishes nothing**.
+
+This is easy to get wrong because the `docker/metadata-action` step is *not*
+gated — it still computes `ghcr.io/epics-containers/<repo>-developer:<branch>`
+and prints it into the CI log. Seeing that tag in a successful branch build is
+not evidence that an image exists.
+
+DLS GitLab behaves differently: `.gitlab/kanikobuild.sh` pushes on every
+commit, using the branch name as the image tag when `CI_COMMIT_TAG` is unset
+(untagged commits go to the work registry, tagged ones to prod). So branch
+images do exist there.
+
+Consequence when layering generic IOCs (`ARG DEVELOPER=.../ioc-<base>-developer:<tag>`):
+if the base lives on GitHub you cannot test a downstream IOC against a branch
+build of it. Cut and push a tag on the base repo first, then point `DEVELOPER`
+at that tag.
