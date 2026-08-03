@@ -70,6 +70,9 @@ bumping a submodule.
 - `/beamline-reconvert <beamline> [services-repo]` — re-run xml2yaml on all IOCs and validate schema
 - `/beamline-check <beamline> [services-repo]` — run ioc-check on all IOCs in a beamline
 - `/ibek-concepts` — ibek entity model patterns (type: id/object, databases.args, Jinja2, auto_* entities, port references)
+- `/vdct-conversion` — VDCT `.vdb` → msi `.template` conversion and `auto_*` derivation
+- `/streamdevice-sweep` — sweep `/dls_sw/prod` into `ibek-runtime-streamdevice`
+  runtime patterns: eligibility gates, skip report, docs, `ibek.manifest.yaml`
 - See [docs/tutorials/create-support-yaml.md](docs/tutorials/create-support-yaml.md)
   and [docs/tutorials/create-support-yaml-advanced.md](docs/tutorials/create-support-yaml-advanced.md)
   for full support YAML guides.

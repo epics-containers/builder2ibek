@@ -11,7 +11,8 @@ AI-assisted IOC conversion. It splits into two parts:
 
 - **Skills** (`.claude/skills/<name>/SKILL.md`) — reference knowledge that
   Claude auto-loads when a task's context matches the skill description.
-  Currently: `ibek-concepts`, `ibek-support-ansible`, `skills-edit`.
+  Currently: `beamline-gui`, `ibek-concepts`, `ibek-support-ansible`,
+  `skills-edit`, `streamdevice-sweep`, `vdct-conversion`.
 - **Commands** (`.claude/commands/<name>.md`) — explicit user workflows
   invoked via `/<name>` with arguments. Currently: `ioc-convert`,
   `ioc-convert-raw`, `ioc-check`, `ioc-inspect`, `beamline-convert`,
@@ -77,6 +78,9 @@ Each concept should live in exactly one place:
 - `shared/vxworks-to-rtems-differences.md` — VxWorks vs RTEMS API differences
 - `shared/module-rename-map.md` — old DLS → epics-containers module/verb renames
   for raw-IOC conversion (`/ioc-convert-raw`)
+- `vdct-conversion/SKILL.md` — VDCT → msi conversion and `auto_*` derivation
+- `streamdevice-sweep/SKILL.md` — which DLS modules can be runtime patterns,
+  and how the sweep into `ibek-runtime-streamdevice` is run
 
 When adding a concept, ask: does it already exist in one of the above? If so,
 link to it rather than repeating it.
