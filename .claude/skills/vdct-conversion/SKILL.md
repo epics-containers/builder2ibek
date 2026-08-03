@@ -218,6 +218,21 @@ currAmpSingle.template:  $(name)
 Then copy the `.template` files into the pattern folder and author the
 `*.ibek.support.yaml`.
 
+### Picking the release — neither `ls -t` nor `sort -V` is safe
+
+A module lives under several EPICS releases (`/dls_sw/prod/R3.14.11/...`,
+`R3.14.12.3`, `R3.14.12.7`), and "latest in prod" means the newest *version
+directory under the newest EPICS release* — usually `R3.14.12.7`. Taking the
+first `/dls_sw/prod/*/support/<mod>` glob hit gives you `R3.14.11`, which for
+OXCS700 is 2-4 against a real latest of 2-22.
+
+Within a release, DLS version dirs use dashes (`2-13`), but strays exist:
+gardasoftLED has a mis-numbered `2.9` that `sort -V` ranks **after** `2-13`
+even though it predates it by 17 months. Check mtimes when the ordering looks
+odd — `ls -latr` on the module dir settles it, and `ls -1t` is wrong in the
+other direction because it also ranks `.tar.gz` archives and whatever was last
+touched.
+
 ### Worked example — currAmp 1-45 (validated)
 
 | File | Role | Outcome |
@@ -234,6 +249,71 @@ Then 9 annotation-only macros across 4 files get `=` defaults (listed above), an
 `currAmp.template` is dropped — `Db/Makefile` never installs it, so it is build-time
 only. Result: 6 entity models, 8 shipped templates, proved identical to the VDCT
 build (section 6c).
+
+### Driver scripts
+
+`convert-module.sh <module> <dls-dir> <out>` runs the whole of section 4 from a
+clean copy of the read-only DLS sources, then applies the per-module fixups in
+section 4a. `validate-module.sh` is section 6c, `macro-report.sh` derives the
+parameter set for section 5, and `make-test-ioc.py` builds the every-entity
+`ioc.yaml` that section 6a needs.
+
+---
+
+## 4a. What vdct2template cannot do
+
+Three failure modes the tool leaves for you. All three were found converting
+OXCryo / OXCS700 / gardasoftLED / microlab500, and each is silent — the tool
+exits 0 and writes plausible output.
+
+### Nested expansion loses the middle layer's `_` prefix
+
+`OXCB700.vdb` → `OXcommonCB.vdb` → `OXcommon.vdb`. A file that is *both* an
+include target and an expansion gets written twice: once by `Macros.process()`
+(reads the raw `.vdb`, applies the `_` prefix, leaves `expand()` intact), then
+again by the `Expansion` branch (converts `expand()`, no `_` prefix). The
+second write wins, so the parent substitutes `_CTEMP_DRVL` while the child
+still reads `$(CTEMP_DRVL)`.
+
+You cannot fix it by prefixing again — both levels would want `_CTEMP_DRVL` and
+`substitute "_CTEMP_DRVL=$(_CTEMP_DRVL)"` is a msi self-reference. When the
+middle layer passes the macro straight through unchanged, just **delete its
+`substitute` lines**: the grandparent's substitution is still in scope when the
+grandchild is included one level down.
+
+### VDCT instance-port references are left as literal macros
+
+`field(LNK3, "$(microlab500Right.STARTUP).PROC")` with
+`#! TemplateField("microlab500Right","STARTUP",...)` means "the record bound to
+the STARTUP port of that expand instance". VisualDCT resolves it at flatten
+time; vdct2template treats `microlab500Right.STARTUP` as an ordinary macro name
+and msi then reports it undefined.
+
+Resolve by hand to the name the include produces — the child names the record
+`$(_P)$(_R):$(_SIDE):STARTUP` and the parent passes `_SIDE=RIGHT`, so it is
+`$(P)$(R):RIGHT:STARTUP`. Find them with:
+
+```bash
+grep -n '\$([A-Za-z_][A-Za-z0-9_]*\.[A-Za-z]' <Db>/*.vdb | grep -v ':#!'
+```
+
+Rare — 2 occurrences in the 4-module set, none in the other three modules.
+
+### A child that is *also* installed standalone must not get the `_` prefix
+
+`Db/Makefile` installs `PP600SeriesChannel.template` **and** `PP612LED.vdb`
+expands it twice. Prefixed, the standalone entity breaks; unprefixed, the
+include breaks — unless the parent passes literals, which is the common case
+(`macro(N,"1")`, `macro(N,"2")`).
+
+The `_` prefix is only needed when the passed *value* references the same macro
+name (`macro(N,"$(N=1)")` → a self-referential `substitute`). With literals,
+drop the prefix and the one file serves both roles: an msi `substitute` beats a
+value supplied from the substitution file, verified with a hostile `-M N=99`
+against `PP612LED.template` — channels still came out `CH1`/`CH2`.
+
+Detect the case with `comm -12` between the `DB +=` list in `Db/Makefile` and
+the set of `expand()` targets.
 
 ---
 
