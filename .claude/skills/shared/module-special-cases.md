@@ -28,3 +28,19 @@ The public module at `ibek-support/iocStats/` defines
 `module: devIocStats` with `iocAdminSoft` using the `$(IOCSTATS)` macro.
 Do **not** create a `ibek-support-dls/devIocStats/` — the DLS-specific
 copy was removed as redundant.
+
+## `positioner.motorpositioner` — `motor` is a suffix, not a PV
+
+`motorpositioner.template` resolves the link as `$(P)$(motor).RBV`, and the
+motorpositioner takes its `P` from the parent multipositioner (`P: "{{MP.P}}"`).
+So `motor` holds the referenced motor's **`M`** (or **`Q`** for
+`softMotorForPiezo`) — a bare suffix like `:Y`, which looks wrong but is what
+XMLbuilder emitted.
+
+Setting `motor` to `P + M` duplicates the prefix and produces a dead link:
+`BL04I-MO-MAPT-01BL04I-MO-MAPT-01:Y.RBV`.
+
+This only works while the motor and the multipositioner share a prefix, which
+XMLbuilder asserted and `converters/positioner.py` now checks. If you see
+`motor ... prefix does not match multipositioner ... prefix`, the XML is
+referencing a motor on another device, and `$(P)$(motor)` cannot express it.
