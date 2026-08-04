@@ -520,15 +520,20 @@ def _record_files(module_dir: Path) -> list[Path]:
     built output. Both are read: a record that exists only in one still counts.
     """
     found: list[Path] = []
-    seen: set[str] = set()
+    seen: set[Path] = set()
     for sub in ("db", "*App/Db", "*App/db"):
         for d in module_dir.glob(sub):
             if not d.is_dir():
                 continue
             for pat in ("*.template", "*.db", "*.vdb"):
                 for f in sorted(d.glob(pat)):
-                    if f.name not in seen:
-                        seen.add(f.name)
+                    # Keyed on the path within the release, not the basename:
+                    # `db/x.template` and `fooApp/Db/x.template` are distinct
+                    # inputs, and deduplicating by name let the built copy hide
+                    # a record the authored source declares.
+                    rel = f.relative_to(module_dir)
+                    if rel not in seen:
+                        seen.add(rel)
                         found.append(f)
     return found
 
