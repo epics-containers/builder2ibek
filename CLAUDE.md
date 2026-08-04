@@ -47,9 +47,15 @@ uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 
 # Testing:
 uv run pytest
-./tests/samples/make_samples.sh   # regenerate sample outputs
-./update-schema                   # rebuild global ioc schema
+env -u EPICS_ROOT uv run pytest      # as CI runs it -- local /epics hides failures
+./tests/samples/make_samples.sh      # regenerate sample outputs (after any pin bump)
+./update-schema                      # rebuild global ioc schema
+python3 tests/vendor_support_dls.py --check   # is the vendored dls copy current?
 ```
+
+See [.claude/skills/shared/testing-and-ci.md](.claude/skills/shared/testing-and-ci.md)
+for the vendored ibek-support-dls copy, the pin guards, and what to run after
+bumping a submodule.
 
 ## Slash Commands
 
