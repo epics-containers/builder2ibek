@@ -46,7 +46,6 @@ entities:
     interrupt_vector: Vec2
     invertin: true
     invertout: true
-    ip_support: true
     name: BL19I-VA-IOC-01.Slot6
     scan: 100
     slot: 6

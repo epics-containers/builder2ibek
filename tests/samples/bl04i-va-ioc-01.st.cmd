@@ -29,6 +29,16 @@ save_restoreSet_SeqPeriodInSeconds 600
 save_restoreSet_DatedBackupFiles 1
 save_restoreSet_IncompleteSetsOk 1
 set_pass0_restoreFile autosave_positions.sav
+# settings are restored at BOTH pass 0 (before iocInit) and pass 1
+# (after iocInit), reproducing the legacy DLS level-1 semantics.
+# Pass 0 is essential for records that self-initialise from their
+# restored value at PINI - e.g. dlsPLC_temperature :HIGH, whose
+# :HIGH_INIT calcout copies the restored :HIGH into the temperature
+# record's .HIGH field during iocInit. With a pass-1-only restore
+# that PINI runs before the value is restored and :HIGH collapses to
+# 0. Pass 1 is also kept so PVs that get overwritten during init are
+# restored on top afterwards.
+set_pass0_restoreFile autosave_settings.sav
 set_pass1_restoreFile autosave_settings.sav
 
 # ErConfigurePMC card_id card_index
@@ -50,6 +60,8 @@ Hy8001Configure(60, 6, $(Vec2), 0, 0, 0, 100, 0, 1, 1)
 # records (e.g. the VLVCC valve-crate interlocks on #C60) never
 # reach the hardware. ipacAddHy8001 is the RTEMS wrapper (cf ipacAddHy8002).
 ipacAddHy8001("6")
+# record above carrier card ID 2 in 'BL04I-VA-IOC-01.Slot6'
+epicsEnvSet BL04I-VA-IOC-01.Slot6 2
 
 # DLS8515Configure(card id, carrier_index, interrupt_vector)
 DLS8515Configure(40, $(BL04I-VA-IOC-01.Slot4), $(Vec3))

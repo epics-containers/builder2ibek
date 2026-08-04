@@ -4,6 +4,7 @@ cd ""
 
 epicsEnvSet EPICS_TZ GMT0BST
 epicsEnvSet STREAM_PROTOCOL_PATH /epics/runtime/protocol/
+epicsEnvSet EPICS_CA_MAX_ARRAY_BYTES 6000000
 
 dbLoadDatabase dbd/ioc.dbd
 ioc_registerRecordDeviceDriver pdbbase
@@ -12,7 +13,7 @@ ioc_registerRecordDeviceDriver pdbbase
 set_requestfile_path("/epics", "autosave")
 set_requestfile_path("/epics", "runtime")
 set_savefile_path("/autosave")
-save_restoreSet_status_prefix BL11I-CS-IOC-09:
+save_restoreSet_status_prefix BL03I-MO-IOC-11:
 save_restoreSet_Debug 0
 save_restoreSet_NumSeqFiles 3
 save_restoreSet_SeqPeriodInSeconds 600
@@ -30,12 +31,12 @@ set_pass0_restoreFile autosave_positions.sav
 # restored on top afterwards.
 set_pass0_restoreFile autosave_settings.sav
 set_pass1_restoreFile autosave_settings.sav
-asSetFilename /epics/support/pvlogging/src/access.acf
-set_logging_enable 1
-set_max_array_length 10
-
-# drvAsynIPPortConfigure(name, port, priority, noAutoConnect, noProcessEos)
-drvAsynIPPortConfigure(rgaPort, 10.111.5.1:5025, 100, 0, 0)
+# Create SSH Port (PortName, IPAddress, Username, Password, Priority, DisableAutoConnect, noProcessEos)
+drvAsynPowerPMACPortConfigure("PPMAC01_PORT", "10.0.0.0", "root", "pytest", "0", "0", "0")
+# Configure Model 3 Controller Driver (ControlerPort, LowLevelDriverPort, Address, Axes, MovingPoll, IdlePoll)
+pmacCreateController("PPMAC01", "PPMAC01_PORT", 0, 8, 100, 1000)
+# Configure Model 3 Axes Driver (Controler Port, Axis Count)
+pmacCreateAxes("PPMAC01", 8)
 
 dbLoadRecords /ioc.db
 iocInit
@@ -43,5 +44,3 @@ iocInit
 # Autosave post iocInit
 create_monitor_set autosave_positions.req, 5, ""
 create_monitor_set autosave_settings.req, 30, ""
-
-seq(sncDegas, "P=BL11I-EA-RGA-01")
