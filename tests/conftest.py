@@ -50,19 +50,27 @@ def sample_needs_dls(sample_yaml: Path) -> bool:
     return not used <= COMMUNITY_MODULES
 
 
-def _run_update_schema(tmp_path_factory):
-    env = os.environ.copy()
-    # Use a temp dir when /epics is not writable (e.g. CI runners)
-    epics_root = Path(env.get("EPICS_ROOT", "/epics"))
-    if not os.access(epics_root.parent, os.W_OK) and not epics_root.exists():
-        tmpdir = tmp_path_factory.mktemp("epics")
-        env["EPICS_ROOT"] = str(tmpdir)
+def _epics_root(tmp_path_factory) -> Path:
+    """Where ibek-defs should be built.
+
+    Prefer $EPICS_ROOT (or /epics) when it is writable, as in the devcontainer.
+    Otherwise use a temp dir — but one derived from getbasetemp().parent, which
+    is the same path in every xdist worker, rather than mktemp(), which gives
+    each worker a directory of its own.
+    """
+    epics_root = Path(os.environ.get("EPICS_ROOT", "/epics"))
+    if not os.access(epics_root, os.W_OK):
+        epics_root = tmp_path_factory.getbasetemp().parent / "epics"
+        epics_root.mkdir(exist_ok=True)
+    return epics_root
+
+
+def _run_update_schema():
     result = subprocess.run(
         [str(REPO_ROOT / "update-schema")],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
-        env=env,
     )
     assert result.returncode == 0, f"update-schema failed:\n{result.stderr}"
 
@@ -82,15 +90,24 @@ def ibek_defs(tmp_path_factory, worker_id):
     """
     if not HAS_COMMUNITY_SUPPORT:
         pytest.skip("no support submodules available to build ibek-defs from")
+
+    # Export EPICS_ROOT rather than passing it to update-schema alone:
+    # test_generate runs `ibek runtime generate2` as a subprocess of its own,
+    # and that has to find the same ibek-defs. Setting it only for the
+    # update-schema call built the definitions into a directory nothing else
+    # could see, so generate2 fell back to /epics -- absent on a CI runner --
+    # and resolved only ibek's builtin models.
+    os.environ["EPICS_ROOT"] = str(_epics_root(tmp_path_factory))
+
     if worker_id == "master":
         # non-xdist run: just do it
-        _run_update_schema(tmp_path_factory)
+        _run_update_schema()
         return
     shared_tmp = tmp_path_factory.getbasetemp().parent
     done = shared_tmp / "schema.done"
     with FileLock(str(shared_tmp / "schema.lock")):
         if not done.exists():
-            _run_update_schema(tmp_path_factory)
+            _run_update_schema()
             done.touch()
 
 
