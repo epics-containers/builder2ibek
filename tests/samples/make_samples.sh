@@ -14,6 +14,10 @@ set -e
 # pass a list of XML files as args or use all xml files in the samples dir
 XMLS=${@:-$(ls *.xml)}
 
+# samples that generate2 rejected; reported at the end so that one bad sample
+# does not stop the rest being regenerated
+failed=""
+
 for x in ${XMLS}; do
   stem=$(echo "${x%.xml}" | tr '[:upper:]' '[:lower:]')
   y="${stem}.yaml"
@@ -37,9 +41,15 @@ for x in ${XMLS}; do
   else
     echo " ERROR SKIPPING !!! generate2 SKIP (validation failed)"
     rm -f "${stem}.st.cmd" "${stem}.ioc.subst"
+    failed="$failed $stem"
   fi
 
   rm -rf "$tmpdir"
 done
 
 builder2ibek db-compare ./SR03C-VA-IOC-01_expanded.db ./sr03c-va-ioc-01.db --output ./compare.diff --ignore SR03C-VA-IOC-01:
+
+if [ -n "$failed" ]; then
+  echo "ERROR: generate2 failed, outputs removed for:$failed"
+  exit 1
+fi
