@@ -347,6 +347,11 @@ def needs_pandoc(plan: list[dict]) -> bool:
     )
 
 
+def is_generated(f: Path) -> bool:
+    """Was this file written by a sweep? Only those may be overwritten or pruned."""
+    return f.read_text(errors="replace")[:200].startswith(GENERATED_MARK)
+
+
 def prune(docs: Path, keep: set[str]) -> None:
     """Remove docs an earlier sweep wrote and this one did not.
 
@@ -360,7 +365,7 @@ def prune(docs: Path, keep: set[str]) -> None:
     for f in sorted(docs.iterdir()):
         if not f.is_file() or f.name in keep:
             continue
-        if f.read_text(errors="replace")[:200].startswith(GENERATED_MARK):
+        if is_generated(f):
             f.unlink()
             print(f"removed stale {f} (not produced by this release's sweep)")
     if not any(docs.iterdir()):
@@ -375,10 +380,26 @@ def apply_plan(
         sys.exit(PANDOC_MISSING)
     docs = pattern / "docs"
     names = assign_names(plan)
+
+    # A destination that already exists and is not this script's output is a
+    # hand-curated document. prune() never deletes one, but the write loop below
+    # would overwrite it before prune ever runs - so the destinations are
+    # checked up front and the whole apply refuses rather than half-writing.
+    written = [i for i in plan if i["action"] in ("convert", "verbatim")]
+    clashes = [
+        d
+        for d in (docs / names[i["file"]] for i in written)
+        if d.exists() and not is_generated(d)
+    ]
+    if clashes:
+        sys.exit(
+            "refusing to overwrite hand-curated documentation:\n  "
+            + "\n  ".join(str(c) for c in clashes)
+            + "\nrename or delete these, or merge the new text by hand."
+        )
+
     produced = 0
-    for item in plan:
-        if item["action"] not in ("convert", "verbatim"):
-            continue
+    for item in written:
         src = module_dir / item["file"]
         docs.mkdir(parents=True, exist_ok=True)
         dest = docs / names[item["file"]]
