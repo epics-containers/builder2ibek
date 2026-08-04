@@ -12,29 +12,15 @@ import pytest
 
 from builder2ibek.convert import convert_file
 from builder2ibek.converters.epics_base import InterruptVector
-from tests.conftest import (
-    HAS_COMMUNITY_SUPPORT,
-    requires_dls,
-    requires_support,
-    sample_needs_dls,
-)
+from tests.conftest import DLS_SUPPORT, HAS_COMMUNITY_SUPPORT, requires_support
 
 SAMPLES = Path(__file__).parent / "samples"
-SAMPLE_XMLS = sorted(SAMPLES.glob("*.xml"))
 
-# Both conversion steps depend on the support repos: generate2 needs every
-# module a sample uses to be in ibek-defs, and xml2yaml consults the same YAMLs
-# via support_defaults to strip parameters that match a model's default. So
-# mark each sample with what it actually requires, rather than skipping the lot.
+# Every sample runs everywhere. The dls entity models are always resolvable --
+# from the submodule locally, or from the vendored copy CI installs -- so there
+# is nothing left to mark a sample as conditional on.
 SAMPLE_PARAMS = [
-    pytest.param(
-        xml,
-        marks=[requires_dls]
-        if sample_needs_dls(SAMPLES / f"{xml.stem.lower()}.yaml")
-        else [],
-        id=xml.stem,
-    )
-    for xml in SAMPLE_XMLS
+    pytest.param(xml, id=xml.stem) for xml in sorted(SAMPLES.glob("*.xml"))
 ]
 
 
@@ -47,6 +33,20 @@ def test_support_submodule_present():
     assert HAS_COMMUNITY_SUPPORT, (
         "ibek-support submodule not initialised — run "
         "`git submodule update --init ibek-support`"
+    )
+
+
+def test_dls_models_available():
+    """Guard the other half of ibek-defs.
+
+    The samples no longer skip when ibek-support-dls is missing, because the
+    vendored copy makes its models available to anyone. If neither is present
+    the dls samples just fail, so say why once rather than 15 times.
+    """
+    assert any(DLS_SUPPORT.glob("*/*.ibek.support.yaml")), (
+        "no ibek-support-dls entity models — run "
+        "`git submodule update --init ibek-support-dls`, or without GitLab "
+        "access `python3 tests/vendor_support_dls.py --install`"
     )
 
 
@@ -134,7 +134,6 @@ def test_generate(sample_xml: Path, ibek_defs):
         )
 
 
-@requires_dls
 def test_debug(samples: Path):
     """
     A single test to debug the conversion process (a redundant test, just useful
