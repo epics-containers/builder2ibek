@@ -34,10 +34,15 @@ local function strip_img_tags(text)
         if attrs ~= "" and not attrs:match("^[%s/]") then
             return nil -- leave the match untouched
         end
-        local src = attrs:match("[sS][rR][cC]%s*=%s*[\"']([^\"']*)[\"']")
-            or attrs:match("[sS][rR][cC]%s*=%s*([^%s>]+)")
+        -- The leading %s is required, not decoration: without it `src` matches
+        -- inside `data-src` and the figure list names the lazy-load
+        -- placeholder instead of the real image. attrs always opens with the
+        -- separator after `<img`, so a real attribute is always preceded by
+        -- whitespace.
+        local src = attrs:match("%s[sS][rR][cC]%s*=%s*[\"']([^\"']*)[\"']")
+            or attrs:match("%s[sS][rR][cC]%s*=%s*([^%s>]+)")
             or "?"
-        local alt = attrs:match("[aA][lL][tT]%s*=%s*[\"']([^\"']*)[\"']") or ""
+        local alt = attrs:match("%s[aA][lL][tT]%s*=%s*[\"']([^\"']*)[\"']") or ""
         note(src, alt)
         removed = removed + 1
         return ""
