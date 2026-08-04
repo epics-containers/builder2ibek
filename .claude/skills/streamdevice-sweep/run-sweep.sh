@@ -1,6 +1,7 @@
 #!/bin/bash
 # Run the mechanical stages of the sweep: candidate set, both eligibility gates,
-# the description audit, and the skip report. Roughly 30 seconds.
+# the description audit, and the skip report. Roughly three and a half minutes,
+# nearly all of it stage 2 walking /dls_sw/prod.
 #
 # This does NOT generate or refresh any pattern folder. Sections 4-7 of SKILL.md
 # (VDCT, docs curation, the manifest, entity models) need judgement and are
@@ -23,7 +24,7 @@ bash "$HERE/image-modules.sh" "$IOC" | tee "$WORK/image-modules.txt"
 "$PY" -c 'import json,sys; print(json.dumps([l.strip() for l in open(sys.argv[1]) if l.strip()]))' \
     "$WORK/image-modules.txt" > "$WORK/image-modules.json"
 
-echo "== 2. candidate set + case-duplicate rule (~20s: walks /dls_sw/prod)"
+echo "== 2. candidate set + case-duplicate rule (~3 min: walks /dls_sw/prod)"
 "$PY" "$HERE/scan-candidates.py" -o "$WORK" > "$WORK/candidates.tsv"
 
 echo "== 3. eligibility gates"

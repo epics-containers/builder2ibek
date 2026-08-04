@@ -22,13 +22,13 @@ VDCT-authored databases), [ibek-concepts](../ibek-concepts/SKILL.md) and
 
 > `/dls_sw` is a read-only fileserver. **Never run a broad `find`/`grep` over
 > `/dls_sw`** — the scripts here walk only the latest release of each module and
-> take about 30 seconds in total. Do not hand-roll a wider scan.
+> take about three and a half minutes in total. Do not hand-roll a wider scan.
 
 ## Run it
 
 ```bash
 S=.claude/skills/streamdevice-sweep
-bash $S/run-sweep.sh /tmp/sweep     # stages 1-3 and 8 only. ~30s.
+bash $S/run-sweep.sh /tmp/sweep     # stages 1-3 and 8 only. ~3.5 min.
 ```
 
 `run-sweep.sh` does the stages that are pure computation over `/dls_sw/prod`.
@@ -60,7 +60,7 @@ case-duplicates (PRs #11 and #13). Branch from `main`.
 sweeping every module in `/dls_sw/prod` and rejecting most of them.
 
 ```bash
-python3 $S/scan-candidates.py -o /tmp/sweep
+uv run --no-project python $S/scan-candidates.py -o /tmp/sweep
 ```
 
 Measured on 2026-08-03: **748** module names across the eight `/dls_sw/prod/R*`
@@ -157,11 +157,11 @@ The first two are the ones that had to be cleaned up by hand
 
 ```bash
 bash $S/image-modules.sh /workspaces/ioc-streamdevice > /tmp/sweep/image-modules.txt
-python3 $S/check-eligibility.py --candidates /tmp/sweep/candidates.json \
+uv run --no-project python $S/check-eligibility.py --candidates /tmp/sweep/candidates.json \
         --image-modules /tmp/sweep/image-modules.txt -o /tmp/sweep/eligibility.json
 ```
 
-Verdicts are `PASS` / `SKIP` / `REVIEW`. Measured: **96 PASS, 67 SKIP, 23 REVIEW**
+Verdicts are `PASS` / `SKIP` / `REVIEW`. Measured: **94 PASS, 67 SKIP, 25 REVIEW**
 out of 186.
 
 ### The reference set: read it from `ioc-streamdevice`'s Dockerfile
@@ -177,7 +177,7 @@ line, minus:
 
 Today that yields nine modules:
 
-```
+```text
 StreamDevice  asyn  autosave  busy  calc  iocStats  pvlogging  sscan  std
 ```
 
@@ -311,10 +311,16 @@ It rejects three things:
 - **A `DTYP` the image does not provide** — `Hy8001`, `Hy8401ip`, `Hy8402ao`
   (Hytec IP-carrier hardware) as against `stream`, the soft-channel family and
   `asyn*`. A macro-supplied `DTYP` such as `$(DTYPE)` cannot be decided
-  statically and goes to `REVIEW`.
+  statically, so the module still `PASS`es and the macro is carried into the
+  report as `instance_dtyp`. The pattern is vendorable; which device support an
+  instance names is an instance question the sweep cannot answer. That is a
+  flagged risk, not a cleared one — if an instance names anything but soft
+  support, that support has to be compiled into its IOC. `currAmp`'s known
+  consumer does not use the entity model in question at all and reads the device
+  over Channel Access, which is why the flag beats a rejection here.
 
 Gate 3 caught `jena`, `ozone` and `enzLoCuM4`, which pass both module gates and
-still cannot run, and sent `currAmp` to `REVIEW`.
+still cannot run, and flagged `currAmp`'s instance-chosen `DTYP`.
 
 ### Gate 3 rescues gate 1, and never gate 2
 
@@ -367,7 +373,7 @@ about it says yes.
 backlog for the next phase of work.**
 
 ```bash
-python3 $S/render-report.py --outdir /tmp/sweep \
+uv run --no-project python $S/render-report.py --outdir /tmp/sweep \
         --repo /workspaces/ibek-runtime-streamdevice > BUILD-TIME-ONLY.md
 ```
 
@@ -405,7 +411,7 @@ one: eight per-module analyses no sweep can reproduce (`mks937a` →
 
 The report is therefore **regenerated only above a marker**:
 
-```
+```text
 <!-- hand-written notes below this line survive the next sweep -->
 ```
 
@@ -438,8 +444,8 @@ Docs live in a `docs/` subfolder of the pattern and are **never vendored into an
 IOC instance**. They are repo context.
 
 ```bash
-python3 $S/sweep-docs.py --module /dls_sw/prod/R3.14.12.7/support/lakeshore340/2-6
-python3 $S/sweep-docs.py --module <dls-release> --pattern <repo>/<name> --apply \
+uv run --no-project python $S/sweep-docs.py --module /dls_sw/prod/R3.14.12.7/support/lakeshore340/2-6
+uv run --no-project python $S/sweep-docs.py --module <dls-release> --pattern <repo>/<name> --apply \
         --skips-json /tmp/sweep/docs-skips.json
 ```
 
@@ -535,13 +541,14 @@ noise list.
 
 ### Calibration — expect a small yield
 
-Of the 91 PASS modules, **20 have any authored document at all** and only **8
+Of the PASS set (91 modules when this section was measured), **20 have any
+authored document at all** and only **8
 produce one automatically** (`Keithley6487`, `KeithleyDMM6500`, `alicatGasFlow`,
 `attocubeInterf`, `enzLoCuM4`, `gardasoftLED`, `keithley2400`, `lakeshore340`);
 the other 12 are `MANUAL` — a human reads them and decides. So **fewer than a
 dozen patterns end up with a `docs/` folder** and 70-odd see no doc diff at all.
 That is the expected outcome, not a failure, and it is what makes the
-minimal-churn rule below cheap. 43 of the 91 have at least one file on the
+minimal-churn rule below cheap. 43 of those 91 have at least one file on the
 copyright blocklist (125 blocked files in total), all of which are named in the
 report rather than copied.
 
@@ -619,7 +626,7 @@ Verified against the real implementation (`ibek.pattern_cmds.manifest.plan_vendo
 on the `pattern-manifest` branch): with `docs/UserGuide.md` present, the plan is
 exactly
 
-```
+```text
 config/lakeshore340.ibek.support.yaml
 config/lakeshore340.proto
 config/lakeshore340.template

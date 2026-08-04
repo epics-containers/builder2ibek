@@ -14,7 +14,7 @@ Writes candidates.json (full detail) and prints a TSV summary.
 
 usage: scan-candidates.py [-o OUTDIR] [--prod /dls_sw/prod]
 
-Takes ~2 minutes: it walks the latest release of every module.
+Takes ~3 minutes: it walks the latest release of every module.
 """
 
 from __future__ import annotations
