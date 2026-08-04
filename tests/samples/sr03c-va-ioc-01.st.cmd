@@ -23,6 +23,16 @@ save_restoreSet_SeqPeriodInSeconds 600
 save_restoreSet_DatedBackupFiles 1
 save_restoreSet_IncompleteSetsOk 1
 set_pass0_restoreFile autosave_positions.sav
+# settings are restored at BOTH pass 0 (before iocInit) and pass 1
+# (after iocInit), reproducing the legacy DLS level-1 semantics.
+# Pass 0 is essential for records that self-initialise from their
+# restored value at PINI - e.g. dlsPLC_temperature :HIGH, whose
+# :HIGH_INIT calcout copies the restored :HIGH into the temperature
+# record's .HIGH field during iocInit. With a pass-1-only restore
+# that PINI runs before the value is restored and :HIGH collapses to
+# 0. Pass 1 is also kept so PVs that get overwritten during init are
+# restored on top afterwards.
+set_pass0_restoreFile autosave_settings.sav
 set_pass1_restoreFile autosave_settings.sav
 
 # drvAsynIPPortConfigure(name, port, priority, noAutoConnect, noProcessEos)

@@ -26,6 +26,16 @@ save_restoreSet_SeqPeriodInSeconds 600
 save_restoreSet_DatedBackupFiles 1
 save_restoreSet_IncompleteSetsOk 1
 set_pass0_restoreFile autosave_positions.sav
+# settings are restored at BOTH pass 0 (before iocInit) and pass 1
+# (after iocInit), reproducing the legacy DLS level-1 semantics.
+# Pass 0 is essential for records that self-initialise from their
+# restored value at PINI - e.g. dlsPLC_temperature :HIGH, whose
+# :HIGH_INIT calcout copies the restored :HIGH into the temperature
+# record's .HIGH field during iocInit. With a pass-1-only restore
+# that PINI runs before the value is restored and :HIGH collapses to
+# 0. Pass 1 is also kept so PVs that get overwritten during init are
+# restored on top afterwards.
+set_pass0_restoreFile autosave_settings.sav
 set_pass1_restoreFile autosave_settings.sav
 
 #  Hy8001Configure(cardNum, vmeslotNum, vectorNum, itrLevel, debounce, clock, scan, direction, invertin, invertout)
@@ -36,14 +46,16 @@ Hy8001Configure(60, 6, $(Vec1), 0, 0, 0, 100, 0, 1, 1)
 # records (e.g. the VLVCC valve-crate interlocks on #C60) never
 # reach the hardware. ipacAddHy8001 is the RTEMS wrapper (cf ipacAddHy8002).
 ipacAddHy8001("6")
+# record above carrier card ID 0 in 'IPAC6'
+epicsEnvSet IPAC6 0
 
 # ipacAddHy8002("slot, intLevel")
 ipacAddHy8002("4, 2")
-# record above carrier card ID 0 in 'IPAC4'
-epicsEnvSet IPAC4 0
+# record above carrier card ID 1 in 'IPAC4'
+epicsEnvSet IPAC4 1
 ipacAddHy8002("5, 2")
-# record above carrier card ID 1 in 'IPAC5'
-epicsEnvSet IPAC5 1
+# record above carrier card ID 2 in 'IPAC5'
+epicsEnvSet IPAC5 2
 
 # Hy8401ipConfigure(cardNum, VMESlotNum, IPSlotNum, interruptVector, intEnable, aiType, externalClock, clockRate, inhibit, samples, spacing, triggered)
 Hy8401ipConfigure(50, $(IPAC5), 0, $(Vec3), 0, 0, 0, 15, 0, 1, 1, 0)
