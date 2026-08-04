@@ -18,9 +18,10 @@ it would be written to, and writes docs-plan.json. `--apply` converts, writes
 `<pattern>/docs/`, prunes the docs it wrote for an earlier release, and adds or
 removes `<pattern>/ibek.manifest.yaml` to match.
 
-Needs pandoc on PATH (`apt-get install -y pandoc`) only when the plan actually
-contains something to convert - a pattern whose docs are all plain markdown, and
-a re-sweep that only has a stale manifest to remove, both run without it.
+Needs pandoc only when the plan actually contains something to convert - a
+pattern whose docs are all plain markdown, and a re-sweep that only has a stale
+manifest to remove, both run without it. pandoc is taken from $PANDOC, then
+PATH, then whatever `pypandoc_binary` ships; see resolve_pandoc.
 """
 
 from __future__ import annotations
@@ -35,6 +36,12 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+
+PANDOC_MISSING = (
+    "pandoc not found. Install it (`apt-get install -y pandoc`), or point $PANDOC "
+    "at a binary, or run this script under `uv run --with pypandoc_binary`, which "
+    "is what works in the epics-containers dev container."
+)
 
 # --- the copyright blocklist -------------------------------------------------
 # ibek-runtime-streamdevice is PUBLIC. DLS documentation folders routinely hold
@@ -288,10 +295,35 @@ def assign_names(plan: list[dict]) -> dict[str, str]:
     return names
 
 
+def resolve_pandoc() -> str | None:
+    """Locate a pandoc executable, or None if there is not one.
+
+    Prefers $PANDOC, then PATH, then the binary `pypandoc_binary` ships. The
+    last of those is how pandoc is reachable in the epics-containers dev
+    container, which has no distro pandoc package and no route to install one.
+    """
+    override = os.environ.get("PANDOC")
+    if override:
+        return override if Path(override).is_file() else None
+    if found := shutil.which("pandoc"):
+        return found
+    try:
+        import pypandoc
+    except ImportError:
+        return None
+    try:
+        return pypandoc.get_pandoc_path()
+    except OSError:
+        return None
+
+
 def pandoc_to_markdown(src: Path, fmt: str) -> str:
+    pandoc = resolve_pandoc()
+    if pandoc is None:
+        sys.exit(PANDOC_MISSING)
     return subprocess.run(
         [
-            "pandoc",
+            pandoc,
             "--from",
             fmt,
             "--to",
@@ -339,8 +371,8 @@ def prune(docs: Path, keep: set[str]) -> None:
 def apply_plan(
     module_dir: Path, pattern: Path, plan: list[dict], module: str, release: str
 ) -> None:
-    if needs_pandoc(plan) and not shutil.which("pandoc"):
-        sys.exit("pandoc not found on PATH - `apt-get install -y pandoc` first")
+    if needs_pandoc(plan) and resolve_pandoc() is None:
+        sys.exit(PANDOC_MISSING)
     docs = pattern / "docs"
     names = assign_names(plan)
     produced = 0
