@@ -298,7 +298,7 @@ def main() -> int:
         out = ["| Pattern | Where | Problem |", "|---|---|---|"]
         out += [
             f"| `{Path(d['file']).parent.name}` | {d['where']} | {d['reason']} |"
-            for d in descs
+            for d in sorted(descs, key=lambda d: (d["file"], d["where"], d["reason"]))
         ]
         print("\n".join(out))
 

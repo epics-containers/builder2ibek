@@ -115,9 +115,30 @@ def audit_file(path: Path) -> list[dict]:
         doc = yaml.safe_load(path.read_text()) or {}
     except yaml.YAMLError as exc:
         return [{"file": str(path), "where": "<file>", "reason": f"unparseable: {exc}"}]
+    # A support yaml that parses but is not a mapping - or whose entity_models
+    # is not a list - is a finding about that file, not a reason to abort the
+    # audit of every other pattern.
+    if not isinstance(doc, dict):
+        return [
+            {
+                "file": str(path),
+                "where": "<file>",
+                "reason": f"not a mapping ({type(doc).__name__})",
+            }
+        ]
     findings: list[dict] = []
     module = doc.get("module", path.stem)
-    for model in doc.get("entity_models") or []:
+    models = doc.get("entity_models") or []
+    if not isinstance(models, list):
+        return [
+            {
+                "file": str(path),
+                "module": module,
+                "where": "entity_models",
+                "reason": f"not a list ({type(models).__name__})",
+            }
+        ]
+    for model in models:
         if not isinstance(model, dict):
             continue
         mname = model.get("name", "<unnamed>")
@@ -134,10 +155,20 @@ def audit_file(path: Path) -> list[dict]:
         params = model.get("parameters") or {}
         if isinstance(params, dict):
             items = params.items()
-        else:  # a list of {name: ..., description: ...}
+        elif isinstance(params, list):  # a list of {name: ..., description: ...}
             items = [
                 (p.get("name", "<unnamed>"), p) for p in params if isinstance(p, dict)
             ]
+        else:
+            findings.append(
+                {
+                    "file": str(path),
+                    "module": module,
+                    "where": f"entity_model {mname} / parameters",
+                    "reason": f"not a mapping or list ({type(params).__name__})",
+                }
+            )
+            continue
         for pname, pdef in items:
             if not isinstance(pdef, dict):
                 continue
