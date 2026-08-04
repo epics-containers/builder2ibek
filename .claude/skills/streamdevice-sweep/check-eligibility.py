@@ -609,13 +609,19 @@ def check(module_dir: Path, image: set[str]) -> dict:
     # lives in st.cmd and appears in no record. Rescuing over gate 2 readmits
     # exactly the modules BUILD-TIME-ONLY.md already rejects (PLV1000Config,
     # centerNConfig, pmacAsynCoordCreate, ...).
+    #
+    # Nor is a gate 2 REVIEW rescuable. A missing, class-less or unparsable
+    # builder.py means gate 2 never got to judge, so there is no clean verdict
+    # for gate 3 to confirm: an unreadable module is unknown, not innocent.
     rescued = False
     if r_verdict == "SKIP":
         verdict = "SKIP"
     elif b_verdict == "SKIP":
         verdict = "SKIP"
     elif not fs_ok:
-        if r_verdict == "PASS":
+        if b_verdict != "PASS":
+            verdict = b_verdict  # REVIEW - gate 2 could not read the module
+        elif r_verdict == "PASS":
             verdict, rescued = "PASS", True
         else:
             verdict = "SKIP"
