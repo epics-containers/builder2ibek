@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -129,7 +130,16 @@ def test_run_reconvert_missing_services_repo(tmp_path: Path):
 
 def test_cli_help():
     cmd = [sys.executable, "-m", "builder2ibek", "reconvert", "--help"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    # Typer renders --help through rich, which colours each option name. That
+    # splits "--services-repo" into escape-separated fragments, so a plain
+    # substring assert cannot find it. rich only colours when it thinks it has a
+    # terminal -- pytest's captured pipe is not one, but CI sets FORCE_COLOR,
+    # which is why this passed locally and failed there. Pin the subprocess to
+    # plain, unwrapped output rather than depending on that detection. COLUMNS
+    # keeps rich from wrapping a long option name across two lines.
+    env = {**os.environ, "NO_COLOR": "1", "TERM": "dumb", "COLUMNS": "200"}
+    env.pop("FORCE_COLOR", None)
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
     assert result.returncode == 0
     assert "reconvert" in result.stdout
     assert "--services-repo" in result.stdout
