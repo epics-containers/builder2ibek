@@ -92,9 +92,50 @@ def hand_written_notes(repo: Path | None) -> str:
     return text[text.index(NOTES_MARKER) :].rstrip("\n")
 
 
+# Prose printed under a heading, where the bucket needs explaining rather than
+# just listing. Keyed by the heading reason_bucket returns.
+BUCKET_NOTES = {
+    "Records bind a compiled routine - not vendorable": (
+        "These modules' databases carry `sub`, `genSub` or `aSub` records, each "
+        "bound to a routine compiled into the module's own library "
+        "(`alarmlookupProcess`, `pfeifferErrorCodeParse`, "
+        "`extractFirmwareVersion`). A vendored pattern ships databases only, so "
+        "the routine is never loaded and the record cannot initialise.\n\n"
+        "Converting `genSub` to the base-7-native `aSub` does **not** make one "
+        "vendorable - the routine is still C. The two spellings are one problem "
+        "at different stages of that conversion.\n\n"
+        "The fix per module is to drop the affected records from the pattern, "
+        "reimplement the routine with `calc`/`scalcout`, or keep the module as a "
+        "build-time IOC."
+    ),
+    "Uses a record type the image does not provide": (
+        "The record type itself is missing from the image - it comes from a "
+        "support module the generic IOC does not ship, so the database will not "
+        "load at all."
+    ),
+    "Uses device support the image does not provide": (
+        "A `DTYP` naming device support the image does not have. Hytec "
+        "IP-carrier types (`Hy8001`, `Hy8401ip`, `Hy8402ao`) are the common "
+        "case: the device is read through a hardware carrier board, which is not "
+        "something a runtime pattern can supply."
+    ),
+}
+
+
 def reason_bucket(entry: dict) -> str:
     g1 = entry["gate1"]["reasons"]
     g2 = entry["gate2"]["reasons"]
+    # Gate 3 first: when it fires it is the decisive gate, and its reason is the
+    # one a reader needs. Bucketing these under "ships compiled device code"
+    # understates them - the module compiling something is incidental, the
+    # records referencing it is the problem.
+    g3 = entry.get("gate3", {}).get("reasons", [])
+    if any("bind a compiled routine" in r for r in g3):
+        return "Records bind a compiled routine - not vendorable"
+    if any(r.startswith("record type") for r in g3):
+        return "Uses a record type the image does not provide"
+    if any(r.startswith("DTYP") for r in g3):
+        return "Uses device support the image does not provide"
     if any("already shipped in the generic image" in r for r in g2):
         return "Already in the generic image - not a pattern"
     if any(r.startswith("compiled source") for r in g1):
@@ -145,11 +186,15 @@ def main() -> int:
     review: list[tuple[str, str, str]] = []
     regressions: list[tuple[str, str, str]] = []
     for e in elig:
-        reasons = e["gate1"]["reasons"] + e["gate2"]["reasons"]
+        reasons = (
+            e.get("gate3", {}).get("reasons", [])
+            + e["gate1"]["reasons"]
+            + e["gate2"]["reasons"]
+        )
         why = "; ".join(f"`{r}`" if ":" in r else r for r in reasons[:3])
         if e["verdict"] == "SKIP":
             if e["name"] in shipped:
-                regressions.append((e["name"], e["version"], why))
+                regressions.append((e["name"], e["version"], why, reason_bucket(e)))
             else:
                 buckets[reason_bucket(e)].append((e["name"], e["version"], why))
         elif e["verdict"] == "REVIEW":
@@ -157,6 +202,8 @@ def main() -> int:
 
     for bucket in sorted(buckets):
         print(f"\n## {bucket}\n")
+        if bucket in BUCKET_NOTES:
+            print(BUCKET_NOTES[bucket] + "\n")
         print(table(sorted(buckets[bucket])))
 
     if dups:
@@ -189,7 +236,43 @@ def main() -> int:
             "to a build-time `ibek-support` definition, or record why it is "
             "acceptable.\n"
         )
-        print(table(sorted(regressions)))
+        # Grouped by failure class, because they are not one problem. A pattern
+        # whose records bind a compiled routine is broken today - it would not
+        # initialise in an instance - while one caught only by a module-level
+        # gate may be vendoring perfectly well.
+        by_class: dict[str, list[tuple[str, str, str]]] = defaultdict(list)
+        for name, ver, why, bucket in regressions:
+            by_class[bucket].append((name, ver, why))
+        for bucket in sorted(by_class):
+            print(f"\n### {bucket}\n")
+            if bucket in BUCKET_NOTES:
+                print(BUCKET_NOTES[bucket] + "\n")
+            print(table(sorted(by_class[bucket])))
+
+    instance_dtyp = sorted(
+        (
+            e["name"],
+            e["version"],
+            ", ".join(f"`{d}`" for d in e["gate3"]["instance_dtyp"]),
+        )
+        for e in elig
+        if e["verdict"] == "PASS" and e.get("gate3", {}).get("instance_dtyp")
+    )
+    if instance_dtyp:
+        print("\n## Device support chosen per instance - verify before deploying\n")
+        print(
+            "These patterns leave `DTYP` to a macro, so the device support is named "
+            "by the **instance**, not the pattern. They vendor fine and are not "
+            "skips. But the sweep cannot tell what an instance will pass: if it "
+            "names anything other than soft support, that support must be compiled "
+            "into the IOC the pattern is vendored to, and a runtime pattern cannot "
+            "supply it.\n\n"
+            "Worth checking against each deployed instance - `currAmp`'s "
+            "`currAmp_ai.template` exists to read an amplifier through an ADC, and "
+            "the Hytec carriers that usually do that (`Hy8401ip`) are exactly what "
+            "gate 3 rejects elsewhere.\n"
+        )
+        print(table(instance_dtyp))
 
     if docskips:
         print("\n## Documentation not copied\n")
