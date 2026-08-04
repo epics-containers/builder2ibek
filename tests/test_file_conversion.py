@@ -12,14 +12,46 @@ import pytest
 
 from builder2ibek.convert import convert_file
 from builder2ibek.converters.epics_base import InterruptVector
-from tests.conftest import requires_dls
+from tests.conftest import (
+    HAS_COMMUNITY_SUPPORT,
+    requires_dls,
+    requires_support,
+    sample_needs_dls,
+)
 
 SAMPLES = Path(__file__).parent / "samples"
 SAMPLE_XMLS = sorted(SAMPLES.glob("*.xml"))
-SAMPLE_IDS = [x.stem for x in SAMPLE_XMLS]
+
+# Both conversion steps depend on the support repos: generate2 needs every
+# module a sample uses to be in ibek-defs, and xml2yaml consults the same YAMLs
+# via support_defaults to strip parameters that match a model's default. So
+# mark each sample with what it actually requires, rather than skipping the lot.
+SAMPLE_PARAMS = [
+    pytest.param(
+        xml,
+        marks=[requires_dls]
+        if sample_needs_dls(SAMPLES / f"{xml.stem.lower()}.yaml")
+        else [],
+        id=xml.stem,
+    )
+    for xml in SAMPLE_XMLS
+]
 
 
-@pytest.mark.parametrize("sample_xml", SAMPLE_XMLS, ids=SAMPLE_IDS)
+def test_support_submodule_present():
+    """Guard against the whole suite silently skipping.
+
+    Without ibek-support nearly every test below skips, which previously left
+    CI green while running nothing at all. Fail loudly instead.
+    """
+    assert HAS_COMMUNITY_SUPPORT, (
+        "ibek-support submodule not initialised — run "
+        "`git submodule update --init ibek-support`"
+    )
+
+
+@requires_support
+@pytest.mark.parametrize("sample_xml", SAMPLE_PARAMS)
 def test_convert(sample_xml: Path):
     """Test that xml2yaml produces the expected YAML for a sample XML."""
     expected_yaml = SAMPLES / f"{sample_xml.stem.lower()}.yaml"
@@ -32,9 +64,9 @@ def test_convert(sample_xml: Path):
     InterruptVector.reset()
 
 
-@requires_dls
-@pytest.mark.parametrize("sample_xml", SAMPLE_XMLS, ids=SAMPLE_IDS)
-def test_generate(sample_xml: Path):
+@requires_support
+@pytest.mark.parametrize("sample_xml", SAMPLE_PARAMS)
+def test_generate(sample_xml: Path, ibek_defs):
     """
     Test the full pipeline for a sample XML: XML → YAML → st.cmd + ioc.subst.
 
