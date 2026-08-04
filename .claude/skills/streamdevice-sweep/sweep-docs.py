@@ -272,28 +272,35 @@ def assign_names(plan: list[dict]) -> dict[str, str]:
     notes respectively), and both reduce to `README.md`. When names collide the
     full relative path is used for all of them, so no document silently
     overwrites another.
+
+    Collisions are judged case-insensitively - `README.md` and `readme.md` are
+    two files here and one file on a macOS or Windows clone - while the chosen
+    spelling is preserved.
     """
     produced = [i for i in plan if i["action"] in ("convert", "verbatim")]
     grouped: dict[str, list[str]] = {}
+    spelling: dict[str, str] = {}
     for item in produced:
-        grouped.setdefault(_flatten(Path(item["file"]), True), []).append(item["file"])
+        short = _flatten(Path(item["file"]), True)
+        grouped.setdefault(short.casefold(), []).append(item["file"])
+        spelling.setdefault(short.casefold(), short)
 
     names: dict[str, str] = {}
-    for short, files in grouped.items():
+    for key, files in grouped.items():
         for f in files:
-            names[f] = short if len(files) == 1 else _flatten(Path(f), False)
+            names[f] = spelling[key] if len(files) == 1 else _flatten(Path(f), False)
 
     # A residual collision would be pathological; number rather than lose a file.
     used: set[str] = set()
     for f in sorted(names):
         name = names[f]
-        if name in used:
+        if name.casefold() in used:
             base, n = name[:-3], 2
-            while f"{base}-{n}.md" in used:
+            while f"{base}-{n}.md".casefold() in used:
                 n += 1
             name = f"{base}-{n}.md"
         names[f] = name
-        used.add(name)
+        used.add(name.casefold())
     return names
 
 
