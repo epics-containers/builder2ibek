@@ -7,11 +7,64 @@
 
 local dropped = {}
 
+local function note(src, alt)
+    table.insert(dropped, alt ~= "" and (alt .. " (" .. src .. ")") or src)
+end
+
 function Image(el)
     local src = el.src or "?"
     local alt = pandoc.utils.stringify(el.caption or "")
-    table.insert(dropped, alt ~= "" and (alt .. " (" .. src .. ")") or src)
+    note(src, alt)
     return {}
+end
+
+-- An `<img>` written as HTML is NOT parsed into an Image: every reader keeps it
+-- as RawInline/RawBlock, so Image() above never sees it and the figure survives
+-- into the public repo. sweep-docs.py routes exactly these files here - MD_IMAGE
+-- matches `<img` as well as `![](...)` - so missing them defeats the detour.
+-- The tags are cut out of the raw text rather than the whole element dropped,
+-- because a RawBlock is often a `<div>` wrapping prose that must survive.
+local function strip_img_tags(text)
+    local removed = 0
+    -- The trailing blank is taken with the tag: a bare newline left inside a
+    -- `<div>` comes back out of the gfm writer as a literal `&#10;`.
+    local out = text:gsub("<([iI][mM][gG])([^>]*)>[ \t]*\n?", function(_, attrs)
+        -- `<image>` and friends are not `<img>`: an attribute list has to start
+        -- with a space or the tag has to end right there (`<img>`, `<img/>`).
+        if attrs ~= "" and not attrs:match("^[%s/]") then
+            return nil -- leave the match untouched
+        end
+        local src = attrs:match("[sS][rR][cC]%s*=%s*[\"']([^\"']*)[\"']")
+            or attrs:match("[sS][rR][cC]%s*=%s*([^%s>]+)")
+            or "?"
+        local alt = attrs:match("[aA][lL][tT]%s*=%s*[\"']([^\"']*)[\"']") or ""
+        note(src, alt)
+        removed = removed + 1
+        return ""
+    end)
+    return out, removed
+end
+
+local function strip_raw(el, ctor)
+    if not el.format:match("html") then
+        return nil
+    end
+    local text, removed = strip_img_tags(el.text)
+    if removed == 0 then
+        return nil
+    end
+    if text:match("^%s*$") then
+        return {}
+    end
+    return ctor(el.format, text)
+end
+
+function RawInline(el)
+    return strip_raw(el, pandoc.RawInline)
+end
+
+function RawBlock(el)
+    return strip_raw(el, pandoc.RawBlock)
 end
 
 function Pandoc(doc)
