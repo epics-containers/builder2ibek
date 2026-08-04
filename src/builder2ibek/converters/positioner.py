@@ -43,6 +43,32 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             )
 
         motor = motors[0]
+
+        # motor is stored as a suffix, not a PV: motorpositioner.template
+        # resolves it as $(P)$(motor).RBV, and the motorpositioner takes its P
+        # from the parent multipositioner. That is only correct while the two
+        # prefixes agree, so XMLbuilder asserted it:
+        #
+        #     assert motor.args['P'] == args['P'], \
+        #         "Motor prefix must match motor positioner prefix"
+        #
+        # Without the check a mismatch is silent, and the record links to a
+        # device that may not even exist. Only checked when the parent resolves;
+        # a dangling MP reference is ibek's error to report, not ours.
+        parents = [
+            e
+            for e in ioc.raw_entities
+            if e.get("type", "").endswith("multipositioner")
+            and e.get("name") == entity.MP
+        ]
+        if len(parents) == 1 and parents[0].get("P") != motor.get("P"):
+            raise ValueError(
+                f"motor '{motor['name']}' prefix '{motor.get('P')}' does not "
+                f"match multipositioner '{entity.MP}' prefix "
+                f"'{parents[0].get('P')}' — motorpositioner.template resolves "
+                f"the motor as $(P)$(motor)"
+            )
+
         # softMotorForPiezo uses Q; pmac/basic motors use M
         if motor.get("type", "").endswith("softMotorForPiezo"):
             try:
