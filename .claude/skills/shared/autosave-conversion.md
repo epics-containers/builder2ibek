@@ -101,11 +101,11 @@ autosave's `readReqFile()` (`asApp/src/save_restore.c`) parses each line with
 sscanf(eline, "%s", name);
 ```
 
-so it takes **only the first whitespace delimited token and silently discards
+so it takes **only the first whitespace-delimited token and silently discards
 the rest of the line** — no warning, no error, the extra fields simply never get
 saved. A line must therefore name exactly one PV:
 
-```
+```text
 $(P)$(R).CALC        # correct — one line per field
 $(P)$(R).SCAN
 $(P)$(R) CALC SCAN   # WRONG — saves $(P)$(R).VAL only; CALC and SCAN are dropped

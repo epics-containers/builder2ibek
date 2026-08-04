@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from builder2ibek.db2autosave import parse_templates
+from builder2ibek.db2autosave import parse_templates, write_req_file
 
-MOTOR = Path("tests/samples/motor.template")
+MOTOR = Path(__file__).parent / "samples" / "motor.template"
 
 
 def test_autosave(tmp_path: Path):
@@ -28,7 +28,7 @@ def test_autosave(tmp_path: Path):
 
 def test_autosave_one_pv_per_line(tmp_path: Path):
     """
-    autosave's readReqFile() reads only the first whitespace delimited token of
+    autosave's readReqFile() reads only the first whitespace-delimited token of
     a line and silently drops the rest, so a req line must hold exactly one PV.
     """
     output = tmp_path / "autosave"
@@ -43,3 +43,18 @@ def test_autosave_one_pv_per_line(tmp_path: Path):
         assert text.endswith("\n"), f"{req_file.name} has no trailing newline"
         for line in text.splitlines():
             assert len(line.split()) == 1, f"{req_file.name}: multi-PV line {line!r}"
+
+
+def test_autosave_empty_expansion_writes_nothing(tmp_path: Path):
+    """
+    A record_set that expands to no PVs must not leave a req file behind.
+
+    Joining an empty set and appending the terminator writes a single blank
+    line, i.e. a line naming no PV -- which breaks the invariant asserted by
+    test_autosave_one_pv_per_line above.
+    """
+    req_file = tmp_path / "empty_settings.req"
+
+    write_req_file(req_file, {"", "   "})
+
+    assert not req_file.exists()

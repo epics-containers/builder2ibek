@@ -14,15 +14,17 @@ def write_req_file(f: Path, record_set: set[str]):
     Each record_set entry is "recordname [FIELD ...]": the record name followed
     by the fields listed on its `#% autosave` comment. autosave's readReqFile()
     parses a line with `sscanf(line, "%s", name)`, so it takes only the first
-    whitespace delimited token and silently discards the rest -- a line holding
+    whitespace-delimited token and silently discards the rest -- a line holding
     several fields saves the record's .VAL and nothing else. Each field
     therefore needs its own `recordname.FIELD` line.
 
     VAL is written as the bare record name: the same PV, and the spelling
     migrate_autosave uses in the .sav files.
-    """
-    print(f"writing file {f}")
 
+    Writes nothing if the expansion is empty. Joining an empty set and
+    appending the terminator would yield a file holding one blank line, which
+    is a line naming no PV at all.
+    """
     lines: set[str] = set()
     for entry in record_set:
         record, *fields = entry.split() or [""]
@@ -33,6 +35,11 @@ def write_req_file(f: Path, record_set: set[str]):
         for field in fields:
             lines.add(record if field == "VAL" else f"{record}.{field}")
 
+    if not lines:
+        print(f"no PVs to save, skipping {f}")
+        return
+
+    print(f"writing file {f}")
     f.write_text("\n".join(sorted(lines)) + "\n")
 
 
