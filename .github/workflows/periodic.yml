@@ -11,3 +11,13 @@ jobs:
     uses: ./.github/workflows/_tox.yml
     with:
       tox: docs -- -b linkcheck
+
+  # Warns, never fails: a pin lagging main is often the correct state, but
+  # nothing else would ever tell us it had happened. ibek-support-dls is on
+  # Diamond's internal GitLab and is reported unreachable from here.
+  pin-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check submodule pins against their remote main
+        run: python3 tests/check_pin_freshness.py

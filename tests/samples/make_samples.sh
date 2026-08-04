@@ -49,6 +49,17 @@ done
 
 builder2ibek db-compare ./SR03C-VA-IOC-01_expanded.db ./sr03c-va-ioc-01.db --output ./compare.diff --ignore SR03C-VA-IOC-01:
 
+# Record which support module revisions these outputs were built from, so that
+# bumping a submodule pin without regenerating (or regenerating against a
+# checkout that is not the pin) fails with a sentence rather than a diff.
+# See test_sample_pins.py.
+{
+  echo "# Written by make_samples.sh -- do not hand edit."
+  for repo in ibek-support ibek-support-dls; do
+    echo "$repo $(git -C "../../$repo" rev-parse HEAD)"
+  done
+} > GENERATED_AGAINST
+
 if [ -n "$failed" ]; then
   echo "ERROR: generate2 failed, outputs removed for:$failed"
   exit 1
