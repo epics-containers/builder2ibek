@@ -65,12 +65,15 @@ differs (3.14 lands `.HIGH=60`, RTEMS lands `.HIGH=0`).
 ### The fix: autosave the FIELD, not the readback record
 `.HIGH` (the field) holds a value fine on both platforms — so save/restore *it*:
 ```
-# dlsPLC_temperature_settings.req  (note: <record> <field>, dot-field of the temp record)
+# dlsPLC_temperature_settings.req  (note: <record>.<field>, dot-field of the temp record)
 # from
-$(device)$(temp):HIGH VAL      # the :HIGH ai record — futile on EPICS 7
+$(device)$(temp):HIGH          # the :HIGH ai record — futile on EPICS 7
 # to
-$(device)$(temp) HIGH          # the <temp>.HIGH alarm-limit field — the real limit
+$(device)$(temp).HIGH          # the <temp>.HIGH alarm-limit field — the real limit
 ```
+The dot is not optional — see [req file syntax](#req-file-syntax-one-pv-per-line)
+below. `$(device)$(temp) HIGH` (space) silently saves `$(device)$(temp).VAL`
+instead, i.e. the temperature reading rather than its alarm limit.
 With `.HIGH` restored directly, `HIGH_INIT`/`:HIGH` become harmless leftovers
 (restore lands on `.HIGH`; `:HIGH` mirrors it via `CP`). It's the **req file**
 that fixes the live IOC — **no template logic change is required**. Two riders:
@@ -87,6 +90,33 @@ A readback record that mirrors a field via `CP`/`CPP` is **not autosave-able on
 EPICS 7** — restore the underlying field. Fingerprint: a put to the readback PV
 reads straight back as the field's value; one alarm-limit sibling holds (`:HIHI`,
 a plain `ao`) while the readback one (`:HIGH`) collapses to 0.
+
+---
+
+## Req file syntax: one PV per line
+
+autosave's `readReqFile()` (`asApp/src/save_restore.c`) parses each line with
+
+```c
+sscanf(eline, "%s", name);
+```
+
+so it takes **only the first whitespace-delimited token and silently discards
+the rest of the line** — no warning, no error, the extra fields simply never get
+saved. A line must therefore name exactly one PV:
+
+```text
+$(P)$(R).CALC        # correct — one line per field
+$(P)$(R).SCAN
+$(P)$(R) CALC SCAN   # WRONG — saves $(P)$(R).VAL only; CALC and SCAN are dropped
+```
+
+`VAL` is written as the bare record name (`$(P)$(R)`), which is the same PV and
+the spelling `builder2ibek migrate-autosave` uses in the `.sav` files.
+
+This is what `builder2ibek autosave` emits, so **regenerate rather than
+hand-edit**; `db2autosave.write_req_file()` carries the same note. A `#% autosave
+N` comment listing several fields expands to one line per field.
 
 ---
 
