@@ -1,0 +1,992 @@
+# yaml-language-server: $schema=../schemas/ibek.support.schema.json
+module: userIO
+
+entity_models:
+  - name: bi
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+      DTYP:
+        type: str
+        description: |-
+          Device Type
+
+      INP:
+        type: str
+        description: |-
+          Input link
+        default: ""
+
+      SCAN:
+        type: str
+        description: |-
+          Scan Rate
+
+      ZNAM:
+        type: str
+        description: |-
+          Name for zero state
+
+      ONAM:
+        type: str
+        description: |-
+          Name for one state
+
+      ZSV:
+        type: str
+        description: |-
+          optional macro to allow zero state alarm severity to be set.
+        default: ""
+
+      OSV:
+        type: str
+        description: |-
+          optional macro to allow one state alarm severity to be set.
+        default: ""
+
+      COSV:
+        type: str
+        description: |-
+          optional macro to allow change of state alarm severity to be set.
+        default: ""
+
+      DESC:
+        type: str
+        description: |-
+          Description
+        default: Binary Input
+
+      archiver_rate:
+        type: str
+        description: |-
+          archiver rate
+        default: "10"
+
+    databases:
+      - file: $(USERIO)/db/bi.template
+        args: { P: null, R: null, DTYP: null, INP: null, SCAN: null, ZNAM: null, ONAM: null, ZSV: null, OSV: null, COSV: null, DESC: null, archiver_rate: null }
+
+  - name: movingAverage
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name
+
+      INP:
+        type: str
+        description: |-
+          PV name of the signal being averaged. This must update on a periodic scan.
+
+      TYPE:
+        type: str
+        description: |-
+          Field type of this PV (e.g. DOUBLE or LONG)
+
+      ADEL:
+        type: str
+        description: |-
+          Archiver deadband
+
+    databases:
+      - file: $(USERIO)/db/movingAverage.template
+        args:
+          ADEL:
+          P:
+          INP:
+          TYPE:
+
+  - name: bo
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+      DTYP:
+        type: str
+        description: |-
+          Device Type
+
+      OUT:
+        type: str
+        description: |-
+          Output link
+
+      SCAN:
+        type: str
+        description: |-
+          Scan Rate
+
+      ZNAM:
+        type: str
+        description: |-
+          Name for zero state
+
+      ONAM:
+        type: str
+        description: |-
+          Name for one state
+
+      HIGH:
+        type: float
+        description: |-
+          Seconds to hold high
+        default: 0
+
+      VAL:
+        type: int
+        description: |-
+          Initial value
+        default: 0
+
+      DESC:
+        type: str
+        description: |-
+          Description
+        default: Binary Output
+
+      PINI:
+        type: str
+        description: |-
+          Process at startup ("YES"/"NO")
+        default: NO
+
+      archiver_rate:
+        type: int
+        description: |-
+          This associates an edm screen with the template
+        default: 10
+
+    databases:
+      - file: $(USERIO)/db/bo.template
+        args:
+          PINI:
+          VAL:
+          SCAN:
+          ZNAM:
+          DTYP:
+          HIGH:
+          P:
+          R:
+          ONAM:
+          OUT:
+          archiver_rate:
+          DESC:
+
+  - name: ai
+    description: |-
+      Template database for an Analogue In for user patch panels, etc.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Mandatory.  Device Prefix - Used to construct ai record name.
+
+      R:
+        type: str
+        description: |-
+          Mandatory.  Device Suffix - Used to construct ai record name.
+
+      DTYP:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record DTYP field - Device Type
+        default: ""
+
+      INP:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record INP  field - Input link
+        default: ""
+
+      SCAN:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record SCAN field - Scan Rate
+        default: ""
+
+      PREC:
+        type: int
+        description: |-
+          Mandatory.  EPICS ai record PREC field - Precision
+        default: 2
+
+      EGUL:
+        type: float
+        description: |-
+          Mandatory.  EPICS ai record EGUL field - low scale
+        default: 0
+
+      EGUF:
+        type: float
+        description: |-
+          Mandatory.  EPICS ai record EGUF field - full scale
+        default: 0
+
+      EGU:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record EGU field  - engineering units.
+        default: ""
+
+      LINR:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record LINR field - conversion method to engineering units, can be NO CONVERSION, LINR or SLOPE or see EPICS record reference manual for temperature conversions.
+        default: NO CONVERSION
+
+      DESC:
+        type: str
+        description: |-
+          Optional.  Defaults to Analogue Input.  Description of input signal.
+        default: Analogue Input
+
+      archiver_rate:
+        type: str
+        description: |-
+          Optional.  Defaults to 10.     EPICS archiver rate configuration.
+        default: "10"
+
+    databases:
+      - file: $(USERIO)/db/ai.template
+        args:
+          EGUF:
+          SCAN:
+          DTYP:
+          INP:
+          LINR:
+          PREC:
+          EGUL:
+          P:
+          R:
+          EGU:
+          DESC:
+          archiver_rate:
+
+  - name: caLab_interface
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      HIGH:
+        type: str
+        description: |-
+          Seconds to hold signal high
+
+      dom:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(USERIO)/db/caLab_interface.db
+        args:
+          HIGH:
+          dom:
+
+  - name: bo_sim
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+      DTYP:
+        type: str
+        description: |-
+          Device Type
+
+      OUT:
+        type: str
+        description: |-
+          Output link
+
+      SCAN:
+        type: str
+        description: |-
+          Scan Rate
+
+      HIGH:
+        type: str
+        description: |-
+          Seconds to hold signal high
+
+      ZNAM:
+        type: str
+        description: |-
+          Name for zero state
+
+      ONAM:
+        type: str
+        description: |-
+          Name for one state
+
+      VAL:
+        type: int
+        description: |-
+          Initial value
+        default: 0
+
+      DESC:
+        type: str
+        description: |-
+          Description
+        default: Binary Output
+
+      PINI:
+        type: str
+        description: |-
+          Process at startup ("YES"/"NO")
+        default: NO
+
+      archiver_rate:
+        type: int
+        description: |-
+          This associates an edm screen with the template
+        default: 10
+
+    databases:
+      - file: $(USERIO)/db/bo.template
+        args:
+          PINI:
+          VAL:
+          SCAN:
+          ZNAM:
+          DTYP:
+          HIGH:
+          P:
+          R:
+          ONAM:
+          OUT:
+          archiver_rate:
+          DESC:
+
+  - name: ao
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+      DTYP:
+        type: str
+        description: |-
+          Device Type
+
+      OUT:
+        type: str
+        description: |-
+          Output link
+        default: ""
+
+      SCAN:
+        type: str
+        description: |-
+          Scan Rate
+
+      EGUL:
+        type: float
+        description: |-
+          EGU low scale
+        default: 0
+
+      EGUF:
+        type: float
+        description: |-
+          EGU full scale
+        default: 0
+
+      DRVH:
+        type: float
+        description: |-
+          Drive high limit
+
+      DRVL:
+        type: float
+        description: |-
+          Drive low limit
+
+      LINR:
+        type: str
+        description: |-
+          LINR
+        default: NO CONVERSION
+
+      PREC:
+        type: int
+        description: |-
+          Precision
+        default: 2
+
+      EGU:
+        type: str
+        description: |-
+          EGU
+        default: V
+
+      PINI:
+        type: str
+        description: |-
+          Process on iocInit
+        default: NO
+
+      DESC:
+        type: str
+        description: |-
+          Description
+        default: Analogue Output
+
+      archiver_rate:
+        type: int
+        description: |-
+          This associates an edm screen with the template
+        default: 10
+
+    databases:
+      - file: $(USERIO)/db/ao.template
+        args:
+          PINI:
+          EGUF:
+          P:
+          SCAN:
+          OUT:
+          DTYP:
+          DRVL:
+          LINR:
+          PREC:
+          EGUL:
+          DRVH:
+          R:
+          EGU:
+          DESC:
+          archiver_rate:
+
+  - name: bi_sim
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+      DTYP:
+        type: str
+        description: |-
+          Device Type
+
+      INP:
+        type: str
+        description: |-
+          Input link
+
+      SCAN:
+        type: str
+        description: |-
+          Scan Rate
+
+      ZNAM:
+        type: str
+        description: |-
+          Name for zero state
+
+      ONAM:
+        type: str
+        description: |-
+          Name for one state
+
+      ZSV:
+        type: str
+        description: |-
+          optional macro to allow zero state alarm severity to be set.
+        default: ""
+
+      OSV:
+        type: str
+        description: |-
+          optional macro to allow one state alarm severity to be set.
+        default: ""
+
+      COSV:
+        type: str
+        description: |-
+          optional macro to allow change of state alarm severity to be set.
+        default: ""
+
+      DESC:
+        type: str
+        description: |-
+          Description
+        default: Binary Input
+
+      archiver_rate:
+        type: int
+        description: |-
+          archiver rate
+        default: 10
+
+    databases:
+      - file: $(USERIO)/db/bi.template
+        args:
+          COSV:
+          ZSV:
+          DTYP:
+          ZNAM:
+          SCAN:
+          INP:
+          OSV:
+          P:
+          R:
+          ONAM:
+          archiver_rate:
+          DESC:
+
+  - name: sel
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      DESC:
+        type: str
+        description: |-
+          Description
+
+      INPA:
+        type: str
+        description: |-
+          Input link A
+
+      INPB:
+        type: str
+        description: |-
+          Input link B
+
+      INPC:
+        type: str
+        description: |-
+          Input link C
+
+      INPD:
+        type: str
+        description: |-
+          Input link D
+
+      INPE:
+        type: str
+        description: |-
+          Input link E
+
+      INPF:
+        type: str
+        description: |-
+          Input link F
+
+      INPG:
+        type: str
+        description: |-
+          Input link G
+
+      INPH:
+        type: str
+        description: |-
+          Input link H
+
+      INPI:
+        type: str
+        description: |-
+          Input link I
+
+      INPJ:
+        type: str
+        description: |-
+          Input link J
+
+      INPK:
+        type: str
+        description: |-
+          Input link K
+
+      INPL:
+        type: str
+        description: |-
+          Input link L
+
+      P:
+        type: str
+        description: |-
+          Device Prefix
+
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+      SELM:
+        type: enum
+        description: |-
+          Select Mechanism
+        values:
+          '"Specified"':
+          '"High Signal"':
+          '"Low Signal"':
+          '"Median Signal"':
+      SELN:
+        type: enum
+        description: |-
+          Select Number
+        values:
+          '"12"':
+          '"1"':
+          '"6"':
+          '"7"':
+          '"4"':
+          '"5"':
+          '"10"':
+          '"11"':
+          '"8"':
+          '"9"':
+          '"2"':
+          '"3"':
+
+  - name: ai_sim
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Mandatory.  Device Prefix - Used to construct ai record name.
+
+      R:
+        type: str
+        description: |-
+          Mandatory.  Device Suffix - Used to construct ai record name.
+
+      DTYP:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record DTYP field - Device Type
+        default: ""
+
+      INP:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record INP  field - Input link
+
+      SCAN:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record SCAN field - Scan Rate
+        default: ""
+
+      PREC:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record PREC field - Precision
+
+      EGUL:
+        type: float
+        description: |-
+          Mandatory.  EPICS ai record EGUL field - low scale
+
+      EGUF:
+        type: float
+        description: |-
+          Mandatory.  EPICS ai record EGUF field - full scale
+
+      EGU:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record EGU field  - engineering units.
+
+      LINR:
+        type: str
+        description: |-
+          Mandatory.  EPICS ai record LINR field - conversion method to engineering units, can be NO CONVERSION, LINR or SLOPE or see EPICS record reference manual for temperature conversions.
+
+      DESC:
+        type: str
+        description: |-
+          Optional.  Defaults to Analogue Input.  Description of input signal.
+        default: Analogue Input
+
+      archiver_rate:
+        type: int
+        description: |-
+          Optional.  Defaults to 10.     EPICS archiver rate configuration.
+        default: 10
+
+    databases:
+      - file: $(USERIO)/db/ai.template
+        args:
+          EGUF:
+          SCAN:
+          DTYP:
+          INP:
+          LINR:
+          PREC:
+          EGUL:
+          P:
+          R:
+          EGU:
+          DESC:
+          archiver_rate:
+
+  - name: ao_sim
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+      DTYP:
+        type: str
+        description: |-
+          Device Type
+
+      OUT:
+        type: str
+        description: |-
+          Output link
+
+      SCAN:
+        type: str
+        description: |-
+          Scan Rate
+
+      EGUL:
+        type: float
+        description: |-
+          EGU low scale
+
+      EGUF:
+        type: float
+        description: |-
+          EGU full scale
+
+      DRVH:
+        type: float
+        description: |-
+          Drive high limit
+
+      DRVL:
+        type: str
+        description: |-
+          Drive low limit
+
+      LINR:
+        type: str
+        description: |-
+          LINR
+
+      PREC:
+        type: int
+        description: |-
+          Precision
+        default: 2
+
+      EGU:
+        type: str
+        description: |-
+          EGU
+        default: V
+
+      PINI:
+        type: str
+        description: |-
+          Process on iocInit
+        default: NO
+
+      DESC:
+        type: str
+        description: |-
+          Description
+        default: Analogue Output
+
+      archiver_rate:
+        type: int
+        description: |-
+          This associates an edm screen with the template
+        default: 10
+
+    databases:
+      - file: $(USERIO)/db/ao.template
+        args:
+          PINI:
+          EGUF:
+          P:
+          SCAN:
+          OUT:
+          DTYP:
+          DRVL:
+          LINR:
+          PREC:
+          EGUL:
+          DRVH:
+          R:
+          EGU:
+          DESC:
+          archiver_rate:
+
+  - name: movAverageGroup
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          group device name
+
+      CH1:
+        type: str
+        description: |-
+          PVs corresponding to the device names used in movingAverage.template
+
+      CH2:
+        type: str
+        description: |-
+          PVs corresponding to the device names used in movingAverage.template
+
+      CH3:
+        type: str
+        description: |-
+          PVs corresponding to the device names used in movingAverage.template
+
+      CH4:
+        type: str
+        description: |-
+          PVs corresponding to the device names used in movingAverage.template
+
+    databases:
+      - file: $(USERIO)/db/movAverageGroup.template
+        args:
+          P:
+          CH2:
+          CH3:
+          CH4:
+          CH1:
+
+  - name: auto_dfanout
+    description: |-
+      Distributed fanout record
+    parameters:
+      P:
+        type: str
+        description: Device Prefix
+      R:
+        type: str
+        description: Device Suffix
+        default: ""
+      DESC:
+        type: str
+        description: Description
+        default: ""
+      SCAN:
+        type: str
+        description: Scan rate
+        default: Passive
+      OUTA:
+        type: str
+        description: Output A link
+        default: ""
+      OUTB:
+        type: str
+        description: Output B link
+        default: ""
+      OUTC:
+        type: str
+        description: Output C link
+        default: ""
+      OUTD:
+        type: str
+        description: Output D link
+        default: ""
+      OUTE:
+        type: str
+        description: Output E link
+        default: ""
+      OUTF:
+        type: str
+        description: Output F link
+        default: ""
+      OUTG:
+        type: str
+        description: Output G link
+        default: ""
+      OUTH:
+        type: str
+        description: Output H link
+        default: ""
+      DOL:
+        type: str
+        description: Desired output link
+        default: ""
+      OMSL:
+        type: str
+        description: Output mode select
+        default: supervisory
+      EGU:
+        type: str
+        description: Engineering units
+        default: ""
+      PREC:
+        type: str
+        description: Precision
+        default: ""
+      HOPR:
+        type: str
+        description: High operating range
+        default: ""
+      LOPR:
+        type: str
+        description: Low operating range
+        default: ""
+
+    databases:
+      - file: $(USERIO)/db/dfanout.template
+        args:
+          .*:

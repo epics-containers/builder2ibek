@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: mrfTiming
+
+entity_models:
+  - name: EventReceiverInit
+    description: |
+      one time init for all EVRs
+      must be placed after all EventReceiverPMC definitions
+    parameters:
+      priority:
+        type: int
+        description: Time provider priority
+        default: 10
+
+    # TODO: the removal of script and post_ioc_init means we need to
+    # explicitly list each of these functions and is rather verbose
+    # TODO consider adding a "text" type to pre_init and post_init
+    # for this purpose
+    pre_init:
+      - type: text
+        when: first
+        value: |
+          # One time initialization for all event receivers
+          ErTimeProviderInit {{ priority }}
+          installLastResortEventProvider
+          syncSysClock
+
+  - name: EventReceiverPMC
+    description: Add an Event Receiver PMC card to the IOC. Requires the EventReceiverInit definition after all cards are added.
+    parameters:
+      name:
+        type: id
+        description: A name to reference this EVR
+
+      cardid:
+        type: int
+        description: EPICS Card id
+
+      card_index:
+        type: int
+        description: PMC slot number
+        default: 0
+
+    pre_init:
+      - when: first
+        value: |
+
+          # ErConfigurePMC card_id card_index
+      - value: |
+          ErConfigurePMC {{ cardid }} {{ card_index }}
+
+  - name: EventReceiverVME
+    description: |
+      Add a VME Event Receiver card to the IOC.
+      Requires the EventReceiverInit definition after all cards are added.
+    parameters:
+      name:
+        type: id
+        description: A name to reference this EVR
+
+      slot:
+        type: int
+        description: VME slot number
+        default: 3
+
+      cardid:
+        type: int
+        description: EPICS card id (defaults to the slot number)
+        default: "{{ slot }}"
+
+      address:
+        type: int
+        description: |
+          Card base address. If you have more than one VME EVR then separate
+          them by 0x10000 to guarantee the address maps don't overlap.
+        default: 0
+
+      interrupt_vector:
+        type: object
+        description: Interrupt Vector reserved with epics.InterruptVectorVME, count=1
+
+      intLevel:
+        type: int
+        description: VME interrupt level
+        default: 5
+
+    pre_init:
+      - when: first
+        value: |
+
+          # ErConfigureVME(slot, card_id, address, interrupt_vector, intLevel)
+      - value: |
+          ErConfigureVME({{ slot }}, {{ cardid }}, 0x{{ "%x" | format(address) }}, $({{ interrupt_vector }}), {{ intLevel }})

@@ -29,6 +29,13 @@ jobs:
       - name: Init ibek-support submodule
         run: git submodule update --init ibek-support
 
+      # ibek-support-dls is on Diamond's internal GitLab, so the runner cannot
+      # clone it. Drop in the vendored entity models instead, or 9 of the 14
+      # samples skip -- every vacuum IOC among them. No-ops wherever the real
+      # submodule is available, so this is CI only in practice.
+      - name: Install vendored ibek-support-dls entity models
+        run: python3 tests/vendor_support_dls.py --install
+
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 

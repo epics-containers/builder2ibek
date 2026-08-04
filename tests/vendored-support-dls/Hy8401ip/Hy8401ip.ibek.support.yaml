@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json
+
+module: Hy8401ip
+
+entity_models:
+  - name: Hy8401
+    description: |-
+      Hytec 8401 Analogue to Digital Converter (ADC).
+    parameters:
+      carrier:
+        type: object
+        description: |-
+          Carrier card
+
+      ipslot:
+        type: int
+        description: |-
+          IP slot in carrier
+
+      cardid:
+        type: int
+        description: |-
+          cardid
+        # TODO complex logic in builder.py for Carrier
+        default: 0
+
+      aiType:
+        type: bool
+        description: |-
+          Analogue input type, 0 = differential, 1 = single ended
+        default: false
+
+      intEnable:
+        type: bool
+        description: |-
+          Enable interrupts
+        default: false
+
+      externalClock:
+        type: bool
+        description: |-
+          Use external clock
+        default: false
+
+      clockRate:
+        type: enum
+        description: |-
+          Clock rate
+        default: 15
+        values:
+          1Hz: 0
+          2Hz: 1
+          5Hz: 2
+          10Hz: 3
+          20Hz: 4
+          50Hz: 5
+          100Hz: 6
+          200Hz: 7
+          500Hz: 8
+          1kHz: 9
+          2kHz: 10
+          5kHz: 11
+          10kHz: 12
+          20kHz: 13
+          50kHz: 14
+          100kHz: 15
+      inhibit:
+        type: bool
+        description: |-
+          Enable front panel inhibit signal
+        default: false
+
+      samples:
+        type: int
+        description: |-
+          Default number of samples for smoothing
+        default: 1
+
+      spacing:
+        type: int
+        description: |-
+          Default spacing between samples
+        default: 1
+
+      triggered:
+        type: int
+        description: |-
+          0 for continuous sampling or number of samples for triggered capture
+        default: 0
+
+      interrupt_vector:
+        type: object
+        description: Interrupt Vector reserved with epics.InterruptVectorVME, count=1
+
+    pre_init:
+      - when: first
+        value: |
+
+          # Hy8401ipConfigure(cardNum, VMESlotNum, IPSlotNum, interruptVector, intEnable, aiType, externalClock, clockRate, inhibit, samples, spacing, triggered)
+      - value: |
+          Hy8401ipConfigure({{carrier.slot * 10 + ipslot}}, $({{carrier}}), {{ipslot}}, $({{interrupt_vector}}), {{intEnable | int}}, {{ aiType | int }}, {{externalClock | int}}, {{clockRate}}, {{inhibit | int}}, {{ samples }}, {{ spacing }}, {{ triggered}})
+
+  - name: auto_Hy8401ip
+    description: |-
+      Auto-generated entity for Hy8401ip.template — single raw ADC channel
+      on a Hytec 8401 ADC card. Used for monitoring analogue signals such
+      as gauge controller temperatures.
+    parameters:
+      name:
+        type: str
+        description: |-
+          Record name (PV) for this ADC channel.
+      c:
+        type: int
+        description: |-
+          ADC card number.
+      s:
+        type: int
+        description: |-
+          ADC signal (channel) number.
+
+    databases:
+      - file: $(HY8401IP)/db/Hy8401ip.template
+        args:
+          .*:

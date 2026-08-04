@@ -1,0 +1,993 @@
+# yaml-language-server: $schema=../schemas/ibek.support.schema.json
+
+module: mxEH
+
+entity_models:
+  - name: Plate_Mode_I03
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+      gonio:
+        type: str
+        description: |-
+          Prefix for gonio PVs
+      base:
+        type: str
+        description: |-
+          Prefix for gonio base stages
+      pinoff:
+        type: str
+        description: |-
+          value for goniometer offset when in pin mode
+      plateoff:
+        type: str
+        description: |-
+          value for goniometer offset when in plate mode
+      pinhlm:
+        type: str
+        description: |-
+          value for goniometer high limit when in pin mode
+      platehlm:
+        type: str
+        description: |-
+          value for goniometer high limit when in plate mode
+      pinllm:
+        type: str
+        description: |-
+          value for goniometer low limit when in plate mode
+      platellm:
+        type: str
+        description: |-
+          value for goniometer low limit when in plate mode
+      plategxhlm:
+        type: str
+        description: |-
+          plate mode gon x high limit
+      plategxllm:
+        type: str
+        description: |-
+          plate mode gon x low limit
+      pingxhlm:
+        type: str
+        description: |-
+          pin mode gon x high limit
+      pingxllm:
+        type: str
+        description: |-
+          pin mode gon x low limit
+
+    databases:
+      - file: $(MXEH)/db/Plate_Mode_I03.template
+        args:
+          .*:
+
+  - name: mx_dig_pos
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Template argument
+      R:
+        type: str
+        description: |-
+          Template argument
+      C:
+        type: str
+        description: |-
+          Template argument
+      S:
+        type: str
+        description: |-
+          Template argument
+      ZNAM:
+        type: str
+        description: |-
+          Template argument
+      ONAM:
+        type: str
+        description: |-
+          Template argument
+      VALUE:
+        type: int
+        description: |-
+          Template argument
+        default: 0
+      PINI:
+        type: int
+        description: |-
+          Template argument
+        default: 0
+
+    databases:
+      - file: $(MXEH)/db/mx_dig_pos.template
+        args:
+          .*:
+
+  - name: Plate_Mode_Interlock
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      brick:
+        type: str
+        description: |-
+          Template argument
+      dom:
+        type: str
+        description: |-
+          Template argument
+      BRICK_PORT:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/Plate_Mode_Interlock.template
+        args:
+          .*:
+
+  - name: Flu_Det_Protection
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Template argument
+      BRICK1PORT:
+        type: str
+        description: |-
+          Template argument
+      BRICK3PORT:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/Flu_Det_Protection.template
+        args:
+          .*:
+
+  - name: simulation_mx_dig_pos
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Template argument
+      R:
+        type: str
+        description: |-
+          Template argument
+      ZNAM:
+        type: str
+        description: |-
+          Template argument
+      ONAM:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/simulation_mx_dig_pos.template
+        args:
+          .*:
+
+  - name: Detector_Z_Status
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+      DET_Z_PORT:
+        type: str
+        description: |-
+          Detector Z safe PMAC port
+      DET_Z_DIS_VAR:
+        type: str
+        description: |-
+          Detector Z disabled variable e.g. P801
+
+    databases:
+      - file: $(MXEH)/db/Detector_Z_Status.template
+        args:
+          .*:
+
+  - name: Femto_Average
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/Femto_Average.template
+        args:
+          .*:
+
+  - name: BacklightScaling
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Template argument
+      PREC:
+        type: int
+        description: |-
+          Template argument
+      OUT:
+        type: str
+        description: |-
+          Template argument
+      SCALE:
+        type: float
+        description: |-
+          Template argument
+        default: 3.3
+      OFFSET:
+        type: int
+        description: |-
+          Template argument
+        default: 0
+
+    databases:
+      - file: $(MXEH)/db/BacklightScaling.template
+        args:
+          .*:
+
+  - name: mx_backlight
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Template argument
+      R:
+        type: str
+        description: |-
+          Template argument
+      C:
+        type: str
+        description: |-
+          Template argument
+      OUTS:
+        type: str
+        description: |-
+          Template argument
+      INS:
+        type: str
+        description: |-
+          Template argument
+      ZRST:
+        type: str
+        description: |-
+          Template argument
+      ONST:
+        type: str
+        description: |-
+          Template argument
+      TWST:
+        type: str
+        description: |-
+          Template argument
+      THST:
+        type: str
+        description: |-
+          Template argument
+      Q:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/mx_backlight.template
+        args:
+          .*:
+
+  - name: filters_applied
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV prefix
+      PV_calculated_state:
+        type: str
+        description: |-
+          the mbbiDirect PV of the filters calculated state to be applied
+      inlim_PV_prefix:
+        type: str
+        description: |-
+          PV name of filter in limits before the number
+      inlim_PV_suffix:
+        type: str
+        description: |-
+          rest of PV name of filter in limits after the number
+      apply_button_pv:
+        type: str
+        description: |-
+          PV name processed by Apply Filter Changes button
+
+    databases:
+      - file: $(MXEH)/db/Filters_Applied.template
+        args:
+          .*:
+
+  - name: Femto_Flux
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      prefix:
+        type: str
+        description: |-
+          prefix for template PVs
+      suffix:
+        type: str
+        description: |-
+          suffix for template PVs
+        default: ""
+      gain:
+        type: str
+        description: |-
+          gain selection PV
+      femto:
+        type: str
+        description: |-
+          the femto current input for conversion
+
+    databases:
+      - file: $(MXEH)/db/Femto_Flux.template
+        args:
+          .*:
+
+  - name: simulation_mx_calc_pos
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Template argument
+      R:
+        type: str
+        description: |-
+          Template argument
+      ZRST:
+        type: str
+        description: |-
+          Template argument
+      ONST:
+        type: str
+        description: |-
+          Template argument
+      TWST:
+        type: str
+        description: |-
+          Template argument
+      THST:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/simulation_mx_calc_pos.template
+        args:
+          .*:
+
+  - name: mx_scatterguard
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Template argument
+      R:
+        type: str
+        description: |-
+          Template argument
+      C:
+        type: str
+        description: |-
+          Template argument
+      OUTS:
+        type: str
+        description: |-
+          Template argument
+      INS:
+        type: str
+        description: |-
+          Template argument
+      ZRST:
+        type: str
+        description: |-
+          Template argument
+      ONST:
+        type: str
+        description: |-
+          Template argument
+      TWST:
+        type: str
+        description: |-
+          Template argument
+      THST:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/mx_scatterguard.template
+        args:
+          .*:
+
+  - name: Femto_Calc
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      prefix:
+        type: str
+        description: |-
+          prefix for PVs
+      lower:
+        type: str
+        description: |-
+          PV for lower current
+      upper:
+        type: str
+        description: |-
+          PV for upper current
+      gain:
+        type: float
+        description: |-
+          default gain
+        default: 1.0
+
+    databases:
+      - file: $(MXEH)/db/Femto_Calc.template
+        args:
+          .*:
+
+  - name: Cryojet_Retraction
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Template argument
+      BRICK1PORT:
+        type: str
+        description: |-
+          Template argument
+      RETRACT_REQ_IP:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/Cryojet_Retraction.template
+        args:
+          .*:
+
+  - name: FeedbackSelect
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      FB1_BASE:
+        type: str
+        description: |-
+          Base PV of feedback loop 1
+      FB1_STRING:
+        type: str
+        description: |-
+          Description of feedback loop 1
+      FB2_BASE:
+        type: str
+        default: ""
+        description: |-
+          Base PV of feedback loop 2
+      FB2_STRING:
+        type: str
+        default: ""
+        description: |-
+          Description of feedback loop 2
+      FB3_BASE:
+        type: str
+        default: ""
+        description: |-
+          Base PV of feedback loop 3
+      FB3_STRING:
+        type: str
+        default: ""
+        description: |-
+          Description of feedback loop 3
+      FB4_BASE:
+        type: str
+        default: ""
+        description: |-
+          Base PV of feedback loop 4
+      FB4_STRING:
+        type: str
+        default: ""
+        description: |-
+          Description of feedback loop 4
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      R:
+        type: str
+        description: |-
+          Device Suffix
+
+    databases:
+      - file: $(MXEH)/db/FeedbackSelect.template
+        args:
+          P:
+          R:
+          FB1_STRING:
+          FB2_STRING:
+          FB3_STRING:
+          FB4_STRING:
+          FB1_SP: '{% if FB1_BASE %}{{FB1_BASE}}.VAL CP{% endif %}'
+          FB2_SP: '{% if FB2_BASE %}{{FB2_BASE}}.VAL CP{% endif %}'
+          FB3_SP: '{% if FB3_BASE %}{{FB3_BASE}}.VAL CP{% endif %}'
+          FB4_SP: '{% if FB4_BASE %}{{FB4_BASE}}.VAL CP{% endif %}'
+          FB1_AUTO: '{% if FB1_BASE %}{{FB1_BASE}}:AUTO PP{% endif %}'
+          FB2_AUTO: '{% if FB2_BASE %}{{FB2_BASE}}:AUTO PP{% endif %}'
+          FB3_AUTO: '{% if FB3_BASE %}{{FB3_BASE}}:AUTO PP{% endif %}'
+          FB4_AUTO: '{% if FB4_BASE %}{{FB4_BASE}}:AUTO PP{% endif %}'
+
+  - name: Percentage
+    description: |-
+      records for transmission calculation
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain (PV prefix)
+
+    databases:
+      - file: $(MXEH)/db/Percentage.db
+        args:
+          dom:
+
+  - name: Gantry_Interlocks
+    description: |-
+      records for Gantry_Interlocks
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain (PV prefix)
+
+    databases:
+      - file: $(MXEH)/db/Gantry_Interlocks.db
+        args:
+          dom:
+
+  - name: Gantry_Interlocks_Limits
+    description: |-
+      records for Gantry_Interlocks
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain (PV prefix)
+
+    databases:
+      - file: $(MXEH)/db/Gantry_Interlocks_Limits.db
+        args:
+          dom:
+
+  - name: RobotInterface_PLC_Statuses
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+      BS_Z_BRICK_PORT:
+        type: str
+        description: |-
+          Beamstop Geobrick port
+      BS_Z_DIS_VAR:
+        type: str
+        description: |-
+          Beamstop disabled variable e.g. P801
+      BS_Z_SAFE_VAR:
+        type: str
+        description: |-
+          Beamstop safe position variable e.g. P801
+      SCIN_Y_BRICK_PORT:
+        type: str
+        description: |-
+          Scintillator Geobrick port
+      SCIN_Y_DIS_VAR:
+        type: str
+        description: |-
+          Scintillator Y disabled variable e.g. P801
+      SCIN_Y_SAFE_VAR:
+        type: str
+        description: |-
+          Scintillator Y safe position variable e.g. P801
+      MAPT_Y_BRICK_PORT:
+        type: str
+        description: |-
+          Mini-aperture Geobrick port
+      MAPT_Y_DIS_VAR:
+        type: str
+        description: |-
+          Mini-aperture Y disabled variable e.g. P801
+      MAPT_Y_SAFE_VAR:
+        type: str
+        description: |-
+          Mini-aperture Y safe position variable e.g. P801
+      GONIO_BRICK_PORT:
+        type: str
+        description: |-
+          Goniometer brick port
+      GONIO_CENTREY_SAFE_VAR:
+        type: str
+        description: |-
+          Goniometer centre-Y safe variable e.g. P801
+      GONIO_CENTREZ_SAFE_VAR:
+        type: str
+        description: |-
+          Goniometer centre-Z safe variable e.g. P801
+
+    databases:
+      - file: $(MXEH)/db/RobotInterface_PLC_Statuses.template
+        args:
+          .*:
+
+  - name: pmacOmegaAirInterlock
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      Q:
+        type: str
+        description: |-
+          Device Suffifix
+
+    databases:
+      - file: $(MXEH)/db/Omega_Air_Status.template
+        args:
+          .*:
+
+  - name: plateMode
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+      gonio:
+        type: str
+        description: |-
+          Prefix for gonio PVs
+      base:
+        type: str
+        description: |-
+          Prefix for gonio base stages
+      pinoff:
+        type: str
+        description: |-
+          value for goniometer offset when in pin mode
+      plateoff:
+        type: str
+        description: |-
+          value for goniometer offset when in plate mode
+      pinhlm:
+        type: str
+        description: |-
+          value for goniometer high limit when in pin mode
+      platehlm:
+        type: str
+        description: |-
+          value for goniometer high limit when in plate mode
+      pinllm:
+        type: str
+        description: |-
+          value for goniometer low limit when in plate mode
+      platellm:
+        type: str
+        description: |-
+          value for goniometer low limit when in plate mode
+      plategxhlm:
+        type: str
+        description: |-
+          plate mode gon x high limit
+      plategxllm:
+        type: str
+        description: |-
+          plate mode gon x low limit
+      pingxhlm:
+        type: str
+        description: |-
+          pin mode gon x high limit
+      pingxllm:
+        type: str
+        description: |-
+          pin mode gon x low limit
+
+    databases:
+      - file: $(MXEH)/db/Plate_Mode_I03.template
+        args:
+          .*:
+
+  - name: ZoomPositioner
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          prefix for zoom positioner
+
+    databases:
+      - file: $(MXEH)/db/ZoomPositioner.template
+        args:
+          .*:
+
+  - name: Plate_Mode_I02
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      prefix:
+        type: str
+        description: |-
+          prefix for template PVs
+      gonio:
+        type: str
+        description: |-
+          prefix for gonio-related PVs
+      backlight:
+        type: str
+        description: |-
+          PV that controls backlight pneumatic
+      pinoff:
+        type: str
+        description: |-
+          value for goniometer offset when in pin mode
+      plateoff:
+        type: str
+        description: |-
+          value for goniometer offset when in plate mode
+      pinhlm:
+        type: str
+        description: |-
+          value for goniometer high limit when in pin mode
+      platehlm:
+        type: str
+        description: |-
+          value for goniometer high limit when in plate mode
+      pinllm:
+        type: str
+        description: |-
+          value for goniometer low limit when in plate mode
+      platellm:
+        type: str
+        description: |-
+          value for goniometer low limit when in plate mode
+      fluorescencedet:
+        type: str
+        description: |-
+          pv for fluorescence detector pneumatic control
+      gantrysel:
+        type: str
+        description: |-
+          gantry hc1/cryojet  selection PV
+
+    databases:
+      - file: $(MXEH)/db/Plate_Mode_I02.template
+        args:
+          .*:
+
+  - name: Omega_Air_Status
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      Q:
+        type: str
+        description: |-
+          Device Suffix
+
+    databases:
+      - file: $(MXEH)/db/Omega_Air_Status.template
+        args:
+          .*:
+
+  - name: Filters_Applied
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV prefix
+      PV_calculated_state:
+        type: str
+        description: |-
+          the mbbiDirect PV of the filters calculated state to be applied
+      inlim_PV_prefix:
+        type: str
+        description: |-
+          PV name of filter in limits before the number
+      inlim_PV_suffix:
+        type: str
+        description: |-
+          rest of PV name of filter in limits after the number
+      apply_button_pv:
+        type: str
+        description: |-
+          PV name processed by Apply Filter Changes button
+
+    databases:
+      - file: $(MXEH)/db/Filters_Applied.template
+        args:
+          .*:
+
+  - name: Minibeam_Z_Interlock
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Template argument
+      BRICK_PORT:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/Minibeam_Z_Interlock.template
+        args:
+          .*:
+
+  - name: mx_cryojet
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      P:
+        type: str
+        description: |-
+          Template argument
+      ASYN:
+        type: str
+        description: |-
+          Template argument
+      MOTOR:
+        type: str
+        description: |-
+          Template argument
+      PORT:
+        type: str
+        description: |-
+          Template argument
+      BEAMSTOP_LIMIT:
+        type: str
+        description: |-
+          Template argument
+      PREC:
+        type: int
+        description: |-
+          Template argument
+      EGU:
+        type: str
+        description: |-
+          Template argument
+      E:
+        type: str
+        description: |-
+          Template argument
+      D:
+        type: str
+        description: |-
+          Template argument
+
+    databases:
+      - file: $(MXEH)/db/mx_cryojet.template
+        args:
+          .*:
+
+  - name: auto_Cryojet_Retraction
+    description: |-
+      Auto-generated entity for Cryojet_Retraction.template
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+      BRICK1PORT:
+        type: str
+        description: |-
+          Geobrick port for retraction
+      RETRACT_REQ_IP:
+        type: str
+        description: |-
+          Retraction request input
+
+    databases:
+      - file: $(MXEH)/db/Cryojet_Retraction.template
+        args:
+          .*:
+
+  - name: auto_Flu_Det_Protection
+    description: |-
+      Auto-generated entity for Flu_Det_Protection.template
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+      BRICK1PORT:
+        type: str
+        description: |-
+          Geobrick port 1
+      BRICK3PORT:
+        type: str
+        description: |-
+          Geobrick port 3
+
+    databases:
+      - file: $(MXEH)/db/Flu_Det_Protection.template
+        args:
+          .*:
+
+  - name: Detector_Shutter_Control
+    description: |-
+      Detector shutter control records
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+
+    databases:
+      - file: $(MXEH)/db/Detector_Shutter_Control.db
+        args:
+          .*:
+
+  - name: Collimation_Table_Diff_Limits
+    description: |-
+      Collimation table differential switch limit records
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+      pmac:
+        type: str
+        description: |-
+          PMAC port name for reading limit variables
+
+    databases:
+      - file: $(MXEH)/db/Collimation_Table_Diff_Limits.db
+        args:
+          .*:

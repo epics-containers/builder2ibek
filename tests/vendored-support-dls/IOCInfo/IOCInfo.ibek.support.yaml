@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/1.2.0/ibek.support.schema.json
+
+module: IOCinfo
+
+entity_models:
+  - name: IOCinfo
+    description: |-
+      Provides basic information about the IOC, supplementing the
+      information provided by vxStats: provides temperature information.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+
+      high:
+        type: int
+        description: |-
+          Temperature for MINOR severity alarm, default 50 deg
+        default: 50
+
+      hihi:
+        type: int
+        description: |-
+          Temperature for MAJOR severity alarm, default 60 deg
+        default: 60
+
+      hyst:
+        type: int
+        description: |-
+          Alarm deadband value, default 2 deg
+        default: 2
+
+      adel:
+        type: float
+        description: |-
+          Template argument
+        default: 0.5
+
+    databases:
+      - file: $(IOCINFO)/db/IOCinfo.template
+        args:
+          device:
+          high:
+          hihi:
+          adel:
+          hyst:

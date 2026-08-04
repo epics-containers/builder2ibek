@@ -1,0 +1,246 @@
+# yaml-language-server: $schema=../schemas/ibek.support.schema.json
+
+module: water
+
+entity_models:
+  - name: flow
+    description: |-
+      This template defines a bi record for representing a low water flow
+      switch attached to a Hytec 8001, and a calc record combining this
+      with a LOLO signal which normally comes from an interlock (via a bi).
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name
+      Q:
+        type: str
+        description: |-
+          switch name (full names are $(P)$(Q):LO/:LOLO/:STATUS)
+        default: ""
+      DESC:
+        type: str
+        description: |-
+          Description of switch
+      C:
+        type: int
+        description: |-
+          Card number
+      S:
+        type: int
+        description: |-
+          Signal number (INP = "#C$(C) S$(S) @")
+      LOLO:
+        type: str
+        description: |-
+          Signal for lolo (Interlock)
+      name:
+        type: id
+        description: |-
+          This associates an edm screen with the template
+      alh:
+        type: str
+        description: |-
+          Template argument
+        default: None
+
+    databases:
+      - file: $(WATER)/db/flow.template
+        args:
+          .*:
+
+  - name: flow_asyn
+    description: |-
+      This template defines a bi records for representing low and lolo
+      water flow switched read from MPS RIO boxes. Low switches will be read from
+      their normal D variable (E.g. D4), Lolo switches from the relevant interlock
+      bits. E.g. if interlock with address 800 bit 4 is S1 water, read D808 bit 4
+      for instantaneous lolo signal
+    parameters:
+      P:
+        type: str
+        description: |-
+          EPICS prefix
+      Q:
+        type: str
+        description: |-
+          EPICS suffix
+      DESC:
+        type: str
+        description: |-
+          Description
+      device:
+        type: str
+        description: |-
+          EPICS name of the vacuum valve crate that connects to the RIO
+      loarea:
+        type: str
+        description: |-
+          Which block of D-variables, '' (blank) for the standard area, 'A' for the upper area
+      loloarea:
+        type: str
+        description: |-
+          Which block of D-variables, '' (blank) for the standard area, 'A' for the upper area
+      loaddress:
+        type: str
+        description: |-
+          D-variable number (for standard area) or offset (for upper area) of the low flow flag
+      loloaddress:
+        type: str
+        description: |-
+          D-variable number (for standard area) or offset (for upper area) of the low low flow flag
+      lobit:
+        type: str
+        description: |-
+          The bit number of the low flow flag (bit 0 is the LSB)
+      lolobit:
+        type: str
+        description: |-
+          The bit number of the low low flow flag (bit 0 is the LSB)
+      name:
+        type: id
+        description: |-
+          Object and gui association name
+
+    databases:
+      - file: $(WATER)/db/flow_asyn.template
+        args:
+          .*:
+
+  - name: flow_lolo
+    description: |-
+      This template defines a dummy LO record for devices which do not have
+      a LO signal into a Hytec digital input card.
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name
+      Q:
+        type: str
+        description: |-
+          switch name (full names are $(P)$(Q):LO/:LOLO/:STATUS)
+      DESC:
+        type: str
+        description: |-
+          Description of switch
+      LOLO:
+        type: str
+        description: |-
+          Signal for lolo (Interlock)
+      name:
+        type: id
+        description: |-
+          Template argument
+      alh:
+        type: str
+        description: |-
+          Template argument
+        default: None
+
+    databases:
+      - file: $(WATER)/db/flow-lolo.template
+        args:
+          .*:
+
+  - name: flow_lo_only
+    description: |-
+      This template was cut down from the full flow template. It only defines the bi record for (the LO PV) representing the LOW water flow switch attached to a Hytec 8001 card (or other hardware). It does NOT include the LOLO signal or status calculation records as it is intended to avoid PV duplication for beamlines with legacy hardware for co-existing with the dlsPLC module flow templates.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Mandatory. Device name.
+      Q:
+        type: str
+        description: |-
+          Mandatory. Switch name.
+      DTYP:
+        type: str
+        description: |-
+          Optional.  EPICS DTYP field (device type) on binary input record.          Defaults to Hy8001.
+        default: Hy8001
+      INP:
+        type: str
+        description: |-
+          Optional.  EPICS INP field.                                                Defaults to "#Cn Sm @" where n is C macro value and m is S macro value.
+        default: "#C$(C=) S$(S=) @"
+      C:
+        type: str
+        description: |-
+          Optional.  Mandatory with default INP.  Card number (integer 0 or more).   Defaults to empty string.
+        default: ""
+      S:
+        type: str
+        description: |-
+          Optional.  Mandatory with default INP.  Signal number (integer 0 or more). Defaults to empty string.
+        default: ""
+      DESC:
+        type: str
+        description: |-
+          Optional.  EPICS DESC field - description of low flow switch.              Defaults to "Low flow signal"
+        default: Low flow signal
+
+    databases:
+      - file: $(WATER)/db/flow-lo-only.template
+        args:
+          .*:
+
+  - name: simulationflow
+    description: |-
+      This template defines two soft channel bi records for representing
+      low and low-low water flow switches and a calc record combining these
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name
+      Q:
+        type: str
+        description: |-
+          switch name (full names are $(P)$(Q):LO/:LOLO/:STATUS)
+      DESC:
+        type: str
+        description: |-
+          Description of switch
+
+    databases:
+      - file: $(WATER)/db/simulationflow.template
+        args:
+          .*:
+
+  - name: flow_rio
+    description: |-
+      This template defines LO and LOLO records
+      for devices where Lo and LOLO are read from MPS RIO
+    parameters:
+      P:
+        type: str
+        description: |-
+          device name
+      Q:
+        type: str
+        description: |-
+          switch name (full names are $(P)$(Q):LO/:LOLO/:STATUS)
+      DESC:
+        type: str
+        description: |-
+          Description of switch
+      LO:
+        type: str
+        description: |-
+          Signal for lo (Interlock)
+      LOLO:
+        type: str
+        description: |-
+          Signal for lolo (Interlock)
+      alh:
+        type: str
+        description: |-
+          Template argument
+        default: None
+
+    databases:
+      - file: $(WATER)/db/flow-rio.template
+        args:
+          .*:

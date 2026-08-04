@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: digitelSpc
+
+entity_models:
+  - name: digitelSpc
+    description: |-
+      Template database for digitel SPC - Sputter Ion Pump Controller
+    parameters:
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+
+      device:
+        type: str
+        description: |-
+          Device name
+
+      port:
+        type: object
+        description: |-
+          Asyn serial port (asyn.AsynSerial with name ty_40_5)
+
+      unit:
+        type: str
+        description: |-
+          Unit number for multi-drop serial (2 hex digits)
+        default: "01"
+
+    databases:
+      - file: $(DIGITELSPC)/db/digitelSpc.template
+        args:
+          device:
+          port:
+          unit:
+
+  - name: digitelSpcIonp
+    description: |-
+      Template database for digitel SPC - Ion Pump
+    parameters:
+      SPC:
+        type: object
+        description: |-
+          digitelSpc object
+
+      device:
+        type: id
+        description: |-
+          Device name
+
+      size:
+        type: int
+        description: |-
+          Pump size (l/s)
+
+      spon:
+        type: float
+        description: |-
+          Setpoint on
+        default: 0
+
+      spoff:
+        type: float
+        description: |-
+          Setpoint off
+        default: 0
+
+    databases:
+      - file: $(DIGITELSPC)/db/digitelSpcIonp.template
+        args:
+          device:
+          port: "{{SPC.port}}"
+          unit: "{{SPC.unit}}"
+          size:
+          spon:
+          spoff:

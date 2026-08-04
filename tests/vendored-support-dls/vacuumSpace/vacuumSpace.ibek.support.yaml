@@ -1,0 +1,823 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json
+
+module: vacuumSpace
+
+shared:
+  - devices: &devices
+      ionp1:
+        type: str
+        description: first ion pump
+        default: ""
+
+      gauge1:
+        type: str
+        description: first gauge
+        default: ""
+
+      img1:
+        type: str
+        description: first img gauge
+        default: ""
+
+      pirg1:
+        type: str
+        description: first pirg gauge
+        default: ""
+
+      valve1:
+        type: str
+        description: first valve
+        default: ""
+
+      ionp2:
+        type: str
+        description: second ion pump
+        default: |-
+          {{ ionp1 }}
+
+      gauge2:
+        type: str
+        description: second combined gauge
+        default: |-
+          {{ gauge1 }}
+
+      img2:
+        type: str
+        description: second img gauge
+        default: |-
+          {{ img1 }}
+
+      pirg2:
+        type: str
+        description: second pirg gauge
+        default: |-
+          {{ pirg1 }}
+
+      valve2:
+        type: str
+        description: second valve
+        default: |-
+          {{ valve1 }}
+
+      ionp3:
+        type: str
+        description: third ion pump
+        default: |-
+          {{ ionp1 }}
+
+      gauge3:
+        type: str
+        description: third combined gauge
+        default: |-
+          {{ gauge1 }}
+
+      img3:
+        type: str
+        description: third img gauge
+        default: |-
+          {{ img1 }}
+
+      pirg3:
+        type: str
+        description: third pirg gauge
+        default: |-
+          {{ pirg1 }}
+
+      valve3:
+        type: str
+        description: third valve
+        default: |-
+          {{ valve1 }}
+
+      ionp4:
+        type: str
+        description: fourth ion pump
+        default: |-
+          {{ ionp1 }}
+
+      gauge4:
+        type: str
+        description: fourth combined gauge
+        default: |-
+          {{ gauge1 }}
+
+      img4:
+        type: str
+        description: fourth img gauge
+        default: |-
+          {{ img1 }}
+
+      pirg4:
+        type: str
+        description: fourth pirg gauge
+        default: |-
+          {{ pirg1 }}
+
+      valve4:
+        type: str
+        description: fourth valve
+        default: |-
+          {{ valve1 }}
+
+      ionp5:
+        type: str
+        description: fifth ion pump
+        default: |-
+          {{ ionp1 }}
+
+      gauge5:
+        type: str
+        description: fifth combined gauge
+        default: |-
+          {{ gauge1 }}
+
+      img5:
+        type: str
+        description: fifth img gauge
+        default: |-
+          {{ img1 }}
+
+      pirg5:
+        type: str
+        description: fifth pirg gauge
+        default: |-
+          {{ pirg1 }}
+
+      valve5:
+        type: str
+        description: fifth valve
+        default: |-
+          {{ valve1 }}
+
+      ionp6:
+        type: str
+        description: sixth ion pump
+        default: |-
+          {{ ionp1 }}
+
+      gauge6:
+        type: str
+        description: sixth combined gauge
+        default: |-
+          {{ gauge1 }}
+
+      img6:
+        type: str
+        description: sixth img gauge
+        default: |-
+          {{ img1 }}
+
+      pirg6:
+        type: str
+        description: sixth pirg gauge
+        default: |-
+          {{ pirg1 }}
+
+      valve6:
+        type: str
+        description: sixth valve
+        default: |-
+          {{ valve1 }}
+
+      ionp7:
+        type: str
+        description: seventh ion pump
+        default: |-
+          {{ ionp1 }}
+
+      gauge7:
+        type: str
+        description: seventh combined gauge
+        default: |-
+          {{ gauge1 }}
+
+      img7:
+        type: str
+        description: seventh img gauge
+        default: |-
+          {{ img1 }}
+
+      pirg7:
+        type: str
+        description: seventh pirg gauge
+        default: |-
+          {{ pirg1 }}
+
+      valve7:
+        type: str
+        description: seventh valve
+        default: |-
+          {{ valve1 }}
+
+      ionp8:
+        type: str
+        description: eighth ion pump
+        default: |-
+          {{ ionp1 }}
+
+      gauge8:
+        type: str
+        description: eighth combined gauge
+        default: |-
+          {{ gauge1 }}
+
+      img8:
+        type: str
+        description: eighth img gauge
+        default: |-
+          {{ img1 }}
+
+      pirg8:
+        type: str
+        description: eighth pirg gauge
+        default: |-
+          {{ pirg1 }}
+
+      valve8:
+        type: str
+        description: eighth valve
+        default: |-
+          {{ valve1 }}
+
+entity_models:
+  - name: spaceGroup
+    description: |-
+      Helper that makes a group of spaces to represent an entire hutch
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+
+      space0:
+        type: str
+        description: |-
+          First vacuum space
+
+      space1:
+        type: str
+        description: |-
+          Second vacuum space
+        default: |-
+          {{ space0 }}
+
+      space2:
+        type: str
+        description: |-
+          Third vacuum space
+        default: |-
+          {{ space0 }}
+
+      space3:
+        type: str
+        description: |-
+          Fourth vacuum space
+        default: |-
+          {{ space0 }}
+
+      space4:
+        type: str
+        description: |-
+          Fifth vacuum space
+        default: |-
+          {{ space0 }}
+
+      space5:
+        type: str
+        description: |-
+          Sixth vacuum space
+        default: |-
+          {{ space0 }}
+
+      space6:
+        type: str
+        description: |-
+          Seventh vacuum space
+        default: |-
+          {{ space0 }}
+
+      space7:
+        type: str
+        description: |-
+          Eighth vacuum space
+        default: |-
+          {{ space0 }}
+
+    # databases:
+    #   - file: $(MKS937A)/db/mks937aImgGroup.template
+    #     args:
+    #       delay:
+    #       device:
+    #       img8:
+    #       img3:
+    #       img2:
+    #       img1:
+    #       img7:
+    #       img6:
+    #       img5:
+    #       img4:
+
+    #   - file: $(MKS937A)/db/mks937aGaugeGroup.template
+    #     args:
+    #       gauge5:
+    #       gauge4:
+    #       gauge7:
+    #       gauge6:
+    #       gauge1:
+    #       gauge3:
+    #       gauge2:
+    #       SELN:
+    #       SELM:
+    #       gauge8:
+    #       device:
+
+    #   - file: $(DLSPLC)/db/dlsPLC_vacValveGroup.template
+    #     args:
+    #       mode2:
+    #       mode1:
+    #       delay:
+    #       device:
+    #       valve8:
+    #       valve4:
+    #       valve5:
+    #       valve6:
+    #       valve7:
+    #       valve1:
+    #       valve2:
+    #       valve3:
+
+    #   - file: $(VACUUMSPACE)/db/space.template
+    #     args:
+    #       name:
+    #       space0:
+    #       space1:
+    #       space2:
+    #       space3:
+    #       space4:
+    #       space5:
+    #       space6:
+    #       space7:
+    #       device:
+
+    #   - file: $(DIGITELMPC)/db/digitelMpcIonpGroup.template
+    #     args:
+    #       ionp7:
+    #       ionp6:
+    #       ionp5:
+    #       ionp4:
+    #       ionp3:
+    #       ionp2:
+    #       ionp1:
+    #       ionp8:
+    #       delay:
+    #       device:
+
+    #   - file: $(MKS937A)/db/mks937aPirgGroup.template
+    #     args:
+    #       pirg1:
+    #       pirg3:
+    #       pirg2:
+    #       pirg5:
+    #       pirg4:
+    #       pirg7:
+    #       pirg6:
+    #       device:
+    #       pirg8:
+
+  - name: spaceTemplate
+    description: |-
+      Simple vacuum space template. Requires Group wrappers for its inputs.
+          Recommended you use space object instead
+    parameters:
+      device:
+        type: id
+        description: |-
+          device name
+
+      ionp:
+        type: str
+        description: |-
+          ion pump
+
+      gauge:
+        type: str
+        description: |-
+          combination gauge
+
+      img:
+        type: str
+        description: |-
+          IMG
+
+      pirg:
+        type: str
+        description: |-
+          Pirani gauge
+
+      valve:
+        type: str
+        description: |-
+          Vacuum valve
+
+    databases:
+      - file: $(VACUUMSPACE)/db/space.template
+        args: { device, ionp, gauge, img, pirg, valve }
+
+  - name: space_bTemplate
+    description: |-
+      Simple vacuum space template. Requires Group wrappers for its inputs.
+          Recommended you use space object instead
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      ionp:
+        type: str
+        description: |-
+          ion pump
+
+      gauge:
+        type: str
+        description: |-
+          combination gauge
+
+      img:
+        type: str
+        description: |-
+          IMG
+
+      pirg:
+        type: str
+        description: |-
+          Pirani gauge
+
+      valve:
+        type: str
+        description: |-
+          Note: The following relay numbers are mapped to the IMG or PIRG device number, not the absolute controller relay number.
+
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+
+      valveIlRelay:
+        type: int
+        description: |-
+          Valve interlock IMG relay
+        default: 1
+
+      mpsIlRelay1:
+        type: int
+        description: |-
+          Machine protection system interlock IMG relay
+        default: 2
+
+      mpsIlRelay2:
+        type: int
+        description: |-
+          Machine protection system interlock IMG relay
+        default: 3
+
+      rgaIlRelay:
+        type: int
+        description: |-
+          RGA interlock IMG relay
+        default: 4
+
+      ionPumpIlRelay:
+        type: int
+        description: |-
+          Ion pump interlock PIRG relay
+        default: 1
+
+    databases:
+      - file: $(VACUUMSPACE)/db/space_b.template
+        args:
+          ionp:
+          name:
+          img:
+          pirg:
+          valve:
+          rgaIlRelay:
+          ionPumpIlRelay:
+          device:
+          gauge:
+          valveIlRelay:
+          mpsIlRelay2:
+          mpsIlRelay1:
+
+  - name: space
+    description: |-
+      Helper that packages up a series of ion pumps, gauges, imgs, pirgs and
+              valves, groups them together, and creates a vacuum space out of them
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+
+      <<: *devices
+
+      SELM:
+        type: int
+        description: |-
+          the space template
+        default: 1
+
+      SELN:
+        type: int
+        description: |-
+          Use this to select which gauge to look at if you set SELM=0
+        default: 0
+
+      mode1:
+        type: str
+        description: |-
+          name of remote operational mode (:MODE)
+        default: Operational
+
+      mode2:
+        type: str
+        description: |-
+          name of local operational mode (:MODE)
+        default: Service
+
+      delay:
+        type: str
+        description: |-
+          delay between starting pumps
+        default: "4"
+
+    databases:
+      - file: $(VACUUMSPACE)/db/space.template
+        args:
+          device:
+          name:
+          ionp: "{{ device }}:IONPG"
+          gauge: "{{ device }}:GAUGEG"
+          img: "{{ device }}:IMGG"
+          pirg: "{{ device }}:PIRGG"
+          valve: "{{ device }}:VALVEG"
+
+      - file: $(DIGITELMPC)/db/digitelMpcIonpGroup.template
+        args:
+          device: "{{ device }}:IONPG"
+          delay:
+          ionp1:
+          ionp2:
+          ionp3:
+          ionp4:
+          ionp5:
+          ionp6:
+          ionp7:
+          ionp8:
+
+      - file: $(MKS937A)/db/mks937aPirgGroup.template
+        args:
+          device: "{{ device }}:PIRGG"
+          pirg1:
+          pirg2:
+          pirg3:
+          pirg4:
+          pirg5:
+          pirg6:
+          pirg7:
+          pirg8:
+
+      # NOTE: arg order MUST match mks937a.mks937aImgGroup so ibek's positional
+      # substitution rows line up with the shared pattern header
+      - file: $(MKS937A)/db/mks937aImgGroup.template
+        args:
+          delay:
+          device: "{{ device }}:IMGG"
+          img8:
+          img3:
+          img2:
+          img1:
+          img7:
+          img6:
+          img5:
+          img4:
+
+      # NOTE: arg order MUST match mks937a.mks937aGaugeGroup
+      - file: $(MKS937A)/db/mks937aGaugeGroup.template
+        args:
+          device: "{{ device }}:GAUGEG"
+          gauge1:
+          gauge2:
+          gauge3:
+          gauge4:
+          gauge5:
+          gauge6:
+          gauge7:
+          gauge8:
+          SELM:
+          SELN:
+
+      # NOTE: dlsPLC.vacValveGroup instantiates this template with `.*`, whose
+      # column order is type, entity_enabled, mode1, mode2, delay, device,
+      # valve1..8.  We must reproduce that exact order (type/entity_enabled are
+      # ignored padding columns) so ibek's positional rows line up.
+      - file: $(DLSPLC)/db/dlsPLC_vacValveGroup.template
+        args:
+          type:
+          entity_enabled:
+          mode1:
+          mode2:
+          delay:
+          device: "{{ device }}:VALVEG"
+          valve1:
+          valve2:
+          valve3:
+          valve4:
+          valve5:
+          valve6:
+          valve7:
+          valve8:
+
+  - name: space_b
+    description: |-
+      Helper that packages up a series of ion pumps, gauges, imgs, pirgs and
+              valves, groups them together, and creates a vacuum space out of them
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+
+      name:
+        type: id
+        description: |-
+          Object name and gui association name
+
+      <<: *devices
+
+      valveIlRelay:
+        type: int
+        description: |-
+          Valve interlock IMG relay
+        default: 1
+
+      mpsIlRelay1:
+        type: int
+        description: |-
+          Machine protection system interlock IMG relay
+        default: 2
+
+      mpsIlRelay2:
+        type: int
+        description: |-
+          Machine protection system interlock IMG relay
+        default: 3
+
+      rgaIlRelay:
+        type: int
+        description: |-
+          RGA interlock IMG relay
+        default: 4
+
+      ionPumpIlRelay:
+        type: int
+        description: |-
+          Ion pump interlock PIRG relay
+        default: 1
+
+      SELM:
+        type: int
+        description: |-
+          the space template
+        default: 1
+
+      SELN:
+        type: int
+        description: |-
+          Use this to select which gauge to look at if you set SELM=0
+        default: 0
+
+      delay:
+        type: str
+        description: |-
+          delay between starting pumps
+        default: "4"
+
+      mode1:
+        type: str
+        description: |-
+          name of remote operational mode (:MODE)
+        default: Operational
+
+      mode2:
+        type: str
+        description: |-
+          name of local operational mode (:MODE)
+        default: Service
+
+    databases:
+      - file: $(VACUUMSPACE)/db/space_b.template
+        args:
+          device:
+          name:
+          valveIlRelay:
+          mpsIlRelay1:
+          mpsIlRelay2:
+          rgaIlRelay:
+          ionPumpIlRelay:
+          SELM:
+          SELN:
+          ionp: "{{ device }}:IONPG"
+          gauge: "{{ device }}:GAUGEG"
+          img: "{{ device }}:IMGG"
+          pirg: "{{ device }}:PIRGG"
+          valve: "{{ device }}:VALVEG"
+
+      # NOTE: arg order MUST match mks937b.mks937bGaugeGroup
+      - file: $(MKS937B)/db/mks937bGaugeGroup.template
+        args:
+          gauge5:
+          gauge4:
+          gauge7:
+          gauge6:
+          gauge1:
+          gauge3:
+          gauge2:
+          SELN:
+          SELM:
+          gauge8:
+          device: "{{ device }}:GAUGEG"
+
+      - file: $(DIGITELMPC)/db/digitelMpcIonpGroup.template
+        args:
+          device: "{{ device }}:IONPG"
+          delay:
+          ionp1:
+          ionp2:
+          ionp3:
+          ionp4:
+          ionp5:
+          ionp6:
+          ionp7:
+          ionp8:
+
+      - file: $(MKS937B)/db/mks937bPirgGroup.template
+        args:
+          device: "{{ device }}:PIRGG"
+          ionPumpIlRelay:
+          pirg1:
+          pirg2:
+          pirg3:
+          pirg4:
+          pirg5:
+          pirg6:
+          pirg7:
+          pirg8:
+
+      - file: $(MKS937B)/db/mks937bImgGroup.template
+        args:
+          device: "{{ device }}:IMGG"
+          delay:
+          mpsIlRelay1:
+          mpsIlRelay2:
+          rgaIlRelay:
+          valveIlRelay:
+          img1:
+          img2:
+          img3:
+          img4:
+          img5:
+          img6:
+          img7:
+          img8:
+
+      # NOTE: dlsPLC.vacValveGroup instantiates this template with `.*`, whose
+      # column order is type, entity_enabled, mode1, mode2, delay, device,
+      # valve1..8.  We must reproduce that exact order (type/entity_enabled are
+      # ignored padding columns) so ibek's positional rows line up.
+      - file: $(DLSPLC)/db/dlsPLC_vacValveGroup.template
+        args:
+          type:
+          entity_enabled:
+          mode1:
+          mode2:
+          delay:
+          device: "{{ device }}:VALVEG"
+          valve1:
+          valve2:
+          valve3:
+          valve4:
+          valve5:
+          valve6:
+          valve7:
+          valve8:

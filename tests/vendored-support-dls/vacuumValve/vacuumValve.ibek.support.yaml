@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json
+
+module: vacuumValve
+
+entity_models:
+  - name: vacuumValveReadExtra
+    description: |-
+      Read 30 extra words of DM memory from a valve control crate via Hostlink
+      serial protocol. Reads 3 blocks of 10 words (B1*10..B3*10+9) into
+      subArray records. Used to support expanded interlock ranges beyond the
+      standard 100-word read100 block.
+
+      TODO: this needs to be moved into dlsPLC !!!
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device prefix of the valve control crate
+      port:
+        type: str
+        description: |-
+          Asyn port name for the Hostlink serial connection, e.g. ty_41_0
+      N:
+        type: int
+        description: |-
+          READBACK record suffix. Use 5 for the first instance and increment
+          for any subsequent instances on the same crate.
+      B1:
+        type: int
+        description: |-
+          First block to read (e.g. 39 reads DM390-399)
+      B2:
+        type: int
+        description: |-
+          Second block to read (must be B1+1)
+      B3:
+        type: int
+        description: |-
+          Third block to read (must be B1+2)
+    databases:
+      - file: vacuumValveReadExtra.template
+        args:
+          device:
+          port:
+          N:
+          B1:
+          B2:
+          B3:

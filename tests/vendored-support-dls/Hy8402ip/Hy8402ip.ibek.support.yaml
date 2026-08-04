@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json
+
+module: Hy8402ip
+
+entity_models:
+  - name: Hy8402
+    description: |-
+      Hytec 8402 Digital to Analogue Converter (DAC).
+    parameters:
+      name:
+        type: str
+        description: |-
+          Object name and asyn port name (optional)
+        default: ""
+
+      carrier:
+        type: object
+        description: |-
+          Carrier card
+
+      ipslot:
+        type: int
+        description: |-
+          IP slot in carrier
+
+      cardid:
+        type: int
+        description: |-
+          cardid
+        # TODO complex logic in builder.py for Carrier
+        default: 0
+
+      doram:
+        type: int
+        description: |-
+          If 1 then run in function generator mode
+        default: 0
+
+      clockSource:
+        type: int
+        description: |-
+          Clock source (0=Internal, 1=External)
+        default: 0
+
+      clockRate:
+        type: enum
+        description: |-
+          Clock rate
+        default: 13
+        values:
+          1Hz: 0
+          2Hz: 1
+          5Hz: 2
+          10Hz: 3
+          20Hz: 4
+          50Hz: 5
+          100Hz: 6
+          200Hz: 7
+          500Hz: 8
+          1kHz: 9
+          2kHz: 10
+          5kHz: 11
+          10kHz: 12
+          20kHz: 13
+          50kHz: 14
+          100kHz: 15
+
+      inhibit:
+        type: int
+        description: |-
+          Front panel inhibit signal (0=Disable, 1=Enable)
+        default: 0
+
+      interrupt_vector:
+        type: object
+        description: Interrupt Vector reserved with epics.InterruptVectorVME, count=1
+
+    pre_init:
+      - when: first
+        value: |
+
+          # Hy8402ipConfigure(cardNum, VMESlotNum, IPSlotNum, interruptVector, doRam, externalClock, clockRate, inhibit)
+      - value: |
+          Hy8402ipConfigure({{carrier.slot * 10 + ipslot}}, $({{carrier}}), {{ipslot}}, $({{interrupt_vector}}), {{doram}}, {{clockSource}}, {{clockRate}}, {{inhibit}})
+          {% if name %}initHy8402ipAsyn("{{name}}", {{carrier.slot * 10 + ipslot}}){% endif %}

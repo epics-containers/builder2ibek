@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=../schemas/ibek.support.schema.json
+
+module: cmsIon
+
+entity_models:
+  - name: RS4hour_IFB300
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name e.g <domain>-<technical>-EVR-01, no default
+      evr:
+        type: str
+        description: |-
+          name defined in the mrmEvrSetupPCI() function, default=EVR
+        default: EVR
+      F:
+        type: str
+        description: |-
+          Pulser function type, default=Trig
+        default: Trig
+
+    databases:
+      - file: $(CMSION)/db/RS4hour-IFB300.template
+        args:
+          .*:
+
+  - name: RS4hour
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name e.g <domain>-<technical>-EVR-01, no default
+      rname:
+        type: str
+        description: |-
+          record name, default = SET-ER
+        default: SET-ER
+      card:
+        type: int
+        description: |-
+          EVR card number, default = 1
+        default: 1
+
+    databases:
+      - file: $(CMSION)/db/RS4hour.template
+        args:
+          .*:
+
+  - name: cmsIon
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device Prefix
+      port:
+        type: str
+        description: |-
+          Asyn port
+      high:
+        type: float
+        description: |-
+          Integrated dose (since reset) HIGH value
+      hihi:
+        type: float
+        description: |-
+          Integrated dose (since reset) HIHI value
+      target:
+        type: str
+        description: |-
+          Indicates if soft IOC protocol file to be used, default=''
+        default: ""
+      name:
+        type: id
+        description: |-
+          Object name and associated gui name
+      DESC:
+        type: str
+        description: |-
+          Description
+        default: ""
+
+    databases:
+      - file: $(CMSION)/db/cmsIon.template
+        args:
+          .*:
+
+  - name: cmsIon_CheckReset
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          Radiation Monitor Device Name
+      evr:
+        type: str
+        description: |-
+          IOCs EVR Device Name
+
+    databases:
+      - file: $(CMSION)/db/cmsIon_CheckReset.template
+        args:
+          .*:
+
+  - name: cmsIon_sim
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device Prefix
+      port:
+        type: str
+        description: |-
+          Asyn port
+      high:
+        type: str
+        description: |-
+          Integrated dose (since reset) HIGH value
+      hihi:
+        type: str
+        description: |-
+          Integrated dose (since reset) HIHI value
+      target:
+        type: str
+        description: |-
+          Indicates if soft IOC protocol file to be used, default=''
+        default: ""
+      name:
+        type: id
+        description: |-
+          Object name and associated gui name
+      DESC:
+        type: str
+        description: |-
+          Description
+
+    databases:
+      - file: $(CMSION)/db/simulation_cmsIon.template
+        args:
+          .*:

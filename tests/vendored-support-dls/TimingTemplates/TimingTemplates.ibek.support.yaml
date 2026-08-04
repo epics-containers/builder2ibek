@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: TimingTemplates
+
+entity_models:
+  - name: DefaultEVR
+    description: define a default Event Receiver configuration
+    parameters:
+      device:
+        type: id
+        description: The device PV prefix
+
+      event_receiver:
+        type: object
+        description: reference to EventReceiverPMC entry
+
+      er:
+        type: str
+        description: Event Receiver record suffix
+        default: SET-ER
+
+    databases:
+      - file: defaultEVR.template
+        args:
+          card: "{{ event_receiver.cardid }}"
+          device:
+          er:
+
+  - name: EvrAlive
+    description: Add a PV to monitor the Event Receiver
+    parameters:
+      device:
+        type: str
+        description: Device prefix
+      SYSTEM:
+        type: str
+        description: Device prefix (defaults to device)
+        default: |-
+          {{ device }}
+
+    databases:
+      - file: evr_alive.template
+        args:
+          device:
+          SYSTEM:
+
+  - name: EventStats
+    description: |
+      Timestamp and age statistics PVs for a single timing event
+    parameters:
+      SYSTEM:
+        type: str
+        description: Device prefix
+      EVNUM:
+        type: int
+        description: Event number
+      EVNAME:
+        type: str
+        description: Device suffix
+
+    databases:
+      - file: event_stats.template
+        args:
+          SYSTEM:
+          EVNUM:
+          EVNAME:
+
+  - name: BL_EVR_PMC
+    description: Beamline Event Receiver PMC configuration template
+    parameters:
+      device:
+        type: str
+        description: Device prefix
+
+      card:
+        type: int
+        description: EPICS Card number supplied to ErConfigurexxx
+
+      INTERRUPTS:
+        type: str
+        description: Whether VME interrupts are generated for timing signals, Enabled or Disabled
+        default: Enabled
+
+      FPS0:
+        type: int
+        description: Default mode for FPS0 (0 = SR INJ, 1 = External)
+        default: 0
+
+      WIDTH0:
+        type: float
+        description: Default pulse width of output 0
+        default: 10e-3
+
+    databases:
+      - file: BL-EVR-PMC.template
+        args:
+          .*:
+
+  - name: GeneralTime
+    description: Add a PV to monitor the General Time
+    parameters:
+      device:
+        type: id
+        description: device name
+
+      gt:
+        type: str
+        description: generalTime PV Prefix
+        default: "GT:"
+
+      scan:
+        type: str
+        description: scan rate
+        default: 10 second
+
+    databases:
+      - file: generalTime.template
+        args: { device: null, gt: null, scan: null }

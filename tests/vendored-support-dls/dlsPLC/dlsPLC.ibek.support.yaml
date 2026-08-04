@@ -1,0 +1,6017 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+shared:
+  # These shared sections are used to define common parameters for the
+  # various Definitions described in the dlsPLC.ibek.support.yaml file.
+  #
+  # They are in the form of anchors that can be merged into each Definition
+  # via aliases. This allows for a more DRY approach and makes the file
+  # considerably smaller.
+  #
+  # e.g.
+  #
+  #  params:
+  #    <<: [*ilk, *gilk, *cilk, *con_label, *sta_label, *sta_sv, *ilksta, *ilksta_sv]
+  #    con_label0:
+  #      type: str
+  #      description: |-
+  #        Label string for control value 0
+  #      default: On
+  #
+  # merges all the shared sections into the params section of a Definition, but
+  # would still allow override of individual parameters as shown for con_label0.
+
+  - PQ: &PQ
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      Q:
+        type: str
+        description: |-
+          Device Suffix
+
+  - tagidx: &tagidx
+      tagidx:
+        type: int
+        description: |-
+          Template argument
+
+  - tag: &tag
+      tag:
+        type: str
+        description: |-
+          NX PLC tag string e.g. V (from V.Control[1])
+      ILKNUM:
+        type: int
+        description: |-
+          Part of Gauge PLC tag (Gauge.PIRG[dollar(ILKNUM)])
+
+  - delay: &delay
+      delay:
+        type: int
+        description: |-
+          delay between opening valves
+
+  - vlvcc: &vlvcc
+      vlvcc:
+        type: str
+        description: |-
+          device name of valve control crate (prefix of device name), NOTE: make sure there is a read100 component whose century (0 means 0-99) includes the object address
+      addr:
+        type: int
+        description: |-
+          First address in the DM variable range decade. E.g. if valve is in DM110..119 then addr=110
+
+  - ilk: &ilk
+      ilk0:
+        type: str
+        description: |-
+          Interlock description 0
+        default: unused
+      ilk1:
+        type: str
+        description: |-
+          Interlock description 1
+        default: unused
+      ilk2:
+        type: str
+        description: |-
+          Interlock description 2
+        default: unused
+      ilk3:
+        type: str
+        description: |-
+          Interlock description 3
+        default: unused
+      ilk4:
+        type: str
+        description: |-
+          Interlock description 4
+        default: unused
+      ilk5:
+        type: str
+        description: |-
+          Interlock description 5
+        default: unused
+      ilk6:
+        type: str
+        description: |-
+          Interlock description 6
+        default: unused
+      ilk7:
+        type: str
+        description: |-
+          Interlock description 7
+        default: unused
+      ilk8:
+        type: str
+        description: |-
+          Interlock description 8
+        default: unused
+      ilk9:
+        type: str
+        description: |-
+          Interlock description 9
+        default: unused
+      ilk10:
+        type: str
+        description: |-
+          Interlock description 10
+        default: unused
+      ilk11:
+        type: str
+        description: |-
+          Interlock description 11
+        default: unused
+      ilk12:
+        type: str
+        description: |-
+          Interlock description 12
+        default: unused
+      ilk13:
+        type: str
+        description: |-
+          Interlock description 13
+        default: unused
+      ilk14:
+        type: str
+        description: |-
+          Interlock description 14
+        default: unused
+      ilk15:
+        type: str
+        description: |-
+          Interlock description 15
+        default: unused
+
+  - gilk: &gilk
+      gilk0:
+        type: str
+        description: |-
+          Gauge interlock description 0
+        default: unused
+      gilk1:
+        type: str
+        description: |-
+          Gauge interlock description 1
+        default: unused
+      gilk2:
+        type: str
+        description: |-
+          Gauge interlock description 2
+        default: unused
+      gilk3:
+        type: str
+        description: |-
+          Gauge interlock description 3
+        default: unused
+      gilk4:
+        type: str
+        description: |-
+          Gauge interlock description 4
+        default: unused
+      gilk5:
+        type: str
+        description: |-
+          Gauge interlock description 5
+        default: unused
+      gilk6:
+        type: str
+        description: |-
+          Gauge interlock description 6
+        default: unused
+      gilk7:
+        type: str
+        description: |-
+          Gauge interlock description 7
+        default: unused
+      gilk8:
+        type: str
+        description: |-
+          Gauge interlock description 8
+        default: unused
+      gilk9:
+        type: str
+        description: |-
+          Gauge interlock description 9
+        default: unused
+      gilk10:
+        type: str
+        description: |-
+          Gauge interlock description 10
+        default: unused
+      gilk11:
+        type: str
+        description: |-
+          Gauge interlock description 11
+        default: unused
+      gilk12:
+        type: str
+        description: |-
+          Gauge interlock description 12
+        default: unused
+      gilk13:
+        type: str
+        description: |-
+          Gauge interlock description 13
+        default: unused
+      gilk14:
+        type: str
+        description: |-
+          Gauge interlock description 14
+        default: unused
+      gilk15:
+        type: str
+        description: |-
+          Gauge interlock description 15
+        default: unused
+
+  - cilk: &cilk
+      cilk0:
+        type: str
+        description: |-
+          Gauge interlock description 0
+        default: unused
+      cilk1:
+        type: str
+        description: |-
+          Gauge interlock description 1
+        default: unused
+      cilk2:
+        type: str
+        description: |-
+          Gauge interlock description 2
+        default: unused
+      cilk3:
+        type: str
+        description: |-
+          Gauge interlock description 3
+        default: unused
+      cilk4:
+        type: str
+        description: |-
+          Gauge interlock description 4
+        default: unused
+      cilk5:
+        type: str
+        description: |-
+          Gauge interlock description 5
+        default: unused
+      cilk6:
+        type: str
+        description: |-
+          Gauge interlock description 6
+        default: unused
+      cilk7:
+        type: str
+        description: |-
+          Gauge interlock description 7
+        default: unused
+      cilk8:
+        type: str
+        description: |-
+          Gauge interlock description 8
+        default: unused
+      cilk9:
+        type: str
+        description: |-
+          Gauge interlock description 9
+        default: unused
+      cilk10:
+        type: str
+        description: |-
+          Gauge interlock description 10
+        default: unused
+      cilk11:
+        type: str
+        description: |-
+          Gauge interlock description 11
+        default: unused
+      cilk12:
+        type: str
+        description: |-
+          Gauge interlock description 12
+        default: unused
+      cilk13:
+        type: str
+        description: |-
+          Gauge interlock description 13
+        default: unused
+      cilk14:
+        type: str
+        description: |-
+          Gauge interlock description 14
+        default: unused
+      cilk15:
+        type: str
+        description: |-
+          Gauge interlock description 15
+        default: unused
+
+  - con_label: &con_label
+      con_label0:
+        type: str
+        description: |-
+          Label string for control value 0
+        default: Open
+      con_label1:
+        type: str
+        description: |-
+          Label string for control value 1
+        default: Close
+      con_label2:
+        type: str
+        description: |-
+          Label string for control value 2
+        default: Reset
+      con_label3:
+        type: str
+        description: |-
+          Label string for control value 3
+        default: ""
+      con_label4:
+        type: str
+        description: |-
+          Label string for control value 4
+        default: ""
+      con_label5:
+        type: str
+        description: |-
+          Label string for control value 5
+        default: ""
+      con_label6:
+        type: str
+        description: |-
+          Label string for control value 6
+        default: ""
+
+  - sta_label: &sta_label
+      sta_label0:
+        type: str
+        description: |-
+          Label string for status value 0
+        default: Fault
+      sta_label1:
+        type: str
+        description: |-
+          Label string for status value 1
+        default: Open
+      sta_label2:
+        type: str
+        description: |-
+          Label string for status value 2
+        default: Opening
+      sta_label3:
+        type: str
+        description: |-
+          Label string for status value 3
+        default: Closed
+      sta_label4:
+        type: str
+        description: |-
+          Label string for status value 4
+        default: Closing
+      sta_label5:
+        type: str
+        description: |-
+          Label string for status value 5
+        default: ""
+      sta_label6:
+        type: str
+        description: |-
+          Label string for status value 6
+        default: ""
+
+  - sta_sv: &sta_sv
+      sta_sv0:
+        type: str
+        description: |-
+          Alarm severity for status value 0.
+        default: MAJOR
+      sta_sv1:
+        type: str
+        description: |-
+          Alarm severity for status value 1.
+        default: NO_ALARM
+      sta_sv2:
+        type: str
+        description: |-
+          Alarm severity for status value 2.
+        default: NO_ALARM
+      sta_sv3:
+        type: str
+        description: |-
+          Alarm severity for status value 3.
+        default: NO_ALARM
+      sta_sv4:
+        type: str
+        description: |-
+          Alarm severity for status value 4.
+        default: NO_ALARM
+      sta_sv5:
+        type: str
+        description: |-
+          Alarm severity for status value 5.
+        default: NO_ALARM
+      sta_sv6:
+        type: str
+        description: |-
+          Alarm severity for status value 6.
+        default: NO_ALARM
+
+  - ilksta_label: &ilksta_label
+      ilksta_label0:
+        type: str
+        description: |-
+          Template argument
+        default: Failed
+      ilksta_label1:
+        type: str
+        description: |-
+          Template argument
+        default: Run Ilks Ok
+      ilksta_label2:
+        type: str
+        description: |-
+          Template argument
+        default: OK
+      ilksta_label3:
+        type: str
+        description: |-
+          Template argument
+        default: Disarmed
+      ilksta_label4:
+        type: str
+        description: |-
+          Template argument
+        default: ""
+      ilksta_label5:
+        type: str
+        description: |-
+          Template argument
+        default: ""
+
+  - ilksta_sv: &ilksta_sv
+      ilksta_sv0:
+        type: str
+        description: |-
+          Template argument
+        default: MAJOR
+      ilksta_sv1:
+        type: str
+        description: |-
+          Template argument
+        default: NO_ALARM
+      ilksta_sv2:
+        type: str
+        description: |-
+          Template argument
+        default: NO_ALARM
+      ilksta_sv3:
+        type: str
+        description: |-
+          Template argument
+        default: NO_ALARM
+      ilksta_sv4:
+        type: str
+        description: |-
+          Template argument
+        default: NO_ALARM
+      ilksta_sv5:
+        type: str
+        description: |-
+          Template argument
+        default: NO_ALARM
+
+  - mode: &mode
+      mode1:
+        type: str
+        description: |-
+          name of remote operational mode (:MODE)
+        default: Operational
+      mode2:
+        type: str
+        description: |-
+          name of local operational mode (:MODE)
+        default: Service
+
+  - allowpv: &allowpv
+      allowpv:
+        type: str
+        description: |-
+          If specified, then only write an open command when this is non-zero. MUST have CP at the end of it
+        default: ""
+
+  - whylocked: &whylocked
+      whylocked:
+        type: str
+        description: |-
+          String to output to EDM synoptic as to precisely why the device is locked and by whom
+        default: Open command not allowed
+
+  - timeout: &timeout
+      timeout:
+        type: int
+        description: |-
+          Timeout in seconds for the FINS protocol
+        default: 0
+
+  - alarm_limits: &alarm_limits
+      lolo:
+        type: float
+        description: |-
+          Lolo alarm limit
+      low:
+        type: float
+        description: |-
+          Low alarm limit
+      high:
+        type: float
+        description: |-
+          High alarm limit
+      hihi:
+        type: float
+        description: |-
+          Hihi alarm limit
+      hopr:
+        type: float
+        description: |-
+          High operating range
+      lopr:
+        type: float
+        description: |-
+          Low operating range
+      llsv:
+        type: str
+        description: |-
+          Lolo severity
+        default: NO_ALARM
+      lsv:
+        type: str
+        description: |-
+          Low severity
+        default: NO_ALARM
+      hyst:
+        type: float
+        description: |-
+          alarm deadband
+        default: 0
+
+###############################################################################
+# the entity models for fast vacuum and fast vacuum channels are hand coded to
+# include the complex processing originally implemented in builder.py
+###############################################################################
+
+entity_models:
+
+  - name: fastVacuumMaster
+    description: |-
+      master records for fast vacuum
+    parameters:
+
+      name:
+        type: id
+        description: |-
+          Object name, used by fastVacuumChannel to reference this master
+
+      dom:
+        type: str
+        description: |-
+          Domain, eg, FE06I
+
+      fins_port:
+        type: object
+        description: |-
+          FINS port
+
+      eip_port:
+        type: str
+        description: |-
+          EtherIP port
+
+    post_defines:
+      device:
+        description: device name
+        value: |-
+          {{dom}}-VA-VFAST-01
+
+      waveform_nelm:
+        description: waveform element count
+        value: "500"
+
+      combined_nelm:
+        description: total waveform element count
+        value: |-
+          {{ (6 * waveform_nelm|int) }}
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_fastVacuumMaster.template
+        args: { device, eip_port }
+
+  - name: fastVacuumChannel
+    description: |-
+      Adds a fast vacuum channel to the fast vacuum master
+    pre_defines:
+      gaugeNum:
+        description: auto gauge count
+        value: |-
+          {{ _global.incrementor("fvGaugeNum", start=1) }}
+
+      fan:
+        description: fan number
+        value: |-
+          {{ "%02d" % (gaugeNum | int / 7 + 1) }}
+
+      mask:
+        description: mask for the channel
+        value: |-
+          {{ _global.set('fvMask', _global.get('fvMask', 0) + 2**(gaugeNum | int)) }}
+
+    parameters:
+      <<: [ *timeout ]
+
+      master:
+        type: object
+        description: |-
+          Master
+
+      img:
+        type: str
+        description: |-
+          Base IMG PV
+
+      id:
+        type: enum
+        description: |-
+          FV PLC gauge number
+        values:
+          "01":
+          "02":
+          "03":
+          "04":
+          "05":
+          "06":
+          "07":
+          "08":
+          "09":
+          "10":
+      em:
+        type: enum
+        description: |-
+          EM block to use
+        default: 0
+        values:
+          "0":
+          "1":
+          "2":
+    post_defines:
+      lnk_no:
+        description: link number
+        value: |-
+          {{ ((gaugeNum | int - 1) % 6) + 1 }}
+
+      gaugePV:
+        description: Gauge PV
+        value: |-
+          {{ master.device }}:GAUGE{{id}}_0
+
+      addr_offset:
+        description: waveform address offset for the first waveform for this channel
+        value: |-
+          {{ (gaugeNum | int - 1) * (master.combined_nelm | int) }}
+
+      wave0_addr:
+        description: waveform address
+        value: |-
+          {{ (addr_offset | int) + (master.waveform_nelm | int) * 0 }}
+
+      wave1_addr:
+        description: waveform address
+        value: |-
+          {{ (addr_offset | int) + (master.waveform_nelm | int) * 1 }}
+
+      wave2_addr:
+        description: waveform address
+        value: |-
+          {{ (addr_offset | int) + (master.waveform_nelm | int) * 2 }}
+
+      wave3_addr:
+        description: waveform address
+        value: |-
+          {{ (addr_offset | int) + (master.waveform_nelm | int) * 3 }}
+
+      wave4_addr:
+        description: waveform address
+        value: |-
+          {{ (addr_offset | int) + (master.waveform_nelm | int) * 4 }}
+
+      wave5_addr:
+        description: waveform address
+        value: |-
+          {{ (addr_offset | int) + (master.waveform_nelm | int) * 5 }}
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_fastVacuumLink.template
+        args: { device: "{{master.device}}", lnk_no, lnk: "{{gaugePV}}", fan, mask }
+
+      - file: $(DLSPLC)/db/dlsPLC_fastVacuumChannel.template
+        args:
+          device: "{{master.device}}"
+          img:
+          fins_port: "{{master.fins_port}}"
+          eip_port: "{{master.eip_port}}"
+          tagidx: "{{ (id | string).strip('0') }}"
+          id: "{{id}}"
+          em:
+          waveform_nelm: "{{master.waveform_nelm}}"
+          wave0_addr:
+          wave1_addr:
+          wave2_addr:
+          wave3_addr:
+          wave4_addr:
+          wave5_addr:
+          combined_nelm: "{{master.combined_nelm}}"
+          timeout:
+
+  - name: overrideRequestIndividual
+    description: |-
+      Template allowing override of individual interlock bits
+    parameters:
+      P:
+        type: str
+        description: |-
+          device prefix
+      DESC:
+        type: str
+        description: |-
+          Description (e.g. DCM piezo override)
+      PRESSURE1:
+        type: str
+        description: |-
+          Pressure in mbar that needs to be over setpoint to allow override
+      PRESSURE2:
+        type: str
+        description: |-
+          Pressure in mbar that needs to be over setpoint to allow override
+      OVERRIDE:
+        type: str
+        description: |-
+          P of overrideRequestMain instance
+      BIT:
+        type: int
+        description: |-
+          Bit of overrideRequestMain instance to use (0-8)
+      SETPOINT:
+        type: int
+        description: |-
+          Setpoint in mbar that both pressures need to be higher than to allow override
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_overrideRequestIndividual.template
+        args:
+          .*:
+
+  - name: softwareVersion
+    description: |-
+      Template that reads software version from a PLC.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device prefix
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_softwareVersion.template
+        args:
+          .*:
+
+  - name: vacValveBistable
+    description: |-
+      Template database for a vacuum valve with different interlocks for open and close operations
+    parameters:
+      <<:
+        [
+          *vlvcc,
+          *allowpv,
+          *whylocked,
+          *timeout,
+          *ilk,
+          *cilk,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: id
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      valvetype:
+        type: str
+        description: |-
+          Template argument
+        default: valve
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacValveBistable.template
+        args:
+          .*:
+
+  - name: writeEnum
+    description: |-
+      Write the Enum value into a DM variable in a PLC
+    parameters:
+      <<: [ *PQ, *timeout ]
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      addr:
+        type: int
+        description: |-
+          DM variable of the int
+      VAL0:
+        type: int
+        description: |-
+          Value for state 0
+        default: 0
+      VAL1:
+        type: int
+        description: |-
+          Value for state 1
+        default: 1
+      VAL2:
+        type: int
+        description: |-
+          Value for state 2
+        default: 2
+      VAL3:
+        type: int
+        description: |-
+          Value for state 3
+        default: 3
+      VAL4:
+        type: int
+        description: |-
+          Value for state 4
+        default: 4
+      VAL5:
+        type: int
+        description: |-
+          Value for state 5
+        default: 5
+      VAL6:
+        type: int
+        description: |-
+          Value for state 6
+        default: 6
+      VAL7:
+        type: int
+        description: |-
+          Value for state 7
+        default: 7
+      STR0:
+        type: str
+        description: |-
+          String Value for state 0
+        default: ""
+      STR1:
+        type: str
+        description: |-
+          String Value for state 1
+        default: ""
+      STR2:
+        type: str
+        description: |-
+          String Value for state 2
+        default: ""
+      STR3:
+        type: str
+        description: |-
+          String Value for state 3
+        default: ""
+      STR4:
+        type: str
+        description: |-
+          String Value for state 4
+        default: ""
+      STR5:
+        type: str
+        description: |-
+          String Value for state 5
+        default: ""
+      STR6:
+        type: str
+        description: |-
+          String Value for state 6
+        default: ""
+      STR7:
+        type: str
+        description: |-
+          String Value for state 7
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_writeEnum.template
+        args:
+          .*:
+
+  - name: flow
+    description: |-
+      This template defines a bi records for representing low and lolo
+      water flow switched read from MPS RIO boxes. Low switches will be read from
+      their normal DM variable (E.g. DM4), Lolo switches from the relevant interlock
+      bits. E.g. if interlock DM816..818 bit 4 is S1 water,
+      use loloaddress=818,lolobit=4 for instantaneous lolo signal
+    parameters:
+      <<: [ *PQ ]
+      DESC:
+        type: str
+        description: |-
+          Description
+      device:
+        type: str
+        description: |-
+          EPICS name of the vacuum valve crate that connects to the RIO
+      loaddress:
+        type: str
+        description: |-
+          Address of lo DM variable. E.g. if lo signal is in DM4 bit1 then loaddress=4 lobit=1
+      lobit:
+        type: str
+        description: |-
+          Bit of lo DM variable. E.g. if lo signal is in DM4 bit1 then loaddress=4 lobit=1
+      loloaddress:
+        type: str
+        description: |-
+          Address of lolo DM variable. E.g. if lolo signal is in DM818 bit4 then loloaddress=818 lolobit=4
+      lolobit:
+        type: str
+        description: |-
+          Bit of lolo DM variable. E.g. if lolo signal is in DM818 bit4 then loloaddress=818 lolobit=4
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_flow.template
+        args:
+          .*:
+
+  - name: readEnum
+    description: |-
+      Read the Enum value stored in a DM variable in a PLC
+    parameters:
+      <<: [ *PQ, *vlvcc ]
+      VAL0:
+        type: int
+        description: |-
+          Value for state 0
+        default: 0
+      VAL1:
+        type: int
+        description: |-
+          Value for state 1
+        default: 1
+      VAL2:
+        type: int
+        description: |-
+          Value for state 2
+        default: 2
+      VAL3:
+        type: int
+        description: |-
+          Value for state 3
+        default: 3
+      VAL4:
+        type: int
+        description: |-
+          Value for state 4
+        default: 4
+      VAL5:
+        type: int
+        description: |-
+          Value for state 5
+        default: 5
+      VAL6:
+        type: int
+        description: |-
+          Value for state 6
+        default: 6
+      VAL7:
+        type: int
+        description: |-
+          Value for state 7
+        default: 7
+      STR0:
+        type: str
+        description: |-
+          String Value for state 0
+        default: ""
+      STR1:
+        type: str
+        description: |-
+          String Value for state 1
+        default: ""
+      STR2:
+        type: str
+        description: |-
+          String Value for state 2
+        default: ""
+      STR3:
+        type: str
+        description: |-
+          String Value for state 3
+        default: ""
+      STR4:
+        type: str
+        description: |-
+          String Value for state 4
+        default: ""
+      STR5:
+        type: str
+        description: |-
+          String Value for state 5
+        default: ""
+      STR6:
+        type: str
+        description: |-
+          String Value for state 6
+        default: ""
+      STR7:
+        type: str
+        description: |-
+          String Value for state 7
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
+        args:
+          .*:
+
+  - name: motionInterlockPLC
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device Prefix
+      port:
+        type: object
+        description: |-
+          Fins port
+      addr:
+        type: int
+        description: |-
+          First interlock work
+      axis1Description:
+        type: str
+        description: |-
+          Axis 1 Description
+        default: unused
+      axis2Description:
+        type: str
+        description: |-
+          Axis 2 Description
+        default: unused
+      axis3Description:
+        type: str
+        description: |-
+          Axis 3 Description
+        default: unused
+      axis4Description:
+        type: str
+        description: |-
+          Axis 4 Description
+        default: unused
+      axis5Description:
+        type: str
+        description: |-
+          Axis 5 Description
+        default: unused
+      axis6Description:
+        type: str
+        description: |-
+          Axis 6 Description
+        default: unused
+      axis7Description:
+        type: str
+        description: |-
+          Axis 7 Description
+        default: unused
+      axis8Description:
+        type: str
+        description: |-
+          Axis 8 Description
+        default: unused
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock:
+          desc:
+          addr:
+          name:
+          timeout:
+          ilk0:
+          ilk1:
+          ilk2:
+          ilk3:
+          ilk4:
+          ilk5:
+          ilk6:
+          ilk7:
+          ilk8:
+          ilk9:
+          ilk10:
+          ilk11:
+          ilk12:
+          ilk13:
+          ilk14:
+          ilk15:
+          auto_reset:
+
+  - name: NX102_robotDX200_RW
+    description: |-
+      Template database for reading and writing a real value for a DX200 controller variable through NX102 PLC
+    parameters:
+      device:
+        type: str
+        description: |-
+          PV prefix
+      variable:
+        type: str
+        description: |-
+          PV suffix (its associated _RBV will be autogenerated).
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tagread:
+        type: str
+        description: |-
+          tag name of ether_ip read value
+      tagwrite:
+        type: str
+        description: |-
+          tag name of ether_ip write value
+      drvl:
+        type: str
+        description: |-
+          Lowest accepted value
+      drvh:
+        type: str
+        description: |-
+          This associates an edm screen with the template
+      desc:
+        type: str
+        description: |-
+          Description
+        default: ""
+      readscan:
+        type: str
+        description: |-
+          value update time for readback value
+        default: 1 second
+      writescan:
+        type: float
+        description: |-
+          value for Ethernet/IP update time - use value without "seconds", e.g. 0.5
+        default: 0.5
+      egu:
+        type: str
+        description: |-
+          Engineering units
+        default: ""
+      prec:
+        type: int
+        description: |-
+          precision for reporting value back
+        default: 2
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_robotDXrealRW.template
+        args:
+          .*:
+
+  - name: externalValve
+    description: |-
+      Valve interface for a valve that lives in another IOC
+    parameters:
+      device:
+        type: id
+        description: |-
+          Device macro of valve that exists in another IOC
+      valvetype:
+        type: enum
+        description: |-
+          Type of Device
+        default: valve
+        values:
+          valve:
+          absorber:
+          shutter:
+
+  - name: NX102_feFastValve
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      <<: [ *tag, *tagidx ]
+      name:
+        type: id
+        description: |-
+          Gui tag
+      device:
+        type: str
+        description: |-
+          Device prefix
+      port:
+        type: str
+        description: |-
+          etherIP port
+      extended_interface:
+        type: enum
+        description: |-
+          Extended interface present?
+        default: 0
+        values:
+          "0":
+          "1":
+      ILKNUM:
+        type: int
+        description: |-
+          Interlock number
+        default: 1
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_fastValve.template
+        args:
+          device:
+          port:
+          tag:
+          tagidx:
+          ILKNUM:
+          allowpv:
+          whylocked:
+          con_label0:
+          con_label1:
+          con_label2:
+          con_label3:
+          con_label4:
+          con_label5:
+          con_label6:
+          con_label7:
+          sta_label0:
+          sta_label1:
+          sta_label2:
+          sta_label3:
+          sta_label4:
+          sta_label5:
+          sta_label6:
+          sta_label7:
+          sta_sv0:
+          sta_sv1:
+          sta_sv2:
+          sta_sv3:
+          sta_sv4:
+          sta_sv5:
+          sta_sv6:
+          sta_sv7:
+          ilksta_label0:
+          ilksta_label1:
+          ilksta_label2:
+          ilksta_label3:
+          ilksta_label4:
+          ilksta_label5:
+          ilksta_label6:
+          ilksta_label7:
+          ilksta_sv0:
+          ilksta_sv1:
+          ilksta_sv2:
+          ilksta_sv3:
+          ilksta_sv4:
+          ilksta_sv5:
+          ilksta_sv6:
+          ilksta_sv7:
+          mode1:
+          mode2:
+          DIRILK1:
+          showilk:
+          extended_interface:
+          name:
+
+  - name: dummyValve
+    description: |-
+      Template database for a dummy vacuum valve, enough to keep
+      vacuum space happy
+      Peter Denison 30/9/2005, based on vacuum valve by
+      Pete Owens - 26/4/04
+    parameters:
+      <<: [ *con_label, *ilksta_label, *ilksta_sv, *allowpv ]
+      device:
+        type: id
+        description: |-
+          device name
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_dummyValve.template
+        args:
+          .*:
+
+  - name: fastValve
+    description: |-
+      Template database for a vacuum valve without debounce or raw air records
+    parameters:
+      <<:
+        [
+          *vlvcc,
+          *allowpv,
+          *whylocked,
+          *timeout,
+          *ilk,
+          *gilk,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: id
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      con_label3:
+        type: str
+        description: |-
+          Label string for control value 3 (Optional - defaults to "")
+        default: Arm
+      sta_label1:
+        type: str
+        description: |-
+          Label string for status value 1 (Optional - defaults to Open)
+        default: Open Armed
+      sta_label5:
+        type: str
+        description: |-
+          Label string for status value 5 (Optional - defaults to "")
+        default: Open Disarmed
+      desc:
+        type: str
+        description: |-
+          Box label for gui
+        default: $(device)
+      showilk:
+        type: int
+        description: |-
+          0 (default) => Gauge, 1 => Arm
+        default: 0
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_fastValve.template
+        args:
+          .*:
+
+  - name: NX102_mpsPermit
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          Template argument
+      port:
+        type: str
+        description: |-
+          Template argument
+      tag:
+        type: str
+        description: |-
+          Template argument
+      DIRILK1:
+        type: str
+        description: |-
+          Template argument
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_mpsPermit.template
+        args:
+          .*:
+
+  - name: BeamRecords
+    description: |-
+      Creates beam records that the gui can connect to to see which valves and
+          shutters are open
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix for summary PV, records will be $(P):STA$(N) for 1<=N<=#objects
+      object0:
+        type: object
+        description: |-
+          vacuumValve object
+      object1:
+        type: object
+        description: |-
+          vacuumValve object
+      object2:
+        type: object
+        description: |-
+          vacuumValve object
+      object3:
+        type: object
+        description: |-
+          vacuumValve object
+      object4:
+        type: object
+        description: |-
+          vacuumValve object
+      object5:
+        type: object
+        description: |-
+          vacuumValve object
+      object6:
+        type: object
+        description: |-
+          vacuumValve object
+      object7:
+        type: object
+        description: |-
+          vacuumValve object
+      object8:
+        type: object
+        description: |-
+          vacuumValve object
+      object9:
+        type: object
+        description: |-
+          vacuumValve object
+      object10:
+        type: object
+        description: |-
+          vacuumValve object
+      object11:
+        type: object
+        description: |-
+          vacuumValve object
+
+  - name: readFloat32
+    description: |-
+      Read the Float32 value stored in 2 DM variables in a PLC
+    parameters:
+      <<: [ *PQ, *timeout ]
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      addr:
+        type: int
+        description: |-
+          DM variable of the LOWERer address of the float32
+      SCAN:
+        type: str
+        description: |-
+          Scan rate of read record
+        default: 1 second
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_readFloat32.template
+        args:
+          .*:
+
+  - name: DCMHeater
+    description: |-
+      Initially created for use with I22's new (2021) DCM.
+          Calc records are created in the dlsPLC_DCMHeater.template file so that they have the archiver tag applied.
+    parameters:
+      <<: [ *PQ ]
+      desc:
+        type: str
+        description: |-
+          Description
+      vlvcc:
+        type: str
+        description: |-
+          Parent PLC control crate device prefix
+      port:
+        type: object
+        description: |-
+          asyn port name of FINS driver
+      C_addr:
+        type: int
+        description: |-
+          Address of the demand register
+      UTSP_addr:
+        type: int
+        description: |-
+          Address of the under temperature setpoint register
+      PID_offset:
+        type: int
+        description: |-
+          2 digit integer offset of DM variables. E.g. if Proportional             gain constant setpoint is in DM150 and readback in DM250 offset=50
+      PID_output_addr:
+        type: int
+        description: |-
+          Address of the PID loop output
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
+        args:
+          P:
+          Q:
+          vlvcc:
+          addr:
+          name:
+          VAL0:
+          VAL1:
+          VAL2:
+          VAL3:
+          VAL4:
+          VAL5:
+          VAL6:
+          VAL7:
+          STR0:
+          STR1:
+          STR2:
+          STR3:
+          STR4:
+          STR5:
+          STR6:
+          STR7:
+
+      - file: $(DLSPLC)/db/dlsPLC_DCMHeater.template
+        args:
+          P:
+          Q:
+          name:
+          desc:
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P:
+          Q:
+          port:
+          addr:
+          timeout:
+          name:
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P:
+          Q:
+          vlvcc:
+          addr:
+          name:
+          ftvl:
+
+      - file: $(DLSPLC)/db/dlsPLC_writeEnum.template
+        args:
+          P:
+          Q:
+          port:
+          addr:
+          name:
+          timeout:
+          VAL0:
+          VAL1:
+          VAL2:
+          VAL3:
+          VAL4:
+          VAL5:
+          VAL6:
+          VAL7:
+          STR0:
+          STR1:
+          STR2:
+          STR3:
+          STR4:
+          STR5:
+          STR6:
+          STR7:
+
+  - name: NX102_vacValve
+    description: |-
+      Template database for a vacuum valve without debounce or raw air records
+    parameters:
+      <<:
+        [
+          *tag,
+          *tagidx,
+          *allowpv,
+          *whylocked,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          EtherIP Port Name
+      con_label7:
+        type: str
+        description: |-
+          Label string for control value 7 (Optional - defaults to "")
+        default: ""
+      sta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      sta_sv7:
+        type: str
+        description: |-
+          Alarm severity for status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_label6:
+        type: str
+        description: |-
+          Label string for status value 6 (Optional - defaults to "")
+        default: ""
+      ilksta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      ilksta_sv6:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 6 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_sv7:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      DIRILK1:
+        type: str
+        description: |-
+          Part of ILK1 PV name (dollar(device):dollar(DIRILK1)ILK), named for "direction" of operation controlled by ILK1, e.g. set to OPEN for Bistable valve or leave blank for ordinary valve.  (Optional - defaults to "")
+        default: ""
+      DIRILK2:
+        type: str
+        description: |-
+          Part of ILK2 PV name (dollar(device):dollar(DIRILK2)ILK), named for "direction" of operation controlled by ILK2, e.g. set to CLOSE for Bistable valves (Optional - defaults to "ILK2")
+        default: ILK2
+      desc:
+        type: str
+        description: |-
+          Box label for gui                        (Optional - defaults to value of device macro)
+        default: $(device)
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_vacValve.template
+        args:
+          .*:
+
+  - name: read100
+    description: |-
+      Template that reads 100 blocks of memory into records so
+      that it can be used in various templates.
+    parameters:
+      <<: [ *timeout ]
+      device:
+        type: str
+        description: |-
+          Device prefix
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      century:
+        type: int
+        description: |-
+          Read DM$(century)00..DM$(century)99
+      SCAN:
+        type: str
+        description: |-
+          Scan rate of read record
+        default: 1 second
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_read100.template
+        args:
+          .*:
+
+  - name: NX102_temperature
+    description: |-
+      Template database for an individual temperature on an Omron NX102 PLC.
+    parameters:
+      <<: [ *tagidx, *alarm_limits ]
+      device:
+        type: str
+        description: |-
+          PV prefix
+      temp:
+        type: str
+        description: |-
+          PV suffix
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tag:
+        type: str
+        description: |-
+          Optional.  Tag name on PLC     Defaults to "Temp" for e.g. Temp.Value[tagindex] E
+        default: Temp
+      adel:
+        type: float
+        description: |-
+          Optional.  Archiver deadband.  Defaults to 0.2
+        default: 0.2
+      scalefac:
+        type: int
+        description: |-
+          Optional.  Scale factor for temperature/setpoint (1 for new PLC templates, 10 for old where PLC reports in 10ths of a degree).  Defaults to 1.
+        default: 1
+      tempcal:
+        type: int
+        description: |-
+          Optional.  Temperature calibration offset in egu. Defaults to 0
+        default: 0
+      prec:
+        type: int
+        description: |-
+          Optional.  Precision for reporting value back.    Defaults to 1
+        default: 1
+      disable_pv:
+        type: str
+        description: |-
+          Optional.  If set, then this is the value of A in disable_calc.  Defaults to $(device)$(temp):ZERO
+        default: $(device)$(temp):ZERO
+      disable_calc:
+        type: str
+        description: |-
+          Optional.  If this condition is met then save the current limit and set the limit to 3276.7, disabling the interlock for this PV.  Defaults to A=1
+        default: A=1
+      egu:
+        type: str
+        description: |-
+          Optional.  Engineering units for temperature.     Defaults to C
+        default: C
+      desc:
+        type: str
+        description: |-
+          Description
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_temperature.template
+        args:
+          .*:
+
+  - name: NX102_readBool
+    description: |-
+      Template database for reading a bool from and NX PLC
+    parameters:
+      device:
+        type: str
+        description: |-
+          PV prefix
+      port:
+        type: str
+        description: |-
+          Port name of ether_ip driver
+      tag:
+        type: str
+        description: |-
+          Tag name of ether_ip read value
+      desc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty.     Description of the Boolean
+        default: ""
+      scan:
+        type: str
+        description: |-
+          Optional.  Defaults to 1 second.  Record scan rate
+        default: 1 second
+      onam:
+        type: str
+        description: |-
+          Optional.  Defaults to On.        ONAM field on bi record - label for 1 level.
+        default: On
+      znam:
+        type: str
+        description: |-
+          Optional.  Defaults to Off.       ZNAM field on bi record - label for 0 level.
+        default: Off
+      name:
+        type: str
+        description: |-
+          Optional.  Defaults to empty.     Object name and gui association name.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_readBool.template
+        args:
+          .*:
+
+  - name: PIDControl
+    description: |-
+      Associates a PID control that runs on the PLC.
+          Calc records are created in the associated template file so that they have the archiver tag applied.
+          Initially created for use with K11's proportional valve (2021).
+    parameters:
+      <<: [ *PQ ]
+      desc:
+        type: str
+        description: |-
+          Description
+      vlvcc:
+        type: str
+        description: |-
+          Parent PLC control crate device prefix
+      port:
+        type: object
+        description: |-
+          asyn port name of FINS driver
+      SetValue_addr:
+        type: int
+        description: |-
+          Address of the value register for value setting
+      PID_output_addr:
+        type: int
+        description: |-
+          Address of the current PID output value read
+      Control_addr:
+        type: int
+        description: |-
+          Address of the demand register for mode setting
+      PID_addr:
+        type: int
+        description: |-
+          Address of the PID values group read block (starting by Proportional constant)
+      PIDwrite_addr:
+        type: int
+        description: |-
+          Address of the PID values group write block (starting by Proportional constant)
+      units:
+        type: str
+        description: |-
+          Value units
+      precision:
+        type: int
+        description: |-
+          Decimal precision for setpoint (converted from integer)
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
+        args:
+          P:
+          Q:
+          vlvcc:
+          addr:
+          name:
+          VAL0:
+          VAL1:
+          VAL2:
+          VAL3:
+          VAL4:
+          VAL5:
+          VAL6:
+          VAL7:
+          STR0:
+          STR1:
+          STR2:
+          STR3:
+          STR4:
+          STR5:
+          STR6:
+          STR7:
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P:
+          Q:
+          port:
+          addr:
+          timeout:
+          name:
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P:
+          Q:
+          vlvcc:
+          addr:
+          name:
+          ftvl:
+
+      - file: $(DLSPLC)/db/dlsPLC_writeEnum.template
+        args:
+          P:
+          Q:
+          port:
+          addr:
+          name:
+          timeout:
+          VAL0:
+          VAL1:
+          VAL2:
+          VAL3:
+          VAL4:
+          VAL5:
+          VAL6:
+          VAL7:
+          STR0:
+          STR1:
+          STR2:
+          STR3:
+          STR4:
+          STR5:
+          STR6:
+          STR7:
+
+      - file: $(DLSPLC)/db/dlsPLC_PIDControl.template
+        args:
+          P:
+          Q:
+          UNITS:
+          PREC:
+          name:
+          desc:
+
+  - name: writeFloat32
+    description: |-
+      Write an float32 value into a PLC DM variable
+    parameters:
+      <<: [ *PQ, *timeout ]
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      addr:
+        type: str
+        description: |-
+          DM variable of the LOWERer address of the float32
+      drvl:
+        type: int
+        description: |-
+          Drive low limit
+        default: 0
+      drvh:
+        type: int
+        description: |-
+          Drive high limit
+        default: 0
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_writeFloat32.template
+        args:
+          .*:
+
+  - name: NX102_robotDX200_status
+    description: |-
+      Template database for reading the status of a DX200 controller through NX102 PLC
+    parameters:
+      <<: [ *PQ ]
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tag:
+        type: str
+        description: |-
+          ether_ip tag name of robot status
+      numbits:
+        type: str
+        description: |-
+          number of bits used
+      scan:
+        type: str
+        description: |-
+          value update time
+        default: 1 second
+      desc:
+        type: str
+        description: |-
+          Description
+        default: ""
+      label0:
+        type: str
+        description: |-
+          Label string for status bit 0
+        default: unused
+      label1:
+        type: str
+        description: |-
+          Label string for status bit 1
+        default: unused
+      label2:
+        type: str
+        description: |-
+          Label string for status bit 2
+        default: unused
+      label3:
+        type: str
+        description: |-
+          Label string for status bit 3
+        default: unused
+      label4:
+        type: str
+        description: |-
+          Label string for status bit 4
+        default: unused
+      label5:
+        type: str
+        description: |-
+          Label string for status bit 5
+        default: unused
+      label6:
+        type: str
+        description: |-
+          Label string for status bit 6
+        default: unused
+      label7:
+        type: str
+        description: |-
+          Label string for status bit 7
+        default: unused
+      label8:
+        type: str
+        description: |-
+          Label string for status bit 8
+        default: unused
+      label9:
+        type: str
+        description: |-
+          Label string for status bit 9
+        default: unused
+      labelA:
+        type: str
+        description: |-
+          Label string for status bit 10
+        default: unused
+      labelB:
+        type: str
+        description: |-
+          Label string for status bit 11
+        default: unused
+      labelC:
+        type: str
+        description: |-
+          Label string for status bit 12
+        default: unused
+      labelD:
+        type: str
+        description: |-
+          Label string for status bit 13
+        default: unused
+      labelE:
+        type: str
+        description: |-
+          Label string for status bit 14
+        default: unused
+      labelF:
+        type: str
+        description: |-
+          This associates a BOY screen with the template
+        default: unused
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_robotDXstatus.template
+        args:
+          .*:
+
+  - name: interlockNameOverride
+    description: |-
+      Template allowing interlock names to be overriden.
+    parameters:
+      <<: [ *ilk ]
+      device:
+        type: str
+        description: |-
+          device prefix
+      interlock:
+        type: str
+        description: |-
+          Interlock suffix (e.g. :INT1)
+      ilk0:
+        type: str
+        description: |-
+          Interlock description 0
+      ilk1:
+        type: str
+        description: |-
+          Interlock description 1
+      ilk2:
+        type: str
+        description: |-
+          Interlock description 2
+      ilk3:
+        type: str
+        description: |-
+          Interlock description 3
+      ilk4:
+        type: str
+        description: |-
+          Interlock description 4
+      ilk5:
+        type: str
+        description: |-
+          Interlock description 5
+      ilk6:
+        type: str
+        description: |-
+          Interlock description 6
+      ilk7:
+        type: str
+        description: |-
+          Interlock description 7
+      ilk8:
+        type: str
+        description: |-
+          Interlock description 8
+      ilk9:
+        type: str
+        description: |-
+          Interlock description 9
+      ilk10:
+        type: str
+        description: |-
+          Interlock description 10
+      ilk11:
+        type: str
+        description: |-
+          Interlock description 11
+      ilk12:
+        type: str
+        description: |-
+          Interlock description 12
+      ilk13:
+        type: str
+        description: |-
+          Interlock description 13
+      ilk14:
+        type: str
+        description: |-
+          Interlock description 14
+      ilk15:
+        type: str
+        description: |-
+          Interlock description 15
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_valveIlkNameOverride.template
+        args:
+          .*:
+
+  - name: temperature
+    description: |-
+      Template database for an individual temperature on a
+      temperature PLC. Requires an instance of dlsPLC_read100 for century=1 and
+      century=2
+    parameters:
+      <<: [ *alarm_limits, *timeout ]
+      device:
+        type: str
+        description: |-
+          PV prefix
+      temp:
+        type: str
+        description: |-
+          PV suffix
+      desc:
+        type: str
+        description: |-
+          Description
+      tmpcc:
+        type: str
+        description: |-
+          Parent temperature control crate prefix
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      offset:
+        type: int
+        description: |-
+          2 digit integer offset of DM variables. E.g. if setpoint is in DM136 and readback in DM236 offset=36
+      adel:
+        type: float
+        description: |-
+          archiver deadband
+        default: 0.2
+      scalefac:
+        type: int
+        description: |-
+          scale factor for temperature/setpoint
+        default: 10
+      tempcal:
+        type: float
+        description: |-
+          temperature calibration offset in egu (default=0)
+        default: 0.0
+      prec:
+        type: int
+        description: |-
+          precision for reporting value back
+        default: 1
+      disable_pv:
+        type: str
+        description: |-
+          If set, then this is the value of A in disable_calc
+        default: $(device)$(temp):ZERO
+      disable_calc:
+        type: str
+        description: |-
+          If this condition is met then save the current limit and set the limit to 3276.7, disabling the interlock for this PV
+        default: A=1
+      incentury:
+        type: int
+        description: |-
+          The Century digit(s) for the PLC D address to read temperature values
+        default: 2
+      outcentury:
+        type: int
+        description: |-
+          The Century digit(s) for the PLC D address to write setpoints
+        default: 1
+      egu:
+        type: str
+        description: |-
+          This associates an edm screen with the template
+        default: C
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_temperature.template
+        args:
+          .*:
+
+  - name: motionLimitInterlock
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      <<: [ *ilk ]
+      PLC:
+        type: object
+        description: |-
+          Instance of motionInterlockPLC to belong to
+      axisNo:
+        type: enum
+        description: |-
+          Axis Number
+        values:
+          "1":
+          "2":
+          "3":
+          "4":
+          "5":
+          "6":
+          "7":
+          "8":
+      pLim:
+        type: enum
+        description: |-
+          1 for +lim, 0 for -lim
+        values:
+          "0":
+          "1":
+
+  - name: vacPump
+    description: |-
+      Template database for a vacuum Pump without debounce or raw air records
+    parameters:
+      <<:
+        [
+          *vlvcc,
+          *allowpv,
+          *whylocked,
+          *timeout,
+          *ilk,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *mode,
+          *ilksta_label,
+          *ilksta_sv,
+        ]
+      device:
+        type: id
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      con_label0:
+        type: str
+        description: |-
+          Label string for control value 0 (Optional - defaults to On)
+        default: On
+      con_label1:
+        type: str
+        description: |-
+          Label string for control value 1 (Optional - defaults to Off)
+        default: Off
+      sta_label1:
+        type: str
+        description: |-
+          Label string for status value 1 (Optional - defaults to On)
+        default: On
+      sta_label2:
+        type: str
+        description: |-
+          Label string for status value 2 (Optional - defaults to Turning On)
+        default: Turning On
+      sta_label3:
+        type: str
+        description: |-
+          Label string for status value 3 (Optional - defaults to Off)
+        default: Off
+      sta_label4:
+        type: str
+        description: |-
+          Label string for status value 4 (Optional - defaults to Turning Off)
+        default: Turning Off
+      pumptype:
+        type: enum
+        description: |-
+          Type of Pump
+        default: turbo
+        values:
+          turbo:
+          scroll:
+          cryo:
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacPump.template
+        args:
+          .*:
+
+  - name: readInt32
+    description: |-
+      Read the Int32 value stored in 2 DM variables in a PLC
+    parameters:
+      <<: [ *PQ, *timeout ]
+      addr:
+        type: str
+        description: |-
+          DM variable of the int
+      port:
+        type: str
+        description: |-
+          Template argument
+      scale:
+        type: int
+        description: |-
+          Scaling of raw value into EGUs
+        default: 1
+      roffset:
+        type: int
+        description: |-
+          Pre scaling offset in cts
+        default: 0
+      offset:
+        type: int
+        description: |-
+          Offset of value in EGUs
+        default: 0
+      scan:
+        type: str
+        description: |-
+          Template argument
+        default: 1 second
+      egu:
+        type: str
+        description: |-
+          Template argument
+        default: mm
+      prec:
+        type: int
+        description: |-
+          Template argument
+        default: 3
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt32.template
+        args:
+          .*:
+
+  - name: NX102_IRVacuum
+    description: |-
+      Template database for reading a bool from and NX PLC
+    parameters:
+      P:
+        type: str
+        description: |-
+          PV prefix
+      port:
+        type: str
+        description: |-
+          Port name of ether_ip driver
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_IRVacuum.template
+        args:
+          .*:
+
+  - name: vacValveGroup
+    description: |-
+      Template database for a group of up to 8 vacuum valves
+      Pete Owens - 3/5/05
+    parameters:
+      <<: [ *delay, *mode ]
+      device:
+        type: str
+        description: |-
+          device name
+      valve1:
+        type: str
+        description: |-
+          Valve 1 device name
+      valve2:
+        type: str
+        description: |-
+          Valve 2 device name
+      valve3:
+        type: str
+        description: |-
+          Valve 3 device name
+      valve4:
+        type: str
+        description: |-
+          Valve 4 device name
+      valve5:
+        type: str
+        description: |-
+          Valve 5 device name
+      valve6:
+        type: str
+        description: |-
+          Valve 6 device name
+      valve7:
+        type: str
+        description: |-
+          Valve 7 device name
+      valve8:
+        type: str
+        description: |-
+          Valve 8 device name
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacValveGroup.template
+        args:
+          .*:
+
+  - name: NX102_fastValve
+    description: |-
+      Template database for a fast vacuum valve.
+    parameters:
+      <<:
+        [
+          *tag,
+          *tagidx,
+          *allowpv,
+          *whylocked,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name of the fast valve used as PV name prefix.
+      port:
+        type: str
+        description: |-
+          Mandatory.  EtherIP communication port name.
+      con_label3:
+        type: str
+        description: |-
+          Optional.  Defaults to Arm.    Label string for control value 3.
+        default: Arm
+      con_label4:
+        type: str
+        description: |-
+          Optional.  Defaults to "".     Label string for control value 4.
+        default: Partially Arm
+      con_label7:
+        type: str
+        description: |-
+          Optional.  Defaults to "".     Label string for control value 7.
+        default: ""
+      sta_label1:
+        type: str
+        description: |-
+          Optional.  Defaults to Open Fully Armed.	 Label string for status value 1.
+        default: Open Armed
+      sta_label5:
+        type: str
+        description: |-
+          Optional.  Defaults to Open Disarmed.	 Label string for status value 5.
+        default: Open Disarmed
+      sta_label6:
+        type: str
+        description: |-
+          Optional.  Defaults to Open Partially Armed.  Label string for status value 6.
+        default: Partially Armed
+      sta_label7:
+        type: str
+        description: |-
+          Optional.  Defaults to "".  	     	 Label string for status value 7.
+        default: ""
+      sta_sv7:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      	 Alarm severity for status value 7.
+        default: NO_ALARM
+      ilksta_label6:
+        type: str
+        description: |-
+          Optional.  Defaults to "".	       Label string for status value 6.
+        default: ""
+      ilksta_label7:
+        type: str
+        description: |-
+          Optional.  Defaults to "".           Label string for status value 7.
+        default: ""
+      ilksta_sv6:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.     Alarm severity for interlock status value 6.
+        default: NO_ALARM
+      ilksta_sv7:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.     Alarm severity for interlock status value 7.
+        default: NO_ALARM
+      DIRILK1:
+        type: str
+        description: |-
+          Optional.  Defaults to "".           Component interlock PV names (dollar(device):dollar(DIRILK1)ILK), named for "direction" of operation controlled by ILK1.
+        default: ""
+      showilk:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.            Which set of interlocks to display - '0': Gauge 1: Arm
+        default: 0
+      extended_interface:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.           Set to 1 if the extended interface is available in the PLC
+        default: 0
+      name:
+        type: id
+        description: |-
+          Optional.  Defaults to "".           Object name and associated gui name.
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_fastValve.template
+        args:
+          .*:
+
+  - name: NX102_radmonreset
+    description: |-
+      Template database for a vacuum valve
+      Ian Gillingham October 2012
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name
+      radmon_device:
+        type: str
+        description: |-
+          full PV name of RAD MON :RESET:OK
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_radmonreset.template
+        args:
+          .*:
+
+  - name: vacValveSoftOpening
+    description: |-
+      Template database for a soft opening vacuum valve.
+    parameters:
+      <<:
+        [
+          *vlvcc,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *allowpv,
+          *whylocked,
+          *timeout,
+        ]
+      device:
+        type: id
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      fullilk0:
+        type: str
+        description: |-
+          Interlock description 0
+        default: unused
+      fullilk1:
+        type: str
+        description: |-
+          Interlock description 1
+        default: unused
+      fullilk2:
+        type: str
+        description: |-
+          Interlock description 2
+        default: unused
+      fullilk3:
+        type: str
+        description: |-
+          Interlock description 3
+        default: unused
+      fullilk4:
+        type: str
+        description: |-
+          Interlock description 4
+        default: unused
+      fullilk5:
+        type: str
+        description: |-
+          Interlock description 5
+        default: unused
+      fullilk6:
+        type: str
+        description: |-
+          Interlock description 6
+        default: unused
+      fullilk7:
+        type: str
+        description: |-
+          Interlock description 7
+        default: unused
+      fullilk8:
+        type: str
+        description: |-
+          Interlock description 8
+        default: unused
+      fullilk9:
+        type: str
+        description: |-
+          Interlock description 9
+        default: unused
+      fullilk10:
+        type: str
+        description: |-
+          Interlock description 10
+        default: unused
+      fullilk11:
+        type: str
+        description: |-
+          Interlock description 11
+        default: unused
+      fullilk12:
+        type: str
+        description: |-
+          Interlock description 12
+        default: unused
+      fullilk13:
+        type: str
+        description: |-
+          Interlock description 13
+        default: unused
+      fullilk14:
+        type: str
+        description: |-
+          Interlock description 14
+        default: unused
+      fullilk15:
+        type: str
+        description: |-
+          Interlock description 15
+        default: unused
+      softilk0:
+        type: str
+        description: |-
+          Interlock description 0
+        default: unused
+      softilk1:
+        type: str
+        description: |-
+          Interlock description 1
+        default: unused
+      softilk2:
+        type: str
+        description: |-
+          Interlock description 2
+        default: unused
+      softilk3:
+        type: str
+        description: |-
+          Interlock description 3
+        default: unused
+      softilk4:
+        type: str
+        description: |-
+          Interlock description 4
+        default: unused
+      softilk5:
+        type: str
+        description: |-
+          Interlock description 5
+        default: unused
+      softilk6:
+        type: str
+        description: |-
+          Interlock description 6
+        default: unused
+      softilk7:
+        type: str
+        description: |-
+          Interlock description 7
+        default: unused
+      softilk8:
+        type: str
+        description: |-
+          Interlock description 8
+        default: unused
+      softilk9:
+        type: str
+        description: |-
+          Interlock description 9
+        default: unused
+      softilk10:
+        type: str
+        description: |-
+          Interlock description 10
+        default: unused
+      softilk11:
+        type: str
+        description: |-
+          Interlock description 11
+        default: unused
+      softilk12:
+        type: str
+        description: |-
+          Interlock description 12
+        default: unused
+      softilk13:
+        type: str
+        description: |-
+          Interlock description 13
+        default: unused
+      softilk14:
+        type: str
+        description: |-
+          Interlock description 14
+        default: unused
+      softilk15:
+        type: str
+        description: |-
+          Interlock description 15
+        default: unused
+      con_label0:
+        type: str
+        description: |-
+          Label string for control value 0 (Optional - defaults to Open)
+        default: Soft Open
+      con_label3:
+        type: str
+        description: |-
+          Label string for control value 3 (Optional - defaults to Full Open)
+        default: Full Open
+      sta_label1:
+        type: str
+        description: |-
+          Label string for status value 1 (Optional - defaults to Full Open)
+        default: Full Open
+      sta_label2:
+        type: str
+        description: |-
+          Label string for status value 2 (Optional - defaults to Soft Open)
+        default: Soft Open
+      sta_label4:
+        type: str
+        description: |-
+          Label string for status value 4 (Optional - defaults to "")
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacValveSoftOpening.template
+        args:
+          .*:
+
+  - name: genericDevice
+    description: |-
+      Template5B database for a vacuum valve without debounce or raw air records
+    parameters:
+      <<:
+        [
+          *vlvcc,
+          *allowpv,
+          *whylocked,
+          *timeout,
+          *ilk,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *mode,
+          *ilksta_label,
+          *ilksta_sv,
+        ]
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      con_label0:
+        type: str
+        description: |-
+          Label string for control value 0 (Optional - defaults to Open)
+        default: On
+      con_label1:
+        type: str
+        description: |-
+          Label string for control value 1 (Optional - defaults to Close)
+        default: Off
+      sta_label1:
+        type: str
+        description: |-
+          Label string for status value 1 (Optional - defaults to Open)
+        default: On
+      sta_label2:
+        type: str
+        description: |-
+          Label string for status value 2 (Optional - defaults to Opening)
+        default: ""
+      sta_label3:
+        type: str
+        description: |-
+          Label string for status value 3 (Optional - defaults to Closed)
+        default: Off
+      sta_label4:
+        type: str
+        description: |-
+          Label string for status value 4 (Optional - defaults to Closing)
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_genericDevice.template
+        args:
+          .*:
+
+  - name: NX102_PreVacCoils_SMControl
+    description: |-
+      Template database for a control of PreVac Sample Manipulator.  Two parameters for source and target chambers (where to transfer sample from and to respectively) have to be written.  Further writes to NX PLC registers act commands to turn on motors and gas, and transfer commands for Prepare, Transfer, Abort, Reset.  Each of these writes has to have associated pulsed trigger writes to cause the NX PLC to act on the latest value.  The NX PLC processes the requested value and decides whether to pass it to the PreVac Modbus PLC.  If the latter, the PreVac Modbus PLC also processes the requested value and decides whether to act on it or not.  EPICS does not have any direct communication with the PreVac Modbus PLC.  Intentions for macros as follows: (1) Strings for posportID<n>_shortdesc macros should be provided only for ports which are present, but they should be left alone as empty strings for ports which are not present.  (2) Alarm severities of MAJOR should be defined for posportID<n>_SV macros for ports which are not present, but those which are present are left alone as NO_ALARM.  (3) Setting the posportID<n>_compass macros must result in a unique compass direction for all ports n=1-8 for the embedded diagram display on the Control screen to work properly.  The default values conform to this.  (4) Set targetparam_init to a posport ID number of a port which is present.  (5) The value of posportIDs_allowedmask defaults to a safe value of 0, which causes no transfers to be allowed, so you must define it according to the ports present to allow transfers.  (NOTE: In descriptions and macro names, "arm" is a noun referring to the sample manipulator arm and not a verb as used for a fast valve).
+    parameters:
+      device:
+        type: str
+        description: |-
+          Mandatory. Device name.
+      port:
+        type: str
+        description: |-
+          Mandatory. Comms port (DLS NX102) PLC controller is on.
+      tag_sourceparam:
+        type: str
+        description: |-
+          Mandatory. NX PLC tag string to write the source chamber parameter.
+      tag_targetparam:
+        type: str
+        description: |-
+          Mandatory. NX PLC tag string to write the target chamber parameter.
+      tag_setcoil:
+        type: str
+        description: |-
+          Mandatory. NX PLC tag string to set a Coil to TRUE.
+      tag_unsetcoil:
+        type: str
+        description: |-
+          Mandatory. NX PLC tag string to set a Coil to FALSE.
+      tag_Tsourceparam:
+        type: str
+        description: |-
+          Optional.  Defaults to T$(tag_sourceparam).  NX PLC tag string to set the trigger to set the source chamber parameter.
+        default: T$(tag_sourceparam)
+      tag_Ttargetparam:
+        type: str
+        description: |-
+          Optional.  Defaults to T$(tag_targetparam).  NX PLC tag string to set the trigger to set the target chamber parameter.
+        default: T$(tag_targetparam)
+      tag_Tsetcoil:
+        type: str
+        description: |-
+          Optional.  Defaults to T$(tag_setcoil).      NX PLC tag string to set the trigger to set a Coil to TRUE.
+        default: T$(tag_setcoil)
+      tag_Tunsetcoil:
+        type: str
+        description: |-
+          Optional.  Defaults to T$(tag_unsetcoil).    NX PLC tag string to set the trigger to set a Coil to FALSE.
+        default: T$(tag_unsetcoil)
+      coilout_scanrate:
+        type: float
+        description: |-
+          Optional.  Defaults to .2   The value of scanrate which when writing to NX PLC the coil output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists. (These are the records which run commands).
+        default: 0.2
+      paramout_scanrate:
+        type: float
+        description: |-
+          Optional.  Defaults to .2   The value of scanrate which when writing to NX PLC the parameter output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+        default: 0.5
+      trigger_scanrate:
+        type: float
+        description: |-
+          Optional.  Defaults to .2   The value of scanrate which when writing to NX PLC triggers the trigger output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+        default: 0.2
+      posportIDs_allowedmask:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.   Mask of bits set for each posportID number which is allowed as source and target.  (i.e. a chamber is present).  Bit 0 represents the Arm - do NOT set that bit, it is not allowed as a target and has special functionality for error recovery as a source.  Although the macro is optional, the default value doesnt allow any transfers, so you must set this.
+        default: 0
+      posportID0_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to Arm.           Short (for menu) description of zeroth port (for error recovery only).  The posportID1...7_shortdesc macros are not populated by default, so you must set some of them to get a readable menu button.
+        default: Arm
+      posportID1_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 1.
+        default: ""
+      posportID2_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 2.
+        default: ""
+      posportID3_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 3.
+        default: ""
+      posportID4_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 4.
+        default: ""
+      posportID5_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 5.
+        default: ""
+      posportID6_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 6.
+        default: ""
+      posportID7_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 7.
+        default: ""
+      posportID8_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short (for menu) description of posport 8.
+        default: ""
+      posportID0_sourceSV:
+        type: str
+        description: |-
+          Optional.  Defaults to MINOR.         Alarm severity for posport ID 0 for the Arm as source.  It is allowed as part of error recovery.
+        default: MINOR
+      posportID0_targetSV:
+        type: str
+        description: |-
+          Optional.  Defaults to MAJOR.         Alarm severity for posport ID 0 for the Arm as target.
+        default: MAJOR
+      posportID1_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 1, same for source and target.
+        default: NO_ALARM
+      posportID2_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 2, same for source and target.
+        default: NO_ALARM
+      posportID3_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 3, same for source and target.
+        default: NO_ALARM
+      posportID4_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 4, same for source and target.
+        default: NO_ALARM
+      posportID5_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 5, same for source and target.
+        default: NO_ALARM
+      posportID6_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 6, same for source and target.
+        default: NO_ALARM
+      posportID7_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 7, same for source and target.
+        default: NO_ALARM
+      posportID8_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 8, same for source and target.
+        default: NO_ALARM
+      posportID1_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to E.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen for posport ID1.
+        default: E
+      posportID2_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to NE.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID2.
+        default: NE
+      posportID3_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to N.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID3.
+        default: N
+      posportID4_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to NW.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID4.
+        default: NW
+      posportID5_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to W.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID5.
+        default: W
+      posportID6_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to SW.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID6.
+        default: SW
+      posportID7_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to S.             Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID7.
+        default: S
+      posportID8_compass:
+        type: str
+        description: |-
+          Optional.  Defaults to SE.            Allowed values N,NW,W,SW,S,SE,E,NE.  Position in the layout of the sample manipulator diagram on the control screen brought up from the Control button on the generated screen, posport ID8.
+        default: SE
+      ctrlprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to :CTRL          Prefix for SM control records.
+        default: :CTRL
+      paramprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to :PARAM         Prefix for SM parameter records.
+        default: :PARAM
+      paramprec:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.             Precision of the parameter value.
+        default: 0
+      staprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to :STA           Prefix for SM status records for screens.  Must match SM status template.
+        default: :STA
+      posportprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to :POSPORT       Prefix for SM port status records for screens.  Must match definitions for SM port status template.
+        default: :POSPORT
+      sourceparam_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to Source.        Short description or name of the Source parameter.
+        default: Source
+      targetparam_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to Target.        Short description or name of the Target parameter.
+        default: Target
+      sourceparam_longdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to $(sourceparam_shortdesc=Source) chamber to move from.  Long description of the Source Parameter.
+        default: $(sourceparam_shortdesc=Source) chamber to move from.
+      targetparam_longdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to $(targetparam_shortdesc=Target) chamber to move to.  Long description of the Target Parameter.
+        default: " $(targetparam_shortdesc=Target) chamber to move to."
+      sourceparam_init:
+        type: int
+        description: |-
+          Optional.  Defaults to 0 (Arm).       Initial value of the user demand for the Source parameter.  Helps the display on reboot in the absence of autosave.
+        default: 0
+      targetparam_init:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.             Initial value of the user demand for the Target parameter.  Helps the display on reboot in the absence of autosave.  The default value could not be left at 0 because the Arm is never allowed as target.  The value of 1 is arbitrary.  Recommend set this to the ID of one of the ports which is present in the manipulator configuration.
+        default: 1
+      trigger_onval:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.             Value to write to a trigger tag to pulse the trigger on.  Must be consistent with trigger_offval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+        default: 1
+      trigger_offval:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.             Value to write to a trigger tag to pulse the trigger off.  Must be consistent with trigger_onval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+        default: 0
+      trigger_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger On.    Label for 1 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+        default: Trigger On
+      trigger_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger Off.   Label for 0 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+        default: Trigger Off
+      trigger_pulseDLY:
+        type: float
+        description: |-
+          Optional.  Defaults to 1.0.           Delay in seconds between sending Trigger On and Trigger Off writes when pulsing a trigger.
+        default: 1.0
+      ackprepare_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.             Number (0 to 15) of the bit in the status word which acknowledges response to the prepare transfer command.
+        default: 0
+      acktransfer_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.             Number (0 to 15) of the bit in the status word which acknowledges response to the transfer command.
+        default: 1
+      ackabort_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to 2.             Number (0 to 15) of the bit in the status word which acknowledges response to the abort transfer command.
+        default: 2
+      ackclear_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to 3.             Number (0 to 15) of the bit in the status word which acknowledges response to the clear error command.
+        default: 3
+      ackprepare_status:
+        type: str
+        description: |-
+          Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the prepare transfer command from.
+        default: $(device)$(posportprefix=:POSPORT)0:POSSTA
+      acktransfer_status:
+        type: str
+        description: |-
+          Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the transfer command from.
+        default: $(device)$(posportprefix=:POSPORT)0:POSSTA
+      ackabort_status:
+        type: str
+        description: |-
+          Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the abort transfer command from.
+        default: $(device)$(posportprefix=:POSPORT)0:POSSTA
+      ackclear_status:
+        type: str
+        description: |-
+          Optional.  Defaults $(device)$(posportprefix=:POSPORT)0:POSSTA.  Record for status word to link to extract the acknowledgement to the clear error command from.
+        default: $(device)$(posportprefix=:POSPORT)0:POSSTA
+      ackprepare_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Request.     Label for off state (ZNAM field) of prepare for transfer command acknowledgement.
+        default: No Request
+      acktransfer_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Request.     Label for off state (ZNAM field) of transfer command acknowledgement.
+        default: No Request
+      ackabort_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Request.     Label for off state (ZNAM field) of abort transfer command acknowledgement.
+        default: No Request
+      ackclear_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Request.     Label for off state (ZNAM field) of clear error command acknowledgement.
+        default: No Request
+      ackprepare_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Request.        Label for on state (ONAM field) of prepare for transfer command acknowledgement.
+        default: Request
+      acktransfer_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Request.        Label for on state (ONAM field) of transfer command acknowledgement.
+        default: Request
+      ackabort_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Request.        Label for on state (ONAM field) of abort transfer command acknowledgement.
+        default: Request
+      ackclear_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Request.        Label for on state (ONAM field) of clear error command acknowledgement.
+        default: Request
+      acksource_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.     Label for off state (ZNAM field) of source parameter acknowledgement.
+        default: No Trigger
+      acktarget_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.     Label for off state (ZNAM field) of target parameter acknowledgement.
+        default: No Trigger
+      acksource_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.        Label for on state (ONAM field) of source parameter acknowledgement.
+        default: Trigger
+      acktarget_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.        Label for on state (ONAM field) of target parameter acknowledgement.
+        default: Trigger
+      ackmotorcurrenton_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of motor current on command acknowledgement.
+        default: No Trigger
+      ackmotorcurrentoff_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of motor current off command acknowledgement.
+        default: No Trigger
+      ackmotorcurrenton_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.      Label for on state (ONAM field) of motor current on command acknowledgement.
+        default: Trigger
+      ackmotorcurrentoff_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.      Label for on state (ONAM field) of motor current off command acknowledgement.
+        default: Trigger
+      ackcompressedairon_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of compressed air on command acknowledgement.
+        default: No Trigger
+      ackcompressedairoff_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of compressed air off command acknowledgement.
+        default: No Trigger
+      ackcompressedairon_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.      Label for on state (ONAM field) of compressed air on command acknowledgement.
+        default: Trigger
+      ackcompressedairoff_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.      Label for on state (ONAM field) of compressed air off command acknowledgement.
+        default: Trigger
+      ackholderonarmon_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of acknowledgement for command to set the Holder On Arm status to True.
+        default: No Trigger
+      ackholderonarmoff_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to No Trigger.   Label for off state (ZNAM field) of acknowledgement for command to set the Holder On Arm status to False.
+        default: No Trigger
+      ackholderonarmon_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.      Label for on state (ONAM field) of acknowledgement for command to set the Holder On Arm status to True.
+        default: Trigger
+      ackholderonarmoff_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger.      Label for on state (ONAM field) of acknowledgement for command to set the Holder On Arm status to False.
+        default: Trigger
+      ingprepare_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Not Preparing.     Label for off state (ZNAM field) of in progress for prepare command.
+        default: Not Preparing
+      ingprepare_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Preparing.         Label for on state (ONAM field) of in progress for prepare command.
+        default: Preparing
+      ingtransfer_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Not Transferring.  Label for off state (ZNAM field) of in progress for transfer command.
+        default: Not Transferring
+      ingtransfer_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Transferring.      Label for on state (ONAM field) of in progress for transfer command.
+        default: Transferring
+      ingabort_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Not Aborting.      Label for off state (ZNAM field) of in progress for abort command.
+        default: Not Aborting
+      ingabort_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Aborting.          Label for on state (ONAM field) of in progress for abort command.
+        default: Aborting
+      ingclear_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Not Clearing.      Label for off state (ZNAM field) of in progress for clear command.
+        default: Not Clearing
+      ingclear_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Clearing.          Label for on state (ONAM field) of in progress for clear command.
+        default: Clearing
+      ingprepare_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to 11.           Number (0 to 15) of the bit in the status word for the in progress status for the prepare command.
+        default: 11
+      ingtransfer_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to 10.           Number (0 to 15) of the bit in the status word for the in progress status for the transfer command.
+        default: 10
+      ingabort_bitno1:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.            Number (0 to 15) of the bit in the status word for the in progress status for the abort command.
+        default: 1
+      ingabort_bitno2:
+        type: int
+        description: |-
+          Optional.  Defaults to 15.           Number (0 to 15) of the bit in the status word for the aborted status for the abort command.
+        default: 15
+      ingprepare_status:
+        type: str
+        description: |-
+          Optional.  Defaults to $(device)$(posportprefix=:POSPORT)0:POSSTA).  Record for status word to link to extract in progress status for the prepare command from.
+        default: $(device)$(posportprefix=:POSPORT)0:POSSTA
+      ingtransfer_status:
+        type: str
+        description: |-
+          Optional.  Defaults to $(device)$(posportprefix=:POSPORT)0:POSSTA).  Record for status word to link to extract in progress status for the transfer command from.
+        default: $(device)$(posportprefix=:POSPORT)0:POSSTA
+      ingabort_status1:
+        type: str
+        description: |-
+          Optional.  Defaults to $(device)$(staprefix=:STA):TRANSFERERRORS2).   Record for status word to link to extract in progress status for the abort command from.
+        default: $(device)$(staprefix=:STA):TRANSFERERRORS2
+      ingabort_status2:
+        type: str
+        description: |-
+          Optional.  Defaults to $(device)$(staprefix=:STA):TRANSFERSTATUS).    Record for status word to link to extract aborted status for the abort command from.  This is required because of the behaviour during HiTES1 commissioning of the PreVac Modbus PLC failing to update some of its status including the aborting in progress bit which once set persists until the next command.
+        default: $(device)$(staprefix=:STA):TRANSFERSTATUS
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_PreVacCoils_SMControl.template
+        args:
+          .*:
+
+  - name: vacValve
+    description: |-
+      Template database for a vacuum valve without debounce or raw air records
+    parameters:
+      <<:
+        [
+          *vlvcc,
+          *allowpv,
+          *whylocked,
+          *timeout,
+          *ilk,
+          *gilk,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *mode,
+          *ilksta_label,
+          *ilksta_sv,
+        ]
+      device:
+        type: id
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      desc:
+        type: str
+        description: |-
+          Box label for gui
+        default: $(device)
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacValve.template
+        args:
+          .*:
+
+  - name: NX102_sequence
+    description: |-
+      Template database for control and interlock of a non-specific device.
+    parameters:
+      <<:
+        [
+          *tagidx,
+          *allowpv,
+          *whylocked,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tag:
+        type: str
+        description: |-
+          NX PLC tag string e.g. S (from S.Interfc[1])
+      whylocked:
+        type: str
+        description: |-
+          String to output to EDM synoptic as to precisely why the device is locked and by whom (Optional.  Defaults to "Open command not allowed")
+        default: Start command not allowed
+      stastrSCAN:
+        type: int
+        description: |-
+          Scan rate for :STASTR PV string read in seconds, may be 10,5,2 or 1. Use to reduce network traffic if comms problems (Optional - defaults to 1)
+        default: 1
+      con_label0:
+        type: str
+        description: |-
+          Label string for control value 0 (Optional - defaults to Start)
+        default: Start
+      con_label1:
+        type: str
+        description: |-
+          Label string for control value 1 (Optional - defaults to Abort)
+        default: Abort
+      con_label7:
+        type: str
+        description: |-
+          Label string for control value 7 (Optional - defaults to "")
+        default: ""
+      sta_label0:
+        type: str
+        description: |-
+          Label string for status value 0 (Optional - defaults to Not running)
+        default: Not running
+      sta_label1:
+        type: str
+        description: |-
+          Label string for status value 1 (Optional - defaults to Running)
+        default: Running
+      sta_label2:
+        type: str
+        description: |-
+          Label string for status value 2 (Optional - defaults to Fault)
+        default: Fault
+      sta_label3:
+        type: str
+        description: |-
+          Label string for status value 3 (Optional - defaults to Aborted)
+        default: Aborted
+      sta_label4:
+        type: str
+        description: |-
+          Label string for status value 4 (Optional - defaults to "")
+        default: ""
+      sta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      sta_sv0:
+        type: str
+        description: |-
+          Alarm severity for status value 0 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      sta_sv2:
+        type: str
+        description: |-
+          Alarm severity for status value 2 (Optional - defaults to MAJOR)
+        default: MAJOR
+      sta_sv3:
+        type: str
+        description: |-
+          Alarm severity for status value 3 (Optional - defaults to MINOR)
+        default: MINOR
+      sta_sv7:
+        type: str
+        description: |-
+          Alarm severity for status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_label3:
+        type: str
+        description: |-
+          Label string for status value 3 (Optional - defaults to "")
+        default: ""
+      ilksta_label6:
+        type: str
+        description: |-
+          Label string for status value 6 (Optional - defaults to "")
+        default: ""
+      ilksta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      ilksta_sv6:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 6 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_sv7:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      p1_desc:
+        type: str
+        description: |-
+          Label string for parameter 1 (Optional - defaults to "Param1")
+        default: Param1
+      p1_isEnum:
+        type: int
+        description: |-
+          Display as enum(1) or number(0) (Optional - defaults to 1)
+        default: 1
+      p1_prec:
+        type: int
+        description: |-
+          Precision of p1 number (Optional - defaults to 0)
+        default: 0
+      p1_LOPR:
+        type: str
+        description: |-
+          LOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+        default: ""
+      p1_HOPR:
+        type: str
+        description: |-
+          HOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+        default: ""
+      p1_label0:
+        type: str
+        description: |-
+          Label string for enum value 0 (Optional - defaults to "unused")
+        default: unused
+      p1_label1:
+        type: str
+        description: |-
+          Label string for enum value 1 (Optional - defaults to "")
+        default: ""
+      p1_label2:
+        type: str
+        description: |-
+          Label string for enum value 2 (Optional - defaults to "")
+        default: ""
+      p1_label3:
+        type: str
+        description: |-
+          Label string for enum value 3 (Optional - defaults to "")
+        default: ""
+      p1_label4:
+        type: str
+        description: |-
+          Label string for enum value 4 (Optional - defaults to "")
+        default: ""
+      p1_label5:
+        type: str
+        description: |-
+          Label string for enum value 5 (Optional - defaults to "")
+        default: ""
+      p1_label6:
+        type: str
+        description: |-
+          Label string for enum value 6 (Optional - defaults to "")
+        default: ""
+      p1_label7:
+        type: str
+        description: |-
+          Label string for enum value 7 (Optional - defaults to "")
+        default: ""
+      p1_label8:
+        type: str
+        description: |-
+          Label string for enum value 8 (Optional - defaults to "")
+        default: ""
+      p1_label9:
+        type: str
+        description: |-
+          Label string for enum value 9 (Optional - defaults to "")
+        default: ""
+      p1_label10:
+        type: str
+        description: |-
+          Label string for enum value 10 (Optional - defaults to "")
+        default: ""
+      p1_label11:
+        type: str
+        description: |-
+          Label string for enum value 11 (Optional - defaults to "")
+        default: ""
+      p1_label12:
+        type: str
+        description: |-
+          Label string for enum value 12 (Optional - defaults to "")
+        default: ""
+      p1_label13:
+        type: str
+        description: |-
+          Label string for enum value 13 (Optional - defaults to "")
+        default: ""
+      p1_label14:
+        type: str
+        description: |-
+          Label string for enum value 14 (Optional - defaults to "")
+        default: ""
+      p1_label15:
+        type: str
+        description: |-
+          Label string for enum value 15 (Optional - defaults to "")
+        default: ""
+      p2_desc:
+        type: str
+        description: |-
+          Label string for parameter 2 (Optional - defaults to "Param2")
+        default: Param2
+      p2_isEnum:
+        type: int
+        description: |-
+          Display as enum(1) or number(0) (Optional - defaults to 1)
+        default: 1
+      p2_prec:
+        type: int
+        description: |-
+          Precision of p2 number (Optional - defaults to 0)
+        default: 0
+      p2_LOPR:
+        type: str
+        description: |-
+          LOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+        default: ""
+      p2_HOPR:
+        type: str
+        description: |-
+          HOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+        default: ""
+      p2_label0:
+        type: str
+        description: |-
+          Label string for enum value 0 (Optional - defaults to "unused")
+        default: unused
+      p2_label1:
+        type: str
+        description: |-
+          Label string for enum value 1 (Optional - defaults to "")
+        default: ""
+      p2_label2:
+        type: str
+        description: |-
+          Label string for enum value 2 (Optional - defaults to "")
+        default: ""
+      p2_label3:
+        type: str
+        description: |-
+          Label string for enum value 3 (Optional - defaults to "")
+        default: ""
+      p2_label4:
+        type: str
+        description: |-
+          Label string for enum value 4 (Optional - defaults to "")
+        default: ""
+      p2_label5:
+        type: str
+        description: |-
+          Label string for enum value 5 (Optional - defaults to "")
+        default: ""
+      p2_label6:
+        type: str
+        description: |-
+          Label string for enum value 6 (Optional - defaults to "")
+        default: ""
+      p2_label7:
+        type: str
+        description: |-
+          Label string for enum value 7 (Optional - defaults to "")
+        default: ""
+      p2_label8:
+        type: str
+        description: |-
+          Label string for enum value 8 (Optional - defaults to "")
+        default: ""
+      p2_label9:
+        type: str
+        description: |-
+          Label string for enum value 9 (Optional - defaults to "")
+        default: ""
+      p2_label10:
+        type: str
+        description: |-
+          Label string for enum value 10 (Optional - defaults to "")
+        default: ""
+      p2_label11:
+        type: str
+        description: |-
+          Label string for enum value 11 (Optional - defaults to "")
+        default: ""
+      p2_label12:
+        type: str
+        description: |-
+          Label string for enum value 12 (Optional - defaults to "")
+        default: ""
+      p2_label13:
+        type: str
+        description: |-
+          Label string for enum value 13 (Optional - defaults to "")
+        default: ""
+      p2_label14:
+        type: str
+        description: |-
+          Label string for enum value 14 (Optional - defaults to "")
+        default: ""
+      p2_label15:
+        type: str
+        description: |-
+          Label string for enum value 15 (Optional - defaults to "")
+        default: ""
+      p3_desc:
+        type: str
+        description: |-
+          Label string for parameter 3 (Optional - defaults to "Param3")
+        default: Param3
+      p3_isEnum:
+        type: int
+        description: |-
+          Display as enum(1) or number(0) (Optional - defaults to 1)
+        default: 1
+      p3_prec:
+        type: int
+        description: |-
+          Precision of p3 number (Optional - defaults to 0)
+        default: 0
+      p3_LOPR:
+        type: str
+        description: |-
+          LOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+        default: ""
+      p3_HOPR:
+        type: str
+        description: |-
+          HOPR for p1 number, optionally set if not using enums (Optional - defaults to "")
+        default: ""
+      p3_label0:
+        type: str
+        description: |-
+          Label string for enum value 0 (Optional - defaults to "unused")
+        default: unused
+      p3_label1:
+        type: str
+        description: |-
+          Label string for enum value 1 (Optional - defaults to "")
+        default: ""
+      p3_label2:
+        type: str
+        description: |-
+          Label string for enum value 2 (Optional - defaults to "")
+        default: ""
+      p3_label3:
+        type: str
+        description: |-
+          Label string for enum value 3 (Optional - defaults to "")
+        default: ""
+      p3_label4:
+        type: str
+        description: |-
+          Label string for enum value 4 (Optional - defaults to "")
+        default: ""
+      p3_label5:
+        type: str
+        description: |-
+          Label string for enum value 5 (Optional - defaults to "")
+        default: ""
+      p3_label6:
+        type: str
+        description: |-
+          Label string for enum value 6 (Optional - defaults to "")
+        default: ""
+      p3_label7:
+        type: str
+        description: |-
+          Label string for enum value 7 (Optional - defaults to "")
+        default: ""
+      p3_label8:
+        type: str
+        description: |-
+          Label string for enum value 8 (Optional - defaults to "")
+        default: ""
+      p3_label9:
+        type: str
+        description: |-
+          Label string for enum value 9 (Optional - defaults to "")
+        default: ""
+      p3_label10:
+        type: str
+        description: |-
+          Label string for enum value 10 (Optional - defaults to "")
+        default: ""
+      p3_label11:
+        type: str
+        description: |-
+          Label string for enum value 11 (Optional - defaults to "")
+        default: ""
+      p3_label12:
+        type: str
+        description: |-
+          Label string for enum value 12 (Optional - defaults to "")
+        default: ""
+      p3_label13:
+        type: str
+        description: |-
+          Label string for enum value 13 (Optional - defaults to "")
+        default: ""
+      p3_label14:
+        type: str
+        description: |-
+          Label string for enum value 14 (Optional - defaults to "")
+        default: ""
+      p3_label15:
+        type: str
+        description: |-
+          Label string for enum value 15 (Optional - defaults to "")
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_sequence.template
+        args:
+          .*:
+
+  - name: NX102_PreVacCoils_SMPort
+    description: |-
+      Template database for status info regarding a Port on PreVac Sample Manipulator.
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          Mandatory. Device name.
+      posportID:
+        type: str
+        description: |-
+          Mandatory. ID of the vacuum port position for the sample manipulator.  Must be integer 1 to 8 or 0 for special case of Arm in RDC/UFO and overall status.
+      port:
+        type: str
+        description: |-
+          Mandatory. Comms port (DLS NX102) PLC controller is on.
+      tag:
+        type: str
+        description: |-
+          Mandatory. NX PLC tag string e.g. V (from V.Control[1])
+      tagname:
+        type: str
+        description: |-
+          Mandatory. NX PLC tag name.
+      tagprefix:
+        type: str
+        description: |-
+          Mandatory. NX PLC prefix to tag name.
+      posportprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to ":POSPORT".            Prefix for the vacuum port position records.
+        default: :POSPORT
+      smready_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to "1".                   Bit number in port position status for whether sample manipulator inside the chamber is in position ready to participate in the transfer, values 0-15.  The Arm/RDC/UFO port is likely to have non-default value, as it needs to address the "Master Interlock Status" bit, whereas the other ports address the "ReadyForTransfer" bit.  NOTE: The intended use is for signals derived from GPIO on GeoBricks with other sample manipulator motors on them.
+        default: 1
+      sampleholder_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to "2".              Bit number in port position status for whether sample holder is present inside the chamber, values 0-15.  The Arm/RDC/UFO port is likely to have non-default value, as it needs to address the "Holder On Arm" bit, whereas the other ports address the "Sample Inside" bit.  NOTE: The sample holder might not have a sample in it!
+        default: 2
+      armadj_bitno:
+        type: int
+        description: |-
+          Optional.  Defaults to "8".                   Bit number in port position status for whether RDC arm is adjacent to the chamber, values 0-15.  (The Arm/RDC/UFO port is likely to have non-default value, but it is not meaningful).
+        default: 8
+      desc_label0:
+        type: str
+        description: |-
+          Optional.  Defaults to "PrepareForTransfer".  Descriptive label for bit0 of the Coil word.
+        default: PrepareForTransfer
+      desc_label1:
+        type: str
+        description: |-
+          Optional.  Defaults to "ReadyForTransfer".    Descriptive label for bit1 of the Coil word.
+        default: ReadyForTransfer
+      desc_label2:
+        type: str
+        description: |-
+          Optional.  Defaults to "SampleInside".        Descriptive label for bit2 of the Coil word.
+        default: SampleInside
+      desc_label3:
+        type: str
+        description: |-
+          Optional.  Defaults to "Error".               Descriptive label for bit3 of the Coil word.
+        default: Error
+      desc_label4:
+        type: str
+        description: |-
+          Optional.  Defaults to "Busy".                Descriptive label for bit4 of the Coil word.
+        default: Busy
+      desc_label5:
+        type: str
+        description: |-
+          Optional.  Defaults to "GateOpenRequest".     Descriptive label for bit5 of the Coil word.
+        default: GateOpenRequest
+      desc_label6:
+        type: str
+        description: |-
+          Optional.  Defaults to "GateOpen".            Descriptive label for bit6 of the Coil word.
+        default: GateOpen
+      desc_label7:
+        type: str
+        description: |-
+          Optional.  Defaults to "GateClosed".          Descriptive label for bit7 of the Coil word.
+        default: GateClosed
+      desc_label8:
+        type: str
+        description: |-
+          Optional.  Defaults to "ArmOnPort".           Descriptive label for bit8 of the Coil word.
+        default: ArmOnPort
+      desc_label9:
+        type: str
+        description: |-
+          Optional.  Defaults to "ReservedForFuture".   Descriptive label for bit9 of the Coil word.
+        default: ReservedForFuture
+      desc_label10:
+        type: str
+        description: |-
+          Optional.  Defaults to "".                    Descriptive label for bit10 of the Coil word.
+        default: ""
+      desc_label11:
+        type: str
+        description: |-
+          Optional.  Defaults to "".                    Descriptive label for bit11 of the Coil word.
+        default: ""
+      desc_label12:
+        type: str
+        description: |-
+          Optional.  Defaults to "".                    Descriptive label for bit12 of the Coil word.
+        default: ""
+      desc_label13:
+        type: str
+        description: |-
+          Optional.  Defaults to "".                    Descriptive label for bit13 of the Coil word.
+        default: ""
+      desc_label14:
+        type: str
+        description: |-
+          Optional.  Defaults to "".                    Descriptive label for bit14 of the Coil word.
+        default: ""
+      desc_label15:
+        type: str
+        description: |-
+          Optional.  Defaults to "".                    Descriptive label for bit15 of the Coil word.
+        default: ""
+      longdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to "Manipulator Position Port $(posportID) status."  Description of position port.
+        default: Manipulator Position Port $(posportID) status.
+      shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to "Posport$(posportID)"  Short, abbreviated description of position port.
+        default: Posport$(posportID)
+      chamber_name:
+        type: str
+        description: |-
+          Optional.  Defaults to "".               Name of vacuum chamber associated with position port.
+        default: ""
+      chamber_shortname:
+        type: str
+        description: |-
+          Optional.  Defaults to "".               Short name of vacuum chamber associated with position port.
+        default: ""
+      valve_device:
+        type: str
+        description: |-
+          Optional.  Defaults to "".               Device name of vacuum valve associated with position port.  So far it is a string for info only, no calcs.
+        default: ""
+      valve_shortname:
+        type: str
+        description: |-
+          Optional.  Defaults to "".               Short, abbreviated name of vacuum valve associated with the position port.
+        default: ""
+      valve_desc:
+        type: str
+        description: |-
+          Optional.  Defaults to "".               Description of vacuum valve associated with position port.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_PreVacCoils_SMPort.template
+        args:
+          .*:
+
+  - name: NX102_reboot_rga
+    description: |-
+      Request NX102 PLC to power cycle an RGA on a particular tag being set.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name of RGA to reboot.
+      tag:
+        type: str
+        description: |-
+          Mandatory.  NX PLC tag string to write to to reboot RGA.
+      port:
+        type: str
+        description: |-
+          Mandatory.  Comms port (DLS NX102) PLC controller is on.
+      rbprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to :REBOOT  Prefix for the reboot record names.
+        default: :REBOOT
+      rb_val:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.       The value to write which instructs the PLC to reboot the RGA.
+        default: 1
+      rb_scanrate:
+        type: float
+        description: |-
+          Optional.  Defaults to 0.5      Rate to scan readback of reboot written value at.
+        default: 0.5
+      ena_timeout:
+        type: float
+        description: |-
+          Optional.  Defaults to 2.0      How long EPICS enables the processing of the reboot records for in seconds.
+        default: 2.0
+      name:
+        type: id
+        description: |-
+          Optional.  Defaults to empty.         Object name and associated gui name
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_reboot_rga.template
+        args:
+          .*:
+
+  - name: NX102_readReal
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          Template argument
+      port:
+        type: str
+        description: |-
+          Template argument
+      tag:
+        type: str
+        description: |-
+          Template argument
+      desc:
+        type: str
+        description: |-
+          Template argument
+        default: ""
+      scan:
+        type: str
+        description: |-
+          Template argument
+        default: 1 second
+      egu:
+        type: str
+        description: |-
+          Template argument
+        default: ""
+      prec:
+        type: int
+        description: |-
+          Template argument
+        default: 2
+      name:
+        type: str
+        description: |-
+          Optional object / GUI association name.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_readReal.template
+        args:
+          .*:
+
+  - name: NX102_genericDevice
+    description: |-
+      Template database for control and interlock of a non-specific device.
+    parameters:
+      <<:
+        [
+          *tagidx,
+          *allowpv,
+          *whylocked,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tag:
+        type: str
+        description: |-
+          NX PLC tag string e.g. S (from S.Interfc[1])
+      con_label0:
+        type: str
+        description: |-
+          Label string for control value 0 (Optional - defaults to Open)
+        default: On
+      con_label1:
+        type: str
+        description: |-
+          Label string for control value 1 (Optional - defaults to Close)
+        default: Off
+      con_label7:
+        type: str
+        description: |-
+          Label string for control value 7 (Optional - defaults to "")
+        default: ""
+      sta_label1:
+        type: str
+        description: |-
+          Label string for status value 1 (Optional - defaults to Open)
+        default: On
+      sta_label2:
+        type: str
+        description: |-
+          Label string for status value 2 (Optional - defaults to Opening)
+        default: ""
+      sta_label3:
+        type: str
+        description: |-
+          Label string for status value 3 (Optional - defaults to Closed)
+        default: Off
+      sta_label4:
+        type: str
+        description: |-
+          Label string for status value 4 (Optional - defaults to Closing)
+        default: ""
+      sta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      sta_sv7:
+        type: str
+        description: |-
+          Alarm severity for status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_label6:
+        type: str
+        description: |-
+          Label string for status value 6 (Optional - defaults to "")
+        default: ""
+      ilksta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      ilksta_sv6:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 6 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_sv7:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_genericDevice.template
+        args:
+          .*:
+
+  - name: reboot_rga
+    description: |-
+      Power cycle an RGA where the PLC code has been setup to power cycle when 1 is written to a particular DM variable
+    parameters:
+      <<: [ *timeout ]
+      device:
+        type: str
+        description: |-
+          device name
+      addr:
+        type: str
+        description: |-
+          DM variable to write to to reboot rga
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_reboot_rga.template
+        args:
+          .*:
+
+  - name: NX102_realRW
+    description: |-
+      Template database for reading and writing a real value for a DX200 controller variable through NX102 PLC
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          PV prefix
+      variable:
+        type: str
+        description: |-
+          PV suffix (its associated _RBV will be autogenerated).
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tagread:
+        type: str
+        description: |-
+          tag name of ether_ip read value
+      tagwrite:
+        type: str
+        description: |-
+          tag name of ether_ip write value
+      drvl:
+        type: str
+        description: |-
+          Lowest accepted value
+      drvh:
+        type: str
+        description: |-
+          Highest accepted value
+      desc:
+        type: str
+        description: |-
+          Description
+        default: ""
+      readscan:
+        type: str
+        description: |-
+          value update time for readback value
+        default: 1 second
+      writescan:
+        type: float
+        description: |-
+          value for Ethernet/IP update time - use value without "seconds", e.g. 0.5
+        default: 0.5
+      egu:
+        type: str
+        description: |-
+          Engineering units
+        default: ""
+      prec:
+        type: int
+        description: |-
+          precision for reporting value back
+        default: 2
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_realRW.template
+        args:
+          .*:
+
+  - name: NX102_vacValveDebounce
+    description: |-
+      Template database for a vacuum valve without debounce or raw air records
+    parameters:
+      <<:
+        [
+          *tag,
+          *tagidx,
+          *allowpv,
+          *whylocked,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          EtherIP Port Name
+      con_label7:
+        type: str
+        description: |-
+          Label string for control value 7 (Optional - defaults to "")
+        default: ""
+      sta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      sta_sv7:
+        type: str
+        description: |-
+          Alarm severity for status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_label6:
+        type: str
+        description: |-
+          Label string for status value 6 (Optional - defaults to "")
+        default: ""
+      ilksta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      ilksta_sv6:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 6 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_sv7:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      DIRILK1:
+        type: str
+        description: |-
+          Part of ILK1 PV name (dollar(device):dollar(DIRILK1)ILK), named for "direction" of operation controlled by ILK1, e.g. set to OPEN for Bistable valve or leave blank for ordinary valve.  (Optional - defaults to "")
+        default: ""
+      DIRILK2:
+        type: str
+        description: |-
+          Part of ILK2 PV name (dollar(device):dollar(DIRILK2)ILK), named for "direction" of operation controlled by ILK2, e.g. set to CLOSE for Bistable valves (Optional - defaults to "ILK2")
+        default: ILK2
+      desc:
+        type: str
+        description: |-
+          Box label for gui                        (Optional - defaults to value of device macro)
+        default: $(device)
+      name:
+        type: str
+        description: |-
+          Optional gui association name.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_vacValveDebounce.template
+        args:
+          .*:
+
+  - name: NX102_vacPump
+    description: |-
+      Template for a NX PLC to control and interlock vacuum pumps of various kinds, e.g. Scroll and Turbo pumps.  NOTE: Covers basic commonly required control only and excludes pump make and model or application specific control and monitoring of the pump which might be available and also be required typically via serial control, for example settings configuration or service period information.
+    parameters:
+      <<:
+        [
+          *tagidx,
+          *allowpv,
+          *whylocked,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name of the pump.
+      port:
+        type: str
+        description: |-
+          Mandatory.  Name of port for the ether_ip driver for the PLC controlling/interlocking the pump.
+      tag:
+        type: str
+        description: |-
+          Mandatory.  NX PLC tag string e.g. S for Scroll or T for Turbo.
+      whylocked:
+        type: str
+        description: |-
+          Optional.   Defaults to "On command not allowed".  String to output to EDM synoptic as to precisely why the device is locked and by whom.
+        default: On command not allowed
+      con_label0:
+        type: str
+        description: |-
+          Optional.  Defaults to On.        Label string for control value 0
+        default: On
+      con_label1:
+        type: str
+        description: |-
+          Optional.  Defaults to Off.       Label string for control value 1
+        default: Off
+      con_label7:
+        type: str
+        description: |-
+          Optional.  Defaults to "".        Label string for control value 7
+        default: ""
+      sta_label1:
+        type: str
+        description: |-
+          Optional.  Defaults to On.        Label string for status value 1
+        default: On
+      sta_label2:
+        type: str
+        description: |-
+          Optional.  Defaults to Standby.   Label string for status value 2
+        default: Standby
+      sta_label3:
+        type: str
+        description: |-
+          Optional.  Defaults to Off.       Label string for status value 3
+        default: Off
+      sta_label4:
+        type: str
+        description: |-
+          Optional.  Defaults to "".        Label string for status value 4
+        default: FullSpeed
+      sta_label7:
+        type: str
+        description: |-
+          Optional.  Defaults to "".        Label string for status value 7
+        default: ""
+      sta_sv7:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      	 Alarm severity for status value 7.
+        default: NO_ALARM
+      ilksta_label3:
+        type: str
+        description: |-
+          Optional.  Defaults to "".          Label string for status value 3
+        default: ""
+      ilksta_label6:
+        type: str
+        description: |-
+          Optional.  Defaults to "".          Label string for status value 6
+        default: ""
+      ilksta_label7:
+        type: str
+        description: |-
+          Optional.  Defaults to "".          Label string for status value 7
+        default: ""
+      ilksta_sv6:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.     Alarm severity for interlock status value 6.
+        default: NO_ALARM
+      ilksta_sv7:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.     Alarm severity for interlock status value 7.
+        default: NO_ALARM
+      short_desc:
+        type: str
+        description: |-
+          Optional.  Defaults to Shorting Plug. Description field on the PLUG record DESC field for whether a shorting plug is present.
+        default: Shorting Plug
+      short_label0:
+        type: str
+        description: |-
+          Optional.  Defaults to Dummy.         Label on the PLUG record ZNAM field for no shorting plug present.
+        default: Dummy
+      short_label1:
+        type: str
+        description: |-
+          Optional.  Defaults to Real.          Label on the PLUG record ONAM field for shorting plug present.
+        default: Real
+      short_sv0:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Severity on the PLUG record ZSV field for the status value 0.
+        default: NO_ALARM
+      short_sv1:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Severity on the PLUG record OSV field for the status value 1.
+        default: NO_ALARM
+      name:
+        type: str
+        description: |-
+          Optional gui association name.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_vacPump.template
+        args:
+          .*:
+
+  - name: NX102_powerSupply
+    description: |-
+      Template showing the status of the power supply from the ether IP readings
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          device prefix
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tag:
+        type: str
+        description: |-
+          NX PLC tag string e.g. PSU (from PSU.Voltage[1])
+        default: PSU
+      name:
+        type: str
+        description: |-
+          Optional gui association name.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_powerSupply.template
+        args:
+          .*:
+
+  - name: feTemperature
+    description: |-
+      Template database for an individual temperature on a
+      temperature PLC. Requires an instance of dlsPLC_read100 for century=1 and
+      century=2
+    parameters:
+      <<: [ *alarm_limits ]
+      device:
+        type: str
+        description: |-
+          PV prefix
+      temp:
+        type: str
+        description: |-
+          PV suffix
+      desc:
+        type: str
+        description: |-
+          Description
+      tmpcc:
+        type: str
+        description: |-
+          Parent temperature control crate prefix
+      offset:
+        type: str
+        description: |-
+          2 digit integer offset of DM variables. E.g. if setpoint is in DM136 and readback in DM236 offset=36
+      adel:
+        type: float
+        description: |-
+          archiver deadband
+        default: 0.2
+      scalefac:
+        type: int
+        description: |-
+          scale factor for temperature/setpoint
+        default: 10
+      tempcal:
+        type: int
+        description: |-
+          temperature calibration offset in egu (default=0)
+        default: 0
+      prec:
+        type: int
+        description: |-
+          precision for reporting value back
+        default: 1
+      disable_pv:
+        type: str
+        description: |-
+          If set, then this is the value of A in disable_calc
+        default: $(device)$(temp):ZERO
+      disable_calc:
+        type: str
+        description: |-
+          If this condition is met then save the current limit and set the limit to 3276.7, disabling the interlock for this PV
+        default: A=1
+      incentury:
+        type: int
+        description: |-
+          The Century digit(s) for the PLC D address to read temperature values
+        default: 2
+      outcentury:
+        type: int
+        description: |-
+          The Century digit(s) for the PLC D address to write setpoints
+        default: 1
+      egu:
+        type: str
+        description: |-
+          This associates an edm screen with the template
+        default: C
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_feTemperature.template
+        args:
+          .*:
+
+  - name: NX102_interlock
+    description: |-
+      Template showing the status of various MPS interlocks in
+      an Omron NX102 PLC.
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          device prefix
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      interlock:
+        type: str
+        description: |-
+          Interlock suffix (e.g. :INT1). May be empty if the device PV already
+          includes the full interlock prefix.
+        default: ""
+      tag:
+        type: str
+        description: |-
+          NX PLC tag string e.g. ILK (from ILK.Control[1])
+      desc:
+        type: str
+        description: |-
+          Permit description (e.g. Front end permit)
+      auto_reset:
+        type: int
+        description: |-
+          Set to 1 to push the reset button whenever the raw interlocks are all ok
+        default: 0
+      name:
+        type: str
+        description: |-
+          Optional gui association name.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_interlock.template
+        args:
+          .*:
+
+  - name: NX102_digitalIn_Debounced
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          Template argument
+      port:
+        type: str
+        description: |-
+          Template argument
+      tag:
+        type: str
+        description: |-
+          Template argument
+        default: Digital_In
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_digitalIn_Debounced.template
+        args:
+          .*:
+
+  - name: NX102_PreVacCoils_SMStaleBanner
+    description: |-
+      Template for Warning GUI banner for stale data from the PreVac Sample Manipulator controller.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name of sample manipulator.
+      staprefix:
+        type: str
+        description: |-
+          Optional.   Defaults to :STA           Prefix for the SM status records.
+        default: :STA
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_PreVacCoils_SMStaleBanner.template
+        args:
+          .*:
+
+  - name: NX102_robotDX200_R
+    description: |-
+      Template database for reading a real value for a DX200 controller variable through NX102 PLC
+    parameters:
+      device:
+        type: str
+        description: |-
+          PV prefix
+      variable:
+        type: str
+        description: |-
+          PV suffix for this robot variable
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tagread:
+        type: str
+        description: |-
+          tag name of ether_ip read value
+      desc:
+        type: str
+        description: |-
+          Description
+        default: ""
+      scan:
+        type: str
+        description: |-
+          value update time
+        default: 1 second
+      egu:
+        type: str
+        description: |-
+          Engineering units
+        default: ""
+      prec:
+        type: int
+        description: |-
+          This associates an edm screen with the template
+        default: 2
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_robotDXrealR.template
+        args:
+          .*:
+
+  - name: NX102_PreVacCoils_SMIlkKeyEntry
+    description: |-
+      Template for Interlock Key Entry for sample manipulator collaboration.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name.
+      keyentryname:
+        type: str
+        description: |-
+          Mandatory.  Name of interlock being described in the key entry.  Used in constructing record names, so no spaces or iffy punctuation characters.
+      ilkkeyprefix:
+        type: str
+        description: |-
+          Optional.   Defaults to :ILKKEY.      Prefix to put on the key entry records.
+        default: :ILKKEY
+      keyentryline2:
+        type: str
+        description: |-
+          Optional.   Defaults to single space. Second line of interlock description.
+        default: " "
+      keyentryline1:
+        type: str
+        description: |-
+          Mandatory.  First line of interlock description.
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_PreVacCoils_SMIlkKeyEntry.template
+        args:
+          .*:
+
+  - name: interlockSummary
+    description: |-
+      Template database for a summary PV of up to 24 interlocks
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      ilk1:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk2:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk3:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk4:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk5:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk6:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk7:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk8:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk9:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk10:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk11:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk12:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk13:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk14:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk15:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk16:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk17:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk18:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk19:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk20:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk21:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk22:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk23:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+      ilk24:
+        type: str
+        description: |-
+          Interlock suffix (e.g. INT1)
+        default: NO-INTERLOCK
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock_summary.template
+        args:
+          .*:
+
+  - name: NX102_PreVacCoils_SMStatus
+    description: |-
+      Template database for status info on PreVac Sample Manipulator (in addition to that for individual SM Ports).
+    parameters:
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name.
+      port:
+        type: str
+        description: |-
+          Mandatory.  Comms port (DLS NX102) PLC controller is on.
+      staprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to :STA           Prefix for the SM status records.
+        default: :STA
+      posportprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to :POSPORT       Prefix for records for individual ports.  Must match port template.
+        default: :POSPORT
+      posportID0_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to Arm.           Short description of zeroth port (for error recovery only).  The posportID1...7_shortdesc macros are not populated by default, so you must set some of them to make things sensible.  Leave the ones not present (i.e. no chamber connected as empty string.)
+        default: Arm
+      posportID1_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 1, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID2_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 2, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID3_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 3, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID4_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 4, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID5_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 5, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID6_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 6, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID7_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 7, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID8_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Short description of posport with ID 8, recommend use an abbreviated chamber name but only if a chamber is present.
+        default: ""
+      posportID0_sourceSV:
+        type: str
+        description: |-
+          Optional.  Defaults to MINOR.         Alarm severity for posport ID 0 for the Arm as source.  It is allowed as part of error recovery.
+        default: MINOR
+      posportID0_targetSV:
+        type: str
+        description: |-
+          Optional.  Defaults to MAJOR.         Alarm severity for posport ID 0 for the Arm as target.
+        default: MAJOR
+      posportID1_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 1, same for source and target.
+        default: NO_ALARM
+      posportID2_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 2, same for source and target.
+        default: NO_ALARM
+      posportID3_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 3, same for source and target.
+        default: NO_ALARM
+      posportID4_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 4, same for source and target.
+        default: NO_ALARM
+      posportID5_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 5, same for source and target.
+        default: NO_ALARM
+      posportID6_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 6, same for source and target.
+        default: NO_ALARM
+      posportID7_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 7, same for source and target.
+        default: NO_ALARM
+      posportID8_SV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.      Alarm severity for posport ID 8, same for source and target.
+        default: NO_ALARM
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_PreVacCoils_SMStatus.template
+        args:
+          .*:
+
+  - name: interlock
+    description: |-
+      Template showing the status of various MPS interlocks in
+      a PLC. Requires dlsPLC_read100 for any century used
+    parameters:
+      <<: [ *timeout, *ilk ]
+      device:
+        type: str
+        description: |-
+          device prefix
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      interlock:
+        type: str
+        description: |-
+          Interlock suffix (e.g. :INT1)
+      desc:
+        type: str
+        description: |-
+          Permit description (e.g. Front end permit)
+      addr:
+        type: int
+        description: |-
+          First address in the DM variable range. E.g. if interlock is in DM800..808 then addr=800
+      auto_reset:
+        type: int
+        description: |-
+          Set to 1 to push the reset button whenever the raw interlocks are all ok
+        default: 0
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          .*:
+
+  - name: vacValveDebounce
+    description: |-
+      Template database for a vacuum valve without debounce or raw air records
+    parameters:
+      <<:
+        [
+          *vlvcc,
+          *allowpv,
+          *whylocked,
+          *timeout,
+          *ilk,
+          *gilk,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *mode,
+          *ilksta_label,
+          *ilksta_sv,
+        ]
+      device:
+        type: id
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      valvetype:
+        type: enum
+        description: |-
+          Type of Device
+        default: valve
+        values:
+          valve:
+          absorber:
+          shutter:
+      desc:
+        type: str
+        description: |-
+          Box label for gui
+        default: $(device)
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacValveDebounce.template
+        args:
+          .*:
+
+  - name: readInt16
+    description: |-
+      Read the Int16 value stored in 1 DM variables in a PLC
+    parameters:
+      <<: [ *PQ, *vlvcc ]
+      ftvl:
+        type: str
+        description: |-
+          Type of data in subArray
+        default: USHORT
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          .*:
+
+  - name: writeInt16
+    description: |-
+      Write an int32 value into a PLC DM variable
+    parameters:
+      <<: [ *PQ, *timeout ]
+      port:
+        type: str
+        description: |-
+          asyn port name of FINS driver
+      addr:
+        type: int
+        description: |-
+          DM variable of the LOWERer address of the float32
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          .*:
+
+  - name: vacValveReadOnly
+    description: |-
+      Template for read only vacuum valves - manual valves with limit switches read back by valve controller PLC so their state is known, but control is not available.
+    parameters:
+      <<: [ *vlvcc, *sta_label ]
+      device:
+        type: id
+        description: |-
+          device name of the valve.
+      sta_label2:
+        type: str
+        description: |-
+          Label string for status value 2 (Optional - defaults to Partial)
+        default: Partial
+      sta_label4:
+        type: str
+        description: |-
+          Label string for status value 4 (Optional - defaults to "")
+        default: ""
+      valvetype:
+        type: str
+        description: |-
+          Template argument
+        default: manualValve
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacValveReadOnly.template
+        args:
+          .*:
+
+  - name: NX102_PreVacCoils_SMLVDT
+    description: |-
+      Template database for an LVDT on PreVac Sample Manipulator.
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          Mandatory. Device name.
+      port:
+        type: str
+        description: |-
+          Mandatory. Comms port (DLS NX102) PLC controller is on.
+      lvdtID:
+        type: str
+        description: |-
+          Mandatory. ID of the LVDT.  Defacto it is a number but it need not be.
+      tag:
+        type: str
+        description: |-
+          Mandatory. NX PLC tag string.
+      lvdtprefix:
+        type: str
+        description: |-
+          Optional.  Defaults to ":LVDT".                       Prefix for SM LVDT records.
+        default: :LVDT
+      lvdt_shortname:
+        type: str
+        description: |-
+          Optional.  Defaults to "LVDT$(lvdtID)".               Short name of the LVDT.
+        default: LVDT$(lvdtID)
+      lvdt_shortdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to "LVDT $(lvdtID)".              Short description of the LVDT.
+        default: LVDT $(lvdtID)
+      lvdt_longdesc:
+        type: str
+        description: |-
+          Optional.  Defaults to "Manipulator LVDT $(lvdtID)".  Longer description of the LVDT.
+        default: Manipulator LVDT $(lvdtID)
+      tagidx:
+        type: str
+        description: |-
+          Optional.  Defaults to "$(lvdtID)".                   NX PLC tag string array index.
+        default: $(lvdtID)
+      pos_SCAN:
+        type: str
+        description: |-
+          Optional.  Defaults to ".5 second".  EPICS .SCAN field.  Scan rate for reading encoder.  NOTE: This is the normal EPICS .SCAN field scanrate and the EtherIP S Flag for scanrate is not in use here.
+        default: .5 second
+      pos_PREC:
+        type: int
+        description: |-
+          Optional.  Defaults to 3.            Precision on the encoder position value.
+        default: 3
+      pos_EGU:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string. Engineering units on the encoder value.
+        default: ""
+      pos_LINR:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string. Values can be "NO CONVERSION", "SLOPE" (must define pos_ESLO and and pos_EOFF), "LINEAR" (must define pos_EGUL and pos_EGUF), (or name of special table) and it will default to "NO CONVERSION".  Conversion method for encoder value.  See EPICS record reference manual sections on the ai record and the convert menu and conversion.
+        default: ""
+      pos_EGUL:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  Low end of LINEAR conversion scale for encoder value.
+        default: ""
+      pos_EGUF:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  High end or full value on LINEAR conversion scale for encoder value.
+        default: ""
+      pos_EOFF:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The offset on the value for SLOPE conversion.  It will default to 0.
+        default: ""
+      pos_ESLO:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The slope on the value for SLOPE conversion.  It will default to 1.
+        default: ""
+      pos_AOFF:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The raw adjustment offset on the value for conversion for all types of conversion.  It will default to 0.
+        default: ""
+      pos_ASLO:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The raw adjustment slope on the value for conversion for all types of conversion.   It will default to 1.
+        default: ""
+      pos_SMOO:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The smoothing fraction parameter on the smoothing algorithm, value between 0 (no smoothing) and 1 (value never changes), it will default to 0.
+        default: ""
+      pos_HOPR:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The position high operator display value.  Will default to 0.
+        default: ""
+      pos_LOPR:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The position low operator display value.   Will default to 0.
+        default: ""
+      pos_HIHI:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The position high high limit.  It will default to 0.
+        default: ""
+      pos_HIGH:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The position high limit.       It will default to 0.
+        default: ""
+      pos_LOW:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The position low limit.        It will default to 0.
+        default: ""
+      pos_LOLO:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The position low low limit.    It will default to 0.
+        default: ""
+      pos_HHSV:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The alarm severity for the HIHI alarm.  It will default to NO_ALARM.
+        default: ""
+      pos_HSV:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The alarm severity for the HIGH alarm.  It will default to NO_ALARM.
+        default: ""
+      pos_LSV:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The alarm severity for the LOW alarm.   It will default to NO_ALARM.
+        default: ""
+      pos_LLSV:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The alarm severity for the LOLO alarm.  It will default to NO_ALARM.
+        default: ""
+      pos_HYST:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The alarm deadband or hysteresis for the scaled position.                 It will default to 0.
+        default: ""
+      pos_ADEL:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The archiver deadband, to stop archiving noise, for the scaled position.  It will default to 0.
+        default: ""
+      pos_MDEL:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The monitor deadband, to stop reacting noise, for the scaled position.    It will default to 0.
+        default: ""
+      raw_EGU:
+        type: str
+        description: |-
+          Optional.  Defaults to count.         Engineering units on the encoder raw value.
+        default: count
+      raw_HYST:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The alarm deadband or hysteresis for the raw position.                    It will default to 0.
+        default: ""
+      raw_ADEL:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The archiver deadband, to stop archiving noise, for the raw position.     It will default to 0.
+        default: ""
+      raw_MDEL:
+        type: str
+        description: |-
+          Optional.  Defaults to empty string.  The monitor deadband, to stop reacting noise, for the raw position.       It will default to 0.
+        default: ""
+      slope_PREC:
+        type: int
+        description: |-
+          Optional.  Defaults to 6.             Precision on the derived encoder slope value.
+        default: 6
+      cal_SCAN:
+        type: str
+        description: |-
+          Optional.  Defaults to "1 second".   EPICS .SCAN field.  Scan rate for reading calibration parameters.  NOTE: This is the normal EPICS .SCAN field scanrate and the EtherIP S Flag for scanrate is not in use here.
+        default: 1 second
+      calout_scanrate:
+        type: float
+        description: |-
+          Optional.  Defaults to .5            The value of scanrate which when writing to NX PLC the calibration output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+        default: 0.5
+      calena_readyval:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.            Value to return calibration update to (i.e. do nothing).                 (Pulse to this level as low).
+        default: 0
+      calena_onval:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.            Value to enable calibration updates   (i.e. to unlock the calibration).  (Pulse to this level as high).
+        default: 1
+      calena_offval:
+        type: int
+        description: |-
+          Optional.  Defaults to 2.            Value to disable calibration updates  (i.e. to lock the calibration).    (Pulse to this level as high).  (The PLC will disable it anyway after a timeout period of 1 day).
+        default: 2
+      calena_pulsestartDLY:
+        type: float
+        description: |-
+          Optional.  Defaults to 0.0           Delay in seconds before setting level to lock or unlock the calibration.
+        default: 0.0
+      calena_pulsewidthDLY:
+        type: float
+        description: |-
+          Optional.  Defaults to 2.0.          Delay in seconds between starting lock or unlock pulse before and returning to ready level.
+        default: 2.0
+      calena_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Unlocked.     Label for 1 state on calibration enable readback record.
+        default: Unlocked
+      calena_OSV:
+        type: str
+        description: |-
+          Optional.  Defaults to MINOR.        Alarm severity for 1 state on calibration enable readback record.
+        default: MINOR
+      calena_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Locked.       Label for 0 state on calibration enable readback record.
+        default: Locked
+      calena_ZSV:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.     Alarm severity for 0 state on calibration enable readback record.
+        default: NO_ALARM
+      trigger_scanrate:
+        type: float
+        description: |-
+          Optional.  Defaults to .5            The value of scanrate which when writing to NX PLC triggers the trigger output records set the EtherIP scanrate S flag to in their OUT field syntax to add the readback to one of the EtherIP scanlists.
+        default: 0.5
+      trigger_onval:
+        type: int
+        description: |-
+          Optional.  Defaults to 1.            Value to write to a trigger tag to pulse the trigger on.  Must be consistent with trigger_offval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+        default: 1
+      trigger_offval:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.            Value to write to a trigger tag to pulse the trigger off.  Must be consistent with trigger_onval.  Together they allow the defininition of the trigger pulse as a blip or a dip with blip as the default.
+        default: 0
+      trigger_ONAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger On.   Label for 1 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+        default: Trigger On
+      trigger_ZNAM:
+        type: str
+        description: |-
+          Optional.  Defaults to Trigger Off.  Label for 0 state on a trigger record.  Must be consistent with trigger_onval and trigger_offval.
+        default: Trigger Off
+      trigger_pulsestartDLY:
+        type: float
+        description: |-
+          Optional.  Defaults to 1.0.          Delay in seconds between last calibration parameter write and pulsing the trigger.
+        default: 1.0
+      trigger_pulsewidthDLY:
+        type: float
+        description: |-
+          Optional.  Defaults to 2.0.          Delay in seconds between sending Trigger On and Trigger Off writes when pulsing a trigger.
+        default: 2.0
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_PreVacCoils_SMLVDT.template
+        args:
+          .*:
+
+  - name: overrideRequestMain
+    description: |-
+      Template allowing overrideRequestIndividual instances to be created
+    parameters:
+      <<: [ *PQ, *timeout ]
+      outaddr:
+        type: int
+        description: |-
+          Output address. Input address is $(outaddr)+1. E.g. if outaddr=80, read DM81 and write DM80.
+      port:
+        type: str
+        description: |-
+          Asyn port for doing serial comms
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_overrideRequestMain.template
+        args:
+          .*:
+
+  - name: NX102_feTemperature
+    description: |-
+      Template database for an individual temperature on a front end
+      temperature PLC.
+    parameters:
+      <<: [ *tagidx, *alarm_limits ]
+      device:
+        type: str
+        description: |-
+          PV prefix
+      temp:
+        type: str
+        description: |-
+          PV suffix
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      tag:
+        type: str
+        description: |-
+          etherip tag
+        default: Temp
+      adel:
+        type: float
+        description: |-
+          archiver deadband
+        default: 0.2
+      scalefac:
+        type: int
+        description: |-
+          scale factor for temperature/setpoint (1 for new PLC templates, 10 for old where PLC reports in 10ths of a degree)
+        default: 1
+      tempcal:
+        type: int
+        description: |-
+          temperature calibration offset in egu (default=0)
+        default: 0
+      prec:
+        type: int
+        description: |-
+          precision for reporting value back
+        default: 1
+      disable_pv:
+        type: str
+        description: |-
+          If set, then this is the value of A in disable_calc
+        default: $(device)$(temp):ZERO
+      disable_calc:
+        type: str
+        description: |-
+          If this condition is met then save the current limit and set the limit to 3276.7, disabling the interlock for this PV
+        default: A=1
+      egu:
+        type: str
+        description: |-
+          This associates an edm screen with the template
+        default: C
+      desc:
+        type: str
+        description: |-
+          Description
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_feTemperature.template
+        args:
+          .*:
+
+  - name: NX102_digitalIn
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          Template argument
+      port:
+        type: str
+        description: |-
+          Template argument
+      tag:
+        type: str
+        description: |-
+          Template argument
+        default: Digital_In
+      name:
+        type: str
+        description: |-
+          Optional gui association name.
+        default: ""
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_digitalIn.template
+        args:
+          .*:
+
+  - name: NX102_controller_status
+    description: |-
+      Template showing the status of the power supply from the ether IP readings
+    parameters:
+      device:
+        type: str
+        description: |-
+          device prefix
+      port:
+        type: str
+        description: |-
+          port name of ether_ip driver
+      name:
+        type: id
+        description: |-
+          Object name and associated gui name
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_controller_status.template
+        args:
+          .*:
+
+  - name: NX102_vacValveBistable
+    description: |-
+      Template database for a bistable vacuum valve without debounce or raw air records.  It has different interlocks for opening and closing it.
+    parameters:
+      <<:
+        [
+          *tag,
+          *tagidx,
+          *allowpv,
+          *whylocked,
+          *con_label,
+          *sta_label,
+          *sta_sv,
+          *ilksta_label,
+          *ilksta_sv,
+          *mode,
+        ]
+      device:
+        type: str
+        description: |-
+          device name
+      port:
+        type: str
+        description: |-
+          EtherIP Port Name
+      con_label3:
+        type: str
+        description: |-
+          Label string for control value 3 (Optional - defaults to Close Enable)
+        default: Close Enable
+      con_label7:
+        type: str
+        description: |-
+          Label string for control value 7 (Optional - defaults to "")
+        default: ""
+      sta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      sta_sv7:
+        type: str
+        description: |-
+          Alarm severity for status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_label1:
+        type: str
+        description: |-
+          Label string for status value 1 (Optional - defaults to Open Disabled)
+        default: Open Disabled
+      ilksta_label2:
+        type: str
+        description: |-
+          Label string for status value 2 (Optional - defaults to Closed, Open Available)
+        default: Closed, Open Available
+      ilksta_label3:
+        type: str
+        description: |-
+          Label string for status value 3 (Optional - defaults to Open)
+        default: Open
+      ilksta_label4:
+        type: str
+        description: |-
+          Label string for status value 4 (Optional - defaults to Close Disabled)
+        default: Close Disabled
+      ilksta_label5:
+        type: str
+        description: |-
+          Label string for status value 5 (Optional - defaults to Open, Close Available)
+        default: Open, Close Available
+      ilksta_label6:
+        type: str
+        description: |-
+          Label string for status value 6 (Optional - defaults to Closed)
+        default: Closed
+      ilksta_label7:
+        type: str
+        description: |-
+          Label string for status value 7 (Optional - defaults to "")
+        default: ""
+      ilksta_sv6:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 6 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      ilksta_sv7:
+        type: str
+        description: |-
+          Alarm severity for interlock status value 7 (Optional - defaults to NO_ALARM)
+        default: NO_ALARM
+      DIRILK1:
+        type: str
+        description: |-
+          Part of ILK1 PV name (dollar(device):dollar(DIRILK1)ILK), named for "direction" of operation controlled by ILK1, e.g. set to OPEN for Bistable valve (Optional - defaults to OPEN)
+        default: OPEN
+      DIRILK1_label:
+        type: str
+        description: |-
+          Label string for the interlock 1 "direction".  (Optional - defaults to Open)
+        default: Open
+      DIRILK2:
+        type: str
+        description: |-
+          Part of ILK2 PV name (dollar(device):dollar(DIRILK2)ILK), named for "direction" of operation controlled by ILK2, e.g. set to CLOSE for Bistable valves (Optional - defaults to CLOSE)
+        default: CLOSE
+      DIRILK2_label:
+        type: str
+        description: |-
+          Label string for the interlock 2 "direction".  (Optional - defaults to Close)
+        default: Close
+      desc:
+        type: str
+        description: |-
+          Box label for gui                        (Optional - defaults to value of device macro)
+        default: $(device)
+      valvetype:
+        type: str
+        description: |-
+          Type of valve for the gui.          (Optional - defaults to valve).
+        default: valve
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_vacValveBistable.template
+        args:
+          .*:
+
+  - name: NX102_flowMeter
+    description: |-
+      Template database for a machine flow meter on an Omron NX PLC.
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          device name prefix for record names
+      desc:
+        type: str
+        description: |-
+          DESC - description of the device (40 chars max)
+      port:
+        type: str
+        description: |-
+          asyn port name of etherip driver
+      tag:
+        type: str
+        description: |-
+          Optional.  Defaults to FlowRate       - etherip tag name of flow rate data array
+        default: FlowRate
+      egu:
+        type: str
+        description: |-
+          Optional.  Defaults to Litres / Hour  - EGU  - Engineering Units
+        default: Litres / Hour
+      prec:
+        type: int
+        description: |-
+          Optional.  Defaults to 1              - PREC - Precision
+        default: 1
+      hopr:
+        type: int
+        description: |-
+          Optional.  Defaults to 300            - HOPR - High Operator Range
+        default: 300
+      lopr:
+        type: float
+        description: |-
+          Optional.  Defaults to 0.0            - LOPR - Low Operator Range
+        default: 0.0
+      hihi:
+        type: int
+        description: |-
+          Optional.  Defaults to 295            - HIHI - High high alarm value
+        default: 295
+      lolo:
+        type: int
+        description: |-
+          Optional.  Defaults to 100            - LOLO - Low low alarm value
+        default: 100
+      high:
+        type: int
+        description: |-
+          Optional.  Defaults to 275            - HIGH - High alarm value
+        default: 275
+      adel:
+        type: int
+        description: |-
+          Optional.  Defaults to 50             - ADEL - Archive delta (change value)
+        default: 50
+      mdel:
+        type: int
+        description: |-
+          Optional.  Defaults to 10             - MDEL - Monitor delta (change value)
+        default: 10
+      low:
+        type: int
+        description: |-
+          Optional.  Defaults to 120            - LOW  - Low alarm value
+        default: 120
+
+    databases:
+
+      - file: $(DLSPLC)/db/NX102_flowMeter.template
+        args:
+          .*:
+
+  - name: auto_dlsPLC_vacValveTclose
+    description: |-
+      Vacuum valve TCLOSE metrics
+    parameters:
+      device:
+        type: str
+        description: |-
+          device name
+      vlvcc:
+        type: str
+        description: |-
+          device name of valve control crate
+      century:
+        type: int
+        description: |-
+          DM century (e.g. DM11XX would be century = 11)
+      index:
+        type: int
+        description: |-
+          DM index (e.g. DM1111 would be index = 11)
+      tclose_high:
+        type: int
+        description: |-
+          HIGH alarm level for TCLOSE record
+        default: 0
+      tclose_hihi:
+        type: int
+        description: |-
+          HIHI alarm level for TCLOSE record
+        default: 0
+      tclose_hsv:
+        type: str
+        description: |-
+          HSV HIGH severity level for TCLOSE record
+        default: NO_ALARM
+      tclose_hhsv:
+        type: str
+        description: |-
+          HHSV HIHI severity level for TCLOSE record
+        default: NO_ALARM
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_vacValveTclose.template
+        args:
+          .*:
+
+  - name: auto_dlsPLC_CommsStatus
+    description: |-
+      Template that reads the overall status of the valve control crate PLC
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device prefix
+      field:
+        type: str
+        description: |-
+          Device PV field to monitor. Defaults to DM0XX
+        default: DM0XX
+
+    databases:
+
+      - file: $(DLSPLC)/db/dlsPLC_CommsStatus.template
+        args:
+          .*:
+
+module: dlsPLC
