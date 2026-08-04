@@ -35,6 +35,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import yaml
+
 HERE = Path(__file__).resolve().parent
 
 PANDOC_MISSING = (
@@ -347,6 +349,32 @@ def needs_pandoc(plan: list[dict]) -> bool:
     )
 
 
+def manifest_vendors_docs(text: str) -> list[str]:
+    """The rules in an existing manifest that would vendor a generated doc.
+
+    A manifest this sweep did not write belongs to a human, so it is checked
+    rather than replaced - but a rule matching `docs/...` defeats the only
+    reason the pattern has a manifest at all.
+    """
+    try:
+        doc = yaml.safe_load(text) or {}
+    except yaml.YAMLError as exc:
+        return [f"unparseable: {exc}"]
+    if not isinstance(doc, dict):
+        return ["not a mapping"]
+    bad = []
+    for rule in doc.get("vendor") or []:
+        src = rule.get("src") if isinstance(rule, dict) else None
+        if not isinstance(src, str):
+            continue
+        try:
+            if re.search(src, "docs/example.md"):
+                bad.append(src)
+        except re.error:
+            bad.append(f"{src} (invalid regex)")
+    return bad
+
+
 def is_generated(f: Path) -> bool:
     """Was this file written by a sweep? Only those may be overwritten or pruned."""
     return f.read_text(errors="replace")[:200].startswith(GENERATED_MARK)
@@ -427,9 +455,22 @@ def apply_plan(
         if not manifest.exists():
             manifest.write_text(MANIFEST)
             print(f"wrote {manifest}")
+        elif rules := manifest_vendors_docs(manifest.read_text()):
+            print(
+                f"WARNING: {manifest} would vendor the generated docs into an IOC "
+                "instance - offending rule(s): " + "; ".join(rules),
+                file=sys.stderr,
+            )
     elif manifest.exists():
-        manifest.unlink()
-        print(f"removed {manifest} (nothing left that must not be vendored)")
+        if manifest.read_text() == MANIFEST:
+            manifest.unlink()
+            print(f"removed {manifest} (nothing left that must not be vendored)")
+        else:
+            print(
+                f"WARNING: left {manifest} alone - it was not written by this sweep "
+                "and may carry hand-written vendor rules",
+                file=sys.stderr,
+            )
     if produced == 0:
         print(
             "no docs produced automatically - anything marked MANUAL still needs "
