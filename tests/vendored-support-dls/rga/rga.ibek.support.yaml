@@ -1,0 +1,736 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.1/ibek.support.schema.json
+
+module: rga
+
+entity_models:
+  - name: rgamvplus
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device Prefix
+
+      channel:
+        type: str
+        description: |-
+          RGA channel number (port number of PC comm port 1-8)
+
+      asynport:
+        type: str
+        description: |-
+          Asyn Serial Port e.g. ty_40_0
+
+      name:
+        type: id
+        description: |-
+          Name of asyn port to create
+
+      ipPort:
+        type: object
+        description: |-
+          IP port object
+
+      mm00_label:
+        type: str
+        description: |-
+          Template argument (Default = H2)
+        default: H2
+
+      mm01_label:
+        type: str
+        description: |-
+          Template argument (Default = He)
+        default: He
+
+      mm02_label:
+        type: str
+        description: |-
+          Template argument (Default = CH2/N2++)
+        default: CH2/N2++
+
+      mm03_label:
+        type: str
+        description: |-
+          Template argument (Default = CH3)
+        default: CH3
+
+      mm04_label:
+        type: str
+        description: |-
+          Template argument (Default = CH4)
+        default: CH4
+
+      mm05_label:
+        type: str
+        description: |-
+          Template argument (Default = H2O)
+        default: H2O
+
+      mm06_label:
+        type: str
+        description: |-
+          Template argument (Default = N2/CO)
+        default: N2/CO
+
+      mm07_label:
+        type: str
+        description: |-
+          Template argument (Default = O2)
+        default: O2
+
+      mm08_label:
+        type: str
+        description: |-
+          Template argument (Default = Ar)
+        default: Ar
+
+      mm09_label:
+        type: str
+        description: |-
+          Template argument (Default = CO2)
+        default: CO2
+
+      mm10_label:
+        type: str
+        description: |-
+          Template argument (Default = CF3/C5H9)
+        default: CF3/C5H9
+
+      mm11_label:
+        type: str
+        description: |-
+          Template argument (Default = unused)
+        default: unused
+
+      mm12_label:
+        type: str
+        description: |-
+          Template argument (Default = unused)
+        default: unused
+
+      mm13_label:
+        type: str
+        description: |-
+          Template argument (Default = unused)
+        default: unused
+
+      mm14_label:
+        type: str
+        description: |-
+          Template argument (Default = unused)
+        default: unused
+
+      mm015_label:
+        type: str
+        description: |-
+          Template argument (Default = unused)
+        default: unused
+
+      mm00_mass:
+        type: int
+        description: |-
+          Template argument (Default = 2)
+        default: 2
+
+      mm01_mass:
+        type: int
+        description: |-
+          Template argument (Default = 4)
+        default: 4
+
+      mm02_mass:
+        type: int
+        description: |-
+          Template argument (Default = 14)
+        default: 14
+
+      mm03_mass:
+        type: int
+        description: |-
+          Template argument (Default = 15)
+        default: 15
+
+      mm04_mass:
+        type: int
+        description: |-
+          Template argument (Default = 16)
+        default: 16
+
+      mm05_mass:
+        type: int
+        description: |-
+          Template argument (Default = 18)
+        default: 18
+
+      mm06_mass:
+        type: int
+        description: |-
+          Template argument (Default = 28)
+        default: 28
+
+      mm07_mass:
+        type: int
+        description: |-
+          Template argument (Default = 32)
+        default: 32
+
+      mm08_mass:
+        type: int
+        description: |-
+          Template argument (Default = 40)
+        default: 40
+
+      mm09_mass:
+        type: int
+        description: |-
+          Template argument (Default = 44)
+        default: 44
+
+      mm10_mass:
+        type: int
+        description: |-
+          Template argument (Default = 69)
+        default: 69
+
+      mm11_mass:
+        type: int
+        description: |-
+          Template argument (Default = 0)
+        default: 0
+
+      mm12_mass:
+        type: int
+        description: |-
+          Template argument (Default = 0)
+        default: 0
+
+      mm13_mass:
+        type: int
+        description: |-
+          Template argument (Default = 0)
+        default: 0
+
+      mm14_mass:
+        type: int
+        description: |-
+          Template argument (Default = 0)
+        default: 0
+
+      mm15_mass:
+        type: int
+        description: |-
+          Template argument (Default = 0)
+        default: 0
+
+    pre_init:
+      - value: |
+          MVPlusInit("{{name}}", "{{ipPort}}")
+
+    databases:
+      - file: $(RGA)/db/rga_asyn.template
+        args:
+          asynport:
+          mm05_mass:
+          mm02_label:
+          mm13_label:
+          mm04_mass:
+          mm08_label:
+          mm06_mass:
+          mm15_mass:
+          mm01_label:
+          mm10_mass:
+          mm14_label:
+          mm10_label:
+          mm12_label:
+          mm09_mass:
+          mm09_label:
+          mm14_mass:
+          mm06_label:
+          channel:
+          mm12_mass:
+          mm04_label:
+          mm13_mass:
+          mm11_mass:
+          mm02_mass:
+          mm00_label:
+          device:
+          mm015_label:
+          mm07_mass:
+          mm03_label:
+          name:
+          mm07_label:
+          mm05_label:
+          mm08_mass:
+          mm03_mass:
+          mm01_mass:
+          mm11_label:
+          mm00_mass:
+
+  - name: rgaGroup
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      device:
+        type: str
+        description: |-
+          Template argument
+
+      rga1:
+        type: str
+        description: |-
+          Template argument
+
+      rga2:
+        type: str
+        description: |-
+          Template argument
+        default: "{{rga1}}"
+
+      rga3:
+        type: str
+        description: |-
+          Template argument
+        default: "{{rga1}}"
+
+      rga4:
+        type: str
+        description: |-
+          Template argument
+        default: "{{rga1}}"
+
+      rga5:
+        type: str
+        description: |-
+          Template argument
+        default: "{{rga1}}"
+
+      rga6:
+        type: str
+        description: |-
+          Template argument
+        default: "{{rga1}}"
+
+      rga7:
+        type: str
+        description: |-
+          Template argument
+        default: "{{rga1}}"
+
+      rga8:
+        type: str
+        description: |-
+          Template argument
+        default: "{{rga1}}"
+
+    databases:
+      - file: $(RGA)/db/rgaGroup.template
+        args: { device: null, rga1: null, rga2: null, rga3: null, rga4: null, rga5: null, rga6: null, rga7: null, rga8: null }
+
+  - name: rga
+    description: |-
+      DLS RGA support (the support module fails to say which RGA this is for)
+    parameters:
+      device:
+        type: id
+        description: |-
+          Device Prefix
+
+      port:
+        type: str
+        description: |-
+          Asyn Serial Port e.g. ty_40_0
+
+      channel:
+        type: int
+        description: |-
+          RGA channel number (port number of PC comm port 1-4)
+
+      mm00_label:
+        type: str
+        description: |-
+          Optional
+        default: H2
+
+      mm01_label:
+        type: str
+        description: |-
+          Optional
+        default: He
+
+      mm02_label:
+        type: str
+        description: |-
+          Optional
+        default: CH2/N2++
+
+      mm03_label:
+        type: str
+        description: |-
+          Optional
+        default: CH3
+
+      mm04_label:
+        type: str
+        description: |-
+          Optional
+        default: CH4
+
+      mm05_label:
+        type: str
+        description: |-
+          Optional
+        default: H2O
+
+      mm06_label:
+        type: str
+        description: |-
+          Optional
+        default: N2/CO
+
+      mm07_label:
+        type: str
+        description: |-
+          Optional
+        default: O2
+
+      mm08_label:
+        type: str
+        description: |-
+          Optional
+        default: Ar
+
+      mm09_label:
+        type: str
+        description: |-
+          Optional
+        default: CO2
+
+      mm10_label:
+        type: str
+        description: |-
+          Optional
+        default: CF3/C5H9
+
+      mm11_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      mm12_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      mm13_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      mm14_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      mm015_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      mm00_mass:
+        type: int
+        description: |-
+          Optional
+        default: 2
+
+      mm01_mass:
+        type: int
+        description: |-
+          Optional
+        default: 4
+
+      mm02_mass:
+        type: int
+        description: |-
+          Optional
+        default: 14
+
+      mm03_mass:
+        type: int
+        description: |-
+          Optional
+        default: 15
+
+      mm04_mass:
+        type: int
+        description: |-
+          Optional
+        default: 16
+
+      mm05_mass:
+        type: int
+        description: |-
+          Optional
+        default: 18
+
+      mm06_mass:
+        type: int
+        description: |-
+          Optional
+        default: 28
+
+      mm07_mass:
+        type: int
+        description: |-
+          Optional
+        default: 32
+
+      mm08_mass:
+        type: int
+        description: |-
+          Optional
+        default: 40
+
+      mm09_mass:
+        type: int
+        description: |-
+          Optional
+        default: 44
+
+      mm10_mass:
+        type: int
+        description: |-
+          Optional
+        default: 69
+
+      mm11_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      mm12_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      mm13_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      mm14_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      mm15_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm00_label:
+        type: str
+        description: |-
+          Optional
+        default: H2
+
+      pjmm01_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm02_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm03_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm04_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm05_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm06_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm07_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm08_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm09_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm10_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm11_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm12_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm13_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm14_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm015_label:
+        type: str
+        description: |-
+          Optional
+        default: unused
+
+      pjmm00_mass:
+        type: int
+        description: |-
+          Optional
+        default: 2
+
+      pjmm01_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm02_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm03_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm04_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm05_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm06_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm07_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm08_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm09_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm10_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm11_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm12_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm13_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm14_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+      pjmm15_mass:
+        type: int
+        description: |-
+          Optional
+        default: 0
+
+    databases:
+      - file: $(RGA)/db/rga.template
+        args: { device: null, port: null, channel: null, mm00_label: null, mm01_label: null, mm02_label: null, mm03_label: null, mm04_label: null, mm05_label: null, mm06_label: null, mm07_label: null, mm08_label: null, mm09_label: null, mm10_label: null, mm11_label: null, mm12_label: null, mm13_label: null, mm14_label: null, mm015_label: null, mm00_mass: null, mm01_mass: null, mm02_mass: null, mm03_mass: null, mm04_mass: null, mm05_mass: null, mm06_mass: null, mm07_mass: null, mm08_mass: null, mm09_mass: null, mm10_mass: null, mm11_mass: null, mm12_mass: null, mm13_mass: null, mm14_mass: null, mm15_mass: null, pjmm00_label: null, pjmm01_label: null, pjmm02_label: null, pjmm03_label: null, pjmm04_label: null, pjmm05_label: null, pjmm06_label: null, pjmm07_label: null, pjmm08_label: null, pjmm09_label: null, pjmm10_label: null, pjmm11_label: null, pjmm12_label: null, pjmm13_label: null, pjmm14_label: null, pjmm015_label: null, pjmm00_mass: null, pjmm01_mass: null, pjmm02_mass: null, pjmm03_mass: null, pjmm04_mass: null, pjmm05_mass: null, pjmm06_mass: null, pjmm07_mass: null, pjmm08_mass: null, pjmm09_mass: null, pjmm10_mass: null, pjmm11_mass: null, pjmm12_mass: null, pjmm13_mass: null, pjmm14_mass: null, pjmm15_mass: null }

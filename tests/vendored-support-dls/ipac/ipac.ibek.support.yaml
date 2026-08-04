@@ -1,0 +1,279 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: ipac
+
+entity_models:
+  - name: Hy8002
+    description: |-
+      Configure a Hytec 8002 Carrier card
+    parameters:
+      slot:
+        type: int
+        description: |-
+          VME Slot number
+
+      name:
+        type: id
+        description: |-
+          Identifier for this device - typically IPAC{{ slot }}
+        default: IPAC{{ slot }}
+
+      intLevel:
+        type: int
+        description: |-
+          VME Interrupt Level
+        default: 2
+
+      test:
+        type: str
+        description: test
+        default: |
+          {{ slot }}
+
+    pre_defines:
+      carrier_id:
+        description: |-
+          carrier card ID - zero based and auto incremented on each new carrier
+        type: int
+        value: |-
+          {{ _global.incrementor("CarrierCardId", start=0, stop=64) }}
+
+    pre_init:
+      - value: |
+
+          # ipacAddHy8002("slot, intLevel")
+        when: first
+
+      - value: |
+          ipacAddHy8002("{{ slot }}, {{ intLevel}}")
+          # record above carrier card ID {{ carrier_id }} in '{{ name }}'
+          epicsEnvSet {{ name }} {{ carrier_id }}
+
+  - name: Hy8001
+    description: |-
+      Configure a Hytec 8001 IO card
+    parameters:
+      slot:
+        type: int
+        description: |-
+          VME Slot number
+
+      name:
+        type: id
+        description: |-
+          Identifier for this device - typically IPAC{{ slot }}
+        default: IPAC{{ slot }}
+
+      interrupt_vector:
+        type: object
+        description: Interrupt Vector reserved with epics.InterruptVectorVME, count=1
+
+      direction:
+        type: enum
+        description: |-
+          Direction of digital IO
+        values:
+          Input: 0
+          Output: 1
+          Mixed: 2
+
+      cardid:
+        type: int
+        description: cardid
+        default: "{{ 10 * slot }}"
+
+      intLevel:
+        type: int
+        description: |-
+          intLevel?
+        default: 0
+
+      clock:
+        type: int
+        description: |-
+          clock?
+        default: 0
+
+      scan:
+        type: int
+        description: |-
+          scan?
+        default: 0
+
+      invertin:
+        type: bool
+        description: |-
+          invertin?
+        default: false
+
+      invertout:
+        type: bool
+        description: |-
+          invertout?
+        default: false
+
+      ip_support:
+        type: bool
+        description: |-
+          Register this Hy8001 as an IPAC carrier (ipacAddHy8001), mapping it
+          into VME address space. Set false only for a card used purely for
+          digital IO, which then consumes no carrier card ID.
+        default: true
+
+    pre_defines:
+      carrier_id:
+        description: |-
+          Carrier card ID, allocated only when this 8001 is used as an IP
+          carrier (ip_support=true). -1 when the card is digital-IO only.
+        type: int
+        value: |-
+          {{ _global.incrementor("CarrierCardId", start=0, stop=64) if ip_support else -1 }}
+
+    pre_init:
+      - when: first
+        value: |
+
+          #  Hy8001Configure(cardNum, vmeslotNum, vectorNum, itrLevel, debounce, clock, scan, direction, invertin, invertout)
+      - value: |
+          Hy8001Configure({{cardid}}, {{slot}}, $({{interrupt_vector}}), {{intLevel}}, 0, {{clock}}, {{scan}}, {{direction | int}}, {{invertin | int}}, {{invertout | int}})
+          {%- if ip_support %}
+          # Register the Hy8001 as an IPAC carrier so the card is mapped into VME
+          # address space - the VxWorks build did this with
+          # ipacEXTAddCarrier(&EXTHy8001, "<slot>"). Without it the Hy8001 bi/bo
+          # records (e.g. the VLVCC valve-crate interlocks on #C{{cardid}}) never
+          # reach the hardware. ipacAddHy8001 is the RTEMS wrapper (cf ipacAddHy8002).
+          ipacAddHy8001("{{ slot }}")
+          # record above carrier card ID {{ carrier_id }} in '{{ name }}'
+          epicsEnvSet {{ name }} {{ carrier_id }}
+          {%- endif %}
+
+  - name: Hy8005
+    description: |-
+      Configure a Hytec 8005 IO card
+    parameters:
+      name:
+        type: id
+        description: Identifier for this device
+
+      slot:
+        type: int
+        description: |-
+          VME Slot number
+
+      cardnum:
+        type: int
+        description: |-
+          Card number
+
+      interrupt_vector:
+        type: object
+        description: Interrupt Vector reserved with epics.InterruptVectorVME, count=1
+
+      int_level:
+        type: int
+        description: |-
+          VME Interrupt Level
+        default: 1
+
+      hs_int:
+        type: int
+        description: |-
+          Dunno actually
+        default: 0
+
+    pre_init:
+      - value: |
+          Hy8005Configure({{cardnum}}, {{slot}}, {{interrupt_vector}}, {{int_level}}, {{hs_int}})
+
+  - name: Hy8005_Channel
+    description: |-
+      TODO:ADD DESCRIPTION
+    parameters:
+      parent:
+        type: object
+        description: Hy8005 card identifier
+
+      ipslot:
+        type: enum
+        description: |-
+          IP slot
+        values:
+          A: 0
+          C: 1
+          B: 2
+          D: 3
+      cardnum:
+        type: int
+        description: |-
+          EPICS card identification
+
+      debrate:
+        type: enum
+        description: |-
+          debrate
+        values:
+          No_Debounce: 0
+          1KHz: 1
+          100Hz: 2
+          200Hz: 3
+          500Hz: 4
+      pwidth:
+        type: enum
+        description: |-
+          pwidth
+        default: 0
+        values:
+          1msec: 0
+          10msec: 1
+          100msec: 2
+          1sec: 3
+          2sec: 4
+          5sec: 5
+          10sec: 6
+          20sec: 7
+          50sec: 8
+          100sec: 9
+      scanrate:
+        type: enum
+        description: |-
+          scanrate
+        default: 0
+        values:
+          1KHz: 0
+          10KHz: 1
+          100KHz: 2
+          1MHz: 3
+      direction:
+        type: enum
+        description: |-
+          direction
+        default: 0
+        values:
+          inputs: 0
+          low in/high out: 1
+          outputs: 2
+          low out/high in: 3
+      clock:
+        type: enum
+        description: |-
+          clock
+        default: 0
+        values:
+          internal: 0
+          external: 1
+      invertInputs:
+        type: bool
+        description: |-
+          invert inputs
+        default: false
+
+      invertOutputs:
+        type: bool
+        description: |-
+          invert outputs
+        default: false
+
+    pre_init:
+      - value: |
+          Hy8005IOConfigure({{cardnum}}, {{parent}}, {{ipslot}}, {{debrate}}, {{pwidth}}, {{scanrate}}, {{direction}}, {{parent.interrupt_vector}}, {{clock}})
+  # TODO - MISSING ARGS: carrier, intr

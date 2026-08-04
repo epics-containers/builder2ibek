@@ -1,0 +1,695 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: SR-VA
+
+entity_models:
+  - name: d2PumpCart
+    description: |-
+      Diamond D2 pump cart vacuum system. Controls valves, pumps, gauges,
+      interlocks, and temperature monitors via an NX102 PLC and MKS 937a
+      gauge controller.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Domain prefix (e.g. ME20V)
+      plc_ip:
+        type: str
+        description: |-
+          IP address of the NX102 PLC
+      ts_ip:
+        type: str
+        description: |-
+          IP address of the terminal server (gauge controller)
+      ts_port:
+        type: int
+        description: |-
+          Terminal server port for gauge controller
+        default: 4196
+
+    sub_entities:
+      # EtherIP connection to PLC
+      - type: ether_ip.EtherIPInit
+        device: "{{ dom }}-VA-VLVCC-01"
+        ip: "{{ plc_ip }}"
+        port: VLVCC_01_EIP
+
+      # Asyn serial connection to MKS 937a gauge controller
+      - type: asyn.AsynIP
+        name: GCTLR_01_PORT
+        port: "{{ ts_ip }}:{{ ts_port }}"
+
+      # MKS 937a gauge controller
+      - type: mks937a.mks937a
+        device: "{{ dom }}-VA-GCTLR-01"
+        name: GC
+        port: GCTLR_01_PORT
+
+      # Ion gauges
+      - type: mks937a.mks937aImg
+        GCTLR: GC
+        channel: 1
+        device: "{{ dom }}-VA-IMG-01"
+      - type: mks937a.mks937aImg
+        GCTLR: GC
+        channel: 2
+        device: "{{ dom }}-VA-IMG-02"
+
+      # Pirani gauges
+      - type: mks937a.mks937aPirg
+        GCTLR: GC
+        channel: 4
+        device: "{{ dom }}-VA-PIRG-01"
+      - type: mks937a.mks937aPirg
+        GCTLR: GC
+        channel: 5
+        device: "{{ dom }}-VA-PIRG-02"
+
+      # Temperature monitors
+      - type: userIO.ai
+        DESC: Temperature 1
+        DTYP: EtherIP
+        EGU: C
+        INP: "@VLVCC_01_EIP TC1"
+        P: "{{ dom }}-VA-VLVCC-01"
+        R: ":TMON01"
+        SCAN: 1 second
+        archiver_rate: 10 Monitor
+      - type: userIO.ai
+        DESC: Temperature 2
+        DTYP: EtherIP
+        EGU: C
+        INP: "@VLVCC_01_EIP TC2"
+        P: "{{ dom }}-VA-VLVCC-01"
+        R: ":TMON02"
+        SCAN: 1 second
+        archiver_rate: 10 Monitor
+      - type: userIO.ai
+        DESC: Temperature 3
+        DTYP: EtherIP
+        EGU: C
+        INP: "@VLVCC_01_EIP TC3"
+        P: "{{ dom }}-VA-VLVCC-01"
+        R: ":TMON03"
+        SCAN: 1 second
+        archiver_rate: 10 Monitor
+      - type: userIO.ai
+        DESC: Temperature 4
+        DTYP: EtherIP
+        EGU: C
+        INP: "@VLVCC_01_EIP TC4"
+        P: "{{ dom }}-VA-VLVCC-01"
+        R: ":TMON04"
+        SCAN: 1 second
+        archiver_rate: 10 Monitor
+
+      # Vacuum valves (7 valves + 1 RGA)
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        device: "{{ dom }}-VA-VALVE-01"
+        port: VLVCC_01_EIP
+        tag: V
+        tagidx: 1
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        device: "{{ dom }}-VA-VALVE-02"
+        port: VLVCC_01_EIP
+        tag: V
+        tagidx: 2
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        device: "{{ dom }}-VA-VALVE-03"
+        port: VLVCC_01_EIP
+        tag: V
+        tagidx: 3
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        device: "{{ dom }}-VA-VALVE-04"
+        port: VLVCC_01_EIP
+        tag: V
+        tagidx: 4
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        device: "{{ dom }}-VA-VALVE-05"
+        port: VLVCC_01_EIP
+        tag: V
+        tagidx: 5
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        device: "{{ dom }}-VA-VALVE-06"
+        port: VLVCC_01_EIP
+        tag: V
+        tagidx: 6
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        device: "{{ dom }}-VA-VALVE-07"
+        port: VLVCC_01_EIP
+        tag: V
+        tagidx: 7
+      - type: dlsPLC.NX102_vacValveDebounce
+        ILKNUM: 1
+        con_label0: "On"
+        con_label1: "Off"
+        device: "{{ dom }}-VA-RGA-01"
+        port: VLVCC_01_EIP
+        sta_label1: "On"
+        sta_label2: "Off"
+        tag: V
+        tagidx: 8
+
+      # Vacuum pumps
+      - type: dlsPLC.NX102_vacPump
+        device: "{{ dom }}-VA-TURBO-01"
+        port: VLVCC_01_EIP
+        tag: T
+        tagidx: 1
+      - type: dlsPLC.NX102_vacPump
+        device: "{{ dom }}-VA-SCROL-01"
+        port: VLVCC_01_EIP
+        tag: S
+        tagidx: 1
+      - type: dlsPLC.NX102_vacPump
+        device: "{{ dom }}-VA-BKOUT-01"
+        port: VLVCC_01_EIP
+        tag: S
+        tagidx: 2
+      - type: dlsPLC.NX102_vacPump
+        device: "{{ dom }}-VA-BKOUT-02"
+        port: VLVCC_01_EIP
+        tag: S
+        tagidx: 3
+
+      # Interlocks
+      - type: dlsPLC.NX102_interlock
+        desc: RGA X Trip
+        device: "{{ dom }}-VA-ILK-01"
+        port: VLVCC_01_EIP
+        tag: ILK
+        tagidx: 1
+      - type: dlsPLC.NX102_interlock
+        desc: IMG Enable
+        device: "{{ dom }}-VA-ILK-02"
+        port: VLVCC_01_EIP
+        tag: ILK
+        tagidx: 2
+
+      # Gauge override readback
+      - type: dlsPLC.NX102_readBool
+        device: "{{ dom }}-VA-VLVCC-01:GA_OR_RBV"
+        onam: Active
+        port: VLVCC_01_EIP
+        tag: Gauge_Override
+        znam: Inactive
+
+      # Gauge override control
+      - type: userIO.bo
+        DTYP: EtherIP
+        ONAM: Active
+        OUT: "@VLVCC_01_EIP Gauge_Override_Request S 1"
+        P: "{{ dom }}-VA-VLVCC-01"
+        R: ":GA_OR"
+        SCAN: Passive
+        ZNAM: Inactive
+
+  - name: auto_rgaPowerCycle
+    description: |-
+      Auto-generated entity for rgaPowerCycle.template
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device prefix
+      PORT:
+        type: str
+        description: |-
+          EtherIP port name
+      TAG:
+        type: str
+        description: |-
+          EtherIP tag name
+
+    databases:
+      - file: $(SR_VA)/db/rgaPowerCycle.template
+        args:
+          .*:
+
+  - name: common
+    description: |-
+      Storage ring vacuum IOC common setup. Expands common.xml with
+      EPICS environment settings, PV logging, devIocStats, rack fan/PSU
+      digital inputs, terminal server ports, and controller status.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Domain, e.g. SR02C. The cell number (e.g. 02) is extracted
+          from this to derive cell/subnet used in sub_entities.
+      serverip:
+        type: str
+        description: |-
+          Server IP address(es) used for EPICS_CAS_BEACON_ADDR_LIST.
+      eip_port:
+        type: str
+        description: |-
+          EtherIP port name for the vacuum PLC.
+        default: VLVCC_01_EIP
+
+    sub_entities:
+      - type: pvlogging.PvLogging
+      - type: epics.EpicsEnvSet
+        name: EPICS_CA_AUTO_ADDR_LIST
+        value: "NO"
+      - type: epics.EpicsEnvSet
+        name: EPICS_CA_ADDR_LIST
+        value: "172.23.207.255"
+      - type: epics.EpicsEnvSet
+        name: EPICS_CAS_AUTO_BEACON_ADDR_LIST
+        value: "NO"
+      - type: epics.EpicsEnvSet
+        name: EPICS_CAS_BEACON_ADDR_LIST
+        value: "{{ serverip }}"
+
+      # RGA power-cycle controls for 3 RGAs
+      - type: SR-VA.auto_rgaPowerCycle
+        PORT: "{{ eip_port }}"
+        TAG: RGA_S_01_RESET
+        device: "SR{{ dom[2:4] }}S-VA-RGA-01"
+      - type: SR-VA.auto_rgaPowerCycle
+        PORT: "{{ eip_port }}"
+        TAG: RGA_A_01_RESET
+        device: "SR{{ dom[2:4] }}A-VA-RGA-01"
+      - type: SR-VA.auto_rgaPowerCycle
+        PORT: "{{ eip_port }}"
+        TAG: RGA_A_02_RESET
+        device: "SR{{ dom[2:4] }}A-VA-RGA-02"
+
+      # Digital-in aggregators for rack fan + PSU status
+      - type: dlsPLC.NX102_digitalIn
+        device: "SR{{ dom[2:4] }}C-VA-VLVCC-01:DIGITAL01"
+        name: DIG_01
+        port: "{{ eip_port }}"
+        tagidx: 1
+      - type: dlsPLC.NX102_digitalIn
+        device: "SR{{ dom[2:4] }}C-VA-VLVCC-01:DIGITAL02"
+        name: DIG_02
+        port: "{{ eip_port }}"
+        tagidx: 2
+
+      # Per-rack fan/PSU status bi records (soft channel from DIGITAL01 raw bits)
+      - type: userIO.bi
+        DESC: Rack 01 Fan Status
+        DTYP: Soft Channel
+        INP: "SR{{ dom[2:4] }}C-VA-VLVCC-01:DIGITAL01:RAWBIT.B0 CP"
+        ONAM: HEALTHY
+        OSV: NO_ALARM
+        P: "SR{{ dom[2:4] }}C-VA-FANC-01"
+        R: ":STA"
+        SCAN: Passive
+        ZNAM: FAIL
+        ZSV: MAJOR
+        archiver_rate: 3600 Monitor
+      - type: userIO.bi
+        DESC: Rack 02 Fan Status
+        DTYP: Soft Channel
+        INP: "SR{{ dom[2:4] }}C-VA-VLVCC-01:DIGITAL01:RAWBIT.B1 CP"
+        ONAM: HEALTHY
+        OSV: NO_ALARM
+        P: "SR{{ dom[2:4] }}C-VA-FANC-02"
+        R: ":STA"
+        SCAN: Passive
+        ZNAM: FAIL
+        ZSV: MAJOR
+        archiver_rate: 3600 Monitor
+      - type: userIO.bi
+        DESC: Rack 03 Fan Status
+        DTYP: Soft Channel
+        INP: "SR{{ dom[2:4] }}C-VA-VLVCC-01:DIGITAL01:RAWBIT.B2 CP"
+        ONAM: HEALTHY
+        OSV: NO_ALARM
+        P: "SR{{ dom[2:4] }}C-VA-FANC-03"
+        R: ":STA"
+        SCAN: Passive
+        ZNAM: FAIL
+        ZSV: MAJOR
+        archiver_rate: 3600 Monitor
+      - type: userIO.bi
+        DESC: Rack 01 Duplex PSU Status
+        DTYP: Soft Channel
+        INP: "SR{{ dom[2:4] }}C-VA-VLVCC-01:DIGITAL01:RAWBIT.B3 CP"
+        ONAM: HEALTHY
+        OSV: NO_ALARM
+        P: "SR{{ dom[2:4] }}C-VA-PSU-01"
+        R: ":STA"
+        SCAN: Passive
+        ZNAM: FAIL
+        ZSV: MAJOR
+        archiver_rate: 3600 Monitor
+      - type: userIO.bi
+        DESC: Rack 02 Duplex PSU Status
+        DTYP: Soft Channel
+        INP: "SR{{ dom[2:4] }}C-VA-VLVCC-01:DIGITAL01:RAWBIT.B4 CP"
+        ONAM: HEALTHY
+        OSV: NO_ALARM
+        P: "SR{{ dom[2:4] }}C-VA-PSU-02"
+        R: ":STA"
+        SCAN: Passive
+        ZNAM: FAIL
+        ZSV: MAJOR
+        archiver_rate: 3600 Monitor
+
+      # Duplex power-supply channel monitors
+      - type: dlsPLC.NX102_powerSupply
+        device: "SR{{ dom[2:4] }}C-VA-PSU-01:1"
+        name: PSU01.1
+        port: "{{ eip_port }}"
+        tagidx: 1
+      - type: dlsPLC.NX102_powerSupply
+        device: "SR{{ dom[2:4] }}C-VA-PSU-01:2"
+        name: PSU01.2
+        port: "{{ eip_port }}"
+        tagidx: 2
+      - type: dlsPLC.NX102_powerSupply
+        device: "SR{{ dom[2:4] }}C-VA-PSU-02:1"
+        name: PSU02.1
+        port: "{{ eip_port }}"
+        tagidx: 3
+      - type: dlsPLC.NX102_powerSupply
+        device: "SR{{ dom[2:4] }}C-VA-PSU-02:2"
+        name: PSU02.2
+        port: "{{ eip_port }}"
+        tagidx: 4
+
+      # IR-vacuum front-end valve
+      - type: dlsPLC.NX102_IRVacuum
+        P: "SR{{ dom[2:4] }}A-VA-VALVE-01"
+        port: "{{ eip_port }}"
+
+      # Terminal servers
+      - type: terminalServer.Moxa16
+        HOST: "192.168.{{ '%d' % (dom[2:4] | int) }}.11"
+        NCHANS: 16
+        P: "SR{{ dom[2:4] }}C-VA-TSERV-01"
+        R: ""
+        name: TSERV1
+      - type: terminalServer.Moxa16
+        HOST: "192.168.{{ '%d' % (dom[2:4] | int) }}.12"
+        NCHANS: 16
+        P: "SR{{ dom[2:4] }}C-VA-TSERV-02"
+        R: ""
+        name: TSERV2
+
+      # Controller status (PLC heartbeat/diagnostics)
+      - type: dlsPLC.NX102_controller_status
+        device: "SR{{ dom[2:4] }}C-VA-VLVCC-01"
+        name: PLC_CS
+        port: "{{ eip_port }}"
+
+  - name: gaugeSet
+    description: |-
+      mks937b-based gauge-set pair. Instantiates an mks937b controller,
+      two gauges (IMG/Pirani) with EGU templates, twelve relay templates,
+      fast-relay templates, digital-in channels and a relay-status select
+      record. Used where gauges are read back through the MKS 937b.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Domain prefix, e.g. SR04SS.
+      gc_no:
+        type: str
+        description: |-
+          Gauge controller number (e.g. "01").
+      id_a:
+        type: str
+        description: |-
+          First gauge id (e.g. "01").
+      id_b:
+        type: str
+        description: |-
+          Second gauge id (e.g. "02").
+      q:
+        type: str
+        description: |-
+          Quadrant identifier (e.g. S, A, SS, KS).
+      eip_port:
+        type: str
+        description: |-
+          EtherIP port name for PLC readbacks.
+        default: VLVCC_01_EIP
+      address:
+        type: str
+        description: |-
+          MKS 937b serial address.
+        default: "001"
+
+    sub_entities:
+      - type: mks937b.mks937b
+        address: "{{ address }}"
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}"
+        name: "GCTLR_{{ q }}_{{ gc_no }}"
+        port: "GCTLR_{{ q }}_{{ gc_no }}_PORT"
+      - type: dlsPLC.NX102_readReal
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C1_RAW"
+        name: "PLC_COMB{{ q }}{{ id_a }}"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Comb[1]"
+      - type: dlsPLC.NX102_readReal
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C2_RAW"
+        name: "PLC_COMB{{ q }}{{ id_b }}"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Comb[2]"
+      - type: mks937b.mks937bGaugeEGU
+        dom: "{{ dom }}"
+        id: "{{ id_a }}"
+        input: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C1_RAW"
+        name: "GAUGE_{{ q }}_{{ id_a }}"
+        device: "{{ dom }}-VA-GAUGE-{{ id_a }}:PLOG_CALC"
+        p_egu_pv: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C1_RAW"
+        plog_adc_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:PLOG_CALC"
+        plog_calc: A
+      - type: mks937b.mks937bGaugeEGU
+        dom: "{{ dom }}"
+        id: "{{ id_b }}"
+        input: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C2_RAW"
+        name: "GAUGE_{{ q }}_{{ id_b }}"
+        device: "{{ dom }}-VA-GAUGE-{{ id_b }}:PLOG_CALC"
+        p_egu_pv: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C2_RAW"
+        plog_adc_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:PLOG_CALC"
+        plog_calc: A
+      - type: mks937b.mks937bImg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 1
+        device: "{{ dom }}-VA-IMG-{{ id_a }}"
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:ILKSETSP:NOWRITE"
+        name: "IMG_{{ q }}{{ id_a }}"
+      - type: mks937b.mks937bImg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 3
+        ctl_channel: 1
+        device: "{{ dom }}-VA-IMG-{{ id_b }}"
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:ILKSETSP:NOWRITE"
+        name: "IMG_{{ q }}{{ id_b }}"
+      - type: mks937b.mks937bPirg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 5
+        device: "{{ dom }}-VA-PIRG-{{ id_a }}"
+        name: "PIR_{{ q }}{{ id_a }}"
+      - type: mks937b.mks937bPirg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 6
+        device: "{{ dom }}-VA-PIRG-{{ id_b }}"
+        name: "PIR_{{ q }}{{ id_b }}"
+      - type: dlsPLC.NX102_digitalIn
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:DIG01"
+        name: "GCTLR_{{ q }}_{{ gc_no }}.DIG01"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Digital"
+        tagidx: 1
+      - type: dlsPLC.NX102_digitalIn
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:DIG02"
+        name: "GCTLR_{{ q }}_{{ gc_no }}.DIG02"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Digital"
+        tagidx: 2
+      - type: SR-VA.auto_mks937bRelaysAlias
+        dom: "{{ dom }}"
+        gc_no: "{{ gc_no }}"
+        id_a: "{{ id_a }}"
+        id_b: "{{ id_b }}"
+
+  - name: gaugeSetA
+    description: |-
+      mks937a-based gauge-set pair. Instantiates an mks937a controller,
+      two IMGs, two Piranis, gauge EGU templates, PLC combined-pressure
+      readbacks and digital-in channels. Used where gauges are read back
+      through the MKS 937a.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Domain prefix, e.g. SR04A.
+      gc_no:
+        type: str
+        description: |-
+          Gauge controller number (e.g. "01").
+      id_a:
+        type: str
+        description: |-
+          First gauge id (e.g. "01").
+      id_b:
+        type: str
+        description: |-
+          Second gauge id (e.g. "02").
+      q:
+        type: str
+        description: |-
+          Quadrant identifier (e.g. S, A).
+      eip_port:
+        type: str
+        description: |-
+          EtherIP port name for PLC readbacks.
+        default: VLVCC_01_EIP
+
+    sub_entities:
+      - type: mks937a.mks937a
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}"
+        name: "GCTLR_{{ q }}_{{ gc_no }}"
+        port: "GCTLR_{{ q }}_{{ gc_no }}_PORT"
+      - type: dlsPLC.NX102_readReal
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C1_RAW"
+        name: "PLC_COMB{{ q }}{{ id_a }}"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Comb[1]"
+      - type: dlsPLC.NX102_readReal
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C2_RAW"
+        name: "PLC_COMB{{ q }}{{ id_b }}"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Comb[2]"
+      - type: mks937a.mks937aGaugeEGU
+        dom: "{{ dom }}"
+        id: "{{ id_a }}"
+        input: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C1_RAW"
+      - type: mks937a.mks937aGaugeEGU
+        dom: "{{ dom }}"
+        id: "{{ id_b }}"
+        input: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C2_RAW"
+      - type: mks937a.mks937aImg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 1
+        device: "{{ dom }}-VA-IMG-{{ id_a }}"
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:ILKSETSP:NOWRITE"
+      - type: mks937a.mks937aImg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 2
+        device: "{{ dom }}-VA-IMG-{{ id_b }}"
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:ILKSETSP:NOWRITE"
+      - type: mks937a.mks937aPirg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 4
+        device: "{{ dom }}-VA-PIRG-{{ id_a }}"
+      - type: mks937a.mks937aPirg
+        GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
+        channel: 5
+        device: "{{ dom }}-VA-PIRG-{{ id_b }}"
+      - type: dlsPLC.NX102_digitalIn
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:DIG01"
+        name: "GCTLR_{{ q }}_{{ gc_no }}.DIG01"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Digital"
+        tagidx: 1
+      - type: dlsPLC.NX102_digitalIn
+        device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:DIG02"
+        name: "GCTLR_{{ q }}_{{ gc_no }}.DIG02"
+        port: "{{ eip_port }}"
+        tag: "GCTLR_{{ q }}_{{ gc_no }}.Digital"
+        tagidx: 2
+
+  - name: auto_ecatDuplexPSUStatus
+    description: |-
+      Auto-generated entity for ecatDuplexPSUStatus.template — soft-channel
+      bi records tracking rack fan alarms and server PSU status via the
+      EtherCAT digital-in modules on the vacuum IOC.
+    parameters:
+      cell:
+        type: str
+        description: |-
+          SR cell number (e.g. "02"). Used to form SR$(cell)C-VA-IOC-01
+          PV prefixes.
+
+    databases:
+      - file: $(SR_VA)/db/ecatDuplexPSUStatus.template
+        args:
+          .*:
+
+  - name: auto_mks937bRelaysAlias
+    description: |-
+      Auto-generated entity for mks937bRelaysAlias.template — defines alias
+      records so the 12 MKS 937B gauge-controller relays (RLY1..RLY12) are
+      also reachable under the IMG/PIRG PV names used by the gauge-set pair.
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Domain prefix, e.g. SR04SS.
+      gc_no:
+        type: str
+        description: |-
+          Gauge controller number (e.g. "01").
+      id_a:
+        type: str
+        description: |-
+          First gauge id (e.g. "01").
+      id_b:
+        type: str
+        description: |-
+          Second gauge id (e.g. "02").
+
+    databases:
+      - file: $(SR_VA)/db/mks937bRelaysAlias.template
+        args:
+          .*:
+
+  - name: auto_psu24vStatus
+    description: |-
+      Auto-generated entity for psu24vStatus.template — duplex 24V PSU status
+      soft-channel bi record, reading a Hy8001 digital input bit.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Device name
+      card:
+        type: int
+        description: |-
+          VME card number
+        default: 60
+      signal:
+        type: int
+        description: |-
+          Card signal number
+        default: 4
+      znam:
+        type: str
+        description: |-
+          Zero value enumerated string
+        default: FAIL
+      onam:
+        type: str
+        description: |-
+          One value enumerated string
+        default: HEALTHY
+      zsv:
+        type: str
+        description: |-
+          Zero value severity code
+        default: MAJOR
+      osv:
+        type: str
+        description: |-
+          One value severity code
+        default: NO_ALARM
+
+    databases:
+      - file: $(SR_VA)/db/psu24vStatus.template
+        args:
+          .*:

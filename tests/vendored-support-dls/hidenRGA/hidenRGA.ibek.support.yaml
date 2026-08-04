@@ -1,0 +1,164 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json
+
+module: hidenRGA
+
+entity_models:
+  - name: hidenRGA
+    description: |-
+      Hiden Analytical RGA (Residual Gas Analyser), generic variant, 100 amu.
+      Loads hiden_generic.db which includes: global controls (state, filaments,
+      PSU, LEDs, error handling), bar scan (1-100 amu), MID scan (24 channels,
+      default masses 1-24 amu), degas control, and per-mass sensitivity array.
+      MID scan masses can be reconfigured at runtime via $(P)$(Q):MID:N:M_SP PVs.
+    parameters:
+      PORT:
+        type: object
+        description: |-
+          Name of the asyn port for StreamDevice communication.
+          Must be the name of a companion asyn.AsynIP entity.
+      P:
+        type: str
+        description: PV prefix, e.g. "BL01I-EA-RGA-01"
+      Q:
+        type: str
+        description: PV suffix. Defaults to empty string.
+        default: ""
+      BUFFER_SIZE:
+        type: int
+        description: Number of samples in the MID scan rolling results buffer per mass channel.
+        default: 1000
+      MASS_RANGE:
+        type: int
+        description: Mass range of RGA in amu.
+        default: 100
+      HMT_RC:
+        type: int
+        description: Set to 1 for high pressure HMT RC variant.
+        default: 0
+    databases:
+      - file: $(HIDENRGA)/db/hiden_generic.db
+        args:
+          .*:
+    post_init:
+      - value: |
+          seq(sncDegas, "P={{P}}{{Q}}")
+
+  - name: hidenRGA_HMT
+    description: |-
+      Hiden HMT RC RGA, high-pressure variant, 100 amu.
+      Loads hiden_HMT.db which is identical to the generic database but with
+      HMT_RC=1 compiled in, enabling the mode selection record (RGA/HP-RGA/VHP-RGA)
+      and disabling records not valid for the HMT high-pressure variant.
+    parameters:
+      PORT:
+        type: object
+        description: |-
+          Name of the asyn port for StreamDevice communication.
+          Must be the name of a companion asyn.AsynIP entity.
+      P:
+        type: str
+        description: PV prefix, e.g. "BL01I-EA-RGA-01"
+      Q:
+        type: str
+        description: PV suffix. Defaults to empty string.
+        default: ""
+      BUFFER_SIZE:
+        type: int
+        description: Number of samples in the MID scan rolling results buffer per mass channel.
+        default: 1000
+      MASS_RANGE:
+        type: int
+        description: Mass range of RGA in amu.
+        default: 100
+      HMT_RC:
+        type: int
+        description: Set to 1 for high pressure HMT RC variant.
+        default: 0
+    databases:
+      - file: $(HIDENRGA)/db/hiden_HMT.db
+        args:
+          .*:
+    post_init:
+      - value: |
+          seq(sncDegas, "P={{P}}{{Q}}")
+
+  - name: hidenRGA_hpr20
+    description: |-
+      Hiden HPR-20 High Pressure Gas Analyser, 200 amu, SEM detector.
+      Specialised for the Diamond High Pressure Sample Environment project.
+      Loads hiden_hpr20.db which extends the generic database with:
+        - 200 amu bar scan and sensitivity array
+        - AUX1 (auxiliary voltage), IO1, IO2 MID channels in addition to 21 mass channels
+        - hiden_hpr20_valve_state.template (valve temperature calibration, baked in)
+      SEM detector (DETECTOR=1) is the default for mass channels.
+    parameters:
+      PORT:
+        type: object
+        description: |-
+          Name of the asyn port for StreamDevice communication.
+          Must be the name of a companion asyn.AsynIP entity.
+      P:
+        type: str
+        description: PV prefix, e.g. "BL01I-EA-RGA-01"
+      Q:
+        type: str
+        description: PV suffix. Defaults to empty string.
+        default: ""
+      BUFFER_SIZE:
+        type: int
+        description: Number of samples in the MID scan rolling results buffer per mass channel.
+        default: 1000
+      MASS_RANGE:
+        type: int
+        description: Mass range of RGA in amu.
+        default: 100
+      HMT_RC:
+        type: int
+        description: Set to 1 for high pressure HMT RC variant.
+        default: 0
+    databases:
+      - file: $(HIDENRGA)/db/hiden_hpr20.db
+        args:
+          .*:
+    post_init:
+      - value: |
+          seq(sncDegas, "P={{P}}{{Q}}")
+
+  - name: hidenRGA_qga
+    description: |-
+      Hiden QGA Quad Gas Analyser, 200 amu, Faraday detector.
+      Loads hiden_qga.db which extends the generic database to 200 amu
+      (bar scan, sensitivity array, and MID scan mass range) while retaining
+      the standard Faraday detector configuration.
+    parameters:
+      PORT:
+        type: object
+        description: |-
+          Name of the asyn port for StreamDevice communication.
+          Must be the name of a companion asyn.AsynIP entity.
+      P:
+        type: str
+        description: PV prefix, e.g. "BL01I-EA-RGA-01"
+      Q:
+        type: str
+        description: PV suffix. Defaults to empty string.
+        default: ""
+      BUFFER_SIZE:
+        type: int
+        description: Number of samples in the MID scan rolling results buffer per mass channel.
+        default: 1000
+      MASS_RANGE:
+        type: int
+        description: Mass range of RGA in amu.
+        default: 100
+      HMT_RC:
+        type: int
+        description: Set to 1 for high pressure HMT RC variant.
+        default: 0
+    databases:
+      - file: $(HIDENRGA)/db/hiden_qga.db
+        args:
+          .*:
+    post_init:
+      - value: |
+          seq(sncDegas, "P={{P}}{{Q}}")

@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/1.2.0/ibek.support.schema.json
+
+module: rackFan
+
+entity_models:
+  - name: rackFan_rio
+    description: |-
+      Template for rack fan digital input indication via EtherCAT RIO module also used for rack DUPLEX power supply status.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name prefix - rack and parameter monitored.
+
+      rio_dinput:
+        type: str
+        description: |-
+          Mandatory.  The EtherCAT remote io digital input signal.
+
+      DESC:
+        type: str
+        description: |-
+          Optional.   The PV DESC field description.  Defaults to "Status of rack fan".
+        default: Status of rack fan
+
+    databases:
+      - file: $(RACKFAN)/db/rackFan_rio.template
+        args:
+          device:
+          rio_dinput:
+          DESC:
+
+  - name: rackFan
+    description: |-
+      Template for rack fan digital input indication via VME card also used for rack DUPLEX power supply status.
+    parameters:
+      device:
+        type: str
+        description: |-
+          Mandatory.  Device name prefix - rack and parameter monitored.
+
+      c:
+        type: int
+        description: |-
+          Mandatory.  Hy8001 (or other) digital input card number.
+
+      s:
+        type: int
+        description: |-
+          Mandatory.  Hy8001 (or other) digital input signal number.
+
+      DTYP:
+        type: str
+        description: |-
+          Optional.  The device type for the rack fan signal, i.e. which digital card is in use.  Defaults to Hy8001.
+        default: Hy8001
+
+      DESC:
+        type: str
+        description: |-
+          Optional.  the PV DESC field description.  Defaults to "Status of rack fan".
+        default: Status of rack fan
+
+    databases:
+      - file: $(RACKFAN)/db/rackFan.template
+        args:
+          device:
+          c:
+          DTYP:
+          s:
+          DESC:

@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json
+
+module: transfocator
+
+entity_models:
+  - name: transfocator
+    description: |-
+      Transfocator compound refractive lens system controller.
+      Communicates with a Delta Tau GeoBrick via StreamDevice to manage
+      filter insertion/retraction, homing, and position readback.
+      Loads transfocator.db and starts the recover sequencer.
+    parameters:
+      P:
+        type: str
+        description: Device prefix, e.g. "BL04I-MO-FSWT-01"
+      Q:
+        type: str
+        description: Device suffix.
+        default: ""
+      PORT:
+        type: str
+        description: Asyn port name for the Delta Tau GeoBrick (e.g. BRICK_4).
+      PLC:
+        type: int
+        description: Main control PLC number.
+      PLC_MASK:
+        type: int
+        description: EPICS interface PLC number.
+      PLC_HOME:
+        type: int
+        description: Homing PLC number.
+      PLC_IN:
+        type: int
+        description: PLC number to fire filter in.
+      PLC_OUT:
+        type: int
+        description: PLC number to fire filter out.
+      TRANSLATION:
+        type: int
+        description: Translation axis number.
+      ROCKER:
+        type: int
+        description: Rocker axis number.
+    databases:
+      - file: $(TRANSFOCATOR)/db/transfocator.db
+        args:
+          .*:
+    pre_init:
+      - value: |
+          seq recover, "P={{P}}"
+
+  - name: BL04I_beamsizeCalc
+    description: |-
+      BL04I beam-size calculator for the transfocator.
+      Predicts the number of lenses needed for a requested beam size and
+      calculates the resulting vertical, horizontal, and flux density values.
+      Loads BL04I_beamsizeCalc.template.
+    parameters:
+      P:
+        type: str
+        description: Device prefix, e.g. "BL04I-MO-FSWT-01"
+      Q:
+        type: str
+        description: Device suffix.
+        default: ""
+    databases:
+      - file: $(TRANSFOCATOR)/db/BL04I_beamsizeCalc.template
+        args:
+          .*:

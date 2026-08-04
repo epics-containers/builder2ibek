@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: ADAndor
+
+entity_models:
+
+  - name: andorCCD
+    description: |-
+      Creates a andorCCD camera areaDetector driver
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device Prefix
+      R:
+        type: str
+        description: |-
+          Device Suffix
+      PORT:
+        type: id
+        description: |-
+          Port name for the detector
+      TIMEOUT:
+        type: int
+        description: |-
+          Timeout
+        default: 1
+      ADDR:
+        type: int
+        description: |-
+          Asyn Port address
+        default: 0
+      SCANRATE:
+        type: enum
+        description: |-
+          Specified scan rate for cpu intensive PVs
+        default: I/O Intr
+        values:
+          .1 second:
+          .2 second:
+          .5 second:
+          1 second:
+          2 second:
+          5 second:
+          10 second:
+          I/O Intr:
+          Event:
+          Passive:
+      SHAMROCKID:
+        type: int
+        description: |-
+          The index number of the Shamrock spectrograph, if installed.
+        default: 0
+      BUFFERS:
+        type: int
+        description: |-
+          Maximum number of NDArray buffers to be created for plugin callbacks
+        default: 50
+      MEMORY:
+        type: int
+        description: |-
+          Max memory to allocate, should be maxw*maxh*nbuffer for driver and all attached plugins
+        default: 0
+      INSTALLPATH:
+        type: str
+        description: |-
+          Path containing the detector INI files.
+        default: /epics/support/andorCCDSDK/andorCCDSDKApp/src/sdk/andor/etc
+      PRIORITY:
+        type: int
+        description: |-
+          The thread priority for the asyn port driver thread
+        default: 0
+      STACKSIZE:
+        type: int
+        description: |-
+          The stack size for the asyn port driver thread
+        default: 100000
+
+    pre_init:
+      - value: |
+          # andorCCDConfig(portName, installPath, shamrockID, maxBuffers, maxMemory, priority, stackSize)
+          andorCCDConfig("{{PORT}}", "{{INSTALLPATH}}", {{SHAMROCKID}}, {{BUFFERS}}, {{MEMORY}}, {{PRIORITY}}, {{STACKSIZE}})
+
+    databases:
+      - file: $(ADANDOR)/db/andorCCD.template
+        args:
+          P:
+          R:
+          PORT:
+          TIMEOUT:
+          ADDR:
+          SCANRATE:
+      - file: $(ADANDOR)/db/andorCCD-DLSGui.template
+        args:
+          P:
+          R:
+          PORT:
+
+    pvi:
+      yaml_path: AndorCCD.pvi.device.yaml
+      pv_prefix: "{{ P }}"
+      ui_macros:
+        P:
+        R:

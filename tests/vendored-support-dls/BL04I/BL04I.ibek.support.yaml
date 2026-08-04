@@ -1,0 +1,259 @@
+# yaml-language-server: $schema=../schemas/ibek.support.schema.json
+
+module: BL04I
+
+entity_models:
+  - name: auto_BL04I_flux
+    description: |-
+      Auto-generated entity for BL04I_flux.template
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+
+    databases:
+      - file: $(BL04I)/db/BL04I_flux.template
+        args:
+          .*:
+
+  - name: auto_asynMotorAlias
+    description: |-
+      Auto-generated entity for asynMotorAlias.template
+    parameters:
+      P:
+        type: str
+        description: |-
+          Motor record PV
+      alias:
+        type: str
+        description: |-
+          Alias PV name
+
+    databases:
+      - file: $(BL04I)/db/asynMotorAlias.template
+        args:
+          .*:
+
+  - name: auto_GonioReady
+    description: |-
+      Auto-generated entity for GonioReady.db
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+        default: undefined
+
+    databases:
+      - file: $(BL04I)/db/GonioReady.db
+        args:
+          .*:
+
+  - name: auto_Detector_Z_Status
+    description: |-
+      Auto-generated entity for Detector_Z_Status.db
+    parameters:
+      dom:
+        type: str
+        description: |-
+          Beamline domain
+
+    databases:
+      - file: $(BL04I)/db/Detector_Z_Status.db
+        args:
+          .*:
+
+  - name: generic_scan
+    description: |-
+      Scan record with menus for positioner, trigger, and detector defaults.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      S:
+        type: str
+        description: |-
+          Device suffix
+      MPTS:
+        type: int
+        description: |-
+          Maximum number of points in a scan
+      P1:
+        type: str
+        description: |-
+          Positioner 1 default pv
+        default: ""
+      P2:
+        type: str
+        description: |-
+          Positioner 2 default pv
+        default: ""
+      P3:
+        type: str
+        description: |-
+          Positioner 3 default pv
+        default: ""
+      P4:
+        type: str
+        description: |-
+          Positioner 4 default pv
+        default: ""
+      T1:
+        type: str
+        description: |-
+          Trigger 1 default pv
+        default: ""
+      T2:
+        type: str
+        description: |-
+          Trigger 2 default pv
+        default: ""
+      T3:
+        type: str
+        description: |-
+          Trigger 3 default pv
+        default: ""
+      T4:
+        type: str
+        description: |-
+          Trigger 4 default pv
+        default: ""
+      D01:
+        type: str
+        description: |-
+          Detector 1 default pv
+        default: ""
+      D02:
+        type: str
+        description: |-
+          Detector 2 default pv
+        default: ""
+      D03:
+        type: str
+        description: |-
+          Detector 3 default pv
+        default: ""
+      D04:
+        type: str
+        description: |-
+          Detector 4 default pv
+        default: ""
+      D05:
+        type: str
+        description: |-
+          Detector 5 default pv
+        default: ""
+      D06:
+        type: str
+        description: |-
+          Detector 6 default pv
+        default: ""
+      D07:
+        type: str
+        description: |-
+          Detector 7 default pv
+        default: ""
+      D08:
+        type: str
+        description: |-
+          Detector 8 default pv
+        default: ""
+
+    databases:
+      - file: $(GENERIC)/db/generic-scan.template
+        args:
+          .*:
+
+  - name: generic_2d_scan
+    description: |-
+      Two-dimensional scan using 2 scan records.
+    parameters:
+      P:
+        type: str
+        description: |-
+          Device prefix
+      S:
+        type: str
+        description: |-
+          Device suffix
+      MPTS:
+        type: int
+        description: |-
+          Maximum number of points in a scan
+      P1:
+        type: str
+        description: |-
+          Positioner 1 default pv (Outer trace)
+        default: ""
+      P2:
+        type: str
+        description: |-
+          Positioner 2 default pv (Inner trace)
+        default: ""
+      T1:
+        type: str
+        description: |-
+          Trigger 1 default pv
+        default: ""
+      T2:
+        type: str
+        description: |-
+          Trigger 2 default pv
+        default: ""
+      T3:
+        type: str
+        description: |-
+          Trigger 3 default pv
+        default: ""
+      T4:
+        type: str
+        description: |-
+          Trigger 4 default pv
+        default: ""
+      D01:
+        type: str
+        description: |-
+          Detector 1 default pv
+        default: ""
+      D02:
+        type: str
+        description: |-
+          Detector 2 default pv
+        default: ""
+      D03:
+        type: str
+        description: |-
+          Detector 3 default pv
+        default: ""
+      D04:
+        type: str
+        description: |-
+          Detector 4 default pv
+        default: ""
+      D05:
+        type: str
+        description: |-
+          Detector 5 default pv
+        default: ""
+      D06:
+        type: str
+        description: |-
+          Detector 6 default pv
+        default: ""
+      D07:
+        type: str
+        description: |-
+          Detector 7 default pv
+        default: ""
+      D08:
+        type: str
+        description: |-
+          Detector 8 default pv
+        default: ""
+
+    databases:
+      - file: $(GENERIC)/db/generic-2d-scan.template
+        args:
+          .*:

@@ -1,0 +1,143 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.1.2/ibek.support.schema.json
+
+module: mirror
+
+entity_models:
+  - name: mirror2post
+    description: |-
+      Two-post mirror control. Computes pitch and offset soft motors from two
+      real jack motors using geometric transforms. The controlling soft motors
+      will be $(P):$(OFFSET) and $(P):$(PITCH).
+    parameters:
+      P:
+        type: str
+        description: Device prefix
+      PITCH:
+        type: str
+        description: |-
+          Name of motion when motor 1 and 2 are driven in opposition
+          (soft motor name will be $(P):$(PITCH))
+      OFFSET:
+        type: str
+        description: |-
+          Name of motion when motor 1 and 2 are driven forward together
+          (soft motor name will be $(P):$(OFFSET))
+      JACK1:
+        type: str
+        description: Real motor 1 (name will be $(P):$(JACK1))
+      JACK2:
+        type: str
+        description: Real motor 2 (name will be $(P):$(JACK2))
+      CTOM1:
+        type: float
+        description: Length from motor 1 to pivot centre
+      CTOM2:
+        type: float
+        description: Length from motor 2 to pivot centre
+      CDEPTH:
+        type: float
+        description: Depth from mirror surface to pivot centre
+      MAXOFFSET:
+        type: float
+        description: Maximum allowed offset
+      MINOFFSET:
+        type: float
+        description: Minimum allowed offset
+      PITCHLIM:
+        type: float
+        description: Pitch limit (range is +/- this value)
+      SUFFIX:
+        type: str
+        description: |-
+          If 2 mirror2post templates are used on the same $(P) use this
+          to give template records a unique name
+        default: ""
+      gda_name:
+        type: str
+        description: GDA name
+        default: ""
+      gda_desc:
+        type: str
+        description: GDA description
+        default: ""
+    databases:
+      - file: $(MIRROR)/db/mirror2post.template
+        args:
+          .*:
+
+  - name: mirror3jack
+    description: |-
+      Three-jack mirror/table control. Computes height, pitch, and roll soft
+      motors from three real jack motors using geometric transforms.
+    parameters:
+      P:
+        type: str
+        description: Device prefix
+      HEIGHT:
+        type: str
+        description: |-
+          Name of motion when all motors are driven forward together
+          (soft motor name will be $(P):$(HEIGHT))
+      PITCH:
+        type: str
+        description: |-
+          Name of motion when motor 1 driven in opposition to motor 2 & 3
+          (soft motor name will be $(P):$(PITCH))
+      ROLL:
+        type: str
+        description: |-
+          Name of motion when motor 2 driven in opposition to motor 3
+          (soft motor name will be $(P):$(ROLL))
+      JACK1:
+        type: str
+        description: Real motor 1 (name will be $(P):$(JACK1))
+      JACK2:
+        type: str
+        description: Real motor 2 (name will be $(P):$(JACK2))
+      JACK3:
+        type: str
+        description: Real motor 3 (name will be $(P):$(JACK3))
+      LENGTH:
+        type: float
+        description: Length from motor 1 to centre between motor 2 & 3
+      WIDTH:
+        type: float
+        description: Width from motor 2 to motor 3
+      MAXHEIGHT:
+        type: float
+        description: Maximum allowed height
+      MINHEIGHT:
+        type: float
+        description: Minimum allowed height
+      PITCHLIM:
+        type: float
+        description: Pitch limit (range is +/- this value)
+      ROLLLIM:
+        type: float
+        description: Roll limit (range is +/- this value)
+      ANGLESCALE:
+        type: float
+        description: |-
+          Set to 1 for radians, 1000 for mRad. Make negative to reverse rotations.
+      ANGLEUNIT:
+        type: str
+        description: |-
+          The pitch and roll EGU (set to match ANGLESCALE)
+      SUFFIX:
+        type: str
+        description: |-
+          If 2 mirror3jack templates are used on the same $(P) use this
+          to give template records a unique name
+        default: ""
+      gda_name:
+        type: str
+        description: GDA name
+        default: ""
+      gda_desc:
+        type: str
+        description: GDA description
+        default: ""
+    databases:
+      - file: $(MIRROR)/db/mirror3jack.template
+        args:
+          .*:

@@ -78,10 +78,23 @@ Fix any regressions before finishing.
 Do **not** run `./update-schema` or `xml2yaml` — the orchestrator handles
 re-runs.
 
+## Step 4b — Check the vendored dls copy
+
+If you edited anything under `ibek-support-dls/`, run:
+
+```bash
+python3 tests/vendor_support_dls.py --check
+```
+
+**Report the result, do not act on it.** The vendored copy can only be refreshed
+from a commit that is pushed and pinned here, so `PENDING` is the normal answer
+while your change is still uncommitted. See `tests/vendored-support-dls/README.md`.
+
 ## Step 5 — Report
 
 Return a summary of:
 - What errors were fixed and how
+- Whether `vendor_support_dls.py --check` flagged the vendored copy
 - Whether a **converter fix** was also needed (orchestrator must re-run
   `xml2yaml` if so)
 - Any errors that could not be resolved (with explanation)

@@ -160,6 +160,22 @@ Fix any failures before finishing.
 
 Do **not** run `./update-schema` — the orchestrator handles that.
 
+## Step 9b — Check the vendored dls copy
+
+If you wrote to `ibek-support-dls/`, CI may need the vendored copy refreshed —
+it is what lets GitHub Actions test dls modules at all, since it cannot reach
+Diamond's GitLab.
+
+```bash
+python3 tests/vendor_support_dls.py --check
+```
+
+**Report the result, do not try to fix it.** Re-vendoring is only possible once
+the dls change is committed, pushed, and the submodule pin bumped here — the
+script refuses to copy an uncommitted working tree, because the vendored files
+must correspond to a commit others can fetch. A `PENDING` result is therefore
+the expected outcome mid-task, not a failure.
+
 ## Step 10 — Report
 
 Return a summary of:
@@ -168,3 +184,5 @@ Return a summary of:
 - Any uncertainties (e.g. "could not find builder.py", "unclear pre_init")
 - Whether a converter was created or modified (orchestrator needs to know
   whether to re-run `xml2yaml`)
+- Whether `vendor_support_dls.py --check` reported the vendored copy as stale
+  or pending, so the pin bump and `--update` are not forgotten
