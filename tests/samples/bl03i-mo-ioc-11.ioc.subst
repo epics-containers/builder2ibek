@@ -65,6 +65,6 @@ pattern
 
 file "$(POSITIONER)/db/motorpositioner.template" {
 pattern 
-	{ "type",                       "entity_enabled", "Q",    "MP",    "motor",              "DESC",         "EGU", "PREC", "VALA", "VALB",    "VALC",    "VALD",    "VALE", "VALF", "VALG", "VALH", "VALI", "VALJ", "VALK", "VALL", "VALM", "VALN", "VALO", "VALP", "pos", "P"                }
-	{ "positioner.motorpositioner", "True",           ":Y:P", ":Y:MP", "BL03I-DI-QBPM-01:Y", "Pre-HFM QBPM", "mm",  "5",    "1.1",  "-0.0025", "-18.752", "-37.855", "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "A",   "BL03I-DI-QBPM-01" }
+	{ "type",                       "entity_enabled", "Q",    "MP",    "motor", "DESC",         "EGU", "PREC", "VALA", "VALB",    "VALC",    "VALD",    "VALE", "VALF", "VALG", "VALH", "VALI", "VALJ", "VALK", "VALL", "VALM", "VALN", "VALO", "VALP", "pos", "P"                }
+	{ "positioner.motorpositioner", "True",           ":Y:P", ":Y:MP", ":Y",    "Pre-HFM QBPM", "mm",  "5",    "1.1",  "-0.0025", "-18.752", "-37.855", "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "A",   "BL03I-DI-QBPM-01" }
 }
