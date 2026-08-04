@@ -147,30 +147,40 @@ def parse_builder(text: str) -> tuple[ast.Module | None, str]:
         return None, "regex-fallback"
 
 
-def _str_items(node: ast.AST) -> list[str]:
+def _str_items(node: ast.AST) -> tuple[list[str], bool]:
+    """(the string literals, whether the whole expression was understood).
+
+    An expression this cannot read - `LibFileList = BASE + EXTRA`, or a call -
+    must not look like an empty requirement list, so the caller is told.
+    """
     if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
-        return [
+        out = [
             e.value
             for e in node.elts
             if isinstance(e, ast.Constant) and isinstance(e.value, str)
         ]
+        return out, len(out) == len(node.elts)
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
-        return [node.value]
-    return []
+        return [node.value], True
+    return [], False
 
 
-def _name_items(node: ast.AST) -> list[str]:
+def _name_items(node: ast.AST) -> tuple[list[str], bool]:
+    """(the names, whether the whole expression was understood). See _str_items."""
     out = []
     if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
         elts = node.elts
     else:
         elts = [node]
+    ok = True
     for e in elts:
         if isinstance(e, ast.Name):
             out.append(e.id)
         elif isinstance(e, ast.Attribute):
             out.append(e.attr)
-    return out
+        else:
+            ok = False
+    return out, ok
 
 
 def analyse_builder_ast(tree: ast.Module) -> dict:
@@ -179,6 +189,7 @@ def analyse_builder_ast(tree: ast.Module) -> dict:
     libs: list[tuple[str, str]] = []  # (class, entry)
     dbds: list[tuple[str, str]] = []
     deps: list[tuple[str, str]] = []
+    unreadable: list[tuple[str, str]] = []  # (class, target) gate 2 could not read
     local_classes: set[str] = set()
 
     for node in ast.walk(tree):
@@ -214,12 +225,17 @@ def analyse_builder_ast(tree: ast.Module) -> dict:
             if value is None:
                 continue
             for t in targets:
-                if t == "LibFileList":
-                    libs.extend((cls_name, s) for s in _str_items(value))
-                elif t == "DbdFileList":
-                    dbds.extend((cls_name, s) for s in _str_items(value))
+                if t in ("LibFileList", "DbdFileList"):
+                    items, ok = _str_items(value)
+                    target = libs if t == "LibFileList" else dbds
+                    target.extend((cls_name, s) for s in items)
                 elif t == "Dependencies":
-                    deps.extend((cls_name, n) for n in _name_items(value))
+                    items, ok = _name_items(value)
+                    deps.extend((cls_name, n) for n in items)
+                else:
+                    continue
+                if not ok:
+                    unreadable.append((cls_name, t))
 
     walk_class("<module>", tree.body)
     for node in ast.walk(tree):
@@ -231,6 +247,7 @@ def analyse_builder_ast(tree: ast.Module) -> dict:
         "libs": libs,
         "dbds": dbds,
         "deps": deps,
+        "unreadable": unreadable,
         "local_classes": local_classes,
         "lib_classes": _lib_classes(tree, libs, dbds),
     }
@@ -376,6 +393,13 @@ def gate_builder(module_dir: Path, image: set[str]) -> tuple[str, list[str], dic
         )
 
     verdict = "PASS"
+    if info.get("unreadable"):
+        verdict = "REVIEW"
+        reasons.append(
+            "gate 2 could not read "
+            + ", ".join(f"{t} on class {c}" for c, t in sorted(set(info["unreadable"])))
+            + " - not a literal, so the module's binary requirements are unknown"
+        )
     if mode == "regex-fallback":
         verdict = "REVIEW"
         reasons.append(
@@ -395,10 +419,8 @@ FACILITY_RE = re.compile(r"^(BL|SR|LI|BR|TS|FE)[-_]?\d*[A-Z]?([-_].+)?$|BUILDER"
 
 def pre_gate(name: str, image: set[str]) -> tuple[str, str] | None:
     lowered = {m.lower() for m in image}
-    if (
-        name.lower() in lowered
-        or MODULE_ALIASES.get(name.lower(), "").lower() in lowered
-    ):
+    alias = MODULE_ALIASES.get(name, MODULE_ALIASES.get(name.lower(), name))
+    if name.lower() in lowered or alias.lower() in lowered:
         return "SKIP", f"{name} is already shipped in the generic image"
     if FACILITY_RE.match(name):
         return (
