@@ -80,4 +80,4 @@ entities:
     VALB: -0.0025
     VALC: -18.752
     VALD: -37.855
-    motor: BL03I-DI-QBPM-01:Y
+    motor: :Y
