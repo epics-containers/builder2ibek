@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-"""Apply the two eligibility gates to candidate support modules.
+"""Apply the three eligibility gates to candidate support modules.
 
 A module is convertible to a runtime StreamDevice pattern only if it needs
-nothing in the IOC binary. Both gates are mechanical:
+nothing in the IOC binary. All three gates are mechanical:
 
   gate 1 (filesystem)  no compiled code: no `*App/src/*.{c,cpp,cc,cxx}` and no
                        module-authored `*App/src/*.dbd`.
   gate 2 (builder.py)  `LibFileList` and `DbdFileList` empty or absent, and
                        `Dependencies` a subset of the modules the target image
                        already ships.
+  gate 3 (records)     across every database the module ships: no sub/genSub/
+                       aSub (they bind a compiled routine), and no record type
+                       or DTYP the image cannot resolve.
+
+Gate 3 rescues a gate 1 failure - a module that compiles something none of its
+databases reference needs nothing at runtime - but never a gate 2 failure, where
+the module has stated it needs its own library. See SKILL.md.
 
 `Initialise` / `PostIocInitialise` emitting st.cmd lines is NOT a disqualifier -
 ibek expresses those as pre_init/post_init. With LibFileList/DbdFileList empty,
@@ -402,6 +409,170 @@ def pre_gate(name: str, image: set[str]) -> tuple[str, str] | None:
     return None
 
 
+# ---------------------------------------------------------------- gate 3 ----
+# Gates 1 and 2 judge the MODULE; gate 3 judges the RECORD SET a pattern
+# actually vendors, which is what decides whether the IOC needs anything
+# compiled. DLS modules routinely compile code their StreamDevice records never
+# touch - a mean-calculation helper, a driver for a sibling device - and
+# rejecting the whole module for that discards a pattern that would run
+# perfectly. Conversely gate 3 catches what the module gates cannot see: a
+# record type or DTYP the image does not provide.
+
+# EPICS 7 base. `sub`/`aSub` are base record types but are handled separately:
+# they bind a COMPILED routine, so they are never vendorable however the module
+# is built. genSub -> aSub conversion does not change that - the routine is
+# still C compiled into the module's library.
+BASE_RECORDS = {
+    "ai",
+    "ao",
+    "aai",
+    "aao",
+    "bi",
+    "bo",
+    "mbbi",
+    "mbbo",
+    "mbbidirect",
+    "mbbodirect",
+    "longin",
+    "longout",
+    "int64in",
+    "int64out",
+    "stringin",
+    "stringout",
+    "lsi",
+    "lso",
+    "waveform",
+    "calc",
+    "calcout",
+    "fanout",
+    "dfanout",
+    "seq",
+    "sel",
+    "subarray",
+    "compress",
+    "event",
+    "histogram",
+    "permissive",
+    "state",
+    "printf",
+}
+
+ROUTINE_RECORDS = {"sub", "gensub", "asub"}
+
+# Record types each support module adds, keyed by the name image-modules.sh
+# prints. Only modules that define record types appear; StreamDevice, autosave,
+# iocStats and pvlogging contribute device support or services, not records.
+RECORDS_BY_MODULE = {
+    "calc": {"scalcout", "sseq", "acalcout", "transform"},
+    "busy": {"busy"},
+    "sscan": {"scan", "scanparm"},
+    "asyn": {"asyn"},
+    "std": {"epid"},
+    "motor": {"motor"},
+}
+
+# DTYP families that resolve without module-specific device support.
+SOFT_DTYP = {
+    "soft channel",
+    "raw soft channel",
+    "async soft channel",
+    "soft timestamp",
+    "soft channel rw",
+}
+MACRO_DTYP = re.compile(r"\$[({]")
+
+RECORD_RE = re.compile(r"^[^#\n]*?record\s*\(\s*(\w+)\s*,", re.M)
+DTYP_RE = re.compile(r'^[^#\n]*?field\s*\(\s*DTYP\s*,\s*"([^"]*)"', re.M | re.I)
+
+
+def _record_files(module_dir: Path) -> list[Path]:
+    """Every database file the module ships.
+
+    Deliberately NOT the existing pattern's file set. XMLbuilder synthesises an
+    `auto_<name>` AutoSubstitution class for every template, so the sweep takes
+    the module's databases WHOLE - judging a curated subset would pass a module
+    whose other templates carry records the image cannot resolve, and the sweep
+    would then vendor exactly those.
+
+    `*App/Db` holds the authored sources (including VDCT `.vdb`); `db/` is the
+    built output. Both are read: a record that exists only in one still counts.
+    """
+    found: list[Path] = []
+    seen: set[str] = set()
+    for sub in ("db", "*App/Db", "*App/db"):
+        for d in module_dir.glob(sub):
+            if not d.is_dir():
+                continue
+            for pat in ("*.template", "*.db", "*.vdb"):
+                for f in sorted(d.glob(pat)):
+                    if f.name not in seen:
+                        seen.add(f.name)
+                        found.append(f)
+    return found
+
+
+def gate_records(module_dir: Path, image: set[str]) -> tuple[str, list[str], dict]:
+    files = _record_files(module_dir)
+    if not files:
+        return "REVIEW", ["no .template/.db to judge"], {"files": 0}
+
+    allowed = set(BASE_RECORDS)
+    for mod in image:
+        allowed |= RECORDS_BY_MODULE.get(mod, set())
+    stream_ok = "StreamDevice" in image
+    asyn_ok = "asyn" in image
+
+    reasons: list[str] = []
+    routines: set[str] = set()
+    bad_rec: set[str] = set()
+    bad_dtyp: set[str] = set()
+    macro_dtyp: set[str] = set()
+
+    for f in files:
+        text = f.read_text(errors="replace")
+        for rec in RECORD_RE.findall(text):
+            r = rec.lower()
+            if r in ROUTINE_RECORDS:
+                routines.add(r)
+            elif r not in allowed:
+                bad_rec.add(rec)
+        for dtyp in DTYP_RE.findall(text):
+            d = dtyp.strip()
+            if MACRO_DTYP.search(d):
+                macro_dtyp.add(d)
+            elif d.lower() in SOFT_DTYP:
+                continue
+            elif d.lower() == "stream" and stream_ok:
+                continue
+            elif d.lower().startswith("asyn") and asyn_ok:
+                continue
+            else:
+                bad_dtyp.add(d)
+
+    if routines:
+        reasons.append(
+            f"{'/'.join(sorted(routines))} record(s) bind a compiled routine - "
+            "not vendorable at runtime"
+        )
+    for r in sorted(bad_rec):
+        reasons.append(f"record type '{r}' is not provided by the image")
+    for d in sorted(bad_dtyp):
+        reasons.append(f"DTYP '{d}' is not provided by the image")
+
+    extra = {"files": len(files)}
+    if macro_dtyp:
+        # PASS, not REVIEW. A macro-supplied DTYP is an entity parameter: the
+        # pattern is vendorable, and which device support an instance names is
+        # an instance question the sweep cannot answer. But it is a real risk -
+        # if the instance names anything but soft support, that support has to
+        # be compiled into its IOC - so it is carried as a flag for the report
+        # rather than silently cleared. currAmp is the live example.
+        extra["instance_dtyp"] = sorted(macro_dtyp)
+    if reasons:
+        return "SKIP", reasons, extra
+    return "PASS", [], extra
+
+
 # ---------------------------------------------------------------- driver ----
 
 
@@ -419,21 +590,53 @@ def check(module_dir: Path, image: set[str]) -> dict:
             "verdict": verdict,
             "gate1": {"passed": True, "reasons": []},
             "gate2": {"verdict": verdict, "reasons": [reason], "parse": "not-run"},
+            "gate3": {"verdict": verdict, "reasons": [], "files": 0},
         }
     fs_ok, fs_reasons = gate_filesystem(module_dir)
     b_verdict, b_reasons, extra = gate_builder(module_dir, image)
-    if not fs_ok:
+    r_verdict, r_reasons, r_extra = gate_records(module_dir, image)
+
+    # A gate 3 rejection is never overridden: a record bound to a compiled
+    # routine, or naming a type the image lacks, cannot run however innocent the
+    # module looks.
+    #
+    # The rescue runs the other way, and ONLY over gate 1. Gate 1 says "this
+    # module compiles something"; if no database references it, that something
+    # is not needed at runtime and the rejection was false. Gate 2 is different:
+    # a non-empty LibFileList/DbdFileList is the module stating it needs its own
+    # library in the binary, and clean records cannot contradict that - the
+    # dependency is usually an iocsh command emitted by Initialise(), which
+    # lives in st.cmd and appears in no record. Rescuing over gate 2 readmits
+    # exactly the modules BUILD-TIME-ONLY.md already rejects (PLV1000Config,
+    # centerNConfig, pmacAsynCoordCreate, ...).
+    rescued = False
+    if r_verdict == "SKIP":
         verdict = "SKIP"
     elif b_verdict == "SKIP":
         verdict = "SKIP"
+    elif not fs_ok:
+        if r_verdict == "PASS":
+            verdict, rescued = "PASS", True
+        else:
+            verdict = "SKIP"
+    elif r_verdict == "REVIEW":
+        verdict = "REVIEW"
     else:
         verdict = b_verdict
-    return {
+
+    result = {
         "path": str(module_dir),
         "verdict": verdict,
         "gate1": {"passed": fs_ok, "reasons": fs_reasons},
         "gate2": {"verdict": b_verdict, "reasons": b_reasons, **extra},
+        "gate3": {"verdict": r_verdict, "reasons": r_reasons, **r_extra},
     }
+    if rescued:
+        result["rescued"] = (
+            "module gates failed but the vendored records reference none of it: "
+            + "; ".join(fs_reasons + b_reasons)[:200]
+        )
+    return result
 
 
 def main() -> int:
@@ -482,7 +685,12 @@ def main() -> int:
     counts = {"PASS": 0, "SKIP": 0, "REVIEW": 0}
     for r in results:
         counts[r["verdict"]] += 1
-        reasons = r["gate1"]["reasons"] + r["gate2"]["reasons"]
+        # Gate 3's reasons come first: when it rejects it is the decisive gate,
+        # and its reason is the one a reader needs ("aSub binds a compiled
+        # routine"), not the module-level symptom behind it.
+        reasons = r["gate3"]["reasons"] + r["gate1"]["reasons"] + r["gate2"]["reasons"]
+        if r.get("rescued"):
+            reasons = ["RESCUED: " + r["rescued"]]
         print(f"{r['verdict']}\t{r['name']}\t{r['version']}\t{'; '.join(reasons[:3])}")
     print(
         f"\nPASS={counts['PASS']} SKIP={counts['SKIP']} REVIEW={counts['REVIEW']}",

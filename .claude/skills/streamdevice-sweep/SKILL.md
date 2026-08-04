@@ -39,7 +39,7 @@ has to pass before the PR goes up.
 | § | What | How |
 |---|---|---|
 | 1 | candidate set + case-duplicate rule | `scan-candidates.py` |
-| 2 | the two eligibility gates | `image-modules.sh`, `check-eligibility.py` |
+| 2 | the three eligibility gates | `image-modules.sh`, `check-eligibility.py` |
 | 3 | the skip report — a committed deliverable | `render-report.py` |
 | 4 | VDCT conversion | [vdct-conversion](../vdct-conversion/SKILL.md) |
 | 5 | documentation sweep | `sweep-docs.py`, `strip-images.lua` |
@@ -153,7 +153,7 @@ The first two are the ones that had to be cleaned up by hand
 
 ---
 
-## 2. Eligibility — two gates, both must pass
+## 2. Eligibility — three gates, all must pass
 
 ```bash
 bash $S/image-modules.sh /workspaces/ioc-streamdevice > /tmp/sweep/image-modules.txt
@@ -161,7 +161,7 @@ python3 $S/check-eligibility.py --candidates /tmp/sweep/candidates.json \
         --image-modules /tmp/sweep/image-modules.txt -o /tmp/sweep/eligibility.json
 ```
 
-Verdicts are `PASS` / `SKIP` / `REVIEW`. Measured: **91 PASS, 72 SKIP, 23 REVIEW**
+Verdicts are `PASS` / `SKIP` / `REVIEW`. Measured: **96 PASS, 67 SKIP, 23 REVIEW**
 out of 186.
 
 ### The reference set: read it from `ioc-streamdevice`'s Dockerfile
@@ -175,11 +175,22 @@ line, minus:
   registers nothing for runtime; see `ibek-support/vdct/README.md`).
 - **`ioc`** — the generic IOC's own source.
 
-Today that yields eight modules:
+Today that yields nine modules:
 
 ```
-StreamDevice  asyn  autosave  busy  calc  iocStats  pvlogging  sscan
+StreamDevice  asyn  autosave  busy  calc  iocStats  pvlogging  sscan  std
 ```
+
+`std` was added to unlock `keysightLCR`, `micos` and `tenmaPSU`, which were
+blocked on it and nothing else; it also supplies the `epid` record type. It is
+the only dependency worth adding — across all 186 candidates the only other
+module that would unlock anything is `motor`, and that buys one device
+(`microlab500`) at the cost of the whole asyn motor stack.
+
+> **`image-modules.sh` reads the working tree**, so it answers for whatever
+> branch is checked out. That is a real trap: scoring against `vdct-build-support`
+> rather than `main` moves nine modules, because that branch adds `busy` and
+> `sscan`. Record which ref the run used.
 
 The script also **warns if `ARG DEVELOPER` points at another `ioc-*` image**: that
 base's own module set is inherited and must be unioned in by hand. It currently
@@ -264,11 +275,62 @@ Modules that pass the filesystem gate and are caught only by `builder.py`
 | `kriIonBeam` | `3-1` | `DbdFileList = ['kriIonBeam']` |
 | `WS300scale` | `1-5` | `DbdFileList = ['WS300scale_vdct']` |
 | `PIpiezo` | `1-23` | `DbdFileList = ['PIpiezo']` + `Dependencies = (MotorLib,)` |
-| `micos`, `tenmaPSU`, `keysightLCR` | | `Dependencies = (Std,)` — DLS `std` is not in the image |
 | `microlab500` | `1-5` | `Dependencies = (MotorLib,)` — `motor` is not in the image |
+
+(`micos`, `tenmaPSU` and `keysightLCR` used to sit in this table on
+`Dependencies = (Std,)`. They now PASS: `std` was added to the image precisely
+because it was the only thing blocking them.)
 
 `jenaEDS` is the crispest: its dbd is installed from elsewhere in the tree, so a
 filesystem-only gate admits it and the resulting pattern would not load.
+
+### Gate 3 — the records themselves
+
+Gates 1 and 2 judge what the **module builds**. Gate 3 judges what the **IOC
+would have to resolve**, by reading every `*.template`, `*.db` and `*.vdb` under
+the module's `db/` and `*App/Db/`.
+
+Judge the module's databases **whole**, never an existing pattern's file set.
+XMLbuilder synthesises an `auto_<name>` AutoSubstitution class for every
+template, so the sweep takes them all — scoring a curated subset would pass a
+module whose *other* templates carry records the image cannot resolve, and the
+sweep would then vendor exactly those.
+
+It rejects three things:
+
+- **`sub` / `genSub` / `aSub` records.** They bind a compiled routine
+  (`alarmlookupProcess`, `pfeifferErrorCodeParse`, `extractFirmwareVersion`), so
+  they can never be vendored into an instance. Note that converting `genSub` to
+  the base-7-native `aSub` does **not** help: the routine is still C compiled
+  into the module's library. The two are one population at different stages of
+  that conversion.
+- **A record type the image does not provide** — `motor`, and anything outside
+  base plus the record types the image's modules add (`calc` supplies
+  `scalcout`/`sseq`/`acalcout`/`transform`, `busy` supplies `busy`, `std`
+  supplies `epid`).
+- **A `DTYP` the image does not provide** — `Hy8001`, `Hy8401ip`, `Hy8402ao`
+  (Hytec IP-carrier hardware) as against `stream`, the soft-channel family and
+  `asyn*`. A macro-supplied `DTYP` such as `$(DTYPE)` cannot be decided
+  statically and goes to `REVIEW`.
+
+Gate 3 caught `jena`, `ozone` and `enzLoCuM4`, which pass both module gates and
+still cannot run, and sent `currAmp` to `REVIEW`.
+
+### Gate 3 rescues gate 1, and never gate 2
+
+If gate 1 fails but no database references the compiled thing, the rejection was
+false — the module builds something the runtime never needs. That rescues
+`attocube`, `SQC-310`, `ttiCPX`, `VatLeakValve590`, and the new `pilatus`,
+`ThermoFHT6020A` and `epics-twincat-ads`.
+
+**A gate 2 failure is never rescued.** A non-empty `LibFileList`/`DbdFileList` is
+the module stating it needs its own library in the binary, and clean records
+cannot contradict it: the dependency is usually an iocsh command emitted by
+`Initialise()`, which lives in `st.cmd` and appears in no record. Rescuing over
+gate 2 readmits exactly the modules `BUILD-TIME-ONLY.md` already rejects —
+`PLV1000Config`, `centerNConfig`, `pmacAsynCoordCreate`, `YLRLaserConfig`. That
+list is the regression test for this rule: no module named in it may come out
+`PASS`.
 
 ### Two pre-gates
 
