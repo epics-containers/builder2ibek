@@ -65,8 +65,10 @@ uv run --no-project python $S/scan-candidates.py -o /tmp/sweep
 
 Measured on 2026-08-03: **748** module names across the eight `/dls_sw/prod/R*`
 trees, **186** of them carrying a protocol file. That is the candidate set. All
-119 folders currently in `ibek-runtime-streamdevice` are inside it, which is the
-check that the seeding rule is not losing anything.
+100 folders currently in `ibek-runtime-streamdevice` are inside it, which is the
+check that the seeding rule is not losing anything. (It was 119 before
+ibek-runtime-streamdevice#14 withdrew the 19 patterns bound to compiled
+`sub`/`genSub`/`aSub` routines; all 19 were inside the candidate set too.)
 
 ### Picking the release — neither `ls -t` nor `sort -V` is safe
 
@@ -392,9 +394,12 @@ that need writing; and:
 
 ### Already shipped as a pattern, but fails a gate
 
-**35 of the 119 folders currently in `ibek-runtime-streamdevice` fail the
-mechanical gates** — `OXCryo`, `OXCS700`, `mks937a`, `mks937b`, `digitelMpc`,
-`cmsIon`, `lakeshore336`, `tecPeltier` and others. They predate the gates.
+**13 of the 100 folders currently in `ibek-runtime-streamdevice` fail the
+mechanical gates** — `LC400-OEM`, `PIpiezo`, `WS300scale`, `digitelMpc`,
+`enzLoCuM4`, `jena`, `kriIonBeam`, `leyboldCenterOne`, `microlab500`, `mks937a`,
+`mks937b`, `ozone`, `yaskawaBARTRobot`. They predate the gates, and they are now
+all `DTYP`/record-type cases: the compiled-routine ones were withdrawn in
+ibek-runtime-streamdevice#14.
 
 **The sweep does not delete them.** It reports them, and each needs a decision:
 trim the entity models that need the compiled support, move the pattern to a
@@ -683,10 +688,9 @@ than rendering a report with this section silently missing.
 
 Flags a `description:` that is **missing, empty, a placeholder** (`TODO`,
 `Description`, `-`), **too short**, or **trivially restates the name** (word set a
-subset of the name's words plus filler). Measured: **27 flags across 12 of the 119
-shipped patterns** — every one actionable, e.g. eight patterns whose `DESC`
-parameter is described as "Description", and `kellerPyrometer` described as
-"Keller Pyrometer".
+subset of the name's words plus filler). Measured: **19 flags across 9 of the 100
+shipped patterns** — every one actionable, e.g. patterns whose `DESC` parameter is
+described as "Description", and `kellerPyrometer` described as "Keller Pyrometer".
 
 `object`, `entity`, `model` and `record` are deliberately **not** filler words:
 they are ibek/EPICS domain terms, so `name: Object name` reads as the house idiom
