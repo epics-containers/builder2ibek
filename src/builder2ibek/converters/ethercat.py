@@ -99,6 +99,7 @@ def finalize(ioc: Generic_IOC) -> None:
         ]
         ctx.substituter.report_dropped(raw, kept, log=ctx.log, ioc=ctx.ioc_name)
     finally:
-        # Generic_IOC allows extra attributes and model_dump() would serialise
-        # this one into the output YAML, so it must not outlive the conversion.
-        delattr(ioc, "catio")
+        # The field is excluded from model_dump(), so this is not what keeps it
+        # out of the YAML -- it just stops a spent context outliving the
+        # conversion and being applied twice.
+        ioc.catio = None

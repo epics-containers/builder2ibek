@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -44,6 +45,9 @@ from builder2ibek.catio.cli import (
 )
 
 CATIO_SAMPLES = Path(__file__).parent / "samples" / "catio"
+
+#: CSI escape sequences, as Rich emits them when it colourises help output.
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 HAS_FASTCS = importlib.util.find_spec("fastcs_catio") is not None
 HAS_SERVICES = importlib.util.find_spec("builder2ibek.catio.services") is not None
@@ -311,7 +315,11 @@ def test_existing_description_survives_a_corrupt_file(tmp_path: Path):
 def test_help_lists_every_option():
     result = CliRunner().invoke(cli, ["catio", "--help"])
     assert result.exit_code == 0
-    text = result.output
+    # Rich colourises the help when it thinks a terminal is attached, which
+    # splits an option name across escape sequences ("--services-repo" becomes
+    # ESC[1;36m-ESC[0mESC[1;36m-servicesESC[0m..."). CI is such an environment
+    # and a developer's shell usually is not, so strip the codes before looking.
+    text = _ANSI_RE.sub("", result.output)
     for option in (
         "--services-repo",
         "--strict",
