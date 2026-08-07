@@ -69,6 +69,7 @@ bumping a submodule.
 - `/beamline-convert <beamline> [services-repo]` — convert all builder XML IOCs for a beamline
 - `/beamline-reconvert <beamline> [services-repo]` — re-run xml2yaml on all IOCs and validate schema
 - `/beamline-check <beamline> [services-repo]` — run ioc-check on all IOCs in a beamline
+- `/catio-convert <BLxxI-BUILDER> [services-repo]` — migrate a beamline's EtherCAT chains off the legacy `ethercat` scanner onto fastcs-catio, rewriting every consumer's PV references
 - `/ibek-concepts` — ibek entity model patterns (type: id/object, databases.args, Jinja2, auto_* entities, port references)
 - `/vdct-conversion` — VDCT `.vdb` → msi `.template` conversion and `auto_*` derivation
 - `/streamdevice-sweep` — **(work in progress)** sweep `/dls_sw/prod` for
