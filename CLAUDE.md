@@ -71,8 +71,10 @@ bumping a submodule.
 - `/beamline-check <beamline> [services-repo]` — run ioc-check on all IOCs in a beamline
 - `/ibek-concepts` — ibek entity model patterns (type: id/object, databases.args, Jinja2, auto_* entities, port references)
 - `/vdct-conversion` — VDCT `.vdb` → msi `.template` conversion and `auto_*` derivation
-- `/streamdevice-sweep` — sweep `/dls_sw/prod` into `ibek-runtime-streamdevice`
-  runtime patterns: eligibility gates, skip report, docs, `ibek.manifest.yaml`
+- `/streamdevice-sweep` — **(work in progress)** sweep `/dls_sw/prod` into
+  `ibek-runtime-streamdevice` runtime patterns: eligibility gates, skip report,
+  docs, `ibek.manifest.yaml`. Its measured figures go stale as `/dls_sw` and the
+  pattern library move — see the Status section in the skill before relying on it
 - See [docs/tutorials/create-support-yaml.md](docs/tutorials/create-support-yaml.md)
   and [docs/tutorials/create-support-yaml-advanced.md](docs/tutorials/create-support-yaml-advanced.md)
   for full support YAML guides.

@@ -1,6 +1,6 @@
 ---
 name: streamdevice-sweep
-description: Sweep /dls_sw/prod for DLS support modules convertible to runtime StreamDevice patterns, decide eligibility mechanically, and generate or refresh the corresponding folders (plus their curated docs) in ibek-runtime-streamdevice. Use when asked to sweep dls_sw for runtime patterns, to decide whether a module can be a runtime pattern rather than a generic IOC, to refresh ibek-runtime-streamdevice against a newer DLS release, or to produce the build-time-only skip report.
+description: Sweep /dls_sw/prod for DLS support modules convertible to runtime StreamDevice patterns, decide eligibility mechanically, and generate or refresh the corresponding folders (plus their curated docs) in ibek-runtime-streamdevice. Use when asked to sweep dls_sw for runtime patterns, to decide whether a module can be a runtime pattern rather than a generic IOC, to refresh ibek-runtime-streamdevice against a newer DLS release, or to produce the build-time-only skip report. Work in progress — read its Status section first; its measured figures go stale and its output needs review rather than trust.
 ---
 
 # Sweeping `/dls_sw/prod` into runtime StreamDevice patterns
@@ -23,6 +23,36 @@ VDCT-authored databases), [ibek-concepts](../ibek-concepts/SKILL.md) and
 > `/dls_sw` is a read-only fileserver. **Never run a broad `find`/`grep` over
 > `/dls_sw`** — the scripts here walk only the latest release of each module and
 > take about three and a half minutes in total. Do not hand-roll a wider scan.
+
+## Status — work in progress
+
+**This skill is unfinished and was merged in that state, deliberately, so the
+work was not stranded on a branch. Treat its output as a starting point for
+review, never as a decision you can act on unread.**
+
+What has been exercised: the pipeline end to end produced the pattern library
+now in `ibek-runtime-streamdevice`, and the eligibility gates were re-measured
+against that library on 2026-08-05 (after #14 withdrew the 19 compiled-routine
+patterns).
+
+What to be careful of:
+
+- **Every number here is a measurement, not an invariant.** The candidate counts
+  (748 names / 186 with a protocol file), the verdict split (94 PASS / 67 SKIP /
+  25 REVIEW), the 13 of 100 that fail a gate and the 19 description flags across
+  9 folders were all measured on a specific day against a specific state of
+  `/dls_sw/prod` and of the pattern library. They go stale the moment either
+  moves. Re-run the scripts and re-measure rather than quoting these figures.
+- **`REVIEW` means review.** The gates are deliberately conservative and a
+  `REVIEW` verdict is not a soft `PASS`; 25 of 186 land there.
+- The gate logic, the report grouping and the docs generation were each being
+  corrected repeatedly right up to the merge, so treat edge-case behaviour as
+  under-tested.
+
+<!-- Extend this list as gaps are found. If you are picking this work back up,
+     start by re-running the sweep and comparing against the figures above. -->
+
+*The maintainer's own list of remaining work is not yet recorded here.*
 
 ## Run it
 
