@@ -6014,4 +6014,36 @@ entity_models:
         args:
           .*:
 
+  - name: digio
+    description: |-
+      dlsPLC digital input/output status bit (e.g. gas pressure switch).
+    parameters:
+      device:
+        type: str
+        description: Device PV name
+      vlvcc:
+        type: str
+        description: Owning valve control crate device
+      address:
+        type: int
+        description: PLC word address
+      znam:
+        type: str
+        description: Zero-state name
+      onam:
+        type: str
+        description: One-state name
+      zsv:
+        type: str
+        description: Zero-state severity
+        default: NO_ALARM
+      osv:
+        type: str
+        description: One-state severity
+        default: NO_ALARM
+    databases:
+      - file: $(DLSPLC)/db/dlsPLC_digio.template
+        args:
+          .*:
+
 module: dlsPLC
