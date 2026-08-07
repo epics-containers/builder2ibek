@@ -73,16 +73,61 @@ component. Classify each class by its base type:
 
 ### Which classes need reporting?
 
-**YES — report these:**
+**Step 2a — apply the exclusion test FIRST.** A class that fails this test is
+never reported, no matter how many of the "report these" signals it shows.
+Exclusions always win.
+
+**NO — skip these, unconditionally:**
+- **Not exported.** If builder.py declares `__all__`, that list *is* the set of
+  user-facing components. A class absent from `__all__` is internal — skip it.
+- **`_prefixed` names** — internal helpers, even when they carry `TemplateFile`
+  and `Arguments` (this combination is the usual shape of an internal helper,
+  not a reason to report one).
+- `AutoInstantiate = True` — singleton, created automatically, not user-facing
+- `BaseClass = True` — abstract parent, never instantiated directly
+- Simulation variants (e.g. `_Sim` suffix classes)
+
+**Step 2b — of what survives, YES, report these:**
 - Classes users instantiate in XML (they have `ArgInfo` and take parameters)
 - Classes with `TemplateFile` (they load a database)
 - Classes with `Initialise` / `PostIocInitialise` methods (they emit st.cmd commands)
 
-**NO — skip these:**
-- `AutoInstantiate = True` — singleton, created automatically, not user-facing
-- `BaseClass = True` — abstract parent, never instantiated directly
-- Simulation variants (e.g. `_Sim` suffix classes)
-- Internal `_prefixed` template helper classes
+**Why the order matters.** Internal helpers are instantiated *by* a public
+`Device` in its `__init__`, so their templates load automatically as a side
+effect of the public entity. Giving them their own entity model invents an XML
+tag that no IOC ever writes, and usually duplicates records the public entity
+already loads.
+
+**Confirm before reporting a doubtful class:** grep the IOC XMLs for the class
+name. A class that never appears as an XML tag is not user-facing.
+
+```bash
+grep -rl '<module\.ClassName' $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml")
+```
+
+**Worked example — the trap this rule exists to prevent.** DLS `autosave`
+declares `__all__ = ['Autosave', 'SetAutosaveServer']`, and:
+
+```python
+class _AutosaveFile(Substitution):
+    Arguments = ('device', 'file')
+    TemplateFile = 'dlssrfile.template'
+
+class _AutosaveStatus(Substitution):
+    Arguments = ('device', 'name')
+    TemplateFile = 'dlssrstatus.template'
+
+class Autosave(Device):
+    def __init__(self, iocName, ...):
+        _AutosaveFile(device=iocName + db_suffix, file='0')   # created internally
+```
+
+Both helpers have `TemplateFile` and `Arguments`, so the "report these" signals
+all fire — but they are `_prefixed` and absent from `__all__`, so both must be
+skipped. A previous pass reported them and generated `dlssrfile` / `dlssrstatus`
+entity models. Those were wrong twice over: no IOC XML can reference them, and
+the records they load are superseded by upstream autosave's
+`save_restoreStatus.db`, which ibek's `autosave.Autosave` already loads.
 
 ---
 

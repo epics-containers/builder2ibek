@@ -29,6 +29,22 @@ The public module at `ibek-support/iocStats/` defines
 Do **not** create a `ibek-support-dls/devIocStats/` — the DLS-specific
 copy was removed as redundant.
 
+## `autosave` — already converted; never add DLS `dlssr*` entities
+
+`autosave` needs **no new entity models**. The converter at
+`src/builder2ibek/converters/autosave.py` already maps
+`<autosave.Autosave iocName=.../>` to ibek `autosave.Autosave`, which loads
+upstream `save_restoreStatus.db`. It also deletes redundant
+`auto_save_restoreStatus` entities.
+
+Do **not** create `dlssrstatus` / `dlssrfile` entity models from the DLS
+`autosave` builder.py. They come from `_AutosaveFile` / `_AutosaveStatus`,
+which are private (absent from `__all__`) and instantiated inside
+`Autosave.__init__`, so no IOC XML can reference them. Their records are
+superseded one-for-one by `save_restoreStatus.db` (`$(device):SRSTATUS` →
+`$(P)SR_status`, and so on). See
+[builder-py-analysis.md](builder-py-analysis.md) Step 2 for the general rule.
+
 ## `positioner.motorpositioner` — `motor` is a suffix, not a PV
 
 `motorpositioner.template` resolves the link as `$(P)$(motor).RBV`, and the
