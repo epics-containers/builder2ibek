@@ -19,17 +19,20 @@ from pathlib import Path
 import pytest
 import typer
 
-from builder2ibek.catio.chains import (
+# Ahead of the builder2ibek.catio imports: those reach fastcs_catio lazily today,
+# but if one ever grows a module-scope import this file must skip rather than
+# fail collection.
+fastcs_catio = pytest.importorskip("fastcs_catio")
+
+from builder2ibek.catio.chains import (  # noqa: E402
     build_substituter,
     discover_chains,
 )
-from builder2ibek.catio.cli import catio_cli
-from builder2ibek.catio.diagnostics import DiagnosticLog, Severity
-from builder2ibek.catio.substitute import Substituter
-from builder2ibek.convert import convert_to_ioc
-from builder2ibek.converters.ethercat import CatioContext
-
-fastcs_catio = pytest.importorskip("fastcs_catio")
+from builder2ibek.catio.cli import catio_cli  # noqa: E402
+from builder2ibek.catio.diagnostics import DiagnosticLog, Severity  # noqa: E402
+from builder2ibek.catio.substitute import NewPv, Substituter  # noqa: E402
+from builder2ibek.convert import convert_to_ioc  # noqa: E402
+from builder2ibek.converters.ethercat import CatioContext  # noqa: E402
 
 
 def write_chain(directory: Path, ioc: str, body: str) -> Path:
@@ -433,3 +436,45 @@ def test_the_scanners_own_ethercat_entities_are_not_reported_as_dropped(
     )
 
     assert [d for d in log if d.code == "dropped-reference"] == []
+
+
+def test_a_second_pv_in_the_value_does_not_decide_the_first_ones_direction():
+    """A writer followed by a reader must not be pulled onto the readback.
+
+    `_trailing_flags` used to join every token after the PV, so in
+    "PV1 PP PV2 CP" the reader's `CP` reached PV1 and rewrote a writable
+    output link to its read-only `_RBV` -- a PV the IOC cannot write.
+    """
+    writer = NewPv(read="NEW:A_RBV", write="NEW:A")
+    reader = NewPv(read="NEW:B_RBV", write="NEW:B")
+    sub = Substituter(
+        {"OLD:A": writer, "OLD:B": reader},
+        owners={"OLD:A": "SCANNER", "OLD:B": "SCANNER"},
+        unresolved={},
+        known_labels={},
+    )
+    log = DiagnosticLog()
+
+    out = sub.rewrite_value(
+        "OLD:A PP OLD:B CP", attribute="OUTGB0", log=log, ioc="IOC", entity="E"
+    )
+
+    assert out == "NEW:A PP NEW:B_RBV CP"
+
+
+def test_a_lone_pv_still_sees_its_own_flags():
+    """The companion check: the scan must not stop too early either."""
+    reader = NewPv(read="NEW:B_RBV", write="NEW:B")
+    sub = Substituter(
+        {"OLD:B": reader},
+        owners={"OLD:B": "SCANNER"},
+        unresolved={},
+        known_labels={},
+    )
+    log = DiagnosticLog()
+
+    out = sub.rewrite_value(
+        "OLD:B CP MS", attribute="whatever", log=log, ioc="IOC", entity="E"
+    )
+
+    assert out == "NEW:B_RBV CP MS"

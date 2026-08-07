@@ -183,6 +183,11 @@ def _copy_missing(template_dir: Path, target_dir: Path) -> None:
         elif entry.is_dir():
             _copy_missing(entry, target)
         elif not target.exists():
+            # exists() follows symlinks, so a broken link reads as absent and
+            # copyfile would then write *through* it, landing the file wherever
+            # the link points -- possibly outside the instance folder.
+            if target.is_symlink():
+                target.unlink()
             shutil.copyfile(entry, target)
 
 

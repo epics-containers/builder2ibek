@@ -206,12 +206,26 @@ class Substituter:
                 attribute=attribute,
             )
 
-    @staticmethod
-    def _trailing_flags(parts: list[str], index: int) -> str:
-        """The non-whitespace tokens of *parts* that follow position *index*."""
-        return " ".join(
-            token for token in parts[index + 1 :] if token and not token.isspace()
-        )
+    def _trailing_flags(self, parts: list[str], index: int) -> str:
+        """The EPICS link flags that belong to the PV at position *index*.
+
+        A value may carry more than one PV -- ``"PV1 PP PV2 CP"`` is a writer
+        followed by a reader -- so the scan stops at the next token that is
+        itself a PV. Running on past it would let ``PV2``'s ``CP`` decide
+        ``PV1``'s direction and quietly point a writer at a read-only readback.
+        """
+        flags: list[str] = []
+        for token in parts[index + 1 :]:
+            if not token or token.isspace():
+                continue
+            if (
+                token in self.subs
+                or token in self.unresolved
+                or LEGACY_PV_RE.match(token)
+            ):
+                break
+            flags.append(token)
+        return " ".join(flags)
 
     # -- public API --------------------------------------------------------
 
