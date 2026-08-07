@@ -312,13 +312,19 @@ def test_existing_description_survives_a_corrupt_file(tmp_path: Path):
 # -- CLI surface -------------------------------------------------------------
 
 
-def test_help_lists_every_option():
+def test_help_lists_every_option(monkeypatch):
+    # Rich styles and wraps help to the perceived terminal. Colour splits an
+    # option name across escape sequences ("--services-repo" becomes
+    # ESC[1;36m-ESC[0mESC[1;36m-servicesESC[0m...), and a narrow width would
+    # break it across lines. CI is such an environment and a developer's shell
+    # usually is not, which is how this passed locally and failed on the runner.
+    # Pin the width and disable colour, then strip anything that survives.
+    monkeypatch.delenv("FORCE_COLOR", raising=False)
+    monkeypatch.setenv("NO_COLOR", "1")
+    monkeypatch.setenv("TERM", "dumb")
+    monkeypatch.setenv("COLUMNS", "200")
     result = CliRunner().invoke(cli, ["catio", "--help"])
     assert result.exit_code == 0
-    # Rich colourises the help when it thinks a terminal is attached, which
-    # splits an option name across escape sequences ("--services-repo" becomes
-    # ESC[1;36m-ESC[0mESC[1;36m-servicesESC[0m..."). CI is such an environment
-    # and a developer's shell usually is not, so strip the codes before looking.
     text = _ANSI_RE.sub("", result.output)
     for option in (
         "--services-repo",

@@ -160,10 +160,17 @@ def snake_to_pascal(name: str) -> str:
     'Channel2'
     >>> snake_to_pascal("10VAI01")
     '10VAI01'
+
+    Only the first character of a part is raised, never one following a digit --
+    ``str.title()`` would give ``'Ch1A'`` here and diverge from the PV fastcs
+    actually creates:
+
+    >>> snake_to_pascal("ch1a")
+    'Ch1a'
     """
     if not re.fullmatch(r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*", name):
         return name
-    return "".join(part.title() for part in name.split("_"))
+    return re.sub(r"(?:^|_)([a-z0-9])", lambda m: m.group(1).upper(), name)
 
 
 def _expand(template: str, channel: int | None) -> str:
