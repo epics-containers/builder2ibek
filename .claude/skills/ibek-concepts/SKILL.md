@@ -51,6 +51,25 @@ Determined from `# % macro` declarations at the top of the compiled `.db` file
 - Macros **with** a default (e.g. `MASS_RANGE`) → optional ibek parameters
   (so instances can override)
 
+### `$(MODULE)` in a database path: underscores, never hyphens
+
+For a module whose directory name contains a hyphen (`SR-VA`,
+`Hy8401ip-asyn`), the RELEASE macro ibek-support's ansible writes is
+uppercased **with hyphens replaced by underscores** —
+`macro: "{{ module | replace('-', '_') | upper }}"` in
+`_ansible/roles/support/vars/main.yml`. So it is `$(SR_VA)`, never `$(SR-VA)`.
+
+msi macro names accept only alphanumerics and underscore, so a hyphenated
+reference survives expansion as a literal and fails with `msi: No template
+file` — and it fails **late**, crashing generic-IOC startup at the msi step
+after `generate2` has already produced a perfectly good `ioc.subst`/`st.cmd`.
+
+Grep after editing:
+
+```bash
+grep -rn 'file: \$([A-Z0-9]*-' ibek-support*
+```
+
 ---
 
 ## name parameter and type: id
@@ -87,6 +106,24 @@ These need:
 - Parameters + `databases` section only (no `pre_init`/`post_init`)
 - `.*:` in `databases.args`
 - Drop `name` (gui label, not a cross-reference)
+
+---
+
+## XML template entities (`Xml` classes) use `sub_entities`
+
+A builder.py class inheriting from `Xml` corresponds to an XML template in
+`etc/makeIocs/`. Model it as **one entity with `sub_entities`** referencing
+entity types from other modules — do **not** write a converter that expands it
+into individual child entities in `ioc.yaml`.
+
+That keeps `ioc.yaml` minimal and reusable: one entity with a few macro
+parameters (`dom`, `plc_ip`, `ts_ip`) instead of dozens of expanded children,
+preserving the template abstraction the XML author intended.
+
+To do it: read the template from `etc/makeIocs/`, write an entity model whose
+`sub_entities` reference existing entity models, use Jinja2 `{{ param }}` for
+the macro substitution, and write no converter at all. Worked example:
+`ibek-support-dls/SR-VA/SR-VA.ibek.support.yaml` (`d2PumpCart`).
 
 ---
 
