@@ -990,3 +990,33 @@ entity_models:
       - file: $(USERIO)/db/dfanout.template
         args:
           .*:
+
+  - name: userAsynRecord
+    description: |-
+      Generic asyn record (userIO) bound to an asyn port for raw comms.
+    parameters:
+      P:
+        type: str
+        description: Device PV name
+      R:
+        type: str
+        description: PV name suffix
+      PORT:
+        type: str
+        description: asyn port name
+      ADDR:
+        type: int
+        description: asyn address
+        default: 0
+      OMAX:
+        type: int
+        description: output buffer size
+        default: 80
+      IMAX:
+        type: int
+        description: input buffer size
+        default: 80
+    databases:
+      - file: $(USERIO)/db/userAsynRecord.template
+        args:
+          .*:
