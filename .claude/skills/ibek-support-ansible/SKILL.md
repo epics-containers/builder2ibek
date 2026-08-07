@@ -41,6 +41,29 @@ inside containers.
 
 Items default to pre-build. Set `post_build: true` to run after make.
 
+### Module order in a generic IOC Dockerfile
+
+Each `RUN ansible.sh <module>` is a separate layer, so a module must be built
+**after** everything its dbd or link line needs. The authoritative order is the
+`core` group in `ibek-support/build-groups.yml`:
+
+```
+calc  sscan  asyn  busy  autosave  sequencer  std
+```
+
+Two dependencies in there are easy to miss, and both were shipped broken:
+
+- **`std` must follow `asyn`.** `stdInclude.dbd` includes `asyn.dbd`, so building
+  it first gives `dbdExpand.pl: Can't find file 'asyn.dbd'`.
+- **`std` needs `sequencer`.** `std_SRCS` includes `femto.st` and `delayDo.st`,
+  which need `snc` to become objects, and `std_LIBS += asyn seq pv`. Without it:
+  `make: *** No rule to make target 'femto.o', needed by 'libstd.a'`. No IOC uses
+  the sequencer directly, which is exactly why it gets left out.
+
+A missing-dependency failure surfaces at whichever module is built too early, not
+at the one that is absent — read the error for what it *wanted*, not where it
+stopped.
+
 ---
 
 ## Adding new install.yml variables

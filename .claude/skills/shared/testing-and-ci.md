@@ -56,6 +56,44 @@ ever sees committed state, so this is a local-only gap.
 Re-run it after any pin bump even when no sample output changes — the record
 tracks the revisions built from, not whether the outputs differed.
 
+`vendor_support_dls.py --update` refuses to run while the checkout and the
+committed pin disagree — it tells you to commit the bump first. So the order is:
+commit the pin, vendor, then `--amend` the vendored files into that same commit.
+Landing them separately leaves one commit that moves the pin without its
+vendored copy, which fails the guard, so history contains a red commit.
+
+### Regenerated samples must be reviewed by a human
+
+**Never commit a regenerated sample set without the user reading the diff.**
+
+The samples are the regression baseline for the whole converter: `test_convert`
+and `test_generate` compare against them. Committing a regenerated set silently
+redefines "correct", so a converter or support-YAML bug that changes `st.cmd` or
+`ioc.subst` gets baked in as the new expected output and the suite goes green on
+it. The diff **is** the review surface. Show it, explain what changed and why it
+is expected, and commit only once the user has said so.
+
+If a run fails partway, `git checkout -- tests/samples/` rather than committing a
+partial or emptied set.
+
+### make_samples.sh needs a writable `EPICS_ROOT`
+
+`generate2` resolves entity models from `$EPICS_ROOT/ibek-defs`, which
+`./update-schema` populates. Where `/epics` is read-only (some sandboxes),
+`update-schema` cannot refresh it, so `generate2` validates every sample against
+a **stale** schema, rejects them all, and `make_samples.sh` deletes all 14
+outputs. The symptom is misleading — it names whichever support YAML sorts first
+(`VALIDATION ERROR READING /epics/ibek-defs/ACCELCryoIP...`), which is not the
+faulty file.
+
+Point both steps at the same writable root, in one shell so it persists:
+
+```bash
+export EPICS_ROOT=$(mktemp -d)
+./update-schema
+./tests/samples/make_samples.sh
+```
+
 `tests/check_pin_freshness.py` covers the opposite mistake: a pin that has *not*
 moved while upstream has. It warns and never fails, and runs weekly from
 `periodic.yml`.
