@@ -105,6 +105,14 @@ name. A class that never appears as an XML tag is not user-facing.
 grep -rl '<module\.ClassName' $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -maxdepth 5 -name "*.xml")
 ```
 
+This searches the **work** tree, which holds one current `etc/makeIocs` per
+beamline — the project's usual convention. It is evidence, not proof: released
+BUILDER modules also exist under `/dls_sw/prod/.../support/*BUILDER/<version>/
+etc/makeIocs`, and are not covered. Do not widen the glob to every prod version
+— that is the broad `/dls_sw` scan the sweep skill forbids. Treat "no hits" as
+supporting a conclusion the `__all__` test has already reached, never as the
+sole reason to call a class internal.
+
 **Worked example — the trap this rule exists to prevent.** DLS `autosave`
 declares `__all__ = ['Autosave', 'SetAutosaveServer']`, and:
 

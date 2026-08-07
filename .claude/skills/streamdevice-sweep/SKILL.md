@@ -1,6 +1,6 @@
 ---
 name: streamdevice-sweep
-description: Sweep /dls_sw/prod for DLS support modules convertible to runtime StreamDevice patterns, decide eligibility mechanically, and generate or refresh the corresponding folders (plus their curated docs) in ibek-runtime-streamdevice. Use when asked to sweep dls_sw for runtime patterns, to decide whether a module can be a runtime pattern rather than a generic IOC, to refresh ibek-runtime-streamdevice against a newer DLS release, or to produce the build-time-only skip report. Work in progress — read its Status section first; its measured figures go stale and its output needs review rather than trust.
+description: Sweep /dls_sw/prod for DLS support modules convertible to runtime StreamDevice patterns, decide eligibility mechanically, report the verdicts, and curate the documentation and ibek.manifest.yaml of an existing pattern folder in ibek-runtime-streamdevice. It does NOT create pattern folders or their ibek.support.yaml - that is separate work pending ibek#361. Use when asked to sweep dls_sw for runtime patterns, to decide whether a module can be a runtime pattern rather than a generic IOC, to refresh the docs of ibek-runtime-streamdevice against a newer DLS release, or to produce the build-time-only skip report. Work in progress — read its Status section first; its measured figures go stale and its output needs review rather than trust.
 ---
 
 # Sweeping `/dls_sw/prod` into runtime StreamDevice patterns
