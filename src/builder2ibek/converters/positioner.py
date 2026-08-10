@@ -57,3 +57,36 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
                 ) from ex
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
+
+    elif entity_type == "multipositioner":
+        # Name is needed to link to motorpositioner?
+        # entity.remove("name")
+
+        # Multiposioner allows for up to 6 nested multipositioners, however we do
+        # not want this nested logic to exist in future. This is especially the case
+        # as it was handled inside of builder.py for positioner.
+        # We will manually append the corresponding PS macro, which identifies what
+        # positioner of the multipositioner it is.
+
+        # We need the name to determine the number of positioners that have already
+        # been converted for this combination of P and MP.
+        converted_mps = [
+            e
+            for e in ioc.already_converted
+            if e.get("type", "").endswith("multipositioner")
+            and e.get("P") == entity.P
+            and e.get("MP") == entity.MP
+        ]
+
+        # Assign the corresponding PS macro (P1, P2, ...)
+        entity["PS"] = f":P{len(converted_mps) + 1}"
+
+        # TODO: We need to check if POSN is defined (i.e. the builder object
+        # is not used)
+        # posn = entity.get("posn", "")
+        # if posn is not None:
+        #     try:
+        #         posn = int(posn)
+        #     except ValueError:
+        #         # POSN exists but isn't an
+        #         pass

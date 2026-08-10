@@ -64,6 +64,7 @@ class Generic_IOC(BaseModel):
     entities: list[dict[str, Any]]
     raw_entities: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
     source_file: Path
+    already_converted: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
 
 
 # Generic XML classes ##########################################################
