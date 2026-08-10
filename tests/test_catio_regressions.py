@@ -478,3 +478,50 @@ def test_a_lone_pv_still_sees_its_own_flags():
     )
 
     assert out == "NEW:B_RBV CP MS"
+
+
+def test_dbpf_writes_so_it_must_not_be_pointed_at_the_readback():
+    """`epics.dbpf` caputs at startup; its target cannot be a read-only `_RBV`.
+
+    Its attribute is named `pv`, which no name heuristic can read a direction
+    into, so the rule fell through to "assume reading" and rewrote BL21I's four
+    LED drive currents to `...DoxCurrentOutputCurrent_RBV` -- a PV the IOC then
+    fails to caput. The entity type settles it where the attribute name cannot.
+    """
+    current = NewPv(read="NEW:DO01:Cur_RBV", write="NEW:DO01:Cur")
+    sub = Substituter(
+        {"OLD-LED-01:DOXCURRENT:OUTPUTCURRENT": current},
+        owners={"OLD-LED-01:DOXCURRENT:OUTPUTCURRENT": "SCANNER"},
+        unresolved={},
+        known_labels={},
+    )
+    log = DiagnosticLog()
+    entity = {
+        "type": "epics.dbpf",
+        "pv": "OLD-LED-01:DOXCURRENT:OUTPUTCURRENT",
+        "value": "170",
+    }
+
+    sub.rewrite_entity(entity, log=log, ioc="BL21I-DI-IOC-01")
+
+    assert entity["pv"] == "NEW:DO01:Cur"
+    # and it is no longer a guess, so it must not be reported as one
+    assert [d for d in log if d.code == "link-direction-guess"] == []
+
+
+def test_an_unknown_entity_type_still_falls_through_to_the_guess():
+    """The companion: the override must not swallow the general case."""
+    current = NewPv(read="NEW:DO01:Cur_RBV", write="NEW:DO01:Cur")
+    sub = Substituter(
+        {"OLD:X": current},
+        owners={"OLD:X": "SCANNER"},
+        unresolved={},
+        known_labels={},
+    )
+    log = DiagnosticLog()
+    entity = {"type": "some.other", "pv": "OLD:X"}
+
+    sub.rewrite_entity(entity, log=log, ioc="IOC")
+
+    assert entity["pv"] == "NEW:DO01:Cur_RBV"
+    assert [d.code for d in log] == ["link-direction-guess"]

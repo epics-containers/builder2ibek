@@ -96,20 +96,35 @@ class NewPv:
 SubstitutionMap = dict[str, NewPv]
 
 
-def link_is_reading(attribute: str, flags: str) -> bool | None:
+#: ``(entity type, attribute)`` pairs whose direction is not a heuristic at all.
+#: ``epics.dbpf`` performs a caput at startup, so its ``pv`` is written to by
+#: definition -- and its attribute is named ``pv``, which no name heuristic can
+#: read anything into. Without this an EL2595's drive current is rewritten to
+#: ``...DoxCurrentOutputCurrent_RBV`` and the IOC tries to caput a read-only
+#: readback. Real occurrences: the four LED currents in ``BL21I-DI-IOC-01``.
+KNOWN_DIRECTIONS: dict[tuple[str, str], bool] = {
+    ("epics.dbpf", "pv"): False,
+}
+
+
+def link_is_reading(
+    attribute: str, flags: str, entity_type: str | None = None
+) -> bool | None:
     """Whether a link reads from, or writes to, the PV it names.
 
     The rules are tried in order and the first that fires wins:
 
-    1. the trailing link flags contain ``CP``, ``CPP``, ``MS``, ``MSS`` or
+    1. the entity type and attribute are a known, unambiguous pair;
+    2. else the trailing link flags contain ``CP``, ``CPP``, ``MS``, ``MSS`` or
        ``MSI`` -- reading;
-    2. else the flags contain ``PP`` or ``NPP`` -- writing;
-    3. else the attribute name looks like an output link -- writing;
-    4. else the attribute name looks like an input link -- reading;
-    5. else undecidable.
+    3. else the flags contain ``PP`` or ``NPP`` -- writing;
+    4. else the attribute name looks like an output link -- writing;
+    5. else the attribute name looks like an input link -- reading;
+    6. else undecidable.
 
     :param attribute: the builder attribute the value came from, e.g. ``INP1``.
     :param flags: the non-whitespace tokens following the PV in the same value.
+    :param entity_type: the converted entity's ``type``, e.g. ``epics.dbpf``.
     :returns: True for reading, False for writing, None when nothing decided it
         -- the caller then defaults to reading and, for a writable leaf, emits
         ``link-direction-guess``.
@@ -123,7 +138,13 @@ def link_is_reading(attribute: str, flags: str) -> bool | None:
     False
     >>> link_is_reading("INP1", "")
     True
+    >>> link_is_reading("pv", "", "epics.dbpf")
+    False
     """
+    if entity_type is not None:
+        known = KNOWN_DIRECTIONS.get((entity_type, attribute))
+        if known is not None:
+            return known
     tokens = {token.upper() for token in flags.split()}
     if tokens & READ_FLAGS:
         return True
@@ -237,6 +258,7 @@ class Substituter:
         log: DiagnosticLog,
         ioc: str,
         entity: str | None,
+        entity_type: str | None = None,
     ) -> str:
         """Rewrite every legacy PV token in *value*, preserving everything else.
 
@@ -251,7 +273,7 @@ class Substituter:
             new_pv = self.subs.get(token)
             if new_pv is not None:
                 flags = self._trailing_flags(parts, index)
-                reading = link_is_reading(attribute, flags)
+                reading = link_is_reading(attribute, flags, entity_type)
                 if reading is None:
                     reading = True
                     if new_pv.writable:
@@ -305,12 +327,19 @@ class Substituter:
         """
         name = entity.get("name")
         entity_name = name if isinstance(name, str) else None
+        kind = entity.get("type")
+        entity_type = kind if isinstance(kind, str) else None
         changed = False
         for key, value in list(entity.items()):
             if key == "type" or not isinstance(value, str):
                 continue
             new_value = self.rewrite_value(
-                value, attribute=key, log=log, ioc=ioc, entity=entity_name
+                value,
+                attribute=key,
+                log=log,
+                ioc=ioc,
+                entity=entity_name,
+                entity_type=entity_type,
             )
             if new_value != value:
                 entity[key] = new_value
