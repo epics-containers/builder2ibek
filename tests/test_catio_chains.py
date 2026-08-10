@@ -336,12 +336,18 @@ def test_slave_type_mismatch_is_a_warning():
     assert not log.has_errors()
 
 
-def test_unknown_entity_types_raise_nothing_while_parsing():
-    """`auto_EL2595` / `auto_EL4134` only matter if something references them."""
+def test_every_entity_type_on_the_bl21i_chains_has_a_leaf_table():
+    """No BL21I terminal is left without a translation table.
+
+    `auto_EL2595` and `auto_EL4134` were the last two missing, and they are what
+    kept `BL21I-DI-IOC-01` from converting. Removing either table puts a real
+    beamline back into the skipped set, so assert the coverage directly rather
+    than only through the end-to-end counts.
+    """
     log = DiagnosticLog()
     chain = parsed("BL21I-DI-IOC-01", log)
-    unknown = [s for s in chain.slaves if s.entity_type and not s.is_known]
-    assert {s.entity_type for s in unknown} == {"auto_EL2595", "auto_EL4134"}
+    unknown = {s.entity_type for s in chain.slaves if s.entity_type and not s.is_known}
+    assert unknown == set()
     assert "unknown-entity-type" not in codes(log)
     assert not log.has_errors()
 
@@ -531,11 +537,17 @@ def test_unmapped_suffixes_are_registered_as_unresolved(converted):
     assert entry[2] == "BL21I-VA-IOC-01"
 
 
-def test_unknown_entity_types_resolve_by_prefix(converted):
+def test_a_device_style_name_resolves_without_a_coupler_label(converted):
+    """`BL21I-DI-LED-01` names its device, not its bus slot, and still maps.
+
+    Terminals like this sit on couplers with no derivable label, so they get a
+    declared key and no chain-derived alias. The declared key is the one the
+    legacy IOC actually created, so it is the one that has to work.
+    """
     _, substituter, _ = converted
-    code, _, chain = substituter.unresolved.get("BL21I-DI-LED-01:CHANNEL1:OUTPUT")
-    assert code == "unknown-entity-type"
-    assert chain == "BL21I-DI-IOC-01"
+    new = substituter.subs["BL21I-DI-LED-01:DOXCURRENT:OUTPUTCURRENT"]
+    assert new.write.endswith(":DoxCurrentOutputCurrent")
+    assert new.read.endswith(":DoxCurrentOutputCurrent_RBV")
 
 
 def test_no_leaf_is_shortened_at_the_emitted_prefixes(converted):

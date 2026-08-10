@@ -152,7 +152,7 @@ class Slave:
 
         >>> Slave(1, 1, "EL3104", None, "P", SLAVE, "auto_EL3104").is_known
         True
-        >>> Slave(1, 1, "EL2595", None, "P", SLAVE, "auto_EL2595").is_known
+        >>> Slave(1, 1, "EL3602", None, "P", SLAVE, "auto_EL3602").is_known
         False
         >>> Slave(1, 0, "EK1100", None, "P", COUPLER).is_known
         False

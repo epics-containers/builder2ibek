@@ -80,6 +80,37 @@ _EL3356_UNMAPPED = (
     "RMBCONTROL:CTRL_TARA",
 )
 
+# The EL2595's status and control words are packed bitfields on the fastcs side
+# (`dox_status`, `dox_control`), exactly as the EL3356's are, so the legacy
+# per-bit records -- which asyn-address individual bits of `DOXStatus.*` and
+# `DOXControl.*` -- have no PV to point at.
+#
+# The four `OUTPUT_VOLTAGE*` records are a different thing again: they go
+# through `@asyn($(PORT)_SDO)`, so they are CoE/SDO parameter access rather than
+# cyclic PDO data, and `terminal_types.yaml` models CoE under `coe_objects`, not
+# `symbol_nodes`. Mapping them belongs to whatever handles `SdoEntryTemplate`
+# (cf. `HOLDCURR`), not here. Nothing in any DLS BUILDER tree references them.
+#
+# For the record, since it is easy to assume otherwise: these are integers, not
+# floats. `OUTPUT_VOLTAGE` and `DOXCURRENT:OUTPUTCURRENT` are `longout`,
+# `OUTPUT_VOLTAGE:RBV`/`:STAT` are `longin`, all `asynInt32`; only
+# `OUTPUT_VOLTAGE_READ` is a bit, and it is a `bo` that triggers an SDO read.
+_EL2595_UNMAPPED = (
+    "DOXSTATUS:SERROR",
+    "DOXSTATUS:STATUS__DIGITALINPUT",
+    "DOXSTATUS:STATUS__OUTPUTACTIVE",
+    "DOXSTATUS:STATUS__READYTOACTIVATE",
+    "DOXSTATUS:STATUS__WARNING",
+    "DOXSTATUS:STXPDOTOGGLE",
+    "DOXCONTROL:CONTROL__INPUTTRIGGERENABLE",
+    "DOXCONTROL:CONTROL__OUTPUT",
+    "DOXCONTROL:CONTROL__RESET",
+    "OUTPUT_VOLTAGE",
+    "OUTPUT_VOLTAGE:RBV",
+    "OUTPUT_VOLTAGE:STAT",
+    "OUTPUT_VOLTAGE_READ",
+)
+
 # Every terminal template also declares these two. `AL_STATE` is the EtherCAT
 # state machine and `ERROR_FLAG` the slave error latch; fastcs-catio's nearest
 # equivalent, `wcstate`, is a working-counter status and is not the same signal.
@@ -138,6 +169,32 @@ TERMINALS: dict[str, TerminalLeaves] = {
             terminal_type="EL3356-0010",
             leaves=(Leaf("RMB:VALUE", "rmb_value_int32_value"),),
             unmapped=_COMMON_UNMAPPED + _EL3356_UNMAPPED,
+            channels=1,
+        ),
+        TerminalLeaves(
+            entity_type="auto_EL4134",
+            terminal_type="EL4134",
+            leaves=(
+                Leaf("OUTPUT{n}:ANALOG", "ao_out_ch_{n}_analog_out", writable=True),
+            ),
+            unmapped=_COMMON_UNMAPPED,
+        ),
+        # `dox_current_output_current` is only selected in `terminal_types.yaml`
+        # from fastcs-catio#65 onwards. Against an older release fastcs-catio
+        # creates no PV for it and the `leaf-type-mismatch` check fires, which is
+        # the intended outcome: better a named error than a rewritten reference
+        # pointing at a record that will never exist.
+        TerminalLeaves(
+            entity_type="auto_EL2595",
+            terminal_type="EL2595",
+            leaves=(
+                Leaf(
+                    "DOXCURRENT:OUTPUTCURRENT",
+                    "dox_current_output_current",
+                    writable=True,
+                ),
+            ),
+            unmapped=_COMMON_UNMAPPED + _EL2595_UNMAPPED,
             channels=1,
         ),
     )

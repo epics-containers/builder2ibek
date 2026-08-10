@@ -392,15 +392,18 @@ def test_without_fastcs_the_error_names_the_side_venv(
 # -- end to end --------------------------------------------------------------
 
 
-# The three BL21I-VA chains convert cleanly; ``BL21I-DI-IOC-01`` does not. Its
-# own ``EPICS_BASE.dbpf`` entities set currents on ``BL21I-DI-LED-01`` and
-# ``BL21I-OP-LED-01``, PVs created by ``auto_EL2595`` -- a terminal with no leaf
-# table in ``leaves.py``, so no fastcs-catio name can be predicted for them.
-# That is ``unknown-entity-type``, an ERROR, and it fails the DI chain. Real
-# data, not a fixture quirk: fixing it means teaching ``leaves.py`` about
-# EL2595/EL4134 or dropping those dbpf lines.
-CLEAN_CHAINS = ["BL21I-VA-CATIO-01", "BL21I-VA-CATIO-05", "BL21I-VA-CATIO-06"]
-FAILED_CHAIN = "BL21I-DI-IOC-01"
+# All four BL21I chains convert. ``BL21I-DI-IOC-01`` was the last holdout --
+# its own ``EPICS_BASE.dbpf`` entities set currents on ``BL21I-DI-LED-01..03``
+# and ``BL21I-OP-LED-01``, PVs created by ``auto_EL2595`` -- and it converts now
+# that ``leaves.py`` knows EL2595 and EL4134 and fastcs-catio selects the EL2595
+# drive current. The failure path is exercised by synthetic chains in
+# ``test_catio_regressions.py`` instead of by a real beamline staying broken.
+CLEAN_CHAINS = [
+    "BL21I-DI-CATIO-01",
+    "BL21I-VA-CATIO-01",
+    "BL21I-VA-CATIO-05",
+    "BL21I-VA-CATIO-06",
+]
 
 
 @needs_fastcs
@@ -410,10 +413,11 @@ def test_end_to_end_writes_the_clean_chains_and_their_consumers(
     code = run_catio(builder_tree, services_repo)
     out = capsys.readouterr().out
 
-    assert code == 1  # the DI chain errored
+    assert code == 0  # every chain converts
     assert sorted(stub.written_chains) == CLEAN_CHAINS
-    # every clean scanner, plus the two pure consumers -- and nothing else
+    # every scanner, plus the two pure consumers -- and nothing else
     assert sorted(stub.written_iocs) == [
+        "BL21I-DI-IOC-01",
         "BL21I-VA-IOC-01",
         "BL21I-VA-IOC-02",
         "BL21I-VA-IOC-04",
@@ -425,32 +429,32 @@ def test_end_to_end_writes_the_clean_chains_and_their_consumers(
 
     services = services_repo / "services"
     assert (services / "bl21i-va-catio-01" / "config" / "fastcs.yaml").is_file()
+    assert (services / "bl21i-di-catio-01" / "config" / "fastcs.yaml").is_file()
     assert (services / "bl21i-va-ioc-02" / "config" / "ioc.yaml").is_file()
     assert not (services / "bl21i-mo-ioc-99").exists()
-    assert not (services / "bl21i-di-catio-01").exists()
 
     assert "Chains discovered: 4" in out
-    assert "Chains converted:  3" in out
-    assert "Chains failed:     1" in out
+    assert "Chains converted:  4" in out
+    assert "Chains failed:     0" in out
     assert "REPLACE_WITH_FASTCS_IMAGE_URI" in out
     assert "REPLACE_WITH_IMAGE_URI" in out
     assert "sticky" in out
 
 
 @needs_fastcs
-def test_the_failed_chain_blocks_its_own_scanner_ioc(
+def test_nothing_is_skipped_when_every_chain_converts(
     builder_tree: Path, services_repo: Path, stub: StubServices, capsys
 ):
+    """The skip machinery is exercised on synthetic chains in the regressions.
+
+    Here the point is the opposite: a clean beamline must report nothing
+    skipped and no unconverted chain at all.
+    """
     run_catio(builder_tree, services_repo, json_out=True)
     payload = json.loads(capsys.readouterr().out)
 
-    skipped = {item["ioc"]: item for item in payload["iocs_skipped"]}
-    assert list(skipped) == [FAILED_CHAIN]
-    assert skipped[FAILED_CHAIN]["blocked_by"] == [FAILED_CHAIN]
-    assert skipped[FAILED_CHAIN]["own_errors"] is True
-    assert [c for c in payload["chains"] if not c["converted"]] == [
-        c for c in payload["chains"] if c["scanner_ioc"] == FAILED_CHAIN
-    ]
+    assert payload["iocs_skipped"] == []
+    assert [c for c in payload["chains"] if not c["converted"]] == []
 
 
 @needs_fastcs
@@ -479,7 +483,7 @@ def test_dry_run_writes_nothing(
     out = capsys.readouterr().out
     assert "DRY RUN -- nothing was written" in out
     # the analysis still ran in full
-    assert "Chains converted:  3" in out
+    assert "Chains converted:  4" in out
 
 
 @needs_fastcs
@@ -581,7 +585,7 @@ def test_the_command_is_reachable_through_the_typer_app(
         cli,
         ["catio", str(builder_tree), "--services-repo", str(services_repo), "--json"],
     )
-    assert result.exit_code == 1, result.output
+    assert result.exit_code == 0, result.output
     assert sorted(stub.written_chains) == CLEAN_CHAINS
 
 
@@ -598,7 +602,7 @@ def test_end_to_end_with_the_real_services_writer(
     assert (services / "bl21i-va-catio-01").is_dir()
     assert (services / "bl21i-va-ioc-02" / "config" / "ioc.yaml").is_file()
     assert not (services / "bl21i-mo-ioc-99").exists()
-    assert not (services / "bl21i-di-catio-01").exists()
+    assert (services / "bl21i-di-catio-01").is_dir()
 
 
 def test_report_renders_without_any_placeholders():

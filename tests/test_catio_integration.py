@@ -43,14 +43,22 @@ EXPECTED_ORDINALS = {
     "BL21I-VA-CATIO-06": 3,
 }
 
-#: ``BL21I-DI-IOC-01`` is skipped: it ``dbpf``-writes PVs created by
-#: ``auto_EL2595``, a terminal type ``leaves.py`` has no translation table for,
-#: so ``unknown-entity-type`` (ERROR) fails its chain. See the module docstring
-#: of ``builder2ibek.catio.leaves`` for what adding one would take.
-EXPECTED_FAILED_CHAINS = {"BL21I-DI-IOC-01"}
+#: Every BL21I chain converts. ``BL21I-DI-IOC-01`` was the last holdout: it
+#: needed ``auto_EL2595`` and ``auto_EL4134`` leaf tables, and the EL2595 drive
+#: current had to be selected in fastcs-catio's ``terminal_types.yaml``
+#: (fastcs-catio#65) before there was a PV to point its four ``dbpf`` writes at.
+#:
+#: Nothing in the samples exercises the per-chain failure policy any more.
+#: That is covered on purpose by synthetic chains in
+#: ``tests/test_catio_regressions.py`` -- a failed chain failing loudly, a
+#: reference into one erroring, a clean chain not being shadowed by it, and a
+#: straddling consumer being skipped whole -- so the coverage does not depend on
+#: a real beamline staying broken.
+EXPECTED_FAILED_CHAINS: set[str] = set()
 
-#: Consumers of a clean chain, so they are rewritten and written out.
+#: Consumers of a chain, so they are rewritten and written out.
 EXPECTED_IOCS_WRITTEN = {
+    "BL21I-DI-IOC-01",
     "BL21I-VA-IOC-01",
     "BL21I-VA-IOC-02",
     "BL21I-VA-IOC-04",
@@ -125,43 +133,44 @@ def test_full_run_writes_exactly_the_expected_folders(
     code = run_catio(builder_tree, services_repo)
     capsys.readouterr()
 
-    # Non-zero because BL21I-DI-IOC-01's chain failed.
-    assert code != 0
+    # Zero: every chain converts, so no error fired.
+    assert code == 0
 
     expected = {name.lower() for name in EXPECTED_IOCS_WRITTEN} | {
+        "bl21i-di-catio-01",
         "bl21i-va-catio-01",
         "bl21i-va-catio-05",
         "bl21i-va-catio-06",
     }
     assert folders(services_repo) == expected
 
-    # The failed chain got neither a fastcs-catio IOC nor a rewritten scanner.
-    assert not (services_repo / "services" / "bl21i-di-catio-01").exists()
-    assert not (services_repo / "services" / "bl21i-di-ioc-01").exists()
+    # Every chain got both a fastcs-catio IOC and a rewritten scanner.
+    assert (services_repo / "services" / "bl21i-di-catio-01").is_dir()
+    assert (services_repo / "services" / "bl21i-di-ioc-01").is_dir()
 
 
-def test_report_names_the_diagnostic_that_blocked_the_failed_chain(
+def test_the_whole_beamline_converts_with_no_chain_blocked(
     builder_tree: Path, services_repo: Path, capsys
 ):
-    """A skipped chain must be traceable to a named, actionable diagnostic."""
+    """Every BL21I chain converts, so nothing is skipped and no error fires.
+
+    This is the guard on the leaf tables: dropping ``auto_EL2595`` or
+    ``auto_EL4134``, or fastcs-catio deselecting the EL2595 drive current again,
+    puts ``BL21I-DI-IOC-01`` straight back into ``iocs_skipped``.
+    """
     run_catio(builder_tree, services_repo, json_out=True)
     report = json.loads(capsys.readouterr().out)
 
     failed = {c["scanner_ioc"] for c in report["chains"] if not c["converted"]}
     assert failed == EXPECTED_FAILED_CHAINS
 
-    blocking = [
-        d
-        for d in report["diagnostics"]
-        if d["severity"] == "error" and d["chain"] in EXPECTED_FAILED_CHAINS
-    ]
-    assert blocking, "a failed chain must carry at least one error"
-    assert {d["code"] for d in blocking} == {"unknown-entity-type"}
-    # The message must name the terminal type a human has to add a table for.
-    assert all("EL2595" in d["message"] for d in blocking)
+    assert [d for d in report["diagnostics"] if d["severity"] == "error"] == []
+    assert report["iocs_skipped"] == []
 
-    assert [i["ioc"] for i in report["iocs_skipped"]] == ["BL21I-DI-IOC-01"]
-    assert report["iocs_skipped"][0]["blocked_by"] == ["BL21I-DI-IOC-01"]
+    # The four LED drive currents are dbpf *writes*, so they must land on the
+    # setpoint and never on the read-only `_RBV`.
+    written = [d for d in report["diagnostics"] if d["code"] == "link-direction-guess"]
+    assert written == [], "no writable leaf should be left to a guess"
 
 
 def test_no_written_ioc_still_references_a_legacy_ethercat_pv(
@@ -232,7 +241,15 @@ def test_every_sampled_reference_is_rewritten_or_diagnosed(builder_tree: Path):
 
 #: Substitution-map size over all four chains. Pinned so a change in the naming
 #: rule or the dual-key policy cannot pass unnoticed.
-EXPECTED_SUBSTITUTIONS = 526
+#:
+#: Rose from 526 by 19 when the ``auto_EL2595`` and ``auto_EL4134`` tables were
+#: added: 7 for EL2595 (4 terminals x 1 leaf, declared, plus 3 chain-derived)
+#: and 12 for EL4134 (2 terminals x 4 leaves, declared, plus 4 chain-derived).
+#: Fewer chain-derived aliases than declared keys because an alias needs a
+#: coupler label, and several ``BL21I-DI`` couplers have none -- every entity on
+#: them declares a device-style ``DEVICE=`` with no ``:MOD`` part, so there is
+#: nothing to derive a label from. None of the shortfall is a dropped collision.
+EXPECTED_SUBSTITUTIONS = 545
 
 
 def test_substitution_map_size_is_stable(builder_tree: Path):
@@ -266,6 +283,7 @@ def test_rerunning_keeps_the_same_ordinals_and_bytes(
     capsys.readouterr()
     first = fastcs_configs(services_repo)
     assert set(first) == {
+        "bl21i-di-catio-01",
         "bl21i-va-catio-01",
         "bl21i-va-catio-05",
         "bl21i-va-catio-06",
