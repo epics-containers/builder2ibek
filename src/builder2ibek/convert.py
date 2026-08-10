@@ -95,11 +95,12 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
         # first do default conversion to entity
         # (We need this to be before the do_one_element() function to compare
         # against ioc.already_converted)
-        entity = convert_generic(element, ioc)
+        entity = make_entity(element)
 
         if entity in ioc.already_converted:
             # we don't want to duplicate it
             continue
+        ioc.entities.append(entity)
         do_one_element(element, entity, ioc)
 
     sorted_entities: list[Entity] = []
@@ -223,7 +224,7 @@ def make_entity(element: Element) -> Entity:
     return entity
 
 
-def convert_generic(element: Element, ioc: Generic_IOC) -> Entity:
-    entity = make_entity(element)
-    ioc.entities.append(entity)
-    return entity
+# def convert_generic(element: Element, ioc: Generic_IOC) -> Entity:
+#     entity = make_entity(element)
+#     ioc.entities.append(entity)
+#     return entity
