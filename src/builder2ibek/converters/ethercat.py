@@ -8,7 +8,8 @@ behind in place of the ``EthercatMaster``.
 
 When the conversion is driven by the ``catio`` command the IOC additionally
 carries a :class:`CatioContext` in ``ioc.catio``; :func:`finalize` then rewrites
-every legacy EtherCAT PV reference in the whole IOC to its fastcs-catio name.
+every legacy EtherCAT PV reference in the whole IOC to its fastcs-catio name,
+and drops the TODO placeholder -- that switch has just been made.
 """
 
 from dataclasses import dataclass, field
@@ -18,6 +19,12 @@ from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "ethercat"
+
+#: What an ``EthercatMaster`` becomes in a plain ``xml2yaml`` conversion.
+TODO_COMMAND = (
+    "# TODO: ethercat support requires major rewrite for "
+    "epics-containers — switch to fastcs-catio"
+)
 
 
 @dataclass
@@ -55,13 +62,18 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # Replace the first EthercatMaster with a placeholder comment
         entity.clear()
         entity.type = "epics.PostStartupCommand"
-        entity["command"] = (
-            "# TODO: ethercat support requires major rewrite for "
-            "epics-containers — switch to fastcs-catio"
-        )
+        entity["command"] = TODO_COMMAND
     else:
         # Drop all other ethercat entities
         entity.delete_me()
+
+
+def _is_todo_placeholder(entity: dict[str, Any]) -> bool:
+    """True for the placeholder :func:`handler` leaves behind for a master."""
+    return (
+        entity.get("type") == "epics.PostStartupCommand"
+        and entity.get("command") == TODO_COMMAND
+    )
 
 
 def finalize(ioc: Generic_IOC) -> None:
@@ -84,6 +96,12 @@ def finalize(ioc: Generic_IOC) -> None:
         return
 
     try:
+        # The placeholder tells a human to switch to fastcs-catio; in a catio
+        # run that has just happened, so leaving it behind would send whoever
+        # reads the IOC looking for work already done. Only a *written* IOC
+        # matters, and `catio` skips any scanner whose chain failed, so a
+        # placeholder that would reach a services repo is always stale.
+        ioc.entities[:] = [e for e in ioc.entities if not _is_todo_placeholder(e)]
         # Snapshot before rewriting: afterwards these hold the *new* names, and
         # the comparison below needs the legacy ones.
         kept = [dict(entity) for entity in ioc.entities]

@@ -176,6 +176,39 @@ def test_catio_context_sees_every_entity_and_the_ioc_name():
     assert "devIocStats.iocAdminSoft" in {t for _, t in sub.calls}
 
 
+def test_catio_run_strips_the_todo_placeholder():
+    """The switch the TODO asks for is what a catio run just did."""
+    sub = StubSubstituter(SUBS)
+    ctx = CatioContext(substituter=sub, log=StubLog(), ioc_name="BL21I-VA-IOC-02")
+    ioc = convert_xml(ETHERCAT_XML, catio=ctx)
+
+    assert "epics.PostStartupCommand" not in entity_types(ioc)
+    assert TODO_COMMAND not in str(ioc.entities)
+    # the rest of the IOC is untouched
+    assert calc_entity(ioc)["INPA"] == "BL21I-VA-E1RIO-01:AI01:Channel1 CP"
+
+
+def test_catio_run_keeps_unrelated_post_startup_commands():
+    """Only *this* placeholder goes -- a real post-init command must survive."""
+    with_command = ETHERCAT_XML.replace(
+        "</components>",
+        '  <EPICS_BASE.StartupCommand command="dbpf(&quot;X&quot;,1)" '
+        'post_init="True"/>\n</components>',
+    )
+    sub = StubSubstituter(SUBS)
+    ctx = CatioContext(substituter=sub, log=StubLog(), ioc_name="BL21I-VA-IOC-02")
+    ioc = convert_xml(with_command, catio=ctx)
+
+    (kept,) = [e for e in ioc.entities if e["type"] == "epics.PostStartupCommand"]
+    assert kept["command"] == 'dbpf("X",1)'
+
+
+def test_todo_placeholder_survives_a_plain_conversion():
+    """`xml2yaml` has no catio IOC to point at, so the TODO must stay."""
+    ioc = convert_xml(ETHERCAT_XML)
+    assert "epics.PostStartupCommand" in entity_types(ioc)
+
+
 def test_catio_attribute_is_removed_from_the_model():
     sub = StubSubstituter(SUBS)
     ctx = CatioContext(substituter=sub, log=StubLog(), ioc_name="BL21I-VA-IOC-02")
