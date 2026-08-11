@@ -10,7 +10,9 @@ description: Operational knowledge and foot-guns for the epics-containers `ibek 
 central library into `services/<instance>/config/`, prepending a deterministic
 `# Vendored from <src>@<ver> — DO NOT EDIT` header and recording each file's sha256
 in `services/<instance>/runtime-lock.yaml`. Libraries: `ibek-runtime-streamdevice`,
-`ibek-runtime-support`. Shipped in **ibek 4.6.0** (`ibek pattern`, `ibek runtime place-files`).
+`ibek-runtime-support`. Shipped in **ibek 4.6.0** (`ibek pattern`, `ibek runtime
+place-files`), but 4.6.0 was yanked, so the real floor is **`ibek>=4.6.1`** — see
+the version-pin note under "Other conventions".
 
 ## check / dirty semantics
 - `ibek pattern check <instance>` → **exit 1** on any hash mismatch (drift).

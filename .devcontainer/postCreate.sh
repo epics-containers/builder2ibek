@@ -12,10 +12,16 @@ pre-commit install --install-hooks
 # silently move an already checked out submodule back to the pinned commit,
 # losing whatever the developer had there.
 if [ -f .gitmodules ]; then
-    readarray -t uninitialised < <(git submodule status | awk '/^-/ {print $2}')
+    # Capture the status first: a failure inside <( ) is not caught by set -e,
+    # so a broken `git submodule status` would silently read as "nothing to do".
+    submodule_status=$(git submodule status)
+    readarray -t uninitialised < <(printf '%s\n' "${submodule_status}" | awk '/^-/ {print $2}')
     for submodule in "${uninitialised[@]}"; do
         echo "Initialising submodule ${submodule}"
-        git submodule update --init -- "${submodule}"
+        # ibek-support-dls is on Diamond's internal GitLab, which is unreachable
+        # from outside DLS, so warn rather than fail the whole container create.
+        git submodule update --init -- "${submodule}" ||
+            echo "WARNING: could not initialise ${submodule}, continuing without it"
     done
 fi
 
