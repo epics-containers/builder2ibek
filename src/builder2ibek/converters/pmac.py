@@ -33,10 +33,14 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type in [
         "dls_pmac_asyn_motor",
         "dls_pmac_cs_asyn_motor",
+        "dls_pmac_asyn_motor_no_coord",
     ]:
         if entity_type == "dls_pmac_cs_asyn_motor":
             entity.type = "pmac.dls_pmac_asyn_motor"
             entity.is_cs = True
+        elif entity_type == "dls_pmac_asyn_motor_no_coord":
+            entity.type = "pmac.dls_pmac_asyn_motor"
+            entity.is_cs = False
         # standardise the name of the controller port
         entity.rename("PORT", "Controller")
         # this is calculated
