@@ -59,8 +59,8 @@ pattern
 
 file "$(POSITIONER)/db/multipositioner.template" {
 pattern 
-	{ "type",                       "entity_enabled", "P",                "MP",    "DESC",         "name",     "STRA",      "STRB",            "STRC",       "STRD",       "STRE", "STRF", "STRG", "STRH", "STRI", "STRJ", "STRK", "STRL", "STRM", "STRN", "STRO", "STRP", "P1_VALS", "P2_VALS", "P3_VALS", "P4_VALS", "P5_VALS", "P6_VALS" }
-	{ "positioner.multipositioner", "True",           "BL03I-DI-QBPM-01", ":Y:MP", "Pre-HFM QBPM", "QBPM1.MP", "Interlock", "Out of the Beam", "Lower Foil", "Upper Foil", "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "P1 Val",  "P2 Val",  "P3 Val",  "P4 Val",  "P5 Val",  "P6 Val"  }
+	{ "type",                       "entity_enabled", "P",                "MP",    "PS",  "DESC",         "name",     "STRA",      "STRB",            "STRC",       "STRD",       "STRE", "STRF", "STRG", "STRH", "STRI", "STRJ", "STRK", "STRL", "STRM", "STRN", "STRO", "STRP", "P1_VALS", "P2_VALS", "P3_VALS", "P4_VALS", "P5_VALS", "P6_VALS" }
+	{ "positioner.multipositioner", "True",           "BL03I-DI-QBPM-01", ":Y:MP", ":P1", "Pre-HFM QBPM", "QBPM1.MP", "Interlock", "Out of the Beam", "Lower Foil", "Upper Foil", "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "P1 Val",  "P2 Val",  "P3 Val",  "P4 Val",  "P5 Val",  "P6 Val"  }
 }
 
 file "$(POSITIONER)/db/motorpositioner.template" {
