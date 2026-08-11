@@ -280,6 +280,13 @@ For autosave specifically, also check the pass-0/pass-1 restore gotcha in
 
 ### 5b. Validate ioc.subst
 
+**Compare against XMLbuilder's `<IOC>_expanded.substitutions`, not against a
+previous conversion** — see
+[verify-against-builder.md](../skills/shared/verify-against-builder.md). Several
+real defects (unresolved short-names, an entity model that emits nothing, a
+stale module version pin) produce no diff and generate cleanly.
+
+
 Read `$EPICS_ROOT/runtime/ioc.subst`. For each `file` block verify:
 - Correct db file path
 - All required macros present in `pattern`

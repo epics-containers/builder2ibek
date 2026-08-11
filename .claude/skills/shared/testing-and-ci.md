@@ -94,6 +94,20 @@ export EPICS_ROOT=$(mktemp -d)
 ./tests/samples/make_samples.sh
 ```
 
+The same misleading symptom has a second cause: **two processes sharing one
+`ibek-defs`.** `tests/conftest.py` also runs `./update-schema` into
+`$EPICS_ROOT/ibek-defs` (default `/epics`), and `update-schema` does
+`rm -f .../ibek-defs/*` before re-linking. Run `pytest` and `make_samples.sh` at
+the same time — two terminals, or an agent alongside a human — and `generate2`
+reads that window, fails on whichever file happens to be missing, and
+`make_samples.sh` deletes that sample's outputs. The named module is innocent
+and validates fine afterwards.
+
+`conftest` guards *within* a session with an xdist file-lock, but nothing guards
+across processes. If a single sample fails on a module unrelated to your change,
+suspect this before believing it: re-validate the named file on its own, and
+re-run with a private `EPICS_ROOT`.
+
 `tests/check_pin_freshness.py` covers the opposite mistake: a pin that has *not*
 moved while upstream has. It warns and never fails, and runs weekly from
 `periodic.yml`.
