@@ -37,6 +37,7 @@ uv run pytest "tests/test_file_conversion.py::test_convert[BL11I-CS-IOC-09]"
 Regenerate expected outputs and schema:
 
 ```bash
+./update-schema
 ./tests/samples/make_samples.sh
 ./update-schema
 ```
