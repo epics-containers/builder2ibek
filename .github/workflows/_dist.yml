@@ -18,7 +18,7 @@ jobs:
       - name: Build sdist and wheel
         run: >
           export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) &&
-          uvx --from build pyproject-build
+          uv run --with build pyproject-build
 
       - name: Upload sdist and wheel as artifacts
         uses: actions/upload-artifact@v7
