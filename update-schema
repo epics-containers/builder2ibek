@@ -1,11 +1,42 @@
 #!/bin/bash
 
+set -euo pipefail
+
 THISDIR=$(dirname $0)
 EPICS_ROOT="${EPICS_ROOT:-/epics}"
 
+# ibek resolves entity models from $EPICS_ROOT/ibek-defs, never from
+# ibek-support*/ directly, so collect the support yaml from both submodules here.
+shopt -s nullglob
+defs=("$THISDIR"/ibek-support*/*/*.ibek.support.yaml)
+shopt -u nullglob
+
+if [ ${#defs[@]} -eq 0 ]; then
+    echo "ERROR: no *.ibek.support.yaml found under $THISDIR/ibek-support*/" >&2
+    echo "       are the submodules initialised? git submodule update --init" >&2
+    exit 1
+fi
+
+# A support folder that is present but empty yields a partial ibek-defs, whose
+# symptom is a handful of entities failing rather than an obvious error. Say so.
+shopt -s nullglob
+for support in "$THISDIR"/ibek-support*/; do
+    contributed=("${support}"*/*.ibek.support.yaml)
+    if [ ${#contributed[@]} -eq 0 ]; then
+        echo "WARNING: ${support} holds no *.ibek.support.yaml;" \
+             "entities from it will be missing" >&2
+    fi
+done
+shopt -u nullglob
+
 # set up the generic IOC-like environment for ibek
 mkdir -p "$EPICS_ROOT/ibek-defs/"
-rm $EPICS_ROOT/ibek-defs/*
-ln -srf $THISDIR/ibek-support*/*/*.ibek.support.yaml "$EPICS_ROOT/ibek-defs/"
+rm -f "$EPICS_ROOT"/ibek-defs/*
+ln -srf "${defs[@]}" "$EPICS_ROOT/ibek-defs/"
 
-ibek ioc generate-schema > "$EPICS_ROOT/ibek-defs/ioc.schema.json"
+# generate into a temp file first so a failure leaves no truncated schema behind.
+# It is a dotfile, which the rm above does not glob, so clean it up on the way out.
+tmp_schema="$EPICS_ROOT/ibek-defs/.ioc.schema.json.tmp"
+trap 'rm -f "${tmp_schema}"' EXIT
+ibek ioc generate-schema > "${tmp_schema}"
+mv "${tmp_schema}" "$EPICS_ROOT/ibek-defs/ioc.schema.json"
