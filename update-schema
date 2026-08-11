@@ -29,6 +29,27 @@ for support in "$THISDIR"/ibek-support*/; do
 done
 shopt -u nullglob
 
+# ibek-defs is flat, so two support yaml sharing a basename collide there and
+# only one survives. What `ln` does about that varies by coreutils version: it
+# may silently let the last one win (leaving a schema quietly missing whatever
+# the loser defined), or refuse with "will not overwrite just-created", which
+# names the files but not the problem. Neither is a good way to find out, so
+# check first and say exactly what clashed.
+dupes=$(printf '%s\n' "${defs[@]##*/}" | sort | uniq -d)
+if [ -n "${dupes}" ]; then
+    echo "ERROR: support yaml with duplicate basenames would collide in" \
+         "$EPICS_ROOT/ibek-defs/:" >&2
+    while IFS= read -r base; do
+        echo "  ${base}" >&2
+        for def in "${defs[@]}"; do
+            [ "${def##*/}" = "${base}" ] && echo "      ${def}" >&2
+        done
+    done <<< "${dupes}"
+    echo "       remove or rename all but one of each; a module must appear in" \
+         "exactly one ibek-support* folder" >&2
+    exit 1
+fi
+
 # set up the generic IOC-like environment for ibek
 mkdir -p "$EPICS_ROOT/ibek-defs/"
 rm -f "$EPICS_ROOT"/ibek-defs/*
