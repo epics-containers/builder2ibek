@@ -28,6 +28,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # Set motorpositioner.EGU = motor's EGU.
         motor_types = (
             "dls_pmac_asyn_motor",
+            "dls_pmac_asyn_motor_no_coord",
             "basic_asyn_motor",
             "softMotorForPiezo",
         )
