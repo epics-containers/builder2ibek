@@ -96,12 +96,13 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
         # (We need this to be before the do_one_element() function to compare
         # against ioc.already_converted)
         entity = make_entity(element)
+        do_one_element(element, entity, ioc)
 
         if entity in ioc.already_converted:
             # we don't want to duplicate it
             continue
         ioc.entities.append(entity)
-        do_one_element(element, entity, ioc)
+        ioc.already_converted.append(entity)
 
     sorted_entities: list[Entity] = []
     for entity in ioc.entities:  # type: ignore
@@ -154,8 +155,6 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
             del entity[key]
 
     strip_defaults(entity)
-
-    ioc.already_converted.append(entity)
 
 
 def add_defaults(entity: dict[str, Any], defaults: dict[str, dict[str, Any]]):
