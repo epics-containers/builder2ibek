@@ -78,8 +78,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             and e.get("MP") == entity.MP
         ]
 
+        ps_number = len(converted_mps) + 1
+        if ps_number > 6:
+            raise ValueError("A multipositioner supports at most six sub-positioners")
         # Assign the corresponding PS macro (P1, P2, ...)
-        entity["PS"] = f":P{len(converted_mps) + 1}"
+        entity["PS"] = f":P{ps_number}"
 
         # TODO: We need to check if POSN is defined (i.e. the builder object
         # is not used)
