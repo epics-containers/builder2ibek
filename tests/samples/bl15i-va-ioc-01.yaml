@@ -2964,28 +2964,28 @@ entities:
 
   - type: vacuumSpace.space_b
     device: BL15I-VA-SPACE-01
-    gauge1: GAUGE1
-    gauge2: GAUGE21
-    img1: IMG1
-    img2: IMG21
+    gauge1: BL15I-VA-GAUGE-01
+    gauge2: BL15I-VA-GAUGE-21
+    img1: BL15I-VA-IMG-01
+    img2: BL15I-VA-IMG-21
     ionp1: BL15I-VA-IONP-01
     name: SPACE1
-    pirg1: PIRG1
-    pirg2: PIRG21
+    pirg1: BL15I-VA-PIRG-01
+    pirg2: BL15I-VA-PIRG-21
     valve1: FE15I-VA-VALVE-02
 
   - type: vacuumSpace.space_b
     device: BL15I-VA-SPACE-02
-    gauge1: GAUGE2
-    img1: IMG2
+    gauge1: BL15I-VA-GAUGE-02
+    img1: BL15I-VA-IMG-02
     ionp1: BL15I-VA-IONP-02
     name: SPACE2
-    pirg1: PIRG2
+    pirg1: BL15I-VA-PIRG-02
     valve1: BL15I-VA-DVALV-01
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-03
-    gauge1: GAUGE3
+    gauge1: BL15I-VA-GAUGE-03
     img1: BL15I-VA-IMG-03
     ionp1: BL15I-VA-IONP-03
     name: SPACE3
@@ -2994,7 +2994,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-04
-    gauge1: GAUGE4
+    gauge1: BL15I-VA-GAUGE-04
     img1: BL15I-VA-IMG-04
     ionp1: BL15I-VA-IONP-04
     name: SPACE4
@@ -3003,7 +3003,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-05
-    gauge1: GAUGE5
+    gauge1: BL15I-VA-GAUGE-05
     img1: BL15I-VA-IMG-05
     ionp1: BL15I-VA-IONP-05
     name: SPACE5
@@ -3012,7 +3012,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-06
-    gauge1: GAUGE6
+    gauge1: BL15I-VA-GAUGE-06
     img1: BL15I-VA-IMG-06
     ionp1: BL15I-VA-IONP-06
     name: SPACE6
@@ -3021,7 +3021,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-07
-    gauge1: GAUGE7
+    gauge1: BL15I-VA-GAUGE-07
     img1: BL15I-VA-IMG-07
     ionp1: BL15I-VA-IONP-07
     name: SPACE7
@@ -3030,7 +3030,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-08
-    gauge1: GAUGE8
+    gauge1: BL15I-VA-GAUGE-08
     img1: BL15I-VA-IMG-08
     ionp1: BL15I-VA-IONP-08
     name: SPACE8
@@ -3039,7 +3039,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-09
-    gauge1: GAUGE9
+    gauge1: BL15I-VA-GAUGE-09
     img1: BL15I-VA-IMG-09
     ionp1: BL15I-VA-IONP-09
     name: SPACE9
@@ -3048,9 +3048,9 @@ entities:
 
   - type: vacuumSpace.space
     device: BL15I-VA-SPACE-10
-    gauge1: GAUGE10
-    gauge2: GAUGE11
-    gauge3: GAUGE12
+    gauge1: BL15I-VA-GAUGE-10
+    gauge2: BL15I-VA-GAUGE-11
+    gauge3: BL15I-VA-GAUGE-12
     img1: BL15I-VA-IMG-10
     img2: BL15I-VA-IMG-11
     img3: BL15I-VA-IMG-12

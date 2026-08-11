@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One IOC, eight repos — builder2ibek</title>
+<!--
+  Standalone briefing page, copied verbatim into _static/ by Sphinx.
+  Deliberately NOT styled by pydata-sphinx-theme: it is a self-contained
+  handout, linked from docs/explanations/one-ioc-eight-repos.md, which
+  carries the analysis and the recommendations.
+-->
+<style>
+  :root {
+    --paper:      #F4F5F8;
+    --surface:    #FFFFFF;
+    --surface-2:  #ECEEF3;
+    --ink:        #14171F;
+    --ink-2:      #454B5A;
+    --ink-3:      #6E7588;
+    --rule:       #D6DAE3;
+    --rule-soft:  #E4E7EE;
+    --accent:     #A96718;
+    --accent-bg:  #F7EEDF;
+    --alert:      #9C3E33;
+    --alert-bg:   #F8E9E6;
+    --done:       #3F6B57;
+
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+    --max: 60rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:     #12141A;
+      --surface:   #191C24;
+      --surface-2: #21252F;
+      --ink:       #E7E9EF;
+      --ink-2:     #AFB5C4;
+      --ink-3:     #7C8396;
+      --rule:      #2C313D;
+      --rule-soft: #232833;
+      --accent:    #D8A052;
+      --accent-bg: #2A2318;
+      --alert:     #D98177;
+      --alert-bg:  #2B1D1B;
+      --done:      #79AC92;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:     #12141A;
+    --surface:   #191C24;
+    --surface-2: #21252F;
+    --ink:       #E7E9EF;
+    --ink-2:     #AFB5C4;
+    --ink-3:     #7C8396;
+    --rule:      #2C313D;
+    --rule-soft: #232833;
+    --accent:    #D8A052;
+    --accent-bg: #2A2318;
+    --alert:     #D98177;
+    --alert-bg:  #2B1D1B;
+    --done:      #79AC92;
+  }
+
+  :root[data-theme="light"] {
+    --paper:     #F4F5F8;
+    --surface:   #FFFFFF;
+    --surface-2: #ECEEF3;
+    --ink:       #14171F;
+    --ink-2:     #454B5A;
+    --ink-3:     #6E7588;
+    --rule:      #D6DAE3;
+    --rule-soft: #E4E7EE;
+    --accent:    #A96718;
+    --accent-bg: #F7EEDF;
+    --alert:     #9C3E33;
+    --alert-bg:  #F8E9E6;
+    --done:      #3F6B57;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(2rem, 5.5vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst {
+    font-size: 1.09rem;
+    color: var(--ink-2);
+    max-width: 42rem;
+    text-wrap: pretty;
+  }
+
+  /* ---------- stat strip ---------- */
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .stat { background: var(--surface); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.2rem; }
+  .stat b {
+    font-family: var(--mono);
+    font-size: 1.65rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .stat span { font-size: 0.78rem; color: var(--ink-3); line-height: 1.35; }
+  .stat.flag b { color: var(--accent); }
+  .stat.stop b { color: var(--alert); }
+
+  /* ---------- section furniture ---------- */
+
+  section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  h2 {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0;
+    padding-bottom: 0.7rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .lede { color: var(--ink-2); max-width: 42rem; margin: 0; }
+
+  /* ---------- topology ---------- */
+
+  .topo { display: flex; flex-direction: column; gap: 0; }
+
+  .tier {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.15rem 0;
+  }
+  .tier + .tier { border-top: 1px dashed var(--rule); }
+
+  .tier-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .nodes { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+  .node {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.6rem 0.85rem;
+    min-width: 11rem;
+    flex: 1 1 11rem;
+  }
+  .node .name { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; letter-spacing: -0.01em; }
+  .node .meta { font-size: 0.73rem; color: var(--ink-3); }
+  .node.gl { border-left-color: var(--accent); }
+  .node.gh { border-left-color: var(--ink-3); }
+
+  .forge-key { display: flex; flex-wrap: wrap; gap: 1.2rem; font-size: 0.76rem; color: var(--ink-3); }
+  .forge-key i { font-style: normal; display: inline-flex; align-items: center; gap: 0.45rem; }
+  .swatch { width: 0.7rem; height: 0.7rem; border-radius: 1px; display: inline-block; }
+
+  /* ---------- stages ---------- */
+
+  .stages { display: flex; flex-direction: column; gap: 0; }
+
+  .stage {
+    display: grid;
+    grid-template-columns: 3.25rem 1fr;
+    gap: 0 1.2rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .stage:first-child { border-top: none; padding-top: 0; }
+
+  .num {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+    padding-top: 0.15rem;
+  }
+  .stage.hand .num { color: var(--accent); }
+  .stage.stop .num { color: var(--alert); }
+
+  .body { display: flex; flex-direction: column; gap: 0.55rem; min-width: 0; }
+
+  .stage h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .stage p { margin: 0; color: var(--ink-2); max-width: 44rem; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    padding: 0.16rem 0.45rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--ink-3);
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  .tag.hand { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); font-weight: 600; }
+  .tag.stop { color: var(--alert); border-color: var(--alert); background: var(--alert-bg); font-weight: 600; }
+  .tag.done { color: var(--done); border-color: var(--done); }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-bg);
+    padding: 0.7rem 0.9rem;
+    border-radius: 0 2px 2px 0;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+  }
+  .note.stop { border-left-color: var(--alert); background: var(--alert-bg); }
+  .note b { color: var(--ink); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    padding: 0.08em 0.32em;
+    border-radius: 2px;
+    word-break: break-word;
+  }
+
+  /* ---------- friction table ---------- */
+
+  .scroller { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); }
+
+  table { border-collapse: collapse; width: 100%; min-width: 40rem; }
+  th, td { text-align: left; padding: 0.75rem 0.95rem; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.what { font-weight: 600; }
+  td.cost { color: var(--ink-2); }
+
+  .sev {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .sev.hi { color: var(--alert); background: var(--alert-bg); }
+  .sev.md { color: var(--accent); background: var(--accent-bg); }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.4rem;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+    max-width: 44rem;
+  }
+
+  @media (max-width: 34rem) {
+    .stage { grid-template-columns: 1fr; gap: 0.5rem; }
+    .num { padding-top: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Workflow post-mortem · BL15I-VA-IOC-02 · 11 Aug 2026</div>
+    <h1>One IOC, eight repos</h1>
+    <p class="standfirst">
+      The ask was small: add a vacuum IOC instance for I15. Getting there meant
+      changing support metadata in three repositories, cutting a release of a
+      fourth, and stopping twice for a human to merge. This is the chain as it
+      actually ran — laid out so we can argue about which links are load-bearing.
+    </p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b>8</b><span>repositories touched</span></div>
+    <div class="stat"><b>2</b><span>forges, two auth paths</span></div>
+    <div class="stat"><b>10</b><span>defects fixed across 6 modules</span></div>
+    <div class="stat flag"><b>2</b><span>protected-branch hand-offs</span></div>
+    <div class="stat flag"><b>3</b><span>copies of the same support metadata</span></div>
+    <div class="stat"><b>0</b><span>lines of the IOC written by hand</span></div>
+  </div>
+
+  <section>
+    <h2>The dependency graph</h2>
+    <p class="lede">
+      Nothing here is unusual on its own. The cost comes from the depth: a fix in
+      a support model has to climb three tiers before an IOC can use it.
+    </p>
+
+    <div class="topo">
+      <div class="tier">
+        <div class="tier-label">Tier 1 — support metadata</div>
+        <div class="nodes">
+          <div class="node gh"><span class="name">ibek-support</span><span class="meta">GitHub · public entity models</span></div>
+          <div class="node gl"><span class="name">ibek-support-dls</span><span class="meta">GitLab · DLS entity models</span></div>
+          <div class="node gh"><span class="name">ibek-runtime-support</span><span class="meta">GitHub · vendored patterns</span></div>
+        </div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-label">Tier 2 — consumers (submodule pins)</div>
+        <div class="nodes">
+          <div class="node gh"><span class="name">builder2ibek</span><span class="meta">GitHub · converter + CI samples</span></div>
+          <div class="node gl"><span class="name">ioc-dlslinuxvac</span><span class="meta">GitLab · the container image</span></div>
+          <div class="node gh"><span class="name">ioc-template</span><span class="meta">GitHub · copier source</span></div>
+        </div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-label">Tier 3 — instances</div>
+        <div class="nodes">
+          <div class="node gl"><span class="name">i15-services</span><span class="meta">GitLab · the IOC we wanted</span></div>
+          <div class="node gl"><span class="name">i21-services</span><span class="meta">GitLab · collateral, re-fixed</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="forge-key">
+      <i><span class="swatch" style="background: var(--ink-3)"></span> GitHub — agent can push, PR, merge</i>
+      <i><span class="swatch" style="background: var(--accent)"></span> GitLab — protected branches, human merges</i>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it actually ran</h2>
+    <p class="lede">
+      Numbered because the order was forced, not chosen. Each step either
+      uncovered the next problem or was blocked until the previous one landed.
+    </p>
+
+    <div class="stages">
+
+      <div class="stage">
+        <div class="num">01</div>
+        <div class="body">
+          <h3>Convert the XML</h3>
+          <p>
+            <code>builder2ibek xml2yaml</code> turned 338 XMLbuilder elements into
+            335 ibek entities. Every entity type round-tripped. This part worked
+            exactly as intended and took seconds.
+          </p>
+          <div class="tags"><span class="tag done">automated</span><span class="tag">builder2ibek</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">02</div>
+        <div class="body">
+          <h3>Generation failed — and that was the only discovery mechanism</h3>
+          <p>
+            144 validation errors. <code>NX102_femto</code> had no entity model at
+            all; <code>NX102_readBool</code> was missing three macros;
+            <code>NX102_temperature</code> demanded a <code>desc</code> that 122 of
+            123 entities don't set; <code>ether_ip</code> only had
+            <code>EtherIPInit</code>; <code>mks937bGaugeEGU</code> demanded four
+            inputs it should have derived.
+          </p>
+          <div class="note">
+            <b>Nothing knew these gaps existed until an IOC happened to need them.</b>
+            A later sweep found 15 dlsPLC templates with no entity model — the same
+            failure is queued up for the next IOC that touches one.
+          </div>
+          <div class="tags"><span class="tag done">automated</span><span class="tag">dlsPLC</span><span class="tag">ether_ip</span><span class="tag">mks937b</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">03</div>
+        <div class="body">
+          <h3>Fix the same class of bug in two repos on two forges</h3>
+          <p>
+            <code>ether_ip</code> and <code>mks937b</code> live in the public
+            GitHub repo; <code>dlsPLC</code> and <code>vacuumSpace</code> live in
+            the DLS GitLab one. Identical work, split by ownership, with two
+            different review and merge processes.
+          </p>
+          <div class="tags"><span class="tag">ibek-support</span><span class="tag">ibek-support-dls</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">04</div>
+        <div class="body">
+          <h3>A cross-cutting defect surfaced, invalidating earlier work</h3>
+          <p>
+            <code>vacuumSpace</code> was passing XMLbuilder short-names
+            (<code>GAUGE1</code>, <code>PIRG13</code>) straight into database
+            macros instead of device PV names. Every gauge, img and pirg link in
+            every vacuum space group pointed at a PV that could never connect.
+          </p>
+          <div class="note">
+            <b>It also broke the I21 IOC converted an hour earlier and reported clean.</b>
+            Five committed CI samples changed. Nothing flagged it — the only reason
+            it was caught is that I15 exercised the same code path with a different
+            module and the substitutions were compared against XMLbuilder's output.
+          </div>
+          <div class="tags"><span class="tag">vacuumSpace</span><span class="tag">i21-services</span><span class="tag">5 samples</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">05</div>
+        <div class="body">
+          <h3>A build-or-vendor decision, and a third support repo</h3>
+          <p>
+            <code>BL15I-BUILDER</code> is a beamline repo whose entities the
+            converter silently dropped. It turned out to have no compiled code, so
+            it became a vendored runtime pattern rather than a built module — which
+            meant a new pattern folder, a PR, and a <code>v0.2.0</code> tag in a
+            third support repository before the IOC could reference it.
+          </p>
+          <div class="tags"><span class="tag done">automated</span><span class="tag">ibek-runtime-support</span><span class="tag">tag v0.2.0</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">06</div>
+        <div class="body">
+          <h3>The pin choreography</h3>
+          <p>
+            Bump two submodule pins, commit. Refresh the vendored copy that CI uses
+            because GitHub Actions can't reach DLS GitLab. Regenerate every sample.
+            Commit again. The order is forced: the refresh tool refuses unless the
+            pin is already committed, and two guards read <code>git ls-tree HEAD</code>,
+            so staging isn't enough.
+          </p>
+          <div class="tags"><span class="tag">builder2ibek</span><span class="tag">3 copies of the same metadata</span></div>
+        </div>
+      </div>
+
+      <div class="stage hand">
+        <div class="num">07</div>
+        <div class="body">
+          <h3>Hand-off — GitLab main is protected</h3>
+          <p>
+            <code>git push origin main</code> rejected by the pre-receive hook.
+            Push a branch, open a merge request, switch to a browser, merge, come
+            back. The automated chain stops dead here and waits for a person.
+          </p>
+          <div class="tags"><span class="tag hand">human required</span><span class="tag">ibek-support-dls</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">08</div>
+        <div class="body">
+          <h3>Bake it into the container</h3>
+          <p>
+            Point <code>ioc-dlslinuxvac</code> at the two new submodule commits.
+            Straightforward — and, on its own, not enough.
+          </p>
+          <div class="tags"><span class="tag">ioc-dlslinuxvac</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">09</div>
+        <div class="body">
+          <h3>The template update turned out to be load-bearing</h3>
+          <p>
+            The image was two template versions behind, and 4.6.3 carries the only
+            two things that make a vendored pattern work at all:
+            <code>ibek runtime place-files</code> in <code>start.sh</code>, and the
+            config folder on msi's include path.
+          </p>
+          <div class="note">
+            <b>Without both, the IOC builds green and dies at container start.</b>
+            This was found by asking a side question about a version pin, not by
+            any check. The update also exposed two template gaps, now filed as
+            <code>ioc-template#83</code>.
+          </div>
+          <div class="tags"><span class="tag">copier 4.5.2 → 4.6.3</span><span class="tag">3 conflicts</span><span class="tag">ioc-template#83</span></div>
+        </div>
+      </div>
+
+      <div class="stage hand">
+        <div class="num">10</div>
+        <div class="body">
+          <h3>Hand-off — merge request, then tag the release</h3>
+          <p>
+            Same protected-branch stop as step 07. Merge the MR, then push tag
+            <code>2026.8.1</code> to trigger the image build and schema publish.
+          </p>
+          <div class="tags"><span class="tag hand">human required</span><span class="tag">ioc-dlslinuxvac</span></div>
+        </div>
+      </div>
+
+      <div class="stage hand">
+        <div class="num">11</div>
+        <div class="body">
+          <h3>Finally, the thing we set out to do</h3>
+          <p>
+            Set the image URI in the instance's <code>values.yaml</code> and deploy.
+            Eleven steps and eight repositories after the request.
+          </p>
+          <div class="tags"><span class="tag">i15-services</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Where the time actually went</h2>
+    <p class="lede">
+      Ranked by how much of the chain each one lengthens. The conversion itself
+      isn't on the list — that part is fine.
+    </p>
+
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th>Friction</th><th>What it costs</th><th>Weight</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="what">Entity-model gaps only surface at generate time</td>
+            <td class="cost">Every new IOC is a fresh discovery exercise. 15 dlsPLC templates still have no model, waiting for whoever needs them first.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">Protected branches mid-chain</td>
+            <td class="cost">Two full stops that no amount of automation can cross. Both are one-line merges of changes already reviewed in-session.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">Failures that are silent until runtime</td>
+            <td class="cost">Missing <code>place-files</code>, ibek below its floor, <code>IOC_VERSION</code> unset — all build green and fail in the cluster.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">Support metadata lives in three places</td>
+            <td class="cost">Public repo, DLS repo, plus a vendored copy so CI can run without DLS network. Each needs its own commit, and a guard exists to catch them drifting.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Template drift is invisible until you look</td>
+            <td class="cost">Nothing told us the image was two versions behind, or that the gap mattered. It surfaced from a passing remark about a pin.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Sample regeneration couples unrelated modules</td>
+            <td class="cost">A vacuum fix reruns every sample IOC, minutes at a time, and an unrelated upstream change can turn the suite red.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Upstream lands changes unvalidated against converted IOCs</td>
+            <td class="cost">A four-line addition to <code>positioner</code> made a required parameter no XMLbuilder IOC can supply. It broke six samples and is pinned into the release.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <footer>
+    A worked example, not a rule: <code>BL15I-VA-IOC-02</code> converted from
+    <code>/dls_sw/prod/R3.14.12.7/support/BL15I-BUILDER/26-3</code> in August 2026.
+    Counts are of work actually performed, not estimates. The specifics will
+    date; the shape of the chain is the point.
+    <br><br>
+    <a href="../explanations/one-ioc-eight-repos.html">← Why one IOC instance touches eight repositories</a>
+    — the same material in prose, with what it suggests we change.
+  </footer>
+
+</div>
+
+</body>
+</html>

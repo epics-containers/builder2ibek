@@ -104,6 +104,10 @@ master_doc = "index"
 # These patterns also affect html_static_path and html_extra_path
 exclude_patterns = ["_build"]
 
+# Standalone pages that are not part of the toctree - copied verbatim to
+# _static/ and linked from the docs that reference them.
+html_static_path = ["_static"]
+
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 

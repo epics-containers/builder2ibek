@@ -2137,21 +2137,21 @@ entities:
 
   - type: vacuumSpace.space_b
     device: BL19I-VA-SPACE-01
-    gauge1: GAUGE1
-    gauge2: GAUGE2
-    img1: IMG01
-    img2: IMG02
+    gauge1: BL19I-VA-GAUGE-01
+    gauge2: BL19I-VA-GAUGE-02
+    img1: BL19I-VA-IMG-01
+    img2: BL19I-VA-IMG-02
     ionp1: BL19I-VA-IONP-01
     ionp2: BL19I-VA-IONP-02
     ionp3: BL19I-VA-IONP-03
     name: SPACE1
-    pirg1: PIRG01
-    pirg2: PIRG02
+    pirg1: BL19I-VA-PIRG-01
+    pirg2: BL19I-VA-PIRG-02
     valve1: FE19I-VA-VALVE-02
 
   - type: vacuumSpace.space
     device: BL19I-VA-SPACE-02
-    gauge1: GAUGE3
+    gauge1: BL19I-VA-GAUGE-03
     img1: BL19I-VA-IMG-03
     ionp1: BL19I-VA-IONP-04
     ionp2: BL19I-VA-IONP-05
@@ -2161,7 +2161,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL19I-VA-SPACE-03
-    gauge1: GAUGE4
+    gauge1: BL19I-VA-GAUGE-04
     img1: BL19I-VA-IMG-04
     ionp1: BL19I-VA-IONP-06
     name: SPACE3
@@ -2170,7 +2170,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL19I-VA-SPACE-04
-    gauge1: GAUGE5
+    gauge1: BL19I-VA-GAUGE-05
     img1: BL19I-VA-IMG-05
     ionp1: BL19I-VA-IONP-07
     ionp2: BL19I-VA-IONP-08
@@ -2181,7 +2181,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL19I-VA-SPACE-05
-    gauge1: GAUGE6
+    gauge1: BL19I-VA-GAUGE-06
     img1: BL19I-VA-IMG-06
     ionp1: BL19I-VA-IONP-10
     name: SPACE5
@@ -2190,7 +2190,7 @@ entities:
 
   - type: vacuumSpace.space
     device: BL19I-VA-SPACE-06
-    gauge1: GAUGE7
+    gauge1: BL19I-VA-GAUGE-07
     img1: BL19I-VA-IMG-07
     ionp1: BL19I-VA-IONP-11
     name: SPACE6

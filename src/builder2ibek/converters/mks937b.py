@@ -15,6 +15,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type not in (
         "mks937b",
         "mks937bGauge",
+        "mks937bGaugeEGU",
         "mks937bImg",
         "mks937bPirg",
         "mks937bCap",
@@ -25,7 +26,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     # but XML encodes them zero-padded ("02", "001") which the generic
     # converter preserves. Coerce to int; the support YAML re-pads with Jinja
     # (`{{ '%02d' % id }}`, `{{ '%03d' % address }}`) when rendering.
-    if entity_type == "mks937bGauge" and entity.id is not None:
+    if entity_type in ("mks937bGauge", "mks937bGaugeEGU") and entity.id is not None:
         entity.id = int(entity.id)
     if entity_type == "mks937b" and entity.address is not None:
         entity.address = int(entity.address)

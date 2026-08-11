@@ -8,54 +8,62 @@ xml_component = "vacuumSpace"
 # 1-based indices (gauge1..8).  The converter renames them.
 _DEVICE_PREFIXES = ["gauge", "ionp", "img", "pirg", "valve"]
 
-# Parameters whose values are object references that may need translating
-# from builder short-names (e.g. "IONP4") to ibek device PV names
-# (e.g. "BL19I-VA-IONP-04").  After renaming, these are 1-indexed.
-_OBJECT_PARAMS = [
-    "ionp1",
-    "ionp2",
-    "ionp3",
-    "img1",
-    "img2",
-    "img3",
-    "pirg1",
-    "pirg2",
-    "pirg3",
-    "valve1",
-    "valve2",
-    "valve3",
-]
+# Parameters whose values are builder short-names (e.g. "IONP4") that must be
+# translated to the device PV name (e.g. "BL19I-VA-IONP-04").  After renaming,
+# these are 1-indexed, and a space can carry up to 8 of each.
+_OBJECT_PARAMS = [f"{prefix}{i}" for prefix in _DEVICE_PREFIXES for i in range(1, 9)]
+
+# Gauge entity types keyed by dom + id rather than by a device attribute.  Their
+# records are named $(dom)-VA-GAUGE-$(id) - see mks937[ab]Gauge.template.
+_GAUGE_TYPES = {
+    "mks937a.mks937aGauge",
+    "mks937a.mks937aGaugeEGU",
+    "mks937b.mks937bGauge",
+    "mks937b.mks937bGaugeEGU",
+}
+
+
+def _raw_device(raw: dict) -> str | None:
+    """
+    The device PV name that a raw builder entity's records are created under.
+    """
+    device = raw.get("device")
+    if device:
+        return str(device)
+
+    if raw.get("type") in _GAUGE_TYPES:
+        dom, gauge_id = raw.get("dom"), raw.get("id")
+        if dom and gauge_id is not None:
+            return f"{dom}-VA-GAUGE-{int(gauge_id):02d}"
+
+    return None
 
 
 def _build_name_map(ioc: Generic_IOC) -> dict[str, str]:
     """
-    Scan raw_entities for any entity that has both a builder 'name' attribute
-    and a 'device' attribute.  Returns a mapping name→device so that short
-    builder cross-reference names can be resolved to ibek entity ids.
+    Map builder short-name -> device PV name for every raw entity a vacuum space
+    can cross-reference.
 
-    This is needed because ibek registers some entities under their 'device'
-    PV name (type: id = device), but the vacuumSpace XML references them by
-    the builder 'name' attribute (e.g. IONP4 instead of BL19I-VA-IONP-04).
+    vacuumSpace's gauge/ionp/img/pirg/valve parameters are plain strings that get
+    rendered straight into db macros (`field(INPA, "$(gauge1):SEL MS")` and
+    friends), so they must always hold the real PV.  A short-name that survives
+    into the substitutions produces links to PVs like "GAUGE1:SEL" that can never
+    connect - which is what builder avoids by resolving the reference itself.
 
-    Some modules (e.g. mks937b) retain 'name' as the ibek id rather than
-    'device'.  Those entries must NOT be translated: the builder short-name
-    IS the correct ibek id.  We detect them by checking whether the 'name'
-    value still appears in the already-converted ioc.entities — if it does,
-    that entity registered under its 'name', so skip it.
+    This is true even for entities whose 'name' ibek keeps as its `type: id`
+    (mks937[ab] gauges, imgs and pirgs).  Being an ibek id only matters for
+    parameters declared `type: object`; none of vacuumSpace's device parameters
+    are, so the id is never resolved for us and the short-name must be
+    substituted here.
     """
-    # Names that are still present in converted entities are ibek ids themselves.
-    kept_names: set[str] = set()
-    for ent in ioc.entities:
-        n = ent.get("name")
-        if n:
-            kept_names.add(str(n))
-
     mapping: dict[str, str] = {}
     for raw in ioc.raw_entities:
         name = raw.get("name")
-        device = raw.get("device")
-        if name and device and name != device and str(name) not in kept_names:
-            mapping[str(name)] = str(device)
+        if not name:
+            continue
+        device = _raw_device(raw)
+        if device and str(name) != device:
+            mapping[str(name)] = device
     return mapping
 
 

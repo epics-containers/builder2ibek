@@ -101,6 +101,15 @@ produce more than one ibek entity, use `entity.add_entity(extra)` and
 `db/` directory of the support module. These need a support YAML entity model
 with just parameters and a `databases` section — no `pre_init` or `post_init`.
 
+**Beamline modules (`BL<nn><x>-BUILDER`, `BL<nn><x>`)** — these get **vendored
+as runtime patterns**, not built into the image. Some converters currently drop
+their entities wholesale (`converters/BL15I-BUILDER.py`); if the IOC needs one,
+add the entity model to a pattern folder rather than restoring a build-time
+module. **First check the module for compiled code — if it has `src/`, a `.dbd`,
+or `DTYP` device support it cannot be vendored: stop and report it to the user.**
+Full recipe and the check commands are in
+[module-special-cases.md](../skills/shared/module-special-cases.md).
+
 **XML template entities** — some builder modules use XML template files (the
 entity class inherits from `Xml` in builder.py) that expand into many child
 entities from other modules. Examples: `SR-VA.d2PumpCart`, `SR-VA.gaugeSet`.
