@@ -67,7 +67,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             if e.get("type", "").endswith("motorpositioner")
             and e.get("MP") == entity.name
         ]
-        if len(motor_ps) == 1:
+        if len(motor_ps) == 1 and motor_ps[0].get("Q"):
             entity["PS"] = motor_ps[0].get("Q")
 
         else:
