@@ -632,6 +632,7 @@ entity_models:
       # valve1..8.  We must reproduce that exact order (type/entity_enabled are
       # ignored padding columns) so ibek's positional rows line up.
       - file: $(DLSPLC)/db/dlsPLC_vacValveGroup.template
+        enabled: "{{ valve1 != '' }}"
         args:
           type:
           entity_enabled:
@@ -647,6 +648,17 @@ entity_models:
           valve6:
           valve7:
           valve8:
+
+      # A space with no valve at all still needs the :VALVEG records the space
+      # template links to.  Builder emits dlsPLC_dummyValve for that case; a
+      # vacValveGroup with empty valve names would build links like ":CON CA"
+      # that can never connect, leaving the space permanently INVALID.  Every
+      # label/severity macro defaults in-template to the value builder passed,
+      # so only `device` is needed here.
+      - file: $(DLSPLC)/db/dlsPLC_dummyValve.template
+        enabled: "{{ valve1 == '' }}"
+        args:
+          device: "{{ device }}:VALVEG"
 
   - name: space_b
     description: |-
@@ -806,6 +818,7 @@ entity_models:
       # valve1..8.  We must reproduce that exact order (type/entity_enabled are
       # ignored padding columns) so ibek's positional rows line up.
       - file: $(DLSPLC)/db/dlsPLC_vacValveGroup.template
+        enabled: "{{ valve1 != '' }}"
         args:
           type:
           entity_enabled:
@@ -821,3 +834,10 @@ entity_models:
           valve6:
           valve7:
           valve8:
+
+      # See the note on space.  A valve-less space needs dlsPLC_dummyValve for
+      # its :VALVEG records, not a vacValveGroup with empty valve names.
+      - file: $(DLSPLC)/db/dlsPLC_dummyValve.template
+        enabled: "{{ valve1 == '' }}"
+        args:
+          device: "{{ device }}:VALVEG"

@@ -373,6 +373,6 @@ pattern
 
 file "$(DLSPLC)/db/NX102_readBool.template" {
 pattern 
-	{ "type",                  "entity_enabled", "device",                        "port",         "tag",          "desc", "scan",     "onam", "znam", "name" }
-	{ "dlsPLC.NX102_readBool", "True",           "SR03C-VA-VLVCC-01:SWITCH:STAT", "VLVCC_01_EIP", "switch_power", "",     "1 second", "On",   "Off",  ""     }
+	{ "type",                  "entity_enabled", "device",                        "port",         "tag",          "bit", "desc", "zsv",      "osv",      "scan",     "onam", "znam", "name" }
+	{ "dlsPLC.NX102_readBool", "True",           "SR03C-VA-VLVCC-01:SWITCH:STAT", "VLVCC_01_EIP", "switch_power", "0",   "",     "NO_ALARM", "NO_ALARM", "1 second", "On",   "Off",  ""     }
 }
