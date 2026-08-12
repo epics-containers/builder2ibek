@@ -53,7 +53,7 @@ entities:
     DESC: Mini Apertures Y
     MP: :Y:MP
     P: BL04I-MO-MAPT-01
-    PS: :P1
+    PS: :Y:P
     STRA: LARGE_APERTURE
     STRB: MEDIUM_APERTURE
     STRC: SMALL_APERTURE
