@@ -1792,6 +1792,7 @@ entity_models:
         type: str
         description: |-
           Description
+        default: ""
 
     databases:
 
@@ -1815,11 +1816,26 @@ entity_models:
         type: str
         description: |-
           Tag name of ether_ip read value
+      bit:
+        type: int
+        description: |-
+          Optional.  Defaults to 0.         Bit flag number to read
+        default: 0
       desc:
         type: str
         description: |-
           Optional.  Defaults to empty.     Description of the Boolean
         default: ""
+      zsv:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.  Severity to associate with zero value
+        default: NO_ALARM
+      osv:
+        type: str
+        description: |-
+          Optional.  Defaults to NO_ALARM.  Severity to associate with one value
+        default: NO_ALARM
       scan:
         type: str
         description: |-
@@ -4203,6 +4219,140 @@ entity_models:
         args:
           .*:
 
+  - name: NX102_readInt
+    description: |-
+      Read an integer value from an NX102 PLC tag over EtherIP, with raw
+      offset, scale factor and EGU offset applied.
+    parameters:
+      <<: [ *PQ ]
+      port:
+        type: str
+        description: |-
+          Port name of the ether_ip driver
+      tag:
+        type: str
+        description: |-
+          NX PLC tag string
+      desc:
+        type: str
+        description: |-
+          Template argument
+        default: ""
+      scan:
+        type: str
+        description: |-
+          Template argument
+        default: 1 second
+      egu:
+        type: str
+        description: |-
+          Template argument
+        default: ""
+      prec:
+        type: int
+        description: |-
+          Template argument
+        default: 2
+      roffset:
+        type: int
+        description: |-
+          Pre scaling offset in cts
+        default: 0
+      scale:
+        type: float
+        description: |-
+          Scaling of raw value into EGUs
+        default: 1
+      offset:
+        type: float
+        description: |-
+          Offset of value in EGUs
+        default: 0
+      name:
+        type: str
+        description: |-
+          Optional object / GUI association name.
+        default: ""
+
+    databases:
+
+      # NOTE: the template's '# % macro' header is stale -- it advertises the
+      # FINS macros addr/timeout, but the records are DTYP EtherIP and read
+      # @$(port) $(tag). The parameters above follow the records, not the
+      # header. Its egu/prec defaults are also inconsistent between records
+      # (egu=/prec=2 on the raw ai, egu=mm/prec=3 on the calcout); the single
+      # egu/prec parameter here matches NX102_readReal and applies to both.
+      - file: $(DLSPLC)/db/NX102_readInt.template
+        args:
+          .*:
+
+  - name: NX102_PID
+    description: |-
+      PID(x) interface for the NX102 PLC. Read only by default - only the R
+      tags from the PID_External_STRUCT are created. Set read_only to 0 to
+      additionally create the writable setpoint and control records (the W
+      tags). The R records are shared between both variants.
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          Device prefix
+      device_suffix:
+        type: str
+        description: |-
+          Device suffix for multiple PID loops e.g. :PID1
+        default: ""
+      port:
+        type: str
+        description: |-
+          Port name of the ether_ip driver
+      tag:
+        type: str
+        description: |-
+          NX PLC tag string e.g. PID (from PID.SP[1])
+        default: PID
+      read_only:
+        type: int
+        description: |-
+          Read only (no writes to the PLC)?
+        default: 1
+      arrFlags:
+        type: str
+        description: |-
+          ether_ip flags for indexed value reads. Leave blank for zero-based
+          PLC arrays; set to "E" for PLCs whose PID arrays are declared
+          ARRAY[1..N] (single-element reads)
+        default: ""
+      name:
+        type: str
+        description: |-
+          Optional object / GUI association name.
+        default: ""
+
+    databases:
+
+      # the 'screen' macro of NX102_PID.template only selects the EDM screen
+      # in its '# % gui' comment, so it is left at its default here.
+      - file: $(DLSPLC)/db/NX102_PID.template
+        args:
+          device:
+          device_suffix:
+          port:
+          tag:
+          tagidx:
+          arrFlags:
+          name:
+
+      - file: $(DLSPLC)/db/NX102_PID_write.template
+        enabled: "{{ read_only | int == 0 }}"
+        args:
+          device:
+          device_suffix:
+          port:
+          tag:
+          tagidx:
+
   - name: NX102_genericDevice
     description: |-
       Template database for control and interlock of a non-specific device.
@@ -5865,6 +6015,37 @@ entity_models:
     databases:
 
       - file: $(DLSPLC)/db/NX102_vacValveBistable.template
+        args:
+          .*:
+
+  - name: NX102_femto
+    description: |-
+      Femto current amplifier controlled through an Omron NX PLC.
+      Provides gain and AC/DC selection plus the amplifier output reading.
+    parameters:
+      <<: [ *tagidx ]
+      device:
+        type: str
+        description: |-
+          device name prefix for record names
+      port:
+        type: str
+        description: |-
+          asyn port name of etherip driver
+      tag:
+        type: str
+        description: |-
+          Optional.  Defaults to femtos         - etherip tag name of the femto
+          data structure
+        default: femtos
+      name:
+        type: str
+        description: |-
+          Optional.  Defaults to empty.         Object and gui association name.
+        default: ""
+
+    databases:
+      - file: $(DLSPLC)/db/NX102_femto.template
         args:
           .*:
 

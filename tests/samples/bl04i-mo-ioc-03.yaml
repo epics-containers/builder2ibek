@@ -652,6 +652,7 @@ entities:
     DESC: Mini Apertures X
     MP: :X:MP
     P: BL04I-MO-MAPT-01
+    PS: :P1
     STRA: LARGE_APERTURE
     STRB: MEDIUM_APERTURE
     STRC: SMALL_APERTURE
@@ -663,6 +664,7 @@ entities:
     DESC: Mini Apertures Y
     MP: :Y:MP
     P: BL04I-MO-MAPT-01
+    PS: :P1
     STRA: LARGE_APERTURE
     STRB: MEDIUM_APERTURE
     STRC: SMALL_APERTURE
@@ -674,6 +676,7 @@ entities:
     DESC: Mini Apertures Z
     MP: :Z:MP
     P: BL04I-MO-MAPT-01
+    PS: :P1
     STRA: LARGE_APERTURE
     STRB: MEDIUM_APERTURE
     STRC: SMALL_APERTURE
@@ -685,6 +688,7 @@ entities:
     DESC: Scintillator Y
     MP: :Y:MP
     P: BL04I-MO-SCIN-01
+    PS: :P1
     STRA: Out
     STRB: In
     name: SCIN.OB1
@@ -693,6 +697,7 @@ entities:
     DESC: Scintillator Z
     MP: :Z:MP
     P: BL04I-MO-SCIN-01
+    PS: :P1
     STRA: Out
     STRB: In
     name: SCIN.OB2
@@ -701,6 +706,7 @@ entities:
     DESC: Beamstop X
     MP: :X:MP
     P: BL04I-MO-BS-01
+    PS: :P1
     STRA: DataCollection_Low
     STRB: DataCollection_Std
     STRC: DataCollection_High
@@ -712,6 +718,7 @@ entities:
     DESC: Beamstop Y
     MP: :Y:MP
     P: BL04I-MO-BS-01
+    PS: :P1
     STRA: DataCollection_Low
     STRB: DataCollection_Std
     STRC: DataCollection_High
@@ -723,6 +730,7 @@ entities:
     DESC: Beamstop Z
     MP: :Z:MP
     P: BL04I-MO-BS-01
+    PS: :P1
     STRA: DataCollection_Low
     STRB: DataCollection_Std
     STRC: DataCollection_High
@@ -734,6 +742,7 @@ entities:
     DESC: Scatter Guard X
     MP: :X:MP
     P: BL04I-MO-SCAT-01
+    PS: :P1
     STRA: DataCollection
     STRB: RobotLoad
     STRC: ManualLoad
@@ -743,6 +752,7 @@ entities:
     DESC: Scatter Guard Y
     MP: :Y:MP
     P: BL04I-MO-SCAT-01
+    PS: :P1
     STRA: DataCollection
     STRB: RobotLoad
     STRC: ManualLoad

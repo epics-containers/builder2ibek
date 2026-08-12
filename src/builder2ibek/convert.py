@@ -90,8 +90,17 @@ def dispatch(builder: Builder, filename, description: str = "") -> Generic_IOC:
 def do_dispatch(builder: Builder, ioc: Generic_IOC):
     # Generate complete generic list of entities for referencing in plugins.
     ioc.raw_entities = [make_entity(element) for element in builder.elements]
+
     for element in builder.elements:
-        do_one_element(element, ioc)
+        entity = convert_generic(element, ioc)
+
+        do_one_element(element, entity, ioc)
+
+        if entity in ioc.already_converted:
+            # we don't want a duplicate, so ignore it
+            continue
+
+        ioc.already_converted.append(entity)
 
     sorted_entities: list[Entity] = []
     for entity in ioc.entities:  # type: ignore
@@ -105,10 +114,7 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
     return ioc
 
 
-def do_one_element(element: Element, ioc: Generic_IOC):
-    # first do default conversion to entity
-    entity = convert_generic(element, ioc)
-
+def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
     # then dispatch to a specific handler if there is one
     assert isinstance(element, Element)
 
