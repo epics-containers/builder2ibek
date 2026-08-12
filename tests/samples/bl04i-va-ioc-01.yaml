@@ -1114,6 +1114,7 @@ entities:
     gauge: BL04I-VA-GAUGE-03
     img: BL04I-VA-IMG-03
     ionp: BL04I-VA-IONP-03
+    name: SPACE2
     pirg: BL04I-VA-PIRG-03
     valve: BL04I-VA-VALVE-11
 
@@ -1122,6 +1123,7 @@ entities:
     gauge: BL04I-VA-GAUGE-04
     img: BL04I-VA-IMG-04
     ionp: BL04I-VA-IONP-04
+    name: SPACE3
     pirg: BL04I-VA-PIRG-04
     valve: BL04I-VA-VALVE-01
 
@@ -1130,6 +1132,7 @@ entities:
     gauge: BL04I-VA-GAUGE-05
     img: BL04I-VA-IMG-05
     ionp: BL04I-VA-GIONP-04
+    name: SPACE4
     pirg: BL04I-VA-PIRG-05
     valve: BL04I-VA-VALVE-02
 
@@ -1138,6 +1141,7 @@ entities:
     gauge: BL04I-VA-GAUGE-06
     img: BL04I-VA-IMG-06
     ionp: BL04I-VA-IONP-07
+    name: SPACE5
     pirg: BL04I-VA-PIRG-06
     valve: BL04I-VA-VALVE-03
 
@@ -1146,6 +1150,7 @@ entities:
     gauge: BL04I-VA-GGAUG-98
     img: BL04I-VA-GIMG-98
     ionp: BL04I-VA-GIONP-98
+    name: SPACE98
     pirg: BL04I-VA-GPIRG-98
     valve: BL04I-VA-GVALV-98
 
@@ -1154,6 +1159,7 @@ entities:
     gauge: BL04I-VA-GGAUG-99
     img: BL04I-VA-GIMG-99
     ionp: BL04I-VA-GIONP-99
+    name: SPACE99
     pirg: BL04I-VA-GPIRG-99
     valve: BL04I-VA-GVALV-99
 

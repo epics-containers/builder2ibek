@@ -2962,106 +2962,175 @@ entities:
     device: BL15I-VA-ADC-01:CH2
     s: 4
 
-  - type: vacuumSpace.space_b
-    device: BL15I-VA-SPACE-01
+  - type: mks937b.mks937bGaugeGroup
+    device: BL15I-VA-SPACE-01:GAUGEG
     gauge1: BL15I-VA-GAUGE-01
     gauge2: BL15I-VA-GAUGE-21
+    gauge3: BL15I-VA-GAUGE-01
+    gauge4: BL15I-VA-GAUGE-01
+    gauge5: BL15I-VA-GAUGE-01
+    gauge6: BL15I-VA-GAUGE-01
+    gauge7: BL15I-VA-GAUGE-01
+    gauge8: BL15I-VA-GAUGE-01
+
+  - type: mks937b.mks937bImgGroup
+    delay: 2
+    device: BL15I-VA-SPACE-01:IMGG
     img1: BL15I-VA-IMG-01
     img2: BL15I-VA-IMG-21
-    ionp1: BL15I-VA-IONP-01
-    name: SPACE1
+    img3: BL15I-VA-IMG-01
+    img4: BL15I-VA-IMG-01
+    img5: BL15I-VA-IMG-01
+    img6: BL15I-VA-IMG-01
+    img7: BL15I-VA-IMG-01
+    img8: BL15I-VA-IMG-01
+
+  - type: mks937b.mks937bPirgGroup
+    device: BL15I-VA-SPACE-01:PIRGG
     pirg1: BL15I-VA-PIRG-01
     pirg2: BL15I-VA-PIRG-21
-    valve1: FE15I-VA-VALVE-02
+    pirg3: BL15I-VA-PIRG-01
+    pirg4: BL15I-VA-PIRG-01
+    pirg5: BL15I-VA-PIRG-01
+    pirg6: BL15I-VA-PIRG-01
+    pirg7: BL15I-VA-PIRG-01
+    pirg8: BL15I-VA-PIRG-01
 
-  - type: vacuumSpace.space_b
+  - type: vacuumSpace.space_bTemplate
+    device: BL15I-VA-SPACE-01
+    gauge: BL15I-VA-SPACE-01:GAUGEG
+    img: BL15I-VA-SPACE-01:IMGG
+    ionp: BL15I-VA-IONP-01
+    name: SPACE1
+    pirg: BL15I-VA-SPACE-01:PIRGG
+    valve: FE15I-VA-VALVE-02
+
+  - type: vacuumSpace.space_bTemplate
     device: BL15I-VA-SPACE-02
-    gauge1: BL15I-VA-GAUGE-02
-    img1: BL15I-VA-IMG-02
-    ionp1: BL15I-VA-IONP-02
+    gauge: BL15I-VA-GAUGE-02
+    img: BL15I-VA-IMG-02
+    ionp: BL15I-VA-IONP-02
     name: SPACE2
-    pirg1: BL15I-VA-PIRG-02
-    valve1: BL15I-VA-DVALV-01
+    pirg: BL15I-VA-PIRG-02
+    valve: BL15I-VA-DVALV-01
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL15I-VA-SPACE-03
-    gauge1: BL15I-VA-GAUGE-03
-    img1: BL15I-VA-IMG-03
-    ionp1: BL15I-VA-IONP-03
+    gauge: BL15I-VA-GAUGE-03
+    img: BL15I-VA-IMG-03
+    ionp: BL15I-VA-IONP-03
     name: SPACE3
-    pirg1: BL15I-VA-PIRG-03
-    valve1: BL15I-VA-VALVE-01
+    pirg: BL15I-VA-PIRG-03
+    valve: BL15I-VA-VALVE-01
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL15I-VA-SPACE-04
-    gauge1: BL15I-VA-GAUGE-04
-    img1: BL15I-VA-IMG-04
-    ionp1: BL15I-VA-IONP-04
+    gauge: BL15I-VA-GAUGE-04
+    img: BL15I-VA-IMG-04
+    ionp: BL15I-VA-IONP-04
     name: SPACE4
-    pirg1: BL15I-VA-PIRG-04
-    valve1: BL15I-VA-VALVE-02
+    pirg: BL15I-VA-PIRG-04
+    valve: BL15I-VA-VALVE-02
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL15I-VA-SPACE-05
-    gauge1: BL15I-VA-GAUGE-05
-    img1: BL15I-VA-IMG-05
-    ionp1: BL15I-VA-IONP-05
+    gauge: BL15I-VA-GAUGE-05
+    img: BL15I-VA-IMG-05
+    ionp: BL15I-VA-IONP-05
     name: SPACE5
-    pirg1: BL15I-VA-PIRG-05
-    valve1: BL15I-VA-VALVE-03
+    pirg: BL15I-VA-PIRG-05
+    valve: BL15I-VA-VALVE-03
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL15I-VA-SPACE-06
-    gauge1: BL15I-VA-GAUGE-06
-    img1: BL15I-VA-IMG-06
-    ionp1: BL15I-VA-IONP-06
+    gauge: BL15I-VA-GAUGE-06
+    img: BL15I-VA-IMG-06
+    ionp: BL15I-VA-IONP-06
     name: SPACE6
-    pirg1: BL15I-VA-PIRG-06
-    valve1: BL15I-VA-VALVE-04
+    pirg: BL15I-VA-PIRG-06
+    valve: BL15I-VA-VALVE-04
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL15I-VA-SPACE-07
-    gauge1: BL15I-VA-GAUGE-07
-    img1: BL15I-VA-IMG-07
-    ionp1: BL15I-VA-IONP-07
+    gauge: BL15I-VA-GAUGE-07
+    img: BL15I-VA-IMG-07
+    ionp: BL15I-VA-IONP-07
     name: SPACE7
-    pirg1: BL15I-VA-PIRG-07
-    valve1: BL15I-VA-VALVE-05
+    pirg: BL15I-VA-PIRG-07
+    valve: BL15I-VA-VALVE-05
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL15I-VA-SPACE-08
-    gauge1: BL15I-VA-GAUGE-08
-    img1: BL15I-VA-IMG-08
-    ionp1: BL15I-VA-IONP-08
+    gauge: BL15I-VA-GAUGE-08
+    img: BL15I-VA-IMG-08
+    ionp: BL15I-VA-IONP-08
     name: SPACE8
-    pirg1: BL15I-VA-PIRG-08
-    valve1: BL15I-VA-VALVE-06
+    pirg: BL15I-VA-PIRG-08
+    valve: BL15I-VA-VALVE-06
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL15I-VA-SPACE-09
-    gauge1: BL15I-VA-GAUGE-09
-    img1: BL15I-VA-IMG-09
-    ionp1: BL15I-VA-IONP-09
+    gauge: BL15I-VA-GAUGE-09
+    img: BL15I-VA-IMG-09
+    ionp: BL15I-VA-IONP-09
     name: SPACE9
-    pirg1: BL15I-VA-PIRG-09
-    valve1: BL15I-VA-VALVE-07
+    pirg: BL15I-VA-PIRG-09
+    valve: BL15I-VA-VALVE-07
 
-  - type: vacuumSpace.space
-    device: BL15I-VA-SPACE-10
+  - type: mks937a.mks937aGaugeGroup
+    device: BL15I-VA-SPACE-10:GAUGEG
     gauge1: BL15I-VA-GAUGE-10
     gauge2: BL15I-VA-GAUGE-11
     gauge3: BL15I-VA-GAUGE-12
+    gauge4: BL15I-VA-GAUGE-10
+    gauge5: BL15I-VA-GAUGE-10
+    gauge6: BL15I-VA-GAUGE-10
+    gauge7: BL15I-VA-GAUGE-10
+    gauge8: BL15I-VA-GAUGE-10
+
+  - type: mks937a.mks937aImgGroup
+    delay: 2
+    device: BL15I-VA-SPACE-10:IMGG
     img1: BL15I-VA-IMG-10
     img2: BL15I-VA-IMG-11
     img3: BL15I-VA-IMG-12
+    img4: BL15I-VA-IMG-10
+    img5: BL15I-VA-IMG-10
+    img6: BL15I-VA-IMG-10
+    img7: BL15I-VA-IMG-10
+    img8: BL15I-VA-IMG-10
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL15I-VA-SPACE-10:IONPG
     ionp1: BL15I-VA-IONP-10
     ionp2: BL15I-VA-IONP-11
     ionp3: BL15I-VA-IONP-12
-    name: SPACE10
+    ionp4: BL15I-VA-IONP-10
+    ionp5: BL15I-VA-IONP-10
+    ionp6: BL15I-VA-IONP-10
+    ionp7: BL15I-VA-IONP-10
+    ionp8: BL15I-VA-IONP-10
+
+  - type: mks937a.mks937aPirgGroup
+    device: BL15I-VA-SPACE-10:PIRGG
     pirg1: BL15I-VA-PIRG-10
     pirg2: BL15I-VA-PIRG-11
     pirg3: BL15I-VA-PIRG-12
-    valve1: BL15I-VA-VALVE-08
+    pirg4: BL15I-VA-PIRG-10
+    pirg5: BL15I-VA-PIRG-10
+    pirg6: BL15I-VA-PIRG-10
+    pirg7: BL15I-VA-PIRG-10
+    pirg8: BL15I-VA-PIRG-10
+
+  - type: vacuumSpace.spaceTemplate
+    device: BL15I-VA-SPACE-10
+    gauge: BL15I-VA-SPACE-10:GAUGEG
+    img: BL15I-VA-SPACE-10:IMGG
+    ionp: BL15I-VA-SPACE-10:IONPG
+    name: SPACE10
+    pirg: BL15I-VA-SPACE-10:PIRGG
+    valve: BL15I-VA-VALVE-08
 
   - type: water.flow
     C: 60

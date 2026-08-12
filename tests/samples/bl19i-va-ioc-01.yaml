@@ -2135,67 +2135,129 @@ entities:
   - type: dlsPLC.externalValve
     device: FE19I-VA-VALVE-02
 
-  - type: vacuumSpace.space_b
-    device: BL19I-VA-SPACE-01
+  - type: mks937b.mks937bGaugeGroup
+    device: BL19I-VA-SPACE-01:GAUGEG
     gauge1: BL19I-VA-GAUGE-01
     gauge2: BL19I-VA-GAUGE-02
+    gauge3: BL19I-VA-GAUGE-01
+    gauge4: BL19I-VA-GAUGE-01
+    gauge5: BL19I-VA-GAUGE-01
+    gauge6: BL19I-VA-GAUGE-01
+    gauge7: BL19I-VA-GAUGE-01
+    gauge8: BL19I-VA-GAUGE-01
+
+  - type: mks937b.mks937bImgGroup
+    delay: 2
+    device: BL19I-VA-SPACE-01:IMGG
     img1: BL19I-VA-IMG-01
     img2: BL19I-VA-IMG-02
+    img3: BL19I-VA-IMG-01
+    img4: BL19I-VA-IMG-01
+    img5: BL19I-VA-IMG-01
+    img6: BL19I-VA-IMG-01
+    img7: BL19I-VA-IMG-01
+    img8: BL19I-VA-IMG-01
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL19I-VA-SPACE-01:IONPG
     ionp1: BL19I-VA-IONP-01
     ionp2: BL19I-VA-IONP-02
     ionp3: BL19I-VA-IONP-03
-    name: SPACE1
+    ionp4: BL19I-VA-IONP-01
+    ionp5: BL19I-VA-IONP-01
+    ionp6: BL19I-VA-IONP-01
+    ionp7: BL19I-VA-IONP-01
+    ionp8: BL19I-VA-IONP-01
+
+  - type: mks937b.mks937bPirgGroup
+    device: BL19I-VA-SPACE-01:PIRGG
     pirg1: BL19I-VA-PIRG-01
     pirg2: BL19I-VA-PIRG-02
-    valve1: FE19I-VA-VALVE-02
+    pirg3: BL19I-VA-PIRG-01
+    pirg4: BL19I-VA-PIRG-01
+    pirg5: BL19I-VA-PIRG-01
+    pirg6: BL19I-VA-PIRG-01
+    pirg7: BL19I-VA-PIRG-01
+    pirg8: BL19I-VA-PIRG-01
 
-  - type: vacuumSpace.space
-    device: BL19I-VA-SPACE-02
-    gauge1: BL19I-VA-GAUGE-03
-    img1: BL19I-VA-IMG-03
+  - type: vacuumSpace.space_bTemplate
+    device: BL19I-VA-SPACE-01
+    gauge: BL19I-VA-SPACE-01:GAUGEG
+    img: BL19I-VA-SPACE-01:IMGG
+    ionp: BL19I-VA-SPACE-01:IONPG
+    name: SPACE1
+    pirg: BL19I-VA-SPACE-01:PIRGG
+    valve: FE19I-VA-VALVE-02
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL19I-VA-SPACE-02:IONPG
     ionp1: BL19I-VA-IONP-04
     ionp2: BL19I-VA-IONP-05
+    ionp3: BL19I-VA-IONP-04
+    ionp4: BL19I-VA-IONP-04
+    ionp5: BL19I-VA-IONP-04
+    ionp6: BL19I-VA-IONP-04
+    ionp7: BL19I-VA-IONP-04
+    ionp8: BL19I-VA-IONP-04
+
+  - type: vacuumSpace.spaceTemplate
+    device: BL19I-VA-SPACE-02
+    gauge: BL19I-VA-GAUGE-03
+    img: BL19I-VA-IMG-03
+    ionp: BL19I-VA-SPACE-02:IONPG
     name: SPACE2
-    pirg1: BL19I-VA-PIRG-03
-    valve1: BL19I-VA-VALVE-01
+    pirg: BL19I-VA-PIRG-03
+    valve: BL19I-VA-VALVE-01
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL19I-VA-SPACE-03
-    gauge1: BL19I-VA-GAUGE-04
-    img1: BL19I-VA-IMG-04
-    ionp1: BL19I-VA-IONP-06
+    gauge: BL19I-VA-GAUGE-04
+    img: BL19I-VA-IMG-04
+    ionp: BL19I-VA-IONP-06
     name: SPACE3
-    pirg1: BL19I-VA-PIRG-04
-    valve1: BL19I-VA-VALVE-02
+    pirg: BL19I-VA-PIRG-04
+    valve: BL19I-VA-VALVE-02
 
-  - type: vacuumSpace.space
-    device: BL19I-VA-SPACE-04
-    gauge1: BL19I-VA-GAUGE-05
-    img1: BL19I-VA-IMG-05
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL19I-VA-SPACE-04:IONPG
     ionp1: BL19I-VA-IONP-07
     ionp2: BL19I-VA-IONP-08
     ionp3: BL19I-VA-IONP-09
+    ionp4: BL19I-VA-IONP-07
+    ionp5: BL19I-VA-IONP-07
+    ionp6: BL19I-VA-IONP-07
+    ionp7: BL19I-VA-IONP-07
+    ionp8: BL19I-VA-IONP-07
+
+  - type: vacuumSpace.spaceTemplate
+    device: BL19I-VA-SPACE-04
+    gauge: BL19I-VA-GAUGE-05
+    img: BL19I-VA-IMG-05
+    ionp: BL19I-VA-SPACE-04:IONPG
     name: SPACE4
-    pirg1: BL19I-VA-PIRG-05
-    valve1: BL19I-VA-VALVE-03
+    pirg: BL19I-VA-PIRG-05
+    valve: BL19I-VA-VALVE-03
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL19I-VA-SPACE-05
-    gauge1: BL19I-VA-GAUGE-06
-    img1: BL19I-VA-IMG-06
-    ionp1: BL19I-VA-IONP-10
+    gauge: BL19I-VA-GAUGE-06
+    img: BL19I-VA-IMG-06
+    ionp: BL19I-VA-IONP-10
     name: SPACE5
-    pirg1: BL19I-VA-PIRG-06
-    valve1: BL19I-VA-VALVE-04
+    pirg: BL19I-VA-PIRG-06
+    valve: BL19I-VA-VALVE-04
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL19I-VA-SPACE-06
-    gauge1: BL19I-VA-GAUGE-07
-    img1: BL19I-VA-IMG-07
-    ionp1: BL19I-VA-IONP-11
+    gauge: BL19I-VA-GAUGE-07
+    img: BL19I-VA-IMG-07
+    ionp: BL19I-VA-IONP-11
     name: SPACE6
-    pirg1: BL19I-VA-PIRG-07
-    valve1: BL19I-VA-VALVE-05
+    pirg: BL19I-VA-PIRG-07
+    valve: BL19I-VA-VALVE-05
 
   - type: vacuumSpace.spaceGroup
     device: BL19I-VA-SPACE-80
