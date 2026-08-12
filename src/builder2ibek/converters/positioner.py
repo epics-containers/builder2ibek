@@ -59,30 +59,41 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.EGU = motor.get("EGU", "")
 
     elif entity_type == "multipositioner":
-        # Name is needed to link to motorpositioner?
-        # entity.remove("name")
-
-        # Multiposioner allows for up to 6 nested multipositioners, however we do
-        # not want this nested logic to exist in future. This is especially the case
-        # as it was handled inside of builder.py for positioner.
-        # We will manually append the corresponding PS macro, which identifies what
-        # positioner of the multipositioner it is.
-
-        # We need the name to determine the number of positioners that have already
-        # been converted for this combination of P and MP.
-        converted_mps = [
+        # First we need to check if there is a corresponding motorpositioner that
+        # already has a Q (and therefore a PS) macro defined
+        motor_ps = [
             e
-            for e in ioc.already_converted
-            if e.get("type", "").endswith("multipositioner")
-            and e.get("P") == entity.P
-            and e.get("MP") == entity.MP
+            for e in ioc.raw_entities
+            if e.get("type", "").endswith("motorpositioner")
+            and e.get("MP") == entity.name
         ]
+        if len(motor_ps) == 1 and motor_ps[0].get("Q"):
+            entity["PS"] = motor_ps[0].get("Q")
 
-        ps_number = len(converted_mps) + 1
-        if ps_number > 6:
-            raise ValueError("A multipositioner supports at most six sub-positioners")
-        # Assign the corresponding PS macro (P1, P2, ...)
-        entity["PS"] = f":P{ps_number}"
+        else:
+            # Multiposioner allows for up to 6 nested multipositioners, however we do
+            # not want this nested logic to exist in future. This is especially the case
+            # as it was handled inside of builder.py for positioner.
+            # We will manually append the corresponding PS macro, which identifies what
+            # positioner of the multipositioner it is.
+
+            # We need the name to determine the number of positioners that have already
+            # been converted for this combination of P and MP.
+            converted_mps = [
+                e
+                for e in ioc.already_converted
+                if e.get("type", "").endswith("multipositioner")
+                and e.get("P") == entity.P
+                and e.get("MP") == entity.MP
+            ]
+
+            ps_number = len(converted_mps) + 1
+            if ps_number > 6:
+                raise ValueError(
+                    "A multipositioner supports at most six sub-positioners"
+                )
+            # Assign the corresponding PS macro (P1, P2, ...)
+            entity["PS"] = f":P{ps_number}"
 
         # TODO: We need to check if POSN is defined (i.e. the builder object
         # is not used)

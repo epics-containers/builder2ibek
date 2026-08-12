@@ -64,7 +64,7 @@ entities:
     DESC: Pre-HFM QBPM
     MP: :Y:MP
     P: BL03I-DI-QBPM-01
-    PS: :P1
+    PS: :Y:P
     STRA: Interlock
     STRB: Out of the Beam
     STRC: Lower Foil
