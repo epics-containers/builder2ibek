@@ -143,7 +143,8 @@ def _expand_space(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
         # builder pads the group's 8 slots with the first device
         padded = (devices + [devices[0]] * _MAX_DEVICES)[:_MAX_DEVICES]
-        group = {"type": group_type, "device": group_device}
+        # delay is an int, the rest are strings
+        group: dict[str, str | int] = {"type": group_type, "device": group_device}
         if component in _GROUP_DELAY:
             group["delay"] = _GROUP_DELAY[component]
         group.update({f"{component}{i + 1}": d for i, d in enumerate(padded)})
