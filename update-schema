@@ -30,30 +30,55 @@ done
 shopt -u nullglob
 
 # ibek-defs is flat, so two support yaml sharing a basename collide there and
-# only one survives. What `ln` does about that varies by coreutils version: it
-# may silently let the last one win (leaving a schema quietly missing whatever
-# the loser defined), or refuse with "will not overwrite just-created", which
-# names the files but not the problem. Neither is a good way to find out, so
-# check first and say exactly what clashed.
-dupes=$(printf '%s\n' "${defs[@]##*/}" | sort | uniq -d)
-if [ -n "${dupes}" ]; then
-    echo "ERROR: support yaml with duplicate basenames would collide in" \
-         "$EPICS_ROOT/ibek-defs/:" >&2
+# only one survives.
+#
+# Byte-identical copies are legal: a module may be forked (a DLS build of an
+# upstream module, say) so that the two folders differ only in install.yml, and
+# any one generic IOC pulls in exactly one of them. The entity models are the
+# same either way, so the schema does not depend on who wins - link the first
+# and skip the rest.
+#
+# Differing content is the hazard, and what `ln` does about it varies by
+# coreutils version: it may silently let the last one win (leaving a schema
+# quietly missing whatever the loser defined), or refuse with "will not
+# overwrite just-created", which names the files but not the problem. Neither
+# is a good way to find out, so check first and say exactly what clashed.
+declare -A first_seen=()
+unique_defs=()
+conflicts=()
+for def in "${defs[@]}"; do
+    base=${def##*/}
+    first=${first_seen[$base]:-}
+    if [ -z "${first}" ]; then
+        first_seen[$base]=$def
+        unique_defs+=("$def")
+    elif cmp -s "${first}" "${def}"; then
+        echo "NOTE: ${base} is duplicated with identical content;" \
+             "linking ${first}, ignoring ${def}" >&2
+    else
+        conflicts+=("$base")
+    fi
+done
+
+if [ ${#conflicts[@]} -gt 0 ]; then
+    echo "ERROR: support yaml sharing a basename but differing in content" \
+         "would collide in $EPICS_ROOT/ibek-defs/:" >&2
     while IFS= read -r base; do
         echo "  ${base}" >&2
         for def in "${defs[@]}"; do
             [ "${def##*/}" = "${base}" ] && echo "      ${def}" >&2
         done
-    done <<< "${dupes}"
-    echo "       remove or rename all but one of each; a module must appear in" \
-         "exactly one ibek-support* folder" >&2
+    done < <(printf '%s\n' "${conflicts[@]}" | sort -u)
+    echo "       remove or rename all but one of each; a module may live in" \
+         "more than one ibek-support* folder only if its support yaml is" \
+         "identical in each" >&2
     exit 1
 fi
 
 # set up the generic IOC-like environment for ibek
 mkdir -p "$EPICS_ROOT/ibek-defs/"
 rm -f "$EPICS_ROOT"/ibek-defs/*
-ln -srf "${defs[@]}" "$EPICS_ROOT/ibek-defs/"
+ln -srf "${unique_defs[@]}" "$EPICS_ROOT/ibek-defs/"
 
 # generate into a temp file first so a failure leaves no truncated schema behind.
 # It is a dotfile, which the rm above does not glob, so clean it up on the way out.
