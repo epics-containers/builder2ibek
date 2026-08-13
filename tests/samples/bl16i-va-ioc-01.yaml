@@ -1494,135 +1494,226 @@ entities:
     addr: 202
     port: VLVCC02
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-01
-    gauge1: GAUGE01
-    img1: IMG01
-    ionp1: BL16I-VA-IONP-01
+    gauge: BL16I-VA-GAUGE-01
+    img: BL16I-VA-IMG-01
+    ionp: BL16I-VA-IONP-01
     name: SP1
-    pirg1: PIRG01
-    valve1: FE16I-VA-VALVE-02
+    pirg: BL16I-VA-PIRG-01
+    valve: FE16I-VA-VALVE-02
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-02
-    gauge1: GAUGE02
-    img1: BL16I-VA-IMG-02
-    ionp1: BL16I-VA-IONP-02
+    gauge: BL16I-VA-GAUGE-02
+    img: BL16I-VA-IMG-02
+    ionp: BL16I-VA-IONP-02
     name: SP2
-    pirg1: BL16I-VA-PIRG-02
-    valve1: BL16I-VA-DVALV-01
+    pirg: BL16I-VA-PIRG-02
+    valve: BL16I-VA-DVALV-01
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-03
-    gauge1: GAUGE03
-    img1: IMG03
-    ionp1: BL16I-VA-IONP-03
+    gauge: BL16I-VA-GAUGE-03
+    img: BL16I-VA-IMG-03
+    ionp: BL16I-VA-IONP-03
     name: SP3
-    pirg1: PIRG03
-    valve1: BL16I-VA-VALVE-01
+    pirg: BL16I-VA-PIRG-03
+    valve: BL16I-VA-VALVE-01
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-04
-    gauge1: GAUGE04
-    img1: BL16I-VA-IMG-04
-    ionp1: BL16I-VA-IONP-04
+    gauge: BL16I-VA-GAUGE-04
+    img: BL16I-VA-IMG-04
+    ionp: BL16I-VA-IONP-04
     name: SP4
-    pirg1: BL16I-VA-PIRG-04
-    valve1: BL16I-VA-VALVE-02
+    pirg: BL16I-VA-PIRG-04
+    valve: BL16I-VA-VALVE-02
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-05
-    gauge1: GAUGE05
-    img1: BL16I-VA-IMG-05
-    ionp1: BL16I-VA-IONP-05
+    gauge: BL16I-VA-GAUGE-05
+    img: BL16I-VA-IMG-05
+    ionp: BL16I-VA-IONP-05
     name: SP5
-    pirg1: BL16I-VA-PIRG-05
-    valve1: BL16I-VA-VALVE-03
+    pirg: BL16I-VA-PIRG-05
+    valve: BL16I-VA-VALVE-03
 
-  - type: vacuumSpace.space
-    device: BL16I-VA-SPACE-06
-    gauge1: GAUGE06
-    gauge2: GAUGE07
+  - type: mks937a.mks937aGaugeGroup
+    device: BL16I-VA-SPACE-06:GAUGEG
+    gauge1: BL16I-VA-GAUGE-06
+    gauge2: BL16I-VA-GAUGE-07
+    gauge3: BL16I-VA-GAUGE-06
+    gauge4: BL16I-VA-GAUGE-06
+    gauge5: BL16I-VA-GAUGE-06
+    gauge6: BL16I-VA-GAUGE-06
+    gauge7: BL16I-VA-GAUGE-06
+    gauge8: BL16I-VA-GAUGE-06
+
+  - type: mks937a.mks937aImgGroup
+    delay: 2
+    device: BL16I-VA-SPACE-06:IMGG
     img1: BL16I-VA-IMG-06
     img2: BL16I-VA-IMG-07
+    img3: BL16I-VA-IMG-06
+    img4: BL16I-VA-IMG-06
+    img5: BL16I-VA-IMG-06
+    img6: BL16I-VA-IMG-06
+    img7: BL16I-VA-IMG-06
+    img8: BL16I-VA-IMG-06
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL16I-VA-SPACE-06:IONPG
     ionp1: BL16I-VA-IONP-06
     ionp2: BL16I-VA-IONP-07
-    name: SP6
+    ionp3: BL16I-VA-IONP-06
+    ionp4: BL16I-VA-IONP-06
+    ionp5: BL16I-VA-IONP-06
+    ionp6: BL16I-VA-IONP-06
+    ionp7: BL16I-VA-IONP-06
+    ionp8: BL16I-VA-IONP-06
+
+  - type: mks937a.mks937aPirgGroup
+    device: BL16I-VA-SPACE-06:PIRGG
     pirg1: BL16I-VA-PIRG-06
     pirg2: BL16I-VA-PIRG-07
-    valve1: BL16I-VA-VALVE-04
+    pirg3: BL16I-VA-PIRG-06
+    pirg4: BL16I-VA-PIRG-06
+    pirg5: BL16I-VA-PIRG-06
+    pirg6: BL16I-VA-PIRG-06
+    pirg7: BL16I-VA-PIRG-06
+    pirg8: BL16I-VA-PIRG-06
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
+    device: BL16I-VA-SPACE-06
+    gauge: BL16I-VA-SPACE-06:GAUGEG
+    img: BL16I-VA-SPACE-06:IMGG
+    ionp: BL16I-VA-SPACE-06:IONPG
+    name: SP6
+    pirg: BL16I-VA-SPACE-06:PIRGG
+    valve: BL16I-VA-VALVE-04
+
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-07
-    gauge1: GAUGE08
-    img1: BL16I-VA-IMG-08
-    ionp1: BL16I-VA-IONP-08
+    gauge: BL16I-VA-GAUGE-08
+    img: BL16I-VA-IMG-08
+    ionp: BL16I-VA-IONP-08
     name: SP7
-    pirg1: BL16I-VA-PIRG-08
-    valve1: BL16I-VA-VALVE-05
+    pirg: BL16I-VA-PIRG-08
+    valve: BL16I-VA-VALVE-05
 
-  - type: vacuumSpace.space
-    device: BL16I-VA-SPACE-08
-    gauge1: GAUGE09
-    img1: BL16I-VA-IMG-09
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL16I-VA-SPACE-08:IONPG
     ionp1: BL16I-VA-IONP-09
     ionp2: BL16I-VA-IONP-10
     ionp3: BL16I-VA-IONP-11
+    ionp4: BL16I-VA-IONP-09
+    ionp5: BL16I-VA-IONP-09
+    ionp6: BL16I-VA-IONP-09
+    ionp7: BL16I-VA-IONP-09
+    ionp8: BL16I-VA-IONP-09
+
+  - type: vacuumSpace.spaceTemplate
+    device: BL16I-VA-SPACE-08
+    gauge: BL16I-VA-GAUGE-09
+    img: BL16I-VA-IMG-09
+    ionp: BL16I-VA-SPACE-08:IONPG
     name: SP8
-    pirg1: BL16I-VA-PIRG-09
-    valve1: BL16I-VA-VALVE-06
+    pirg: BL16I-VA-PIRG-09
+    valve: BL16I-VA-VALVE-06
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-09
-    gauge1: GAUGE10
-    img1: BL16I-VA-IMG-10
-    ionp1: BL16I-VA-IONP-12
+    gauge: BL16I-VA-GAUGE-10
+    img: BL16I-VA-IMG-10
+    ionp: BL16I-VA-IONP-12
     name: SP9
-    pirg1: BL16I-VA-PIRG-10
-    valve1: BL16I-VA-VALVE-07
+    pirg: BL16I-VA-PIRG-10
+    valve: BL16I-VA-VALVE-07
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-10
-    gauge1: GAUGE11
-    img1: BL16I-VA-IMG-11
-    ionp1: BL16I-VA-DIONP-01
+    gauge: BL16I-VA-GAUGE-11
+    img: BL16I-VA-IMG-11
+    ionp: BL16I-VA-DIONP-01
     name: SP10
-    pirg1: BL16I-VA-PIRG-11
-    valve1: BL16I-VA-DVALV-02
+    pirg: BL16I-VA-PIRG-11
+    valve: BL16I-VA-DVALV-02
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-11
-    gauge1: GAUGE12
-    img1: BL16I-VA-IMG-12
-    ionp1: BL16I-VA-DIONP-02
+    gauge: BL16I-VA-GAUGE-12
+    img: BL16I-VA-IMG-12
+    ionp: BL16I-VA-DIONP-02
     name: BL16I-VA-SPACE-11
-    pirg1: BL16I-VA-PIRG-12
-    valve1: BL16I-VA-VALVE-09
+    pirg: BL16I-VA-PIRG-12
+    valve: BL16I-VA-VALVE-09
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-21
-    gauge1: GAUGE21
-    img1: BL16I-VA-IMG-21
-    ionp1: BL16I-VA-DIONP-13
+    gauge: BL16I-VA-GAUGE-21
+    img: BL16I-VA-IMG-21
+    ionp: BL16I-VA-DIONP-13
     name: BL16I-VA-SPACE-21
-    pirg1: BL16I-VA-PIRG-21
-    valve1: BL16I-VA-VALVE-21
+    pirg: BL16I-VA-PIRG-21
+    valve: BL16I-VA-VALVE-21
 
-  - type: vacuumSpace.space
-    device: BL16I-VA-SPACE-91
-    gauge1: GAUGE09
-    gauge2: GAUGE10
-    gauge3: GAUGE11
+  - type: mks937a.mks937aGaugeGroup
+    device: BL16I-VA-SPACE-91:GAUGEG
+    gauge1: BL16I-VA-GAUGE-09
+    gauge2: BL16I-VA-GAUGE-10
+    gauge3: BL16I-VA-GAUGE-11
+    gauge4: BL16I-VA-GAUGE-09
+    gauge5: BL16I-VA-GAUGE-09
+    gauge6: BL16I-VA-GAUGE-09
+    gauge7: BL16I-VA-GAUGE-09
+    gauge8: BL16I-VA-GAUGE-09
+
+  - type: mks937a.mks937aImgGroup
+    delay: 2
+    device: BL16I-VA-SPACE-91:IMGG
     img1: BL16I-VA-IMG-09
     img2: BL16I-VA-IMG-10
+    img3: BL16I-VA-IMG-09
+    img4: BL16I-VA-IMG-09
+    img5: BL16I-VA-IMG-09
+    img6: BL16I-VA-IMG-09
+    img7: BL16I-VA-IMG-09
+    img8: BL16I-VA-IMG-09
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL16I-VA-SPACE-91:IONPG
     ionp1: BL16I-VA-IONP-09
     ionp2: BL16I-VA-IONP-10
     ionp3: BL16I-VA-IONP-11
-    name: BL16I-VA-SPACE-91
+    ionp4: BL16I-VA-IONP-09
+    ionp5: BL16I-VA-IONP-09
+    ionp6: BL16I-VA-IONP-09
+    ionp7: BL16I-VA-IONP-09
+    ionp8: BL16I-VA-IONP-09
+
+  - type: mks937a.mks937aPirgGroup
+    device: BL16I-VA-SPACE-91:PIRGG
     pirg1: BL16I-VA-PIRG-09
     pirg2: BL16I-VA-PIRG-10
     pirg3: BL16I-VA-PIRG-11
-    valve1: BL16I-VA-VALVE-07
+    pirg4: BL16I-VA-PIRG-09
+    pirg5: BL16I-VA-PIRG-09
+    pirg6: BL16I-VA-PIRG-09
+    pirg7: BL16I-VA-PIRG-09
+    pirg8: BL16I-VA-PIRG-09
+
+  - type: vacuumSpace.spaceTemplate
+    device: BL16I-VA-SPACE-91
+    gauge: BL16I-VA-SPACE-91:GAUGEG
+    img: BL16I-VA-SPACE-91:IMGG
+    ionp: BL16I-VA-SPACE-91:IONPG
+    name: BL16I-VA-SPACE-91
+    pirg: BL16I-VA-SPACE-91:PIRGG
+    valve: BL16I-VA-VALVE-07
 
   - type: vacuumSpace.spaceGroup
     device: BL16I-VA-SPACE-90

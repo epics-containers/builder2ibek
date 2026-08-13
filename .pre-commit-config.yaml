@@ -7,6 +7,11 @@ repos:
       - id: check-yaml
       - id: check-merge-conflict
       - id: end-of-file-fixer
+        # tests/vendored-support-dls is a byte-for-byte copy of the pinned
+        # ibek-support-dls, and test_vendored_support.py checks it as such.
+        # Tidying its line endings here would make that test fail with no way
+        # to fix it short of editing the submodule.
+        exclude: ^tests/vendored-support-dls/
 
   - repo: local
     hooks:

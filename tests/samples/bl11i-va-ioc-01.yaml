@@ -1235,71 +1235,135 @@ entities:
   - type: dlsPLC.externalValve
     device: FE11I-VA-VALVE-02
 
-  - type: vacuumSpace.space_b
-    device: BL11I-VA-SPACE-01
-    gauge1: GAUGE1
-    gauge2: GAUGE2
-    img1: IMG01
-    img2: IMG02
+  - type: mks937b.mks937bGaugeGroup
+    device: BL11I-VA-SPACE-01:GAUGEG
+    gauge1: BL11I-VA-GAUGE-01
+    gauge2: BL11I-VA-GAUGE-02
+    gauge3: BL11I-VA-GAUGE-01
+    gauge4: BL11I-VA-GAUGE-01
+    gauge5: BL11I-VA-GAUGE-01
+    gauge6: BL11I-VA-GAUGE-01
+    gauge7: BL11I-VA-GAUGE-01
+    gauge8: BL11I-VA-GAUGE-01
+
+  - type: mks937b.mks937bImgGroup
+    delay: 2
+    device: BL11I-VA-SPACE-01:IMGG
+    img1: BL11I-VA-IMG-01
+    img2: BL11I-VA-IMG-02
+    img3: BL11I-VA-IMG-01
+    img4: BL11I-VA-IMG-01
+    img5: BL11I-VA-IMG-01
+    img6: BL11I-VA-IMG-01
+    img7: BL11I-VA-IMG-01
+    img8: BL11I-VA-IMG-01
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL11I-VA-SPACE-01:IONPG
     ionp1: BL11I-VA-IONP-01
     ionp2: BL11I-VA-IONP-02
+    ionp3: BL11I-VA-IONP-01
+    ionp4: BL11I-VA-IONP-01
+    ionp5: BL11I-VA-IONP-01
+    ionp6: BL11I-VA-IONP-01
+    ionp7: BL11I-VA-IONP-01
+    ionp8: BL11I-VA-IONP-01
+
+  - type: mks937b.mks937bPirgGroup
+    device: BL11I-VA-SPACE-01:PIRGG
+    pirg1: BL11I-VA-PIRG-01
+    pirg2: BL11I-VA-PIRG-02
+    pirg3: BL11I-VA-PIRG-01
+    pirg4: BL11I-VA-PIRG-01
+    pirg5: BL11I-VA-PIRG-01
+    pirg6: BL11I-VA-PIRG-01
+    pirg7: BL11I-VA-PIRG-01
+    pirg8: BL11I-VA-PIRG-01
+
+  - type: vacuumSpace.space_bTemplate
+    device: BL11I-VA-SPACE-01
+    gauge: BL11I-VA-SPACE-01:GAUGEG
+    img: BL11I-VA-SPACE-01:IMGG
+    ionp: BL11I-VA-SPACE-01:IONPG
     name: SPACE1
-    pirg1: PIRG01
-    pirg2: PIRG02
-    valve1: FE11I-VA-VALVE-02
+    pirg: BL11I-VA-SPACE-01:PIRGG
+    valve: FE11I-VA-VALVE-02
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL11I-VA-SPACE-02
-    gauge1: GAUGE3
-    img1: BL11I-VA-IMG-03
-    ionp1: BL11I-VA-IONP-03
+    gauge: BL11I-VA-GAUGE-03
+    img: BL11I-VA-IMG-03
+    ionp: BL11I-VA-IONP-03
     name: SPACE2
-    pirg1: BL11I-VA-PIRG-03
-    valve1: BL11I-VA-VALVE-01
+    pirg: BL11I-VA-PIRG-03
+    valve: BL11I-VA-VALVE-01
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL11I-VA-SPACE-03
-    gauge1: GAUGE4
-    img1: BL11I-VA-IMG-04
-    ionp1: BL11I-VA-IONP-04
+    gauge: BL11I-VA-GAUGE-04
+    img: BL11I-VA-IMG-04
+    ionp: BL11I-VA-IONP-04
     name: SPACE3
-    pirg1: BL11I-VA-PIRG-04
-    valve1: BL11I-VA-VALVE-02
+    pirg: BL11I-VA-PIRG-04
+    valve: BL11I-VA-VALVE-02
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL11I-VA-SPACE-04
-    gauge1: GAUGE5
-    img1: BL11I-VA-IMG-05
-    ionp1: BL11I-VA-IONP-05
+    gauge: BL11I-VA-GAUGE-05
+    img: BL11I-VA-IMG-05
+    ionp: BL11I-VA-IONP-05
     name: SPACE4
-    pirg1: BL11I-VA-PIRG-05
-    valve1: BL11I-VA-VALVE-03
+    pirg: BL11I-VA-PIRG-05
+    valve: BL11I-VA-VALVE-03
 
-  - type: vacuumSpace.space
-    device: BL11I-VA-SPACE-05
-    gauge1: GAUGE6
-    img1: BL11I-VA-IMG-06
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL11I-VA-SPACE-05:IONPG
     ionp1: BL11I-VA-IONP-06
     ionp2: BL11I-VA-IONP-07
+    ionp3: BL11I-VA-IONP-06
+    ionp4: BL11I-VA-IONP-06
+    ionp5: BL11I-VA-IONP-06
+    ionp6: BL11I-VA-IONP-06
+    ionp7: BL11I-VA-IONP-06
+    ionp8: BL11I-VA-IONP-06
+
+  - type: vacuumSpace.spaceTemplate
+    device: BL11I-VA-SPACE-05
+    gauge: BL11I-VA-GAUGE-06
+    img: BL11I-VA-IMG-06
+    ionp: BL11I-VA-SPACE-05:IONPG
     name: SPACE5
-    pirg1: BL11I-VA-PIRG-06
-    valve1: BL11I-VA-VALVE-04
+    pirg: BL11I-VA-PIRG-06
+    valve: BL11I-VA-VALVE-04
 
-  - type: vacuumSpace.space
+  - type: vacuumSpace.spaceTemplate
     device: BL11I-VA-SPACE-06
-    gauge1: GAUGE7
-    img1: BL11I-VA-IMG-07
-    ionp1: BL11I-VA-IONP-08
+    gauge: BL11I-VA-GAUGE-07
+    img: BL11I-VA-IMG-07
+    ionp: BL11I-VA-IONP-08
     name: SPACE6
-    pirg1: BL11I-VA-PIRG-07
-    valve1: BL11I-VA-VALVE-05
+    pirg: BL11I-VA-PIRG-07
+    valve: BL11I-VA-VALVE-05
 
-  - type: vacuumSpace.space
-    device: BL11I-VA-SPACE-07
-    gauge1: GAUGE8
-    img1: BL11I-VA-IMG-08
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL11I-VA-SPACE-07:IONPG
     ionp1: BL11I-VA-IONP-09
     ionp2: BL11I-VA-IONP-10
+    ionp3: BL11I-VA-IONP-09
+    ionp4: BL11I-VA-IONP-09
+    ionp5: BL11I-VA-IONP-09
+    ionp6: BL11I-VA-IONP-09
+    ionp7: BL11I-VA-IONP-09
+    ionp8: BL11I-VA-IONP-09
+
+  - type: vacuumSpace.spaceTemplate
+    device: BL11I-VA-SPACE-07
+    gauge: BL11I-VA-GAUGE-08
+    img: BL11I-VA-IMG-08
+    ionp: BL11I-VA-SPACE-07:IONPG
     name: SPACE7
-    pirg1: BL11I-VA-PIRG-08
-    valve1: BL11I-VA-VALVE-06
+    pirg: BL11I-VA-PIRG-08
+    valve: BL11I-VA-VALVE-06

@@ -76,9 +76,14 @@ def test_vendored_copy_covers_every_module_the_samples_need():
     )
 
 
-@needs_real_submodule
 def test_vendored_copy_records_the_committed_pin():
-    """The copy must come from the SHA this repo pins, not a stray checkout."""
+    """The copy must come from the SHA this repo pins, not a stray checkout.
+
+    Deliberately not gated on a real checkout: it needs only git and
+    VENDORED_FROM, and CI -- which has no dls submodule at all -- is where a
+    stale copy is otherwise invisible. There the samples are generated from
+    the vendored models, so without this a months-old copy passes everything.
+    """
     pinned = subprocess.run(
         ["git", "ls-tree", "HEAD", "ibek-support-dls"],
         cwd=REPO_ROOT,

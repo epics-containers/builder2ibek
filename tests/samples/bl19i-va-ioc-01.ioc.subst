@@ -58,18 +58,13 @@ pattern
 
 file "$(MKS937A)/db/mks937aGaugeGroup.template" {
 pattern 
-	{ "device",                   "gauge1",            "gauge2",            "gauge3",            "gauge4",            "gauge5",            "gauge6",            "gauge7",            "gauge8",            "SELM", "SELN" }
-	{ "BL19I-VA-GAUGE-92",        "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "1",    "0"    }
-	{ "BL19I-VA-GAUGE-93",        "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "1",    "0"    }
-	{ "BL19I-VA-GAUGE-94",        "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "1",    "0"    }
-	{ "BL19I-VA-GAUGE-95",        "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "1",    "0"    }
-	{ "BL19I-VA-GAUGE-96",        "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "1",    "0"    }
-	{ "BL19I-VA-GAUGE-80",        "BL19I-VA-GAUGE-91", "BL19I-VA-GAUGE-92", "BL19I-VA-GAUGE-93", "BL19I-VA-GAUGE-94", "BL19I-VA-GAUGE-95", "BL19I-VA-GAUGE-96", "BL19I-VA-GAUGE-91", "BL19I-VA-GAUGE-91", "1",    "0"    }
-	{ "BL19I-VA-SPACE-02:GAUGEG", "GAUGE3",            "GAUGE3",            "GAUGE3",            "GAUGE3",            "GAUGE3",            "GAUGE3",            "GAUGE3",            "GAUGE3",            "1",    "0"    }
-	{ "BL19I-VA-SPACE-03:GAUGEG", "GAUGE4",            "GAUGE4",            "GAUGE4",            "GAUGE4",            "GAUGE4",            "GAUGE4",            "GAUGE4",            "GAUGE4",            "1",    "0"    }
-	{ "BL19I-VA-SPACE-04:GAUGEG", "GAUGE5",            "GAUGE5",            "GAUGE5",            "GAUGE5",            "GAUGE5",            "GAUGE5",            "GAUGE5",            "GAUGE5",            "1",    "0"    }
-	{ "BL19I-VA-SPACE-05:GAUGEG", "GAUGE6",            "GAUGE6",            "GAUGE6",            "GAUGE6",            "GAUGE6",            "GAUGE6",            "GAUGE6",            "GAUGE6",            "1",    "0"    }
-	{ "BL19I-VA-SPACE-06:GAUGEG", "GAUGE7",            "GAUGE7",            "GAUGE7",            "GAUGE7",            "GAUGE7",            "GAUGE7",            "GAUGE7",            "GAUGE7",            "1",    "0"    }
+	{ "device",            "gauge1",            "gauge2",            "gauge3",            "gauge4",            "gauge5",            "gauge6",            "gauge7",            "gauge8",            "SELM", "SELN" }
+	{ "BL19I-VA-GAUGE-92", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "BL19I-VA-GAUGE-03", "1",    "0"    }
+	{ "BL19I-VA-GAUGE-93", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "BL19I-VA-GAUGE-04", "1",    "0"    }
+	{ "BL19I-VA-GAUGE-94", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "BL19I-VA-GAUGE-05", "1",    "0"    }
+	{ "BL19I-VA-GAUGE-95", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "BL19I-VA-GAUGE-06", "1",    "0"    }
+	{ "BL19I-VA-GAUGE-96", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "BL19I-VA-GAUGE-07", "1",    "0"    }
+	{ "BL19I-VA-GAUGE-80", "BL19I-VA-GAUGE-91", "BL19I-VA-GAUGE-92", "BL19I-VA-GAUGE-93", "BL19I-VA-GAUGE-94", "BL19I-VA-GAUGE-95", "BL19I-VA-GAUGE-96", "BL19I-VA-GAUGE-91", "BL19I-VA-GAUGE-91", "1",    "0"    }
 }
 
 file "$(MKS937B)/db/mks937bHy8401.template" {
@@ -90,24 +85,19 @@ file "$(MKS937B)/db/mks937bGaugeGroup.template" {
 pattern 
 	{ "gauge5",            "gauge4",            "gauge7",            "gauge6",            "gauge1",            "gauge3",            "gauge2",            "SELN", "SELM", "gauge8",            "device"                   }
 	{ "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-02", "0",    "1",    "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-91"        }
-	{ "GAUGE1",            "GAUGE1",            "GAUGE1",            "GAUGE1",            "GAUGE1",            "GAUGE1",            "GAUGE2",            "0",    "1",    "GAUGE1",            "BL19I-VA-SPACE-01:GAUGEG" }
+	{ "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-01", "BL19I-VA-GAUGE-02", "0",    "1",    "BL19I-VA-GAUGE-01", "BL19I-VA-SPACE-01:GAUGEG" }
 }
 
 file "$(MKS937A)/db/mks937aImgGroup.template" {
 pattern 
-	{ "delay", "device",                 "img8",            "img3",            "img2",            "img1",            "img7",            "img6",            "img5",            "img4"            }
-	{ "4.0",   "BL19I-VA-IMG-91",        "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-02", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01" }
-	{ "4.0",   "BL19I-VA-IMG-92",        "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03" }
-	{ "4.0",   "BL19I-VA-IMG-93",        "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04" }
-	{ "4.0",   "BL19I-VA-IMG-94",        "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05" }
-	{ "4.0",   "BL19I-VA-IMG-95",        "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06" }
-	{ "4.0",   "BL19I-VA-IMG-96",        "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07" }
-	{ "4.0",   "BL19I-VA-IMG-80",        "BL19I-VA-IMG-91", "BL19I-VA-IMG-93", "BL19I-VA-IMG-92", "BL19I-VA-IMG-91", "BL19I-VA-IMG-91", "BL19I-VA-IMG-96", "BL19I-VA-IMG-95", "BL19I-VA-IMG-94" }
-	{ "4",     "BL19I-VA-SPACE-02:IMGG", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03" }
-	{ "4",     "BL19I-VA-SPACE-03:IMGG", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04" }
-	{ "4",     "BL19I-VA-SPACE-04:IMGG", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05" }
-	{ "4",     "BL19I-VA-SPACE-05:IMGG", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06" }
-	{ "4",     "BL19I-VA-SPACE-06:IMGG", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07" }
+	{ "delay", "device",          "img8",            "img3",            "img2",            "img1",            "img7",            "img6",            "img5",            "img4"            }
+	{ "4.0",   "BL19I-VA-IMG-91", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-02", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01" }
+	{ "4.0",   "BL19I-VA-IMG-92", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03", "BL19I-VA-IMG-03" }
+	{ "4.0",   "BL19I-VA-IMG-93", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04", "BL19I-VA-IMG-04" }
+	{ "4.0",   "BL19I-VA-IMG-94", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05", "BL19I-VA-IMG-05" }
+	{ "4.0",   "BL19I-VA-IMG-95", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06", "BL19I-VA-IMG-06" }
+	{ "4.0",   "BL19I-VA-IMG-96", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07", "BL19I-VA-IMG-07" }
+	{ "4.0",   "BL19I-VA-IMG-80", "BL19I-VA-IMG-91", "BL19I-VA-IMG-93", "BL19I-VA-IMG-92", "BL19I-VA-IMG-91", "BL19I-VA-IMG-91", "BL19I-VA-IMG-96", "BL19I-VA-IMG-95", "BL19I-VA-IMG-94" }
 }
 
 file "$(MKS937A)/db/mks937aImg.template" {
@@ -139,19 +129,14 @@ pattern
 
 file "$(MKS937A)/db/mks937aPirgGroup.template" {
 pattern 
-	{ "device",                  "pirg1",            "pirg2",            "pirg3",            "pirg4",            "pirg5",            "pirg6",            "pirg7",            "pirg8"            }
-	{ "BL19I-VA-PIRG-91",        "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-02", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01" }
-	{ "BL19I-VA-PIRG-92",        "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03" }
-	{ "BL19I-VA-PIRG-93",        "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04" }
-	{ "BL19I-VA-PIRG-94",        "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05" }
-	{ "BL19I-VA-PIRG-95",        "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06" }
-	{ "BL19I-VA-PIRG-96",        "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07" }
-	{ "BL19I-VA-PIRG-80",        "BL19I-VA-PIRG-91", "BL19I-VA-PIRG-92", "BL19I-VA-PIRG-93", "BL19I-VA-PIRG-94", "BL19I-VA-PIRG-95", "BL19I-VA-PIRG-96", "BL19I-VA-PIRG-91", "BL19I-VA-PIRG-91" }
-	{ "BL19I-VA-SPACE-02:PIRGG", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03" }
-	{ "BL19I-VA-SPACE-03:PIRGG", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04" }
-	{ "BL19I-VA-SPACE-04:PIRGG", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05" }
-	{ "BL19I-VA-SPACE-05:PIRGG", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06" }
-	{ "BL19I-VA-SPACE-06:PIRGG", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07" }
+	{ "device",           "pirg1",            "pirg2",            "pirg3",            "pirg4",            "pirg5",            "pirg6",            "pirg7",            "pirg8"            }
+	{ "BL19I-VA-PIRG-91", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-02", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01" }
+	{ "BL19I-VA-PIRG-92", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03", "BL19I-VA-PIRG-03" }
+	{ "BL19I-VA-PIRG-93", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04", "BL19I-VA-PIRG-04" }
+	{ "BL19I-VA-PIRG-94", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05", "BL19I-VA-PIRG-05" }
+	{ "BL19I-VA-PIRG-95", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06", "BL19I-VA-PIRG-06" }
+	{ "BL19I-VA-PIRG-96", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07", "BL19I-VA-PIRG-07" }
+	{ "BL19I-VA-PIRG-80", "BL19I-VA-PIRG-91", "BL19I-VA-PIRG-92", "BL19I-VA-PIRG-93", "BL19I-VA-PIRG-94", "BL19I-VA-PIRG-95", "BL19I-VA-PIRG-96", "BL19I-VA-PIRG-91", "BL19I-VA-PIRG-91" }
 }
 
 file "$(MKS937B)/db/mks937bPirg.template" {
@@ -239,10 +224,7 @@ pattern
 	{ "BL19I-VA-IONP-80",        "4",     "BL19I-VA-IONP-91", "BL19I-VA-IONP-92", "BL19I-VA-IONP-93", "BL19I-VA-IONP-94", "BL19I-VA-IONP-95", "BL19I-VA-IONP-96", "BL19I-VA-IONP-91", "BL19I-VA-IONP-91" }
 	{ "BL19I-VA-SPACE-01:IONPG", "4",     "BL19I-VA-IONP-01", "BL19I-VA-IONP-02", "BL19I-VA-IONP-03", "BL19I-VA-IONP-01", "BL19I-VA-IONP-01", "BL19I-VA-IONP-01", "BL19I-VA-IONP-01", "BL19I-VA-IONP-01" }
 	{ "BL19I-VA-SPACE-02:IONPG", "4",     "BL19I-VA-IONP-04", "BL19I-VA-IONP-05", "BL19I-VA-IONP-04", "BL19I-VA-IONP-04", "BL19I-VA-IONP-04", "BL19I-VA-IONP-04", "BL19I-VA-IONP-04", "BL19I-VA-IONP-04" }
-	{ "BL19I-VA-SPACE-03:IONPG", "4",     "BL19I-VA-IONP-06", "BL19I-VA-IONP-06", "BL19I-VA-IONP-06", "BL19I-VA-IONP-06", "BL19I-VA-IONP-06", "BL19I-VA-IONP-06", "BL19I-VA-IONP-06", "BL19I-VA-IONP-06" }
 	{ "BL19I-VA-SPACE-04:IONPG", "4",     "BL19I-VA-IONP-07", "BL19I-VA-IONP-08", "BL19I-VA-IONP-09", "BL19I-VA-IONP-07", "BL19I-VA-IONP-07", "BL19I-VA-IONP-07", "BL19I-VA-IONP-07", "BL19I-VA-IONP-07" }
-	{ "BL19I-VA-SPACE-05:IONPG", "4",     "BL19I-VA-IONP-10", "BL19I-VA-IONP-10", "BL19I-VA-IONP-10", "BL19I-VA-IONP-10", "BL19I-VA-IONP-10", "BL19I-VA-IONP-10", "BL19I-VA-IONP-10", "BL19I-VA-IONP-10" }
-	{ "BL19I-VA-SPACE-06:IONPG", "4",     "BL19I-VA-IONP-11", "BL19I-VA-IONP-11", "BL19I-VA-IONP-11", "BL19I-VA-IONP-11", "BL19I-VA-IONP-11", "BL19I-VA-IONP-11", "BL19I-VA-IONP-11", "BL19I-VA-IONP-11" }
 }
 
 file "$(DLSPLC)/db/dlsPLC_read100.template" {
@@ -327,14 +309,8 @@ pattern
 
 file "$(DLSPLC)/db/dlsPLC_vacValveGroup.template" {
 pattern 
-	{ "type",                 "entity_enabled", "mode1",       "mode2",   "delay", "device",                   "valve1",            "valve2",            "valve3",            "valve4",            "valve5",            "valve6",            "valve7",            "valve8"            }
-	{ "dlsPLC.vacValveGroup", "True",           "Operational", "Service", "4",     "BL19I-VA-VALVE-80",        "FE19I-VA-VALVE-02", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-05", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02" }
-	{ "vacuumSpace.space_b",  "True",           "Operational", "Service", "4",     "BL19I-VA-SPACE-01:VALVEG", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02" }
-	{ "vacuumSpace.space",    "True",           "Operational", "Service", "4",     "BL19I-VA-SPACE-02:VALVEG", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-01" }
-	{ "vacuumSpace.space",    "True",           "Operational", "Service", "4",     "BL19I-VA-SPACE-03:VALVEG", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-02" }
-	{ "vacuumSpace.space",    "True",           "Operational", "Service", "4",     "BL19I-VA-SPACE-04:VALVEG", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-03" }
-	{ "vacuumSpace.space",    "True",           "Operational", "Service", "4",     "BL19I-VA-SPACE-05:VALVEG", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-04" }
-	{ "vacuumSpace.space",    "True",           "Operational", "Service", "4",     "BL19I-VA-SPACE-06:VALVEG", "BL19I-VA-VALVE-05", "BL19I-VA-VALVE-05", "BL19I-VA-VALVE-05", "BL19I-VA-VALVE-05", "BL19I-VA-VALVE-05", "BL19I-VA-VALVE-05", "BL19I-VA-VALVE-05", "BL19I-VA-VALVE-05" }
+	{ "type",                 "entity_enabled", "mode1",       "mode2",   "delay", "device",            "valve1",            "valve2",            "valve3",            "valve4",            "valve5",            "valve6",            "valve7",            "valve8"            }
+	{ "dlsPLC.vacValveGroup", "True",           "Operational", "Service", "4",     "BL19I-VA-VALVE-80", "FE19I-VA-VALVE-02", "BL19I-VA-VALVE-01", "BL19I-VA-VALVE-02", "BL19I-VA-VALVE-03", "BL19I-VA-VALVE-04", "BL19I-VA-VALVE-05", "FE19I-VA-VALVE-02", "FE19I-VA-VALVE-02" }
 }
 
 file "$(DLSPLC)/db/dlsPLC_temperature.template" {
@@ -391,30 +367,30 @@ pattern
 	{ "1.0",  "1 second", "Hy8401ip", "#C50 S4 @MEAN=500", "LINEAR", "3",    "-1.0", "BL19I-VA-LPC-01", ":VOLTAGE", "V",   "Analogue Input", "10"            }
 }
 
-file "$(VACUUMSPACE)/db/space_b.template" {
+file "$(MKS937B)/db/mks937bImgGroup.template" {
 pattern 
-	{ "device",            "name",   "valveIlRelay", "mpsIlRelay1", "mpsIlRelay2", "rgaIlRelay", "ionPumpIlRelay", "SELM", "SELN", "ionp",                    "gauge",                    "img",                    "pirg",                    "valve"                    }
-	{ "BL19I-VA-SPACE-01", "SPACE1", "1",            "2",           "3",           "4",          "1",              "1",    "0",    "BL19I-VA-SPACE-01:IONPG", "BL19I-VA-SPACE-01:GAUGEG", "BL19I-VA-SPACE-01:IMGG", "BL19I-VA-SPACE-01:PIRGG", "BL19I-VA-SPACE-01:VALVEG" }
+	{ "rgaIlRelay", "img6",            "delay", "img3",            "img8",            "device",                 "img5",            "valveIlRelay", "img2",            "img1",            "img7",            "mpsIlRelay2", "mpsIlRelay1", "img4"            }
+	{ "4",          "BL19I-VA-IMG-01", "2",     "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "BL19I-VA-SPACE-01:IMGG", "BL19I-VA-IMG-01", "1",            "BL19I-VA-IMG-02", "BL19I-VA-IMG-01", "BL19I-VA-IMG-01", "3",           "2",           "BL19I-VA-IMG-01" }
 }
 
 file "$(MKS937B)/db/mks937bPirgGroup.template" {
 pattern 
-	{ "device",                  "ionPumpIlRelay", "pirg1",  "pirg2",  "pirg3",  "pirg4",  "pirg5",  "pirg6",  "pirg7",  "pirg8"  }
-	{ "BL19I-VA-SPACE-01:PIRGG", "1",              "PIRG01", "PIRG02", "PIRG01", "PIRG01", "PIRG01", "PIRG01", "PIRG01", "PIRG01" }
+	{ "pirg1",            "ionPumpIlRelay", "pirg3",            "pirg2",            "pirg5",            "pirg4",            "pirg7",            "pirg6",            "device",                  "pirg8"            }
+	{ "BL19I-VA-PIRG-01", "1",              "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-02", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-PIRG-01", "BL19I-VA-SPACE-01:PIRGG", "BL19I-VA-PIRG-01" }
 }
 
-file "$(MKS937B)/db/mks937bImgGroup.template" {
+file "$(VACUUMSPACE)/db/space_b.template" {
 pattern 
-	{ "device",                 "delay", "mpsIlRelay1", "mpsIlRelay2", "rgaIlRelay", "valveIlRelay", "img1",  "img2",  "img3",  "img4",  "img5",  "img6",  "img7",  "img8"  }
-	{ "BL19I-VA-SPACE-01:IMGG", "4",     "2",           "3",           "4",          "1",            "IMG01", "IMG02", "IMG01", "IMG01", "IMG01", "IMG01", "IMG01", "IMG01" }
+	{ "ionp",                    "name",   "img",                    "pirg",                    "valve",             "rgaIlRelay", "ionPumpIlRelay", "device",            "gauge",                    "valveIlRelay", "mpsIlRelay2", "mpsIlRelay1" }
+	{ "BL19I-VA-SPACE-01:IONPG", "SPACE1", "BL19I-VA-SPACE-01:IMGG", "BL19I-VA-SPACE-01:PIRGG", "FE19I-VA-VALVE-02", "4",          "1",              "BL19I-VA-SPACE-01", "BL19I-VA-SPACE-01:GAUGEG", "1",            "3",           "2"           }
 }
 
 file "$(VACUUMSPACE)/db/space.template" {
 pattern 
-	{ "device",            "name",   "ionp",                    "gauge",                    "img",                    "pirg",                    "valve"                    }
-	{ "BL19I-VA-SPACE-02", "SPACE2", "BL19I-VA-SPACE-02:IONPG", "BL19I-VA-SPACE-02:GAUGEG", "BL19I-VA-SPACE-02:IMGG", "BL19I-VA-SPACE-02:PIRGG", "BL19I-VA-SPACE-02:VALVEG" }
-	{ "BL19I-VA-SPACE-03", "SPACE3", "BL19I-VA-SPACE-03:IONPG", "BL19I-VA-SPACE-03:GAUGEG", "BL19I-VA-SPACE-03:IMGG", "BL19I-VA-SPACE-03:PIRGG", "BL19I-VA-SPACE-03:VALVEG" }
-	{ "BL19I-VA-SPACE-04", "SPACE4", "BL19I-VA-SPACE-04:IONPG", "BL19I-VA-SPACE-04:GAUGEG", "BL19I-VA-SPACE-04:IMGG", "BL19I-VA-SPACE-04:PIRGG", "BL19I-VA-SPACE-04:VALVEG" }
-	{ "BL19I-VA-SPACE-05", "SPACE5", "BL19I-VA-SPACE-05:IONPG", "BL19I-VA-SPACE-05:GAUGEG", "BL19I-VA-SPACE-05:IMGG", "BL19I-VA-SPACE-05:PIRGG", "BL19I-VA-SPACE-05:VALVEG" }
-	{ "BL19I-VA-SPACE-06", "SPACE6", "BL19I-VA-SPACE-06:IONPG", "BL19I-VA-SPACE-06:GAUGEG", "BL19I-VA-SPACE-06:IMGG", "BL19I-VA-SPACE-06:PIRGG", "BL19I-VA-SPACE-06:VALVEG" }
+	{ "device",            "name",   "ionp",                    "gauge",             "img",             "pirg",             "valve"             }
+	{ "BL19I-VA-SPACE-02", "SPACE2", "BL19I-VA-SPACE-02:IONPG", "BL19I-VA-GAUGE-03", "BL19I-VA-IMG-03", "BL19I-VA-PIRG-03", "BL19I-VA-VALVE-01" }
+	{ "BL19I-VA-SPACE-03", "SPACE3", "BL19I-VA-IONP-06",        "BL19I-VA-GAUGE-04", "BL19I-VA-IMG-04", "BL19I-VA-PIRG-04", "BL19I-VA-VALVE-02" }
+	{ "BL19I-VA-SPACE-04", "SPACE4", "BL19I-VA-SPACE-04:IONPG", "BL19I-VA-GAUGE-05", "BL19I-VA-IMG-05", "BL19I-VA-PIRG-05", "BL19I-VA-VALVE-03" }
+	{ "BL19I-VA-SPACE-05", "SPACE5", "BL19I-VA-IONP-10",        "BL19I-VA-GAUGE-06", "BL19I-VA-IMG-06", "BL19I-VA-PIRG-06", "BL19I-VA-VALVE-04" }
+	{ "BL19I-VA-SPACE-06", "SPACE6", "BL19I-VA-IONP-11",        "BL19I-VA-GAUGE-07", "BL19I-VA-IMG-07", "BL19I-VA-PIRG-07", "BL19I-VA-VALVE-05" }
 }

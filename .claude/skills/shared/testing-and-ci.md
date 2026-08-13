@@ -46,15 +46,18 @@ python3 tests/vendor_support_dls.py --update       # dls only
 | guard | fires when |
 |---|---|
 | `test_vendored_copy_records_the_committed_pin` | vendored copy predates the dls pin |
-| `test_samples_were_generated_from_the_committed_pin` | samples predate either pin |
+| `test_checkout_matches_the_committed_pin` | a checkout has drifted off the pin |
 
-**Both read `git ls-tree HEAD`, so they fire once the pin is _committed_, not
-while it is staged.** `git add` followed by pytest will report all-pass. CI only
-ever sees committed state, so this is a local-only gap.
+**Both read `git ls-tree HEAD`, so they compare against the _committed_ pin, not
+a staged one.** Bump a checkout and the drift guard stays red until the gitlink
+is committed — which is accurate: CI only ever sees committed state, so until
+then a green suite says nothing about what CI will do.
 
-`make_samples.sh` records what it used in `tests/samples/GENERATED_AGAINST`.
-Re-run it after any pin bump even when no sample output changes — the record
-tracks the revisions built from, not whether the outputs differed.
+There is no separate "samples are stale" guard, and none is needed.
+`test_convert` and `test_generate` regenerate live from whatever is checked out
+and compare against the committed samples, so a pin bump that changes any
+output fails on the real diff. One that changes no output needs no regeneration
+— re-running `make_samples.sh` for its own sake is busywork.
 
 `vendor_support_dls.py --update` refuses to run while the checkout and the
 committed pin disagree — it tells you to commit the bump first. So the order is:
@@ -93,6 +96,20 @@ export EPICS_ROOT=$(mktemp -d)
 ./update-schema
 ./tests/samples/make_samples.sh
 ```
+
+The same misleading symptom has a second cause: **two processes sharing one
+`ibek-defs`.** `tests/conftest.py` also runs `./update-schema` into
+`$EPICS_ROOT/ibek-defs` (default `/epics`), and `update-schema` does
+`rm -f .../ibek-defs/*` before re-linking. Run `pytest` and `make_samples.sh` at
+the same time — two terminals, or an agent alongside a human — and `generate2`
+reads that window, fails on whichever file happens to be missing, and
+`make_samples.sh` deletes that sample's outputs. The named module is innocent
+and validates fine afterwards.
+
+`conftest` guards *within* a session with an xdist file-lock, but nothing guards
+across processes. If a single sample fails on a module unrelated to your change,
+suspect this before believing it: re-validate the named file on its own, and
+re-run with a private `EPICS_ROOT`.
 
 `tests/check_pin_freshness.py` covers the opposite mistake: a pin that has *not*
 moved while upstream has. It warns and never fails, and runs weekly from

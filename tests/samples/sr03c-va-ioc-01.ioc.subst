@@ -270,10 +270,10 @@ pattern
 
 file "$(VACUUMSPACE)/db/space.template" {
 pattern 
-	{ "device",            "ionp",              "gauge",             "img",              "pirg",              "valve"             }
-	{ "SR03S-VA-SPACE-01", "SR03S-VA-GIONP-01", "SR03S-VA-GGAUG-01", "SR03S-VA-GIMG-01", "SR03S-VA-GPIRG-01", "SR03S-VA-GVALV-01" }
-	{ "SR03A-VA-SPACE-01", "SR03A-VA-GIONP-01", "SR03A-VA-GGAUG-01", "SR03A-VA-GIMG-01", "SR03A-VA-GPIRG-01", "SR03A-VA-GVALV-01" }
-	{ "SR03C-VA-SPACE-01", "SR03C-VA-GIONP-01", "SR03C-VA-GGAUG-01", "SR03C-VA-GIMG-01", "SR03C-VA-GPIRG-01", "SR03C-VA-GVALV-01" }
+	{ "device",            "name", "ionp",              "gauge",             "img",              "pirg",              "valve"             }
+	{ "SR03S-VA-SPACE-01", "",     "SR03S-VA-GIONP-01", "SR03S-VA-GGAUG-01", "SR03S-VA-GIMG-01", "SR03S-VA-GPIRG-01", "SR03S-VA-GVALV-01" }
+	{ "SR03A-VA-SPACE-01", "",     "SR03A-VA-GIONP-01", "SR03A-VA-GGAUG-01", "SR03A-VA-GIMG-01", "SR03A-VA-GPIRG-01", "SR03A-VA-GVALV-01" }
+	{ "SR03C-VA-SPACE-01", "",     "SR03C-VA-GIONP-01", "SR03C-VA-GGAUG-01", "SR03C-VA-GIMG-01", "SR03C-VA-GPIRG-01", "SR03C-VA-GVALV-01" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpcIonpGroup.template" {

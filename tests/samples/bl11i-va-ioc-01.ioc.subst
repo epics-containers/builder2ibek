@@ -267,94 +267,45 @@ pattern
 	{ "cmsIon.cmsIon_CheckReset", "True",           "BL11I-RS-RDMON-01", "BL11I-VA-EVR-01" }
 }
 
-file "$(VACUUMSPACE)/db/space_b.template" {
-pattern 
-	{ "device",            "name",   "valveIlRelay", "mpsIlRelay1", "mpsIlRelay2", "rgaIlRelay", "ionPumpIlRelay", "SELM", "SELN", "ionp",                    "gauge",                    "img",                    "pirg",                    "valve"                    }
-	{ "BL11I-VA-SPACE-01", "SPACE1", "1",            "2",           "3",           "4",          "1",              "1",    "0",    "BL11I-VA-SPACE-01:IONPG", "BL11I-VA-SPACE-01:GAUGEG", "BL11I-VA-SPACE-01:IMGG", "BL11I-VA-SPACE-01:PIRGG", "BL11I-VA-SPACE-01:VALVEG" }
-}
-
 file "$(MKS937B)/db/mks937bGaugeGroup.template" {
 pattern 
-	{ "gauge5", "gauge4", "gauge7", "gauge6", "gauge1", "gauge3", "gauge2", "SELN", "SELM", "gauge8", "device"                   }
-	{ "GAUGE1", "GAUGE1", "GAUGE1", "GAUGE1", "GAUGE1", "GAUGE1", "GAUGE2", "0",    "1",    "GAUGE1", "BL11I-VA-SPACE-01:GAUGEG" }
+	{ "gauge5",            "gauge4",            "gauge7",            "gauge6",            "gauge1",            "gauge3",            "gauge2",            "SELN", "SELM", "gauge8",            "device"                   }
+	{ "BL11I-VA-GAUGE-01", "BL11I-VA-GAUGE-01", "BL11I-VA-GAUGE-01", "BL11I-VA-GAUGE-01", "BL11I-VA-GAUGE-01", "BL11I-VA-GAUGE-01", "BL11I-VA-GAUGE-02", "0",    "1",    "BL11I-VA-GAUGE-01", "BL11I-VA-SPACE-01:GAUGEG" }
+}
+
+file "$(MKS937B)/db/mks937bImgGroup.template" {
+pattern 
+	{ "rgaIlRelay", "img6",            "delay", "img3",            "img8",            "device",                 "img5",            "valveIlRelay", "img2",            "img1",            "img7",            "mpsIlRelay2", "mpsIlRelay1", "img4"            }
+	{ "4",          "BL11I-VA-IMG-01", "2",     "BL11I-VA-IMG-01", "BL11I-VA-IMG-01", "BL11I-VA-SPACE-01:IMGG", "BL11I-VA-IMG-01", "1",            "BL11I-VA-IMG-02", "BL11I-VA-IMG-01", "BL11I-VA-IMG-01", "3",           "2",           "BL11I-VA-IMG-01" }
 }
 
 file "$(DIGITELMPC)/db/digitelMpcIonpGroup.template" {
 pattern 
 	{ "device",                  "delay", "ionp1",            "ionp2",            "ionp3",            "ionp4",            "ionp5",            "ionp6",            "ionp7",            "ionp8"            }
 	{ "BL11I-VA-SPACE-01:IONPG", "4",     "BL11I-VA-IONP-01", "BL11I-VA-IONP-02", "BL11I-VA-IONP-01", "BL11I-VA-IONP-01", "BL11I-VA-IONP-01", "BL11I-VA-IONP-01", "BL11I-VA-IONP-01", "BL11I-VA-IONP-01" }
-	{ "BL11I-VA-SPACE-02:IONPG", "4",     "BL11I-VA-IONP-03", "BL11I-VA-IONP-03", "BL11I-VA-IONP-03", "BL11I-VA-IONP-03", "BL11I-VA-IONP-03", "BL11I-VA-IONP-03", "BL11I-VA-IONP-03", "BL11I-VA-IONP-03" }
-	{ "BL11I-VA-SPACE-03:IONPG", "4",     "BL11I-VA-IONP-04", "BL11I-VA-IONP-04", "BL11I-VA-IONP-04", "BL11I-VA-IONP-04", "BL11I-VA-IONP-04", "BL11I-VA-IONP-04", "BL11I-VA-IONP-04", "BL11I-VA-IONP-04" }
-	{ "BL11I-VA-SPACE-04:IONPG", "4",     "BL11I-VA-IONP-05", "BL11I-VA-IONP-05", "BL11I-VA-IONP-05", "BL11I-VA-IONP-05", "BL11I-VA-IONP-05", "BL11I-VA-IONP-05", "BL11I-VA-IONP-05", "BL11I-VA-IONP-05" }
 	{ "BL11I-VA-SPACE-05:IONPG", "4",     "BL11I-VA-IONP-06", "BL11I-VA-IONP-07", "BL11I-VA-IONP-06", "BL11I-VA-IONP-06", "BL11I-VA-IONP-06", "BL11I-VA-IONP-06", "BL11I-VA-IONP-06", "BL11I-VA-IONP-06" }
-	{ "BL11I-VA-SPACE-06:IONPG", "4",     "BL11I-VA-IONP-08", "BL11I-VA-IONP-08", "BL11I-VA-IONP-08", "BL11I-VA-IONP-08", "BL11I-VA-IONP-08", "BL11I-VA-IONP-08", "BL11I-VA-IONP-08", "BL11I-VA-IONP-08" }
 	{ "BL11I-VA-SPACE-07:IONPG", "4",     "BL11I-VA-IONP-09", "BL11I-VA-IONP-10", "BL11I-VA-IONP-09", "BL11I-VA-IONP-09", "BL11I-VA-IONP-09", "BL11I-VA-IONP-09", "BL11I-VA-IONP-09", "BL11I-VA-IONP-09" }
 }
 
 file "$(MKS937B)/db/mks937bPirgGroup.template" {
 pattern 
-	{ "device",                  "ionPumpIlRelay", "pirg1",  "pirg2",  "pirg3",  "pirg4",  "pirg5",  "pirg6",  "pirg7",  "pirg8"  }
-	{ "BL11I-VA-SPACE-01:PIRGG", "1",              "PIRG01", "PIRG02", "PIRG01", "PIRG01", "PIRG01", "PIRG01", "PIRG01", "PIRG01" }
+	{ "pirg1",            "ionPumpIlRelay", "pirg3",            "pirg2",            "pirg5",            "pirg4",            "pirg7",            "pirg6",            "device",                  "pirg8"            }
+	{ "BL11I-VA-PIRG-01", "1",              "BL11I-VA-PIRG-01", "BL11I-VA-PIRG-02", "BL11I-VA-PIRG-01", "BL11I-VA-PIRG-01", "BL11I-VA-PIRG-01", "BL11I-VA-PIRG-01", "BL11I-VA-SPACE-01:PIRGG", "BL11I-VA-PIRG-01" }
 }
 
-file "$(MKS937B)/db/mks937bImgGroup.template" {
+file "$(VACUUMSPACE)/db/space_b.template" {
 pattern 
-	{ "device",                 "delay", "mpsIlRelay1", "mpsIlRelay2", "rgaIlRelay", "valveIlRelay", "img1",  "img2",  "img3",  "img4",  "img5",  "img6",  "img7",  "img8"  }
-	{ "BL11I-VA-SPACE-01:IMGG", "4",     "2",           "3",           "4",          "1",            "IMG01", "IMG02", "IMG01", "IMG01", "IMG01", "IMG01", "IMG01", "IMG01" }
-}
-
-file "$(DLSPLC)/db/dlsPLC_vacValveGroup.template" {
-pattern 
-	{ "type",                "entity_enabled", "mode1",       "mode2",   "delay", "device",                   "valve1",            "valve2",            "valve3",            "valve4",            "valve5",            "valve6",            "valve7",            "valve8"            }
-	{ "vacuumSpace.space_b", "True",           "Operational", "Service", "4",     "BL11I-VA-SPACE-01:VALVEG", "FE11I-VA-VALVE-02", "FE11I-VA-VALVE-02", "FE11I-VA-VALVE-02", "FE11I-VA-VALVE-02", "FE11I-VA-VALVE-02", "FE11I-VA-VALVE-02", "FE11I-VA-VALVE-02", "FE11I-VA-VALVE-02" }
-	{ "vacuumSpace.space",   "True",           "Operational", "Service", "4",     "BL11I-VA-SPACE-02:VALVEG", "BL11I-VA-VALVE-01", "BL11I-VA-VALVE-01", "BL11I-VA-VALVE-01", "BL11I-VA-VALVE-01", "BL11I-VA-VALVE-01", "BL11I-VA-VALVE-01", "BL11I-VA-VALVE-01", "BL11I-VA-VALVE-01" }
-	{ "vacuumSpace.space",   "True",           "Operational", "Service", "4",     "BL11I-VA-SPACE-03:VALVEG", "BL11I-VA-VALVE-02", "BL11I-VA-VALVE-02", "BL11I-VA-VALVE-02", "BL11I-VA-VALVE-02", "BL11I-VA-VALVE-02", "BL11I-VA-VALVE-02", "BL11I-VA-VALVE-02", "BL11I-VA-VALVE-02" }
-	{ "vacuumSpace.space",   "True",           "Operational", "Service", "4",     "BL11I-VA-SPACE-04:VALVEG", "BL11I-VA-VALVE-03", "BL11I-VA-VALVE-03", "BL11I-VA-VALVE-03", "BL11I-VA-VALVE-03", "BL11I-VA-VALVE-03", "BL11I-VA-VALVE-03", "BL11I-VA-VALVE-03", "BL11I-VA-VALVE-03" }
-	{ "vacuumSpace.space",   "True",           "Operational", "Service", "4",     "BL11I-VA-SPACE-05:VALVEG", "BL11I-VA-VALVE-04", "BL11I-VA-VALVE-04", "BL11I-VA-VALVE-04", "BL11I-VA-VALVE-04", "BL11I-VA-VALVE-04", "BL11I-VA-VALVE-04", "BL11I-VA-VALVE-04", "BL11I-VA-VALVE-04" }
-	{ "vacuumSpace.space",   "True",           "Operational", "Service", "4",     "BL11I-VA-SPACE-06:VALVEG", "BL11I-VA-VALVE-05", "BL11I-VA-VALVE-05", "BL11I-VA-VALVE-05", "BL11I-VA-VALVE-05", "BL11I-VA-VALVE-05", "BL11I-VA-VALVE-05", "BL11I-VA-VALVE-05", "BL11I-VA-VALVE-05" }
-	{ "vacuumSpace.space",   "True",           "Operational", "Service", "4",     "BL11I-VA-SPACE-07:VALVEG", "BL11I-VA-VALVE-06", "BL11I-VA-VALVE-06", "BL11I-VA-VALVE-06", "BL11I-VA-VALVE-06", "BL11I-VA-VALVE-06", "BL11I-VA-VALVE-06", "BL11I-VA-VALVE-06", "BL11I-VA-VALVE-06" }
+	{ "ionp",                    "name",   "img",                    "pirg",                    "valve",             "rgaIlRelay", "ionPumpIlRelay", "device",            "gauge",                    "valveIlRelay", "mpsIlRelay2", "mpsIlRelay1" }
+	{ "BL11I-VA-SPACE-01:IONPG", "SPACE1", "BL11I-VA-SPACE-01:IMGG", "BL11I-VA-SPACE-01:PIRGG", "FE11I-VA-VALVE-02", "4",          "1",              "BL11I-VA-SPACE-01", "BL11I-VA-SPACE-01:GAUGEG", "1",            "3",           "2"           }
 }
 
 file "$(VACUUMSPACE)/db/space.template" {
 pattern 
-	{ "device",            "name",   "ionp",                    "gauge",                    "img",                    "pirg",                    "valve"                    }
-	{ "BL11I-VA-SPACE-02", "SPACE2", "BL11I-VA-SPACE-02:IONPG", "BL11I-VA-SPACE-02:GAUGEG", "BL11I-VA-SPACE-02:IMGG", "BL11I-VA-SPACE-02:PIRGG", "BL11I-VA-SPACE-02:VALVEG" }
-	{ "BL11I-VA-SPACE-03", "SPACE3", "BL11I-VA-SPACE-03:IONPG", "BL11I-VA-SPACE-03:GAUGEG", "BL11I-VA-SPACE-03:IMGG", "BL11I-VA-SPACE-03:PIRGG", "BL11I-VA-SPACE-03:VALVEG" }
-	{ "BL11I-VA-SPACE-04", "SPACE4", "BL11I-VA-SPACE-04:IONPG", "BL11I-VA-SPACE-04:GAUGEG", "BL11I-VA-SPACE-04:IMGG", "BL11I-VA-SPACE-04:PIRGG", "BL11I-VA-SPACE-04:VALVEG" }
-	{ "BL11I-VA-SPACE-05", "SPACE5", "BL11I-VA-SPACE-05:IONPG", "BL11I-VA-SPACE-05:GAUGEG", "BL11I-VA-SPACE-05:IMGG", "BL11I-VA-SPACE-05:PIRGG", "BL11I-VA-SPACE-05:VALVEG" }
-	{ "BL11I-VA-SPACE-06", "SPACE6", "BL11I-VA-SPACE-06:IONPG", "BL11I-VA-SPACE-06:GAUGEG", "BL11I-VA-SPACE-06:IMGG", "BL11I-VA-SPACE-06:PIRGG", "BL11I-VA-SPACE-06:VALVEG" }
-	{ "BL11I-VA-SPACE-07", "SPACE7", "BL11I-VA-SPACE-07:IONPG", "BL11I-VA-SPACE-07:GAUGEG", "BL11I-VA-SPACE-07:IMGG", "BL11I-VA-SPACE-07:PIRGG", "BL11I-VA-SPACE-07:VALVEG" }
-}
-
-file "$(MKS937A)/db/mks937aPirgGroup.template" {
-pattern 
-	{ "device",                  "pirg1",            "pirg2",            "pirg3",            "pirg4",            "pirg5",            "pirg6",            "pirg7",            "pirg8"            }
-	{ "BL11I-VA-SPACE-02:PIRGG", "BL11I-VA-PIRG-03", "BL11I-VA-PIRG-03", "BL11I-VA-PIRG-03", "BL11I-VA-PIRG-03", "BL11I-VA-PIRG-03", "BL11I-VA-PIRG-03", "BL11I-VA-PIRG-03", "BL11I-VA-PIRG-03" }
-	{ "BL11I-VA-SPACE-03:PIRGG", "BL11I-VA-PIRG-04", "BL11I-VA-PIRG-04", "BL11I-VA-PIRG-04", "BL11I-VA-PIRG-04", "BL11I-VA-PIRG-04", "BL11I-VA-PIRG-04", "BL11I-VA-PIRG-04", "BL11I-VA-PIRG-04" }
-	{ "BL11I-VA-SPACE-04:PIRGG", "BL11I-VA-PIRG-05", "BL11I-VA-PIRG-05", "BL11I-VA-PIRG-05", "BL11I-VA-PIRG-05", "BL11I-VA-PIRG-05", "BL11I-VA-PIRG-05", "BL11I-VA-PIRG-05", "BL11I-VA-PIRG-05" }
-	{ "BL11I-VA-SPACE-05:PIRGG", "BL11I-VA-PIRG-06", "BL11I-VA-PIRG-06", "BL11I-VA-PIRG-06", "BL11I-VA-PIRG-06", "BL11I-VA-PIRG-06", "BL11I-VA-PIRG-06", "BL11I-VA-PIRG-06", "BL11I-VA-PIRG-06" }
-	{ "BL11I-VA-SPACE-06:PIRGG", "BL11I-VA-PIRG-07", "BL11I-VA-PIRG-07", "BL11I-VA-PIRG-07", "BL11I-VA-PIRG-07", "BL11I-VA-PIRG-07", "BL11I-VA-PIRG-07", "BL11I-VA-PIRG-07", "BL11I-VA-PIRG-07" }
-	{ "BL11I-VA-SPACE-07:PIRGG", "BL11I-VA-PIRG-08", "BL11I-VA-PIRG-08", "BL11I-VA-PIRG-08", "BL11I-VA-PIRG-08", "BL11I-VA-PIRG-08", "BL11I-VA-PIRG-08", "BL11I-VA-PIRG-08", "BL11I-VA-PIRG-08" }
-}
-
-file "$(MKS937A)/db/mks937aImgGroup.template" {
-pattern 
-	{ "delay", "device",                 "img8",            "img3",            "img2",            "img1",            "img7",            "img6",            "img5",            "img4"            }
-	{ "4",     "BL11I-VA-SPACE-02:IMGG", "BL11I-VA-IMG-03", "BL11I-VA-IMG-03", "BL11I-VA-IMG-03", "BL11I-VA-IMG-03", "BL11I-VA-IMG-03", "BL11I-VA-IMG-03", "BL11I-VA-IMG-03", "BL11I-VA-IMG-03" }
-	{ "4",     "BL11I-VA-SPACE-03:IMGG", "BL11I-VA-IMG-04", "BL11I-VA-IMG-04", "BL11I-VA-IMG-04", "BL11I-VA-IMG-04", "BL11I-VA-IMG-04", "BL11I-VA-IMG-04", "BL11I-VA-IMG-04", "BL11I-VA-IMG-04" }
-	{ "4",     "BL11I-VA-SPACE-04:IMGG", "BL11I-VA-IMG-05", "BL11I-VA-IMG-05", "BL11I-VA-IMG-05", "BL11I-VA-IMG-05", "BL11I-VA-IMG-05", "BL11I-VA-IMG-05", "BL11I-VA-IMG-05", "BL11I-VA-IMG-05" }
-	{ "4",     "BL11I-VA-SPACE-05:IMGG", "BL11I-VA-IMG-06", "BL11I-VA-IMG-06", "BL11I-VA-IMG-06", "BL11I-VA-IMG-06", "BL11I-VA-IMG-06", "BL11I-VA-IMG-06", "BL11I-VA-IMG-06", "BL11I-VA-IMG-06" }
-	{ "4",     "BL11I-VA-SPACE-06:IMGG", "BL11I-VA-IMG-07", "BL11I-VA-IMG-07", "BL11I-VA-IMG-07", "BL11I-VA-IMG-07", "BL11I-VA-IMG-07", "BL11I-VA-IMG-07", "BL11I-VA-IMG-07", "BL11I-VA-IMG-07" }
-	{ "4",     "BL11I-VA-SPACE-07:IMGG", "BL11I-VA-IMG-08", "BL11I-VA-IMG-08", "BL11I-VA-IMG-08", "BL11I-VA-IMG-08", "BL11I-VA-IMG-08", "BL11I-VA-IMG-08", "BL11I-VA-IMG-08", "BL11I-VA-IMG-08" }
-}
-
-file "$(MKS937A)/db/mks937aGaugeGroup.template" {
-pattern 
-	{ "device",                   "gauge1", "gauge2", "gauge3", "gauge4", "gauge5", "gauge6", "gauge7", "gauge8", "SELM", "SELN" }
-	{ "BL11I-VA-SPACE-02:GAUGEG", "GAUGE3", "GAUGE3", "GAUGE3", "GAUGE3", "GAUGE3", "GAUGE3", "GAUGE3", "GAUGE3", "1",    "0"    }
-	{ "BL11I-VA-SPACE-03:GAUGEG", "GAUGE4", "GAUGE4", "GAUGE4", "GAUGE4", "GAUGE4", "GAUGE4", "GAUGE4", "GAUGE4", "1",    "0"    }
-	{ "BL11I-VA-SPACE-04:GAUGEG", "GAUGE5", "GAUGE5", "GAUGE5", "GAUGE5", "GAUGE5", "GAUGE5", "GAUGE5", "GAUGE5", "1",    "0"    }
-	{ "BL11I-VA-SPACE-05:GAUGEG", "GAUGE6", "GAUGE6", "GAUGE6", "GAUGE6", "GAUGE6", "GAUGE6", "GAUGE6", "GAUGE6", "1",    "0"    }
-	{ "BL11I-VA-SPACE-06:GAUGEG", "GAUGE7", "GAUGE7", "GAUGE7", "GAUGE7", "GAUGE7", "GAUGE7", "GAUGE7", "GAUGE7", "1",    "0"    }
-	{ "BL11I-VA-SPACE-07:GAUGEG", "GAUGE8", "GAUGE8", "GAUGE8", "GAUGE8", "GAUGE8", "GAUGE8", "GAUGE8", "GAUGE8", "1",    "0"    }
+	{ "device",            "name",   "ionp",                    "gauge",             "img",             "pirg",             "valve"             }
+	{ "BL11I-VA-SPACE-02", "SPACE2", "BL11I-VA-IONP-03",        "BL11I-VA-GAUGE-03", "BL11I-VA-IMG-03", "BL11I-VA-PIRG-03", "BL11I-VA-VALVE-01" }
+	{ "BL11I-VA-SPACE-03", "SPACE3", "BL11I-VA-IONP-04",        "BL11I-VA-GAUGE-04", "BL11I-VA-IMG-04", "BL11I-VA-PIRG-04", "BL11I-VA-VALVE-02" }
+	{ "BL11I-VA-SPACE-04", "SPACE4", "BL11I-VA-IONP-05",        "BL11I-VA-GAUGE-05", "BL11I-VA-IMG-05", "BL11I-VA-PIRG-05", "BL11I-VA-VALVE-03" }
+	{ "BL11I-VA-SPACE-05", "SPACE5", "BL11I-VA-SPACE-05:IONPG", "BL11I-VA-GAUGE-06", "BL11I-VA-IMG-06", "BL11I-VA-PIRG-06", "BL11I-VA-VALVE-04" }
+	{ "BL11I-VA-SPACE-06", "SPACE6", "BL11I-VA-IONP-08",        "BL11I-VA-GAUGE-07", "BL11I-VA-IMG-07", "BL11I-VA-PIRG-07", "BL11I-VA-VALVE-05" }
+	{ "BL11I-VA-SPACE-07", "SPACE7", "BL11I-VA-SPACE-07:IONPG", "BL11I-VA-GAUGE-08", "BL11I-VA-IMG-08", "BL11I-VA-PIRG-08", "BL11I-VA-VALVE-06" }
 }

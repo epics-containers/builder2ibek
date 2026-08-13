@@ -11,7 +11,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
 
     if entity_type in [
-        "SCM10",
         "SMPLTempsController",
         "M5LimitLatch",
         "M5LimitStop",
