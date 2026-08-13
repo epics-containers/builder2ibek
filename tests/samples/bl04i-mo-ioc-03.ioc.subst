@@ -3,25 +3,25 @@
 #############################################################################
 
 file "$(IOCSTATS)/db/iocAdminSoft.db" {
-pattern
+pattern 
 	{ "IOC" }
 	{ ""    }
 }
 
 file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern
+pattern 
 	{ "IOC" }
 	{ ""    }
 }
 
 file "$(BL04I)/db/BL04I_flux.template" {
-pattern
+pattern 
 	{ "type",                  "entity_enabled", "dom"   }
 	{ "BL04I.auto_BL04I_flux", "True",           "BL04I" }
 }
 
 file "pmacStatus.template" {
-pattern
+pattern 
 	{ "P",                "PORT"       }
 	{ "BL04I-MO-STEP-01", "GeoBrick_1" }
 	{ "BL04I-MO-STEP-02", "GeoBrick_2" }
@@ -30,7 +30,7 @@ pattern
 }
 
 file "pmacController.template" {
-pattern
+pattern 
 	{ "FEEDRATE", "CSG7", "CSG6", "CSG5", "CSG4", "CSG3", "CSG2", "CSG1", "CSG0", "P",                "TIMEOUT", "NAXES", "PORT"       }
 	{ "100",      "",     "",     "",     "",     "",     "",     "",     "",     "BL04I-MO-STEP-01", "4",       "8",     "GeoBrick_1" }
 	{ "100",      "",     "",     "",     "",     "",     "",     "",     "",     "BL04I-MO-STEP-02", "4",       "8",     "GeoBrick_2" }
@@ -39,7 +39,7 @@ pattern
 }
 
 file "dls_pmac_asyn_motor.template" {
-pattern
+pattern 
 	{ "P",                 "M",            "PORT",       "SPORT",   "CS", "PMAC",             "VELO",  "ACCL", "SCALE", "BACC", "alh",  "DHLM",      "HOMEVIS", "EGU", "FEHSV",    "VBAS", "VMAX",  "HOME",                    "BDST", "DIR", "DTYP",      "FEHIGH", "DLLM",     "INIT", "ALLOW_HOMED_SET", "RDBL", "SREV",   "LLM", "ADEL", "RDBD",       "URIP", "ADDR", "RTRY", "OFF",           "ERES",         "FEHIHI", "FEHHSV",   "JAR",  "DESC",                  "BVEL", "MRES",         "DLY", "HLSV",     "UEIP", "RRES", "PREC", "RLNK", "FOFF", "HLM", "NTM", "TWV", "HOMEVISSTR"               }
 	{ "BL04I-MO-FSWT-01",  ":UPSTREAMX",   "GeoBrick_4", "BRICK_4", "0",  "BL04I-MO-STEP-04", "0.075", "0.2",  "1",     "0.1",  "None", "7.0",       "0",       "mm",  "NO_ALARM", "0.0",  "0.075", "BL04I-MO-FSWT-01",        "0.0",  "0",   "asynMotor", "0.0",    "-2.0",     "",     "#",               "",     "200",    "0.0", "0.0",  "5e-05",      "0",    "1",    "0",    "0.0",           "5e-05",        "0.0",    "NO_ALARM", "1.0",  "FSWT Upstream X",       "0.0",  "5e-05",        "0",   "MAJOR",    "0",    "0.0",  "5",    "",     "0",    "0.0", "1",   "1.0", "Use motor summary screen" }
 	{ "BL04I-MO-FSWT-01",  ":DOWNSTREAMX", "GeoBrick_4", "BRICK_4", "0",  "BL04I-MO-STEP-04", "0.075", "0.2",  "1",     "0.1",  "None", "5.0",       "0",       "mm",  "NO_ALARM", "0.0",  "0.075", "BL04I-MO-FSWT-01",        "0.0",  "0",   "asynMotor", "0.0",    "-2.0",     "",     "#",               "",     "200",    "0.0", "0.0",  "5e-05",      "0",    "2",    "0",    "0.0",           "5e-05",        "0.0",    "NO_ALARM", "1.0",  "FSWT Downstream X",     "0.0",  "5e-05",        "0",   "MAJOR",    "0",    "0.0",  "5",    "",     "0",    "0.0", "1",   "1.0", "Use motor summary screen" }
@@ -68,7 +68,7 @@ pattern
 }
 
 file "$(BL04I)/db/asynMotorAlias.template" {
-pattern
+pattern 
 	{ "type",                      "entity_enabled", "P",                      "alias"                      }
 	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:X",    "BL04I-AL-SLITS-04:X:CENTER" }
 	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:Y",    "BL04I-AL-SLITS-04:Y:CENTER" }
@@ -79,7 +79,7 @@ pattern
 }
 
 file "$(POSITIONER)/db/multipositioner.template" {
-pattern
+pattern 
 	{ "type",                       "entity_enabled", "P",                "MP",    "PS",   "DESC",             "name",     "STRA",               "STRB",               "STRC",                "STRD",       "STRE",        "STRF", "STRG", "STRH", "STRI", "STRJ", "STRK", "STRL", "STRM", "STRN", "STRO", "STRP", "P1_VALS", "P2_VALS", "P3_VALS", "P4_VALS", "P5_VALS", "P6_VALS" }
 	{ "positioner.multipositioner", "True",           "BL04I-MO-MAPT-01", ":X:MP", ":X:P", "Mini Apertures X", "MAPT.OB1", "LARGE_APERTURE",     "MEDIUM_APERTURE",    "SMALL_APERTURE",      "ROBOT_LOAD", "MANUAL_LOAD", "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "P1 Val",  "P2 Val",  "P3 Val",  "P4 Val",  "P5 Val",  "P6 Val"  }
 	{ "positioner.multipositioner", "True",           "BL04I-MO-MAPT-01", ":Y:MP", ":Y:P", "Mini Apertures Y", "MAPT.OB2", "LARGE_APERTURE",     "MEDIUM_APERTURE",    "SMALL_APERTURE",      "ROBOT_LOAD", "MANUAL_LOAD", "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "",     "P1 Val",  "P2 Val",  "P3 Val",  "P4 Val",  "P5 Val",  "P6 Val"  }
@@ -94,7 +94,7 @@ pattern
 }
 
 file "$(POSITIONER)/db/motorpositioner.template" {
-pattern
+pattern 
 	{ "type",                       "entity_enabled", "Q",    "MP",    "motor",              "DESC",            "EGU", "PREC", "VALA",     "VALB",     "VALC",    "VALD",    "VALE",     "VALF", "VALG", "VALH", "VALI", "VALJ", "VALK", "VALL", "VALM", "VALN", "VALO", "VALP", "pos", "P"                }
 	{ "positioner.motorpositioner", "True",           ":X:P", ":X:MP", "BL04I-MO-MAPT-01:X", "Mini Aperture X", "mm",  "5",    "0.0",      "0.0",      "0.0",     "0.0",     "0.0",      "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "A",   "BL04I-MO-MAPT-01" }
 	{ "positioner.motorpositioner", "True",           ":Y:P", ":Y:MP", "BL04I-MO-MAPT-01:Y", "Mini Aperture Y", "mm",  "5",    "41.81",    "45.2448",  "41.8096", "24.9",    "-48.9496", "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "0.0",  "A",   "BL04I-MO-MAPT-01" }
@@ -109,7 +109,7 @@ pattern
 }
 
 file "autohome.template" {
-pattern
+pattern 
 	{ "GRP10", "CTRL",             "PORT",       "GRP9", "GRP8", "GRP3",          "GRP2",          "GRP1", "GRP7", "GRP6", "GRP5",  "GRP4",          "STATUS11", "STATUSSV11", "STATUS13", "STATUS12", "STATUS15", "STATUS14", "DESC", "P",                       "STATE13", "STATE12", "STATE11", "STATUSSV12", "STATE15", "STATE14", "STATUSSV13", "PLC", "STATUSSV14", "STATUSSV15" }
 	{ "",      "BL04I-MO-STEP-01", "GeoBrick_1", "",     "",     "",              "X Translation", "All",  "",     "",     "",      "",              "",         "NO_ALARM",   "",         "",         "",         "",         "",     "BL04I-MO-BS-01:X",        "",        "",        "",        "NO_ALARM",   "",        "",        "NO_ALARM",   "10",  "NO_ALARM",   "NO_ALARM"   }
 	{ "",      "BL04I-MO-STEP-01", "GeoBrick_1", "",     "",     "Z Translation", "X Translation", "All",  "",     "",     "",      "",              "",         "NO_ALARM",   "",         "",         "",         "",         "",     "BL04I-MO-MAPT-01:XZ",     "",        "",        "",        "NO_ALARM",   "",        "",        "NO_ALARM",   "11",  "NO_ALARM",   "NO_ALARM"   }
@@ -125,50 +125,50 @@ pattern
 }
 
 file "save_restoreStatus.db" {
-pattern
+pattern 
 	{ "P"                }
 	{ "BL04I-MO-IOC-03:" }
 }
 
 file "$(MIRROR)/db/mirror2post.template" {
-pattern
+pattern 
 	{ "type",               "entity_enabled", "P",                "PITCH", "OFFSET", "JACK1",     "JACK2",       "CTOM1", "CTOM2", "CDEPTH", "MAXOFFSET", "MINOFFSET", "PITCHLIM", "SUFFIX", "gda_name", "gda_desc" }
 	{ "mirror.mirror2post", "True",           "BL04I-MO-FSWT-01", "YAW",   "X",      "UPSTREAMX", "DOWNSTREAMX", "170.0", "170.0", "73.0",   "100.0",     "-100.0",    "30.0",     "YAW",    "",         ""         }
 	{ "mirror.mirror2post", "True",           "BL04I-MO-FSWT-01", "PITCH", "Y",      "UPSTREAMY", "DOWNSTREAMY", "170.0", "170.0", "154.0",  "100.0",     "-100.0",    "30.0",     "PITCH",  "",         ""         }
 }
 
 file "$(MXEH)/db/Cryojet_Retraction.template" {
-pattern
+pattern 
 	{ "type",                    "entity_enabled", "dom",   "BRICK1PORT", "RETRACT_REQ_IP" }
 	{ "mxEH.Cryojet_Retraction", "True",           "BL04I", "BRICK_1",    "M12"            }
 }
 
 file "$(MXEH)/db/Flu_Det_Protection.template" {
-pattern
+pattern 
 	{ "type",                    "entity_enabled", "dom",   "BRICK1PORT", "BRICK3PORT" }
 	{ "mxEH.Flu_Det_Protection", "True",           "BL04I", "BRICK_1",    "BRICK_3"    }
 }
 
 file "$(MXEH)/db/RobotInterface_PLC_Statuses.template" {
-pattern
+pattern 
 	{ "type",                             "entity_enabled", "dom",   "BS_Z_BRICK_PORT", "BS_Z_DIS_VAR", "BS_Z_SAFE_VAR", "SCIN_Y_BRICK_PORT", "SCIN_Y_DIS_VAR", "SCIN_Y_SAFE_VAR", "MAPT_Y_BRICK_PORT", "MAPT_Y_DIS_VAR", "MAPT_Y_SAFE_VAR", "GONIO_BRICK_PORT", "GONIO_CENTREY_SAFE_VAR", "GONIO_CENTREZ_SAFE_VAR" }
 	{ "mxEH.RobotInterface_PLC_Statuses", "True",           "BL04I", "BRICK_3",         "P812",         "P813",          "BRICK_2",           "P801",           "P832",            "BRICK_2",           "P802",           "P830",            "BRICK_3",          "P810",                   "P811"                   }
 }
 
 file "$(BL04I)/db/GonioReady.db" {
-pattern
+pattern 
 	{ "type",                  "entity_enabled", "dom"   }
 	{ "BL04I.auto_GonioReady", "True",           "BL04I" }
 }
 
 file "$(TRANSFOCATOR)/db/transfocator.db" {
-pattern
+pattern 
 	{ "type",                      "entity_enabled", "P",                "Q", "PORT",    "PLC", "PLC_MASK", "PLC_HOME", "PLC_IN", "PLC_OUT", "TRANSLATION", "ROCKER" }
 	{ "transfocator.transfocator", "True",           "BL04I-MO-FSWT-01", "",  "BRICK_4", "20",  "24",       "23",       "22",     "21",      "5",           "6"      }
 }
 
 file "$(TRANSFOCATOR)/db/BL04I_beamsizeCalc.template" {
-pattern
+pattern 
 	{ "type",                            "entity_enabled", "P",                "Q" }
 	{ "transfocator.BL04I_beamsizeCalc", "True",           "BL04I-MO-FSWT-01", ""  }
 }
