@@ -139,6 +139,48 @@ the records they load are superseded by upstream autosave's
 
 ---
 
+## Step 2c: Helper classes that compute their own arguments
+
+Some public classes do real work in `__init__` **before** calling the base
+class. The tell is an `__init__` that transforms its arguments and instantiates
+other classes, rather than passing straight through:
+
+```python
+class space(spaceTemplate):
+    def __init__(self, **args):
+        argdict = _make_groups(args, self.components)   # <-- creates other objects
+        self.__super.__init__(**argdict)                #     and rewrites the args
+```
+
+Note this one inherits `AutoSubstitution`, not `ModuleBase`, so the base-type
+table in Step 2 does not catch it. Look at `__init__` itself.
+
+**These cannot be entity models.** An ibek entity model can conditionally
+include a *database* (`enabled:`), but it cannot conditionally instantiate a
+*different entity*, and it cannot vary how many it makes. Modelling one anyway
+means either emitting the maximum every time (wrong output, see
+[verify-against-builder.md](verify-against-builder.md)) or unreadable Jinja.
+
+**Expand them in the converter instead.** Emit the entities the helper would
+have created, then the plain template entity, and let the `ioc.yaml` say what it
+builds. `src/builder2ibek/converters/vacuumSpace.py` is the worked example:
+`space` / `space_b` become a `spaceTemplate` / `space_bTemplate` plus whatever
+`*Group` and dummy entities builder's rule calls for.
+
+When you report such a class, report **the rule it implements**, not just its
+parameters — the counts, the thresholds, and any constants it passes down.
+`vacuumSpace` hardcodes a different `delay` per component type (`ionp=4`,
+`img=2`, `valve=1`); missing that gave the right records with the wrong values.
+
+There is a second reason not to model them. `ibek/render_db.py` keys
+substitution rows by **template filename alone**, and the pattern header comes
+from whichever entity model instantiates that file first — so two models sharing
+a template file must declare identical arg lists and order, or the columns
+silently misalign. Emitting the real group entity makes the owning module the
+only author of those columns, and the problem disappears.
+
+---
+
 ## Step 3: Extract parameters from each class
 
 ### For `AutoSubstitution` classes

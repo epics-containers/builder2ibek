@@ -51,7 +51,16 @@ env -u EPICS_ROOT uv run pytest      # as CI runs it -- local /epics hides failu
 ./tests/samples/make_samples.sh      # regenerate sample outputs (after any pin bump)
 ./update-schema                      # rebuild global ioc schema
 python3 tests/vendor_support_dls.py --check   # is the vendored dls copy current?
+
+# Keep the ibek-support submodules level with another superproject that shares
+# them (e.g. ioc-dlslinuxvac). Local only -- no remote, no credentials:
+./sync-support ../ioc-dlslinuxvac            # report drift (exit 1 if any)
+./sync-support ../ioc-dlslinuxvac --sync     # fast-forward whichever side is behind
 ```
+
+`sync-support` never pushes and never bumps a gitlink -- it reports pin lag and
+leaves the bump to you, because bumping this repo's pin drags in the vendoring
+chain above. It only fast-forwards; real divergence is reported to merge by hand.
 
 See [.claude/skills/shared/testing-and-ci.md](.claude/skills/shared/testing-and-ci.md)
 for the vendored ibek-support-dls copy, the pin guards, and what to run after

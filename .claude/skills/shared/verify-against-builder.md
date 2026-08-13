@@ -42,13 +42,33 @@ Useful comparisons, in rough order of value:
    [find-boot-script.md](find-boot-script.md) and
    [vxworks-to-rtems-differences.md](vxworks-to-rtems-differences.md).
 
+## Extra records are not automatically benign
+
+This list used to say that `vacuumSpace` always emitting a group template was an
+expected difference — "unused slots default to slot 1, so the group's worst-of
+reduces to the single device, same result, more records". That reasoning was
+wrong, and it let the defect sit through several conversions.
+
+The links did resolve: the groups were instantiated, so `db-compare` reported
+`records missing in new: 0`, a strict superset. But routing a one-device space
+through a group is not the same result:
+
+- `digitelMpcIonpGroup`'s `SEQSTART` drives `LNK2..LNK9` from `ionp1..ionp8` at
+  `$(delay)` intervals. With all eight slots padded to the same pump, starting a
+  one-pump space issued START to it **eight times, 4 s apart**.
+- The group's `delay` was taken from the space instead of builder's
+  per-component constant, so img sequences ran at `DLY = 4.0` where builder
+  gives `2.0`.
+- 1360 extra records on a ten-space IOC.
+
+**When you find extra records, read what they do before calling them harmless.**
+Reducing to the same *value* is not the same as behaving the same way — check
+`seq`, `fanout` and `dfanout` records especially, since those turn a padded slot
+list into repeated actions. This is now fixed: the converter expands
+`space`/`space_b` and emits a group only where builder does (ibek-support#200).
+
 ## Expected differences — do not chase these
 
-- **Group templates are always emitted.** `vacuumSpace` instantiates a group per
-  space; builder only does so where a space has more than one device of that
-  type, pointing straight at the device otherwise. Unused slots default to slot
-  1, so the group's worst-of reduces to the single device. Same result, more
-  records.
 - **`entity_enabled` and `type` columns** appear wherever a support YAML uses
   `.*:` in `databases.args`. Harmless.
 - `dlssrfile`/`dlssrstatus`/`iocGui` → `save_restoreStatus.db`, and the autosave

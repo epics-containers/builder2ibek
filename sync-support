@@ -1,0 +1,288 @@
+#!/usr/bin/env python3
+"""Keep the ibek-support submodules level with another superproject's copies.
+
+builder2ibek and ioc-dlslinuxvac both carry ``ibek-support`` and
+``ibek-support-dls`` as submodules, and vacuum work edits them from whichever
+repo is to hand. Round-tripping every edit through GitHub/GitLab to move it a
+few directories is slow and easy to forget, so this compares the two checkouts
+directly on disk and can fast-forward whichever side is behind.
+
+    ./sync-support ../ioc-dlslinuxvac            # report only (default)
+    ./sync-support ../ioc-dlslinuxvac --sync     # fast-forward whichever is behind
+    ./sync-support ../ioc-dlslinuxvac --submodule ibek-support-dls
+
+The peer is named explicitly -- nothing is discovered by scanning /workspaces.
+Submodules are paired by their URL in each repo's .gitmodules, so the two need
+not agree on the checkout path.
+
+Nothing here touches a remote. Commits move between the two checkouts by
+fetching one working copy from the other by path, which needs no network, no
+forge credentials and no persistent ``peer`` remote: the fetch lands in
+FETCH_HEAD and leaves both repos' config alone.
+
+--sync only ever fast-forwards, and refuses a target whose worktree is dirty.
+Genuine divergence is reported for you to merge by hand.
+
+Two things this deliberately does NOT do:
+
+* push, or bump either superproject's gitlink. The pins are separate on
+  purpose -- bumping builder2ibek's drags in the vendoring chain
+  (vendor_support_dls.py --update, then make_samples.sh, in that order), which
+  is a deliberate act, not a side effect of syncing. Pin lag is reported so it
+  is visible.
+* rely on ``receive.denyCurrentBranch = updateInstead`` to push straight into
+  the peer's working tree. That works for a plain clone but not for a submodule
+  (tested on git 2.43): the push-to-checkout consistency check ignores
+  ``core.worktree``, so it always rejects with "Working directory has unstaged
+  changes" even when the peer is clean.
+
+Origin ahead/behind counts come from each repo's existing remote-tracking refs
+and are only as fresh as its last fetch -- this script does not fetch origin.
+
+Exit status: 0 everything level, 1 drift found, 2 the repos are not comparable.
+
+Standard library only, so it runs in either repo's devcontainer without a venv.
+"""
+
+from __future__ import annotations
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+# The local side is the superproject this script lives in, matching
+# update-schema's THISDIR convention, so it works from any cwd.
+LOCAL = Path(__file__).resolve().parent
+
+
+def git(repo: Path, *args: str) -> str:
+    """Run git in repo and return stdout, or "" if it failed."""
+    result = subprocess.run(
+        ["git", "-C", str(repo), *args],
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def git_checked(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args],
+        capture_output=True,
+        text=True,
+    )
+
+
+def submodules(repo: Path) -> dict[str, str]:
+    """Map normalised submodule URL -> checkout path, from repo/.gitmodules."""
+    modules = repo / ".gitmodules"
+    if not modules.exists():
+        return {}
+    listing = git(repo, "config", "--file", str(modules), "--list")
+
+    paths: dict[str, str] = {}
+    urls: dict[str, str] = {}
+    for line in listing.splitlines():
+        key, _, value = line.partition("=")
+        # submodule.<name>.<field> -- the name may itself contain dots, so
+        # split off the known prefix and suffix rather than splitting on ".".
+        if not key.startswith("submodule."):
+            continue
+        name, _, field = key[len("submodule.") :].rpartition(".")
+        if field == "path":
+            paths[name] = value
+        elif field == "url":
+            urls[name] = value.rstrip("/").removesuffix(".git")
+
+    return {urls[name]: paths[name] for name in paths.keys() & urls.keys()}
+
+
+def head_of(sub: Path) -> str:
+    return git(sub, "rev-parse", "HEAD")
+
+
+def branch_of(sub: Path) -> str:
+    return git(sub, "symbolic-ref", "--short", "-q", "HEAD") or "(detached)"
+
+
+def is_dirty(sub: Path) -> bool:
+    return bool(git(sub, "status", "--porcelain"))
+
+
+def pinned_at(repo: Path, path: str) -> str:
+    """The gitlink SHA the superproject has committed for this submodule."""
+    entry = git(repo, "ls-tree", "HEAD", path)
+    # "160000 commit <sha>\t<path>"
+    fields = entry.split()
+    return fields[2] if len(fields) >= 3 else ""
+
+
+def vs_origin(sub: Path) -> str:
+    """Ahead/behind against the tracking ref, from the last fetch."""
+    counts = git(sub, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
+    if not counts:
+        return "no upstream"
+    behind, _, ahead = counts.partition("\t")
+    if behind == "0" and ahead == "0":
+        return "level with origin"
+    # "ahead", not "unpushed": a branch fast-forwarded to main is ahead of its
+    # own tracking ref while every commit in it is already on the remote, so
+    # "unpushed" would imply work at risk that is not.
+    parts = []
+    if ahead != "0":
+        parts.append(f"{ahead} ahead")
+    if behind != "0":
+        parts.append(f"{behind} behind")
+    return ", ".join(parts) + " origin"
+
+
+def fetch_peer_head(into: Path, source: Path) -> bool:
+    """Fetch source's current HEAD into into's FETCH_HEAD. No config changes."""
+    # HEAD as the refspec works whether the source is on a branch or detached.
+    return git_checked(into, "fetch", "--quiet", str(source), "HEAD").returncode == 0
+
+
+def count(sub: Path, base: str, tip: str) -> int:
+    n = git(sub, "rev-list", "--count", f"{base}..{tip}")
+    return int(n) if n.isdigit() else 0
+
+
+def fast_forward(sub: Path, label: str, onto: str) -> bool:
+    if is_dirty(sub):
+        print(f"    ! {label} has uncommitted changes -- not fast-forwarding")
+        return False
+    result = git_checked(sub, "merge", "--ff-only", onto)
+    if result.returncode != 0:
+        print(f"    ! {label} fast-forward failed: {result.stderr.strip()}")
+        return False
+    print(f"    -> {label} fast-forwarded to {head_of(sub)[:7]}")
+    return True
+
+
+def compare(local_path: str, peer_path: str, peer: Path, do_sync: bool) -> bool:
+    """Report one submodule pair. Returns True if it is level afterwards."""
+    local_sub = LOCAL / local_path
+    peer_sub = peer / peer_path
+
+    print(f"{local_path}:")
+
+    for sub, label in ((local_sub, LOCAL.name), (peer_sub, peer.name)):
+        if not (sub / ".git").exists():
+            print(f"    ! not initialised in {label} -- git submodule update --init")
+            return False
+
+    # Report each side before comparing them, so a branch mismatch or a stale
+    # pin is visible even when the two happen to be on the same commit.
+    for repo, sub, path in (
+        (LOCAL, local_sub, local_path),
+        (peer, peer_sub, peer_path),
+    ):
+        dirty = " [dirty]" if is_dirty(sub) else ""
+        pin = pinned_at(repo, path)
+        lag = "" if pin == head_of(sub) else " [checkout ahead of committed pin]"
+        print(
+            f"    {repo.name:<20} {head_of(sub)[:7]}  {branch_of(sub)}"
+            f"  ({vs_origin(sub)}){dirty}{lag}"
+        )
+
+    if branch_of(local_sub) != branch_of(peer_sub):
+        print(
+            f"    ! different branches: {branch_of(local_sub)} vs {branch_of(peer_sub)}"
+        )
+
+    if head_of(local_sub) == head_of(peer_sub):
+        print("    in sync")
+        return True
+
+    # Each side has to fetch the other before it can say how they relate --
+    # neither holds the other's commits until it does.
+    if not (
+        fetch_peer_head(local_sub, peer_sub) and fetch_peer_head(peer_sub, local_sub)
+    ):
+        print("    ! could not fetch between the two checkouts")
+        return False
+
+    local_ahead = count(local_sub, "FETCH_HEAD", "HEAD")
+    peer_ahead = count(peer_sub, "FETCH_HEAD", "HEAD")
+
+    if local_ahead and peer_ahead:
+        print(
+            f"    ! diverged: {LOCAL.name} +{local_ahead},"
+            f" {peer.name} +{peer_ahead} -- merge by hand"
+        )
+        return False
+
+    behind, ahead_by = (
+        (LOCAL.name, peer_ahead) if peer_ahead else (peer.name, local_ahead)
+    )
+    print(f"    {behind} is {ahead_by} commit(s) behind")
+    if not do_sync:
+        print("    (re-run with --sync to fast-forward)")
+        return False
+
+    target = local_sub if peer_ahead else peer_sub
+    return fast_forward(target, behind, "FETCH_HEAD")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "peer",
+        help="path to the other superproject, e.g. ../ioc-dlslinuxvac",
+    )
+    parser.add_argument(
+        "--sync",
+        action="store_true",
+        help="fast-forward whichever side is behind (never merges, never pushes)",
+    )
+    parser.add_argument(
+        "--submodule",
+        metavar="PATH",
+        help="restrict to one submodule, named by its path in this repo",
+    )
+    args = parser.parse_args()
+
+    peer = Path(args.peer).resolve()
+    if not (peer / ".git").exists():
+        print(f"ERROR: {peer} is not a git repository", file=sys.stderr)
+        return 2
+    if peer == LOCAL:
+        print("ERROR: the peer is this repository", file=sys.stderr)
+        return 2
+
+    ours, theirs = submodules(LOCAL), submodules(peer)
+    shared = ours.keys() & theirs.keys()
+    if not shared:
+        print(
+            f"ERROR: {LOCAL.name} and {peer.name} declare no submodule in common."
+            "\n       They are paired by URL -- check .gitmodules in both.",
+            file=sys.stderr,
+        )
+        return 2
+
+    if args.submodule:
+        shared = {url for url in shared if ours[url] == args.submodule.rstrip("/")}
+        if not shared:
+            print(
+                f"ERROR: {args.submodule} is not a submodule shared with {peer.name}",
+                file=sys.stderr,
+            )
+            return 2
+
+    # Anything only one of them carries is not this script's business, but say
+    # so rather than silently comparing a subset.
+    for repo, mods in ((LOCAL, ours), (peer, theirs)):
+        for url in mods.keys() - shared:
+            if not args.submodule:
+                print(f"note: {mods[url]} is only in {repo.name} -- skipped")
+
+    level = [compare(ours[url], theirs[url], peer, args.sync) for url in sorted(shared)]
+    return 0 if all(level) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
