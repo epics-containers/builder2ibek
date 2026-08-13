@@ -134,8 +134,10 @@ previous one has *landed* rather than merely been written.
    because the instance is pure converter output. See
    [](../how-to/verify-with-devcontainer.md).
 
-Steps 3, 5, 6 and 8 each end at a push to a protected branch, which is where the
-chain stops and waits for a person.
+Steps 3, 5, 6 and 8 above each end at a push to a protected branch. Three of
+them are GitLab repositories, and those are where the chain stops and waits for
+another person to merge; step 5 is a pull request on `builder2ibek`, which is on
+GitHub and which the author can merge themselves.
 
 What keeps this tractable is that none of it has to be published to be tried.
 The generic IOC's devcontainer builds the developer image locally with every
@@ -199,7 +201,7 @@ would shorten:
   `ioc.yaml` names the module it needs, and the Dockerfile names the modules the
   image builds. Nothing compares the two.
 - **Shorten the distance from a tier-1 fix to a usable image.** Four of the
-  fifteen steps exist only to propagate a pin.
+  chart's fifteen steps exist only to propagate a pin.
 - **Fail at build time, not boot time.** A check that the image's `ibek` and
   `start.sh` can actually serve the patterns an instance vendors would have
   caught the template drift immediately.
@@ -209,8 +211,8 @@ would shorten:
 - **Validate support-model changes against the conversion samples,** so that a
   change which no converted IOC can satisfy is caught where it is made.
 
-Three of the fifteen steps stop for a human purely because `main` is protected
-on the GitLab repositories. That is a permissions question rather than a design
+Three of the chart's fifteen steps stop for a human purely because `main` is
+protected on the GitLab repositories. That is a permissions question rather than a design
 one, but it is the only part of the chain that no amount of tooling can cross.
 
 ## Related
