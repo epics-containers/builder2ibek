@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Warn when a submodule pin has fallen behind its remote main.
 
-This is the other half of test_sample_pins.py, and the two catch opposite
-mistakes. That test fails when a pin moves and the samples are not regenerated.
-This warns when a pin has *not* moved but upstream has -- at which point the
-repo is internally consistent and entirely green while testing against support
-modules that are months old. Nothing else notices that.
+This is the other half of test_submodule_pins.py, and the two catch opposite
+mistakes. That test fails when a checkout has moved off the pin, so the suite is
+testing a tree CI will not use. This warns when a pin has *not* moved but
+upstream has -- at which point the repo is internally consistent and entirely
+green while testing against support modules that are months old. Nothing else
+notices that.
 
 Deliberately never fails. A pin lagging main is normal for days at a time and
 is often the correct state; it is a thing to be told about, not blocked on. Run
