@@ -363,8 +363,11 @@ Report:
 
 ## Non-IOC compose services
 
-Do **not** hand-port these; the helm template repo already ships equivalents
-(created by copier, not by this command):
+Do **not** hand-port any of these. The helm template repo ships equivalents,
+created by **copier**, not by this command. If the target repo is missing one,
+tell the user to re-run copier rather than writing it by hand.
+
+### Controls services
 
 | compose service | helm equivalent |
 |---|---|
@@ -373,6 +376,32 @@ Do **not** hand-port these; the helm template repo already ships equivalents
 | `phoebus` | none — a developer workstation client |
 | (n/a) | `services/<domain>-epics-pvcs` — the opi/autosave/runtime PVCs |
 
-If the target repo is missing one, tell the user to re-run copier rather than
-writing it by hand. A compose IOC that is *not* built on `linux_ioc` (a fastcs
-service, say) belongs in `.fastcs_ioc_template`, not here — flag it and stop.
+### DAQ services
+
+A compose DAQ stack (`dev-environment/daq-services`) runs local stand-ins for
+infrastructure that is **central** on the cluster. Only rabbitmq and blueapi
+become per-domain services, via the `athena_services` copier answer
+(`rabbitmq` / `blueapi` / `nexus`) plus the `auth_enabled`,
+`numtracker_enabled` and `tiled_enabled` flags:
+
+| compose service | helm outcome |
+|---|---|
+| `rabbitmq` | `services/<instrument>-rabbitmq` — needs a LoadBalancer IP for stomp |
+| `blueapi-oauth2-proxy` | not a service — the `oauth2-proxy` subchart of `<instrument>-blueapi` under `auth_enabled: true` |
+| `keycloak` | drop — the cluster uses `identity.diamond.ac.uk` realm `dls` |
+| `opa` | drop — authz is central (`oci://ghcr.io/diamondlightsource/authz-opa`) |
+| `numtracker` | drop — central; `numtracker_enabled: true` points blueapi at it |
+| `tiled`, `tiled-postgres` | drop — central; `tiled_enabled: true` points blueapi at it |
+
+Enabling `blueapi` is **not** a self-contained edit — it needs DLS-side
+registration (`<instrument>Blueapi` / `<instrument>TiledWriter` keycloak
+clients, the `blueapi-secret` and `rabbitmq-secrets` secrets) and a
+`dodal.beamlines.<instrument>` module, which the generated `values.yaml`
+references. Report those as prerequisites; do not invent them.
+
+Live examples on the current template: `b01-1-services`, `p47-services`.
+
+### Everything else
+
+A compose IOC that is *not* built on `linux_ioc` (a fastcs service, say)
+belongs in `.fastcs_ioc_template`, not here — flag it and stop.
