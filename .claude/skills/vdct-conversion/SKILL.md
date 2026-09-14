@@ -317,6 +317,51 @@ the set of `expand()` targets.
 
 ---
 
+## 4b. Makefile-`sed`-generated variants — not VDCT, no source to convert
+
+A sibling problem to §4a, but outside VDCT entirely: some `builder.py` classes
+are backed by a template that has **no VDCT source anywhere** — not a `.vdb`,
+not a `#!`-tagged `.template`, nothing under `*App/Db`. DLS generated it at
+build time by running `sed` over a *different*, VDCT-authored template.
+
+Found in ODPsu 3-2: `ODPsugda` (VDCT-tagged, `$(NCHAN)`-parameterised) has six
+fixed-channel-count siblings — `ODPsugda24`, `16`, `14`, `12`, `8`, `7` (and six
+more `V2` equivalents, 12 in total) — each its own `builder.py` class. None of
+the twelve has a file under `ODPsuApp/Db`. `ODPsuApp/Db/Makefile` explains why:
+
+```makefile
+DB_INSTALLS+=ODPsugda24.template
+ODPsugda24.template: $(INSTALL_DB)/ODPsugda.template
+	sed \
+	-e 's/.(NCHAN)/24/g' \
+	-e '/^# % macro, NCHAN/d' \
+	$< >> $@
+```
+
+— a plain-text substitution of `NCHAN` plus (for the smaller variants) removal
+of the channel-range record blocks the fixed size doesn't need. This is DLS
+Makefile machinery, not VisualDCT: no `expand()`, no `template() { }`, nothing
+`vdct2template` or the `*.vdb`-rename workaround can find, because there is
+nothing under `*App/Db` to find or rename.
+
+**Detect it**: a class in `builder.py` whose `TemplateFile` doesn't exist under
+`*App/Db`, paired with a `DB_INSTALLS += X.template` target (not a plain
+`DB += X.template` line) in the module's Db `Makefile` whose recipe is a `sed`
+pipeline reading another shipped template.
+
+**Convert it**: since there's no source to run `vdct2template` against, take
+`X.template` straight from the release's **built `db/`** directory instead of
+`*App/Db`, and treat it like any other flat VDCT-tagged file from here — no
+`expand()`/`template(){}` to worry about, just strip `#!` junk and default its
+annotation-only macros the same way as the parent template (the parent's
+`#% macro` annotations still apply; the `sed` recipe only touches `NCHAN` and
+record bodies, not the annotation block). Record in the support yaml's
+provenance comment that this class has no `*App/Db` source and was taken from
+`db/` for that reason, so a future re-sync from a newer DLS release knows to
+look there again rather than expecting a source file to appear.
+
+---
+
 ## 5. Deriving entity models (`auto_*`)
 
 XMLbuilder synthesises an `auto_<name>` AutoSubstitution class for every template
@@ -328,6 +373,32 @@ Modules therefore commonly ship far more templates than `etc/builder.py` declare
 classes for. An extraction driven off `builder.py` alone (as the first
 `ibek-runtime-streamdevice` pass was) silently misses them — currAmp's
 `builder.py` declares 2 classes against 11 installed templates.
+
+### Check completeness in both directions, not just the `auto_*` one
+
+The `auto_*` gap above is templates with **no** `builder.py` class. The
+opposite gap is just as real and easier to miss because it looks like ordinary
+class-by-class extraction: `builder.py` declares the class, but the pattern
+never got an entity model for it anyway. Found in ODPsu 3-2 — `builder.py`
+declares 25 real (non-`auto_*`) `AutoSubstitution`/`AutoProtocol` classes, and
+the shipped `ibek-runtime-streamdevice/ODPsu` pattern had entity models for
+only 8 of them. The entire 14-class `ODPsugda*` family and all 3
+`ODPsu*DUpdate` classes were simply never vendored — apparently a partial read
+of `builder.py` when the pattern was first created — and this wasn't a niche
+omission: `ODPsu22DUpdate` is used by real production IOCs (`BL02I-MO-IOC-01`,
+`BL03I-MO-IOC-01`).
+
+Before calling a pattern's entity-model set complete, check **both**
+directions:
+
+```bash
+grep -c '^class ' <module>/etc/builder.py    # declared classes
+```
+
+against the pattern's `entity_models:` names — a template with no class means
+check the `auto_*` case above; a class with no entity model (ODPsu's case)
+means the extraction just skipped part of the file. Either direction is a real
+gap, not a stylistic choice.
 
 To reproduce `auto_*` in ibek:
 
