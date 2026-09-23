@@ -2259,15 +2259,72 @@ entities:
     pirg: BL19I-VA-PIRG-07
     valve: BL19I-VA-VALVE-05
 
-  - type: vacuumSpace.spaceGroup
+  - type: mks937a.mks937aGaugeGroup
+    device: BL19I-VA-SPACE-80:GAUGEG
+    gauge1: BL19I-VA-SPACE-01:GAUGEG
+    gauge2: BL19I-VA-GAUGE-03
+    gauge3: BL19I-VA-GAUGE-04
+    gauge4: BL19I-VA-GAUGE-05
+    gauge5: BL19I-VA-GAUGE-06
+    gauge6: BL19I-VA-GAUGE-07
+    gauge7: BL19I-VA-SPACE-01:GAUGEG
+    gauge8: BL19I-VA-SPACE-01:GAUGEG
+
+  - type: mks937a.mks937aImgGroup
+    delay: 2
+    device: BL19I-VA-SPACE-80:IMGG
+    img1: BL19I-VA-SPACE-01:IMGG
+    img2: BL19I-VA-IMG-03
+    img3: BL19I-VA-IMG-04
+    img4: BL19I-VA-IMG-05
+    img5: BL19I-VA-IMG-06
+    img6: BL19I-VA-IMG-07
+    img7: BL19I-VA-SPACE-01:IMGG
+    img8: BL19I-VA-SPACE-01:IMGG
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL19I-VA-SPACE-80:IONPG
+    ionp1: BL19I-VA-SPACE-01:IONPG
+    ionp2: BL19I-VA-SPACE-02:IONPG
+    ionp3: BL19I-VA-IONP-06
+    ionp4: BL19I-VA-SPACE-04:IONPG
+    ionp5: BL19I-VA-IONP-10
+    ionp6: BL19I-VA-IONP-11
+    ionp7: BL19I-VA-SPACE-01:IONPG
+    ionp8: BL19I-VA-SPACE-01:IONPG
+
+  - type: mks937a.mks937aPirgGroup
+    device: BL19I-VA-SPACE-80:PIRGG
+    pirg1: BL19I-VA-SPACE-01:PIRGG
+    pirg2: BL19I-VA-PIRG-03
+    pirg3: BL19I-VA-PIRG-04
+    pirg4: BL19I-VA-PIRG-05
+    pirg5: BL19I-VA-PIRG-06
+    pirg6: BL19I-VA-PIRG-07
+    pirg7: BL19I-VA-SPACE-01:PIRGG
+    pirg8: BL19I-VA-SPACE-01:PIRGG
+
+  - type: dlsPLC.vacValveGroup
+    delay: 1
+    device: BL19I-VA-SPACE-80:VALVEG
+    valve1: FE19I-VA-VALVE-02
+    valve2: BL19I-VA-VALVE-01
+    valve3: BL19I-VA-VALVE-02
+    valve4: BL19I-VA-VALVE-03
+    valve5: BL19I-VA-VALVE-04
+    valve6: BL19I-VA-VALVE-05
+    valve7: FE19I-VA-VALVE-02
+    valve8: FE19I-VA-VALVE-02
+
+  - type: vacuumSpace.spaceTemplate
     device: BL19I-VA-SPACE-80
+    gauge: BL19I-VA-SPACE-80:GAUGEG
+    img: BL19I-VA-SPACE-80:IMGG
+    ionp: BL19I-VA-SPACE-80:IONPG
     name: SPACE80
-    space0: SPACE1
-    space1: SPACE2
-    space2: SPACE3
-    space3: SPACE4
-    space4: SPACE5
-    space5: SPACE6
+    pirg: BL19I-VA-SPACE-80:PIRGG
+    valve: BL19I-VA-SPACE-80:VALVEG
 
   - type: mrfTiming.EventReceiverPMC
     cardid: 1

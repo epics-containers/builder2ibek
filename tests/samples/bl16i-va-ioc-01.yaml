@@ -1715,14 +1715,72 @@ entities:
     pirg: BL16I-VA-SPACE-91:PIRGG
     valve: BL16I-VA-VALVE-07
 
-  - type: vacuumSpace.spaceGroup
+  - type: mks937a.mks937aGaugeGroup
+    device: BL16I-VA-SPACE-90:GAUGEG
+    gauge1: BL16I-VA-GAUGE-03
+    gauge2: BL16I-VA-GAUGE-04
+    gauge3: BL16I-VA-GAUGE-05
+    gauge4: BL16I-VA-SPACE-06:GAUGEG
+    gauge5: BL16I-VA-GAUGE-08
+    gauge6: BL16I-VA-GAUGE-03
+    gauge7: BL16I-VA-GAUGE-03
+    gauge8: BL16I-VA-GAUGE-03
+
+  - type: mks937a.mks937aImgGroup
+    delay: 2
+    device: BL16I-VA-SPACE-90:IMGG
+    img1: BL16I-VA-IMG-03
+    img2: BL16I-VA-IMG-04
+    img3: BL16I-VA-IMG-05
+    img4: BL16I-VA-SPACE-06:IMGG
+    img5: BL16I-VA-IMG-08
+    img6: BL16I-VA-IMG-03
+    img7: BL16I-VA-IMG-03
+    img8: BL16I-VA-IMG-03
+
+  - type: digitelMpc.digitelMpcIonpGroup
+    delay: 4
+    device: BL16I-VA-SPACE-90:IONPG
+    ionp1: BL16I-VA-IONP-03
+    ionp2: BL16I-VA-IONP-04
+    ionp3: BL16I-VA-IONP-05
+    ionp4: BL16I-VA-SPACE-06:IONPG
+    ionp5: BL16I-VA-IONP-08
+    ionp6: BL16I-VA-IONP-03
+    ionp7: BL16I-VA-IONP-03
+    ionp8: BL16I-VA-IONP-03
+
+  - type: mks937a.mks937aPirgGroup
+    device: BL16I-VA-SPACE-90:PIRGG
+    pirg1: BL16I-VA-PIRG-03
+    pirg2: BL16I-VA-PIRG-04
+    pirg3: BL16I-VA-PIRG-05
+    pirg4: BL16I-VA-SPACE-06:PIRGG
+    pirg5: BL16I-VA-PIRG-08
+    pirg6: BL16I-VA-PIRG-03
+    pirg7: BL16I-VA-PIRG-03
+    pirg8: BL16I-VA-PIRG-03
+
+  - type: dlsPLC.vacValveGroup
+    delay: 1
+    device: BL16I-VA-SPACE-90:VALVEG
+    valve1: BL16I-VA-VALVE-01
+    valve2: BL16I-VA-VALVE-02
+    valve3: BL16I-VA-VALVE-03
+    valve4: BL16I-VA-VALVE-04
+    valve5: BL16I-VA-VALVE-05
+    valve6: BL16I-VA-VALVE-01
+    valve7: BL16I-VA-VALVE-01
+    valve8: BL16I-VA-VALVE-01
+
+  - type: vacuumSpace.spaceTemplate
     device: BL16I-VA-SPACE-90
+    gauge: BL16I-VA-SPACE-90:GAUGEG
+    img: BL16I-VA-SPACE-90:IMGG
+    ionp: BL16I-VA-SPACE-90:IONPG
     name: BL16I-VA-SPACE-90
-    space0: SP3
-    space1: SP4
-    space2: SP5
-    space3: SP6
-    space4: SP7
+    pirg: BL16I-VA-SPACE-90:PIRGG
+    valve: BL16I-VA-SPACE-90:VALVEG
 
   - type: water.flow
     C: 60
