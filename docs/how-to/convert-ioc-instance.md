@@ -164,6 +164,8 @@ cd tests/samples && ./make_samples.sh
 
 `make_samples.sh` converts all XML files in the folder and updates the
 corresponding `.yaml` files.  Review the diff, then commit both.
+Run `./update-schema` first if you changed any support YAML; see
+[](../explanations/golden-file-tests.md) for how the baselines work.
 
 ---
 

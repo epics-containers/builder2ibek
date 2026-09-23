@@ -20,7 +20,7 @@ with those files.
 - **`test_generate`** runs both steps as subprocesses, so no converter state
   leaks between samples. It compares the YAML again, then the `st.cmd` and
   `ioc.subst` that `ibek runtime generate2 --no-pvi` produces from it.
-- **`test_compare`** is the `db-compare` baseline. It compares
+- **`test_compare`** (in `tests/test_compare.py`) is the `db-compare` baseline. It compares
   `SR03C-VA-IOC-01_expanded.db` (XMLbuilder's output) with `sr03c-va-ioc-01.db`
   and expects the report to equal the committed `compare.diff`.
 
@@ -53,7 +53,9 @@ git diff tests/samples/                              # the review
 
 `make_samples.sh` runs `xml2yaml` and `generate2` for each XML and rewrites the
 outputs. A sample that `generate2` rejects has its outputs deleted and is
-reported at the end, and the script exits non-zero.
+reported at the end, and the script exits non-zero. It then re-runs
+`db-compare` on the SR03C sample to rewrite `compare.diff`, so a change to the
+report format shows up in the same diff.
 
 **The diff is the review.** Committing a regenerated set changes what "correct"
 means for the whole suite, so read every hunk and explain why it is expected

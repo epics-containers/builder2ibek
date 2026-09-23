@@ -42,6 +42,9 @@ Regenerate expected outputs and schema:
 ./update-schema
 ```
 
+See [golden-file tests](https://github.com/epics-containers/builder2ibek/blob/main/docs/explanations/golden-file-tests.md)
+for how the baselines are reviewed and committed.
+
 <!-- README only content. Anything below this line won't be included in index.md -->
 
 <pre><font color="#AAAAAA">╭─ Commands ───────────────────────────────────────────────────────────────────╮</font>
