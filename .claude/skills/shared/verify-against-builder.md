@@ -21,6 +21,11 @@ Two real examples, both found this way and neither visible in a diff:
   `databases` block. Builder emits 6 rows for a super-space; we emitted 0.
   Nothing to diff, so nothing to notice (builder2ibek#133). The converter now
   expands it the same way as `space`, linking each child space's group PV.
+  Known, deliberate divergence: builder picks the mks937a group models for the
+  super-space whenever mks937a is in the project RELEASE; the converter only
+  does so when the IOC has `mks937a.*` entities. An all-mks937b IOC therefore
+  gets `mks937bImgGroup`/`mks937bPirgGroup` super-space rows where prod has
+  the mks937a ones. That difference is expected, not a regression.
 
 ## The check
 

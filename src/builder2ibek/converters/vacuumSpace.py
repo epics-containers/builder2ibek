@@ -181,8 +181,15 @@ def _expand_space_group(entity: Entity, ioc: Generic_IOC):
     none. So the child spaces are resolved here exactly as _expand_space does.
 
     builder builds the groups from spaces[0].components, which is `space` (the
-    mks937a groups) whenever mks937a is in the IOC, otherwise `space_b`. The
-    super-space itself is always a space.template.
+    mks937a groups) whenever `iocbuilder.modules.mks937a` imports, i.e. when
+    mks937a is in the builder project's configure/RELEASE. The XML cannot tell
+    us that, so this uses the mks937a groups only when the IOC has mks937a
+    entities and deliberately falls back to the mks937b (`space_b`) groups
+    otherwise. For an all-mks937b IOC whose RELEASE still lists mks937a this
+    diverges from builder (mks937bImgGroup/mks937bPirgGroup instead of the
+    mks937a ones, which use different record names); the mks937b groups are
+    the ones whose links actually connect to the mks937b child groups. The
+    super-space itself is always a space.template, as in builder.
     """
     name_map = _build_name_map(ioc)
     spaces = {
