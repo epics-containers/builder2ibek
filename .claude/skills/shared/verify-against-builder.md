@@ -17,9 +17,10 @@ Two real examples, both found this way and neither visible in a diff:
   `{ "SPACE-01:PIRGG", "BL21I-VA-PIRG-01", "BL21I-VA-PIRG-02" }`. Every gauge,
   img and pirg link in every vacuum space group pointed at a PV that can never
   connect. It had been that way for every converted vacuum IOC.
-- **`vacuumSpace.spaceGroup` emits nothing at all** — parameters but no
-  `databases` block. Builder emits 6 rows for a super-space; we emit 0. Nothing
-  to diff, so nothing to notice (builder2ibek#133).
+- **`vacuumSpace.spaceGroup` emitted nothing at all** — parameters but no
+  `databases` block. Builder emits 6 rows for a super-space; we emitted 0.
+  Nothing to diff, so nothing to notice (builder2ibek#133). The converter now
+  expands it the same way as `space`, linking each child space's group PV.
 
 ## The check
 

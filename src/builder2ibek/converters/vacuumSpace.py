@@ -115,42 +115,109 @@ def _take_devices(entity: Entity, component: str, name_map: dict[str, str]):
     return devices
 
 
+def _link(space_device: str, component: str, devices: list[str]) -> str:
+    """
+    The PV a space links to for one component: the device itself when it was
+    given exactly one, otherwise the group (or dummy) at <device>:<COMPONENT>G.
+    """
+    if len(devices) == 1:
+        return devices[0]
+    return f"{space_device}:{component.upper()}G"
+
+
+def _add_groups(entity: Entity, models: dict, devices: dict[str, list[str]]) -> None:
+    """
+    Point each of a space's components at its link PV, adding the group or
+    dummy entity that builder's _make_groups() would have created for it.
+    """
+    for component, (group_type, dummy_type) in models.items():
+        found = devices[component]
+        link = _link(entity.device, component, found)
+        entity[component] = link
+
+        if len(found) == 1:
+            # no group - the space template links straight at the device
+            continue
+
+        if not found:
+            if dummy_type is None:
+                raise ValueError(
+                    f"{entity.device}: vacuum space defined with missing {component}"
+                )
+            entity.add_entity({"type": dummy_type, "device": link})
+            continue
+
+        # builder pads the group's 8 slots with the first device
+        padded = (found + [found[0]] * _MAX_DEVICES)[:_MAX_DEVICES]
+        # delay is an int, the rest are strings
+        group: dict[str, str | int] = {"type": group_type, "device": link}
+        if component in _GROUP_DELAY:
+            group["delay"] = _GROUP_DELAY[component]
+        group.update({f"{component}{i + 1}": d for i, d in enumerate(padded)})
+        entity.add_entity(group)
+
+
 def _expand_space(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     Replace a `space` / `space_b` helper with the group and dummy entities
     builder would have created, plus the space[_b]Template that links them.
     """
     name_map = _build_name_map(ioc)
-
-    for component, (group_type, dummy_type) in _MODELS[entity_type].items():
-        devices = _take_devices(entity, component, name_map)
-        group_device = f"{entity.device}:{component.upper()}G"
-
-        if len(devices) == 1:
-            # no group - the space template links straight at the device
-            entity[component] = devices[0]
-            continue
-
-        entity[component] = group_device
-
-        if not devices:
-            if dummy_type is None:
-                raise ValueError(
-                    f"{entity.device}: vacuum space defined with missing {component}"
-                )
-            entity.add_entity({"type": dummy_type, "device": group_device})
-            continue
-
-        # builder pads the group's 8 slots with the first device
-        padded = (devices + [devices[0]] * _MAX_DEVICES)[:_MAX_DEVICES]
-        # delay is an int, the rest are strings
-        group: dict[str, str | int] = {"type": group_type, "device": group_device}
-        if component in _GROUP_DELAY:
-            group["delay"] = _GROUP_DELAY[component]
-        group.update({f"{component}{i + 1}": d for i, d in enumerate(padded)})
-        entity.add_entity(group)
-
+    models = _MODELS[entity_type]
+    devices = {c: _take_devices(entity, c, name_map) for c in models}
+    _add_groups(entity, models, devices)
     entity.type = f"vacuumSpace.{entity_type}Template"
+
+
+def _expand_space_group(entity: Entity, ioc: Generic_IOC):
+    """
+    Replace a `spaceGroup` (a super-space for a whole hutch) with a
+    spaceTemplate whose components link to its child spaces, plus the groups
+    that aggregate them.
+
+    builder's spaceGroup hands each child's *resolved* component link to
+    _make_groups(): the child's own group PV where it had several devices of
+    that type, the device itself where it had one, or its dummy where it had
+    none. So the child spaces are resolved here exactly as _expand_space does.
+
+    builder builds the groups from spaces[0].components, which is `space` (the
+    mks937a groups) whenever mks937a is in the IOC, otherwise `space_b`. The
+    super-space itself is always a space.template.
+    """
+    name_map = _build_name_map(ioc)
+    spaces = {
+        str(raw["name"]): raw
+        for raw in ioc.raw_entities
+        if raw.get("type") in ("vacuumSpace.space", "vacuumSpace.space_b")
+        and raw.get("name")
+    }
+    uses_937a = any(
+        str(raw.get("type", "")).startswith("mks937a.") for raw in ioc.raw_entities
+    )
+    models = _MODELS["space" if uses_937a else "space_b"]
+
+    devices: dict[str, list[str]] = {c: [] for c in models}
+    for i in range(_MAX_DEVICES):
+        child_name = entity.get(f"space{i}")
+        entity.remove(f"space{i}")
+        if not child_name:
+            continue
+        child = spaces.get(str(child_name))
+        if child is None:
+            raise ValueError(
+                f"{entity.device}: spaceGroup space{i}={child_name} is not the "
+                "name of a vacuumSpace.space or space_b in this IOC"
+            )
+        for component in models:
+            found = [
+                name_map.get(str(v), str(v))
+                for j in range(_MAX_DEVICES)
+                if (v := child.get(f"{component}{j}"))
+            ]
+            devices[component].append(_link(str(child["device"]), component, found))
+
+    _add_groups(entity, models, devices)
+    entity.type = "vacuumSpace.spaceTemplate"
 
 
 @globalHandler
@@ -160,3 +227,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     if entity_type in _MODELS:
         _expand_space(entity, entity_type, ioc)
+    elif entity_type == "spaceGroup":
+        _expand_space_group(entity, ioc)
