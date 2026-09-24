@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
@@ -9,10 +8,11 @@ default_acf = re.compile(r"/dls_sw/.*/.*/support/pvlogging/1-4/data/access.acf")
 xml_component = "pvlogging"
 
 # the blacklist accumulates over all of an IOC's BlacklistPv entities - it is
-# keyed on the output file so that converting more than one IOC in a single
-# process starts a fresh list for each of them
+# keyed on the Generic_IOC being built (convert_file makes a fresh one per
+# conversion) so that converting more than one IOC in a single process, or the
+# same IOC twice, starts a fresh list each time
 blacklist: list[str] = []
-filename: Path | None = None
+current_ioc: Generic_IOC | None = None
 
 
 @globalHandler
@@ -35,11 +35,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.type = "pvlogging.BlacklistPvs"
         # write the blacklist alongside the converted YAML, not into the cwd
         out_file = ioc.out_dir / (ioc.source_file.stem.lower() + "_blacklist.txt")
-        global filename
-        if out_file != filename:
-            # first BlacklistPv of this IOC: start a new list
+        global current_ioc
+        if ioc is not current_ioc:
+            # first BlacklistPv of this conversion: start a new list
             blacklist.clear()
-            filename = out_file
+            current_ioc = ioc
             blacklist.append(
                 "# Rename to 'pvlogging_excl.txt' and move to IOC config directory.\n"
             )
