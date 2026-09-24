@@ -79,4 +79,5 @@ lockfiles/
 .claude/commands/ioc-check/last-services-repo
 DONE
 .claude/scheduled_tasks.lock
+.claude/worktrees/
 _raw-convert-out
