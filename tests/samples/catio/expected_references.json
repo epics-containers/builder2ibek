@@ -1,0 +1,1731 @@
+[
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "BL21I.DewarScales",
+    "entity_name": "SMPL.SCALES",
+    "attribute": "LOAD_CELL_1",
+    "value": "BL21I-DI-ERIO-04:MOD12:RMB:VALUE"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "BL21I.DewarScales",
+    "entity_name": "SMPL.SCALES",
+    "attribute": "LOAD_CELL_2",
+    "value": "BL21I-DI-ERIO-04:MOD13:RMB:VALUE"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "BL21I.DewarScales",
+    "entity_name": "SMPL.SCALES",
+    "attribute": "LOAD_CELL_3",
+    "value": "BL21I-DI-ERIO-04:MOD14:RMB:VALUE"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "BL21I.DewarScales",
+    "entity_name": "SMPL.SCALES",
+    "attribute": "LOAD_CELL_4",
+    "value": "BL21I-DI-ERIO-04:MOD15:RMB:VALUE"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "HLS_AI1",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-10:MOD1"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "HLS_AI2",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-10:MOD2"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "HLS_AI3",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-10:MOD3"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "HLS_AI4",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-10:MOD4"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "HLS_AI5",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-10:MOD5"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "HLS_AI6",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-10:MOD6"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG01",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD6"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG02",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD7"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG03",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD8"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG04",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD9"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG05",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD10"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG06",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD11"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG07",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD12"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG08",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD13"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG09",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD14"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG10",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD15"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG11",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD16"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG12",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD17"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG13",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD18"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG14",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD19"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG15",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-01:MOD20"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG20",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-04:MOD3"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG21",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-04:MOD4"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG22",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-04:MOD5"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG23",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-05:MODSAM3"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG24",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-05:MODSAM4"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG25",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-05:MODSAM5"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG26",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-05:MODSAM6"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG27",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-09:MOD1"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG28",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-09:MOD2"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG29",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-09:MOD3"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG30",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-09:MOD4"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG31",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-09:MOD5"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG32",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-09:MOD6"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL2024_0010",
+    "entity_name": "DIG33",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-05:MODSAM7"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3356_0010",
+    "entity_name": "SCALES1",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-04:MOD12"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3356_0010",
+    "entity_name": "SCALES2",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-04:MOD13"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3356_0010",
+    "entity_name": "SCALES3",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-04:MOD14"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "ethercat.auto_EL3356_0010",
+    "entity_name": "SCALES4",
+    "attribute": "DEVICE",
+    "value": "BL21I-DI-ERIO-04:MOD15"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto1",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD6:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto1",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD6:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto1",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD6:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto1",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD6:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto2",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD7:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto2",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD7:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto2",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD7:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto2",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD7:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto3",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD9:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto3",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD9:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto3",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD9:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto3",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD9:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto4",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD8:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto4",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD8:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto4",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD8:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S2.Femto4",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD8:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D3B.Femto1",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD11:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D3B.Femto1",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD11:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D3B.Femto1",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD11:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D3B.Femto1",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD11:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto1",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD12:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto1",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD12:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto1",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD12:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto1",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD12:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto2",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD13:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto2",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD13:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto2",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD13:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto2",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD13:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto3",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD14:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto3",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD14:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto3",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD14:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto3",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD14:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto4",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-01:MOD15:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto4",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-01:MOD15:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto4",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-01:MOD15:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "S3.Femto4",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-01:MOD15:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto1",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-04:MOD3:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto1",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-04:MOD3:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto1",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-04:MOD3:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto1",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-04:MOD3:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto2",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-04:MOD4:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto2",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-04:MOD4:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto2",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-04:MOD4:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D7.Femto2",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-04:MOD4:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto1",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-05:MODSAM3:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto1",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-05:MODSAM3:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto1",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-05:MODSAM3:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto1",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-05:MODSAM3:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto2",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-05:MODSAM4:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto2",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-05:MODSAM4:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto2",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-05:MODSAM4:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "M4.Femto2",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-05:MODSAM4:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D8.Femto1",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-05:MODSAM5:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D8.Femto1",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-05:MODSAM5:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D8.Femto1",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-05:MODSAM5:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "D8.Femto1",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-05:MODSAM5:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto1",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-05:MODSAM6:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto1",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-05:MODSAM6:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto1",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-05:MODSAM6:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto1",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-05:MODSAM6:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto2",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-09:MOD1:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto2",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-09:MOD1:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto2",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-09:MOD1:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto2",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-09:MOD1:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto3",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-09:MOD2:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto3",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-09:MOD2:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto3",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-09:MOD2:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto3",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-09:MOD2:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto4",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-09:MOD3:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto4",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-09:MOD3:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto4",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-09:MOD3:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto4",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-09:MOD3:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto5",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-09:MOD4:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto5",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-09:MOD4:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto5",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-09:MOD4:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto5",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-09:MOD4:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto6",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-09:MOD5:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto6",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-09:MOD5:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto6",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-09:MOD5:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto6",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-09:MOD5:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto7",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-09:MOD6:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto7",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-09:MOD6:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto7",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-09:MOD6:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto7",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-09:MOD6:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto8",
+    "attribute": "OUTGB0",
+    "value": "BL21I-DI-ERIO-05:MODSAM7:CHANNEL1:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto8",
+    "attribute": "OUTGB1",
+    "value": "BL21I-DI-ERIO-05:MODSAM7:CHANNEL2:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto8",
+    "attribute": "OUTGB2",
+    "value": "BL21I-DI-ERIO-05:MODSAM7:CHANNEL3:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "femto.femto200",
+    "entity_name": "SMPL.Femto8",
+    "attribute": "OUTHIS",
+    "value": "BL21I-DI-ERIO-05:MODSAM7:CHANNEL4:OUTPUT PP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT01:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD1:INPUT1:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT02:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD1:INPUT2:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT03:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD1:INPUT3:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT04:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD1:INPUT4:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT05:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD2:INPUT1:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT06:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD2:INPUT2:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT07:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD2:INPUT3:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT08:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD2:INPUT4:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT09:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD3:INPUT1:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT10:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD3:INPUT2:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT11:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD3:INPUT3:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT12:LEVEL:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD3:INPUT4:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT01:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD4:INPUT1:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT02:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD4:INPUT2:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT03:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD4:INPUT3:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT04:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD4:INPUT4:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT05:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD5:INPUT1:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT06:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD5:INPUT2:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT07:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD5:INPUT3:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT08:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD5:INPUT4:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT09:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD6:INPUT1:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT10:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD6:INPUT2:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT11:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD6:INPUT3:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-DI-IOC-01",
+    "entity_type": "records.ai",
+    "entity_name": "BL21I-AL-HLS-01:POT12:TEMP:SOURCE",
+    "attribute": "INP",
+    "value": "BL21I-DI-ERIO-10:MOD6:INPUT4:VALUE CP"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC1",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-01:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC2",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-01:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC3",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-01:MOD3"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC4",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-01:MOD4"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC5",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-02:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC6",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-02:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC7",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-03:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC8",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-03:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC9",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-04:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC10",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-04:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC11",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-04:MOD3"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC12",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-04:MOD4"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC13",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-12:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC14",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-12:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI1",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-01:MOD5"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI2",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-01:MOD6"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI3",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-03:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI4",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-03:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI5",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-04:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI6",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-04:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI7",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-02:MOD3"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI8",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-02:MOD4"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN1",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD5:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU1",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD6:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN2",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD5:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU2",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD6:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN3",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD4:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU3",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD4:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN4",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-03:MOD3:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU4",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-03:MOD3:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN5",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-04:MOD5:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU5",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-04:MOD5:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN6",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-04:MOD6:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU6",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-04:MOD6:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "PSFAN1",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD5:CHANNEL2:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "PSPSU1",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD6:CHANNEL2:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "PSFAN2",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD5:CHANNEL4:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "PSPSU2",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-01:MOD6:CHANNEL4:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "NTFAN1",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD3:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "NTFAN2",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD3:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "NTFAN3",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD4:CHANNEL2:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "MOFAN2",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD4:CHANNEL4:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "MOFAN3",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD3:CHANNEL2:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-01",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "MOFAN4",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-02:MOD3:CHANNEL4:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks9xx.mks9xxGauge",
+    "entity_name": "GAUGE22",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-12:MOD1:INPUT4:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks9xx.mks9xxGauge",
+    "entity_name": "GAUGE23",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-12:MOD2:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks9xx.mks9xxGauge",
+    "entity_name": "GAUGE43",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-12:MOD1:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks9xx.mks9xxGauge",
+    "entity_name": "GAUGE44",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-12:MOD1:INPUT3:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks9xx.mks9xxGauge",
+    "entity_name": "GAUGE45",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-12:MOD1:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE1",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD1:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE2",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD1:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE3",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD1:INPUT3:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE4",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD1:INPUT4:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE5",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD2:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE6",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD2:INPUT3:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE7",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD2:INPUT4:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE8",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-01:MOD3:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE9",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-02:MOD1:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE10",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-02:MOD1:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE11",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-02:MOD1:INPUT3:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE40",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-02:MOD1:INPUT4:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE12",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-03:MOD1:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE13",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-03:MOD1:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE14",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-03:MOD2:INPUT3:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE16",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-03:MOD1:INPUT3:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE17",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-03:MOD1:INPUT4:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE18",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-03:MOD2:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE19",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD3:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE20",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD3:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE21",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD3:INPUT3:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE41",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD3:INPUT4:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE30",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD4:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-02",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE42",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD4:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-04",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE24",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-05:MOD1:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-04",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE25",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-06:MOD1:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-04",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE26",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-06:MOD1:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-04",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE27",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD1:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-04",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE28",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD1:INPUT2:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-04",
+    "entity_type": "mks937b.mks937bGauge",
+    "entity_name": "GAUGE29",
+    "attribute": "plog_adc_pv",
+    "value": "BL21I-VA-ERIO-04:MOD2:INPUT1:VALUE"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC1",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-05:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC2",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-05:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC3",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-06:MOD1"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC4",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-06:MOD2"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI1",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-05:MOD3"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI2",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-05:MOD4"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI3",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-06:MOD3"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "ethercat.auto_EL1014",
+    "entity_name": "DIGI4",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-06:MOD4"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN7",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-05:MOD3:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU7",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-05:MOD3:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAFAN8",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-06:MOD3:CHANNEL1:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-05",
+    "entity_type": "rackFan.rackFan_rio",
+    "entity_name": "VAPSU8",
+    "attribute": "rio_dinput",
+    "value": "BL21I-VA-ERIO-06:MOD3:CHANNEL3:INPUT"
+  },
+  {
+    "ioc": "BL21I-VA-IOC-06",
+    "entity_type": "ethercat.auto_EL3104",
+    "entity_name": "ADC1",
+    "attribute": "DEVICE",
+    "value": "BL21I-VA-ERIO-99:MOD1"
+  }
+]
