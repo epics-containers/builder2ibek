@@ -81,3 +81,5 @@ DONE
 .claude/scheduled_tasks.lock
 .claude/worktrees/
 _raw-convert-out
+
+*.kubeconfig
