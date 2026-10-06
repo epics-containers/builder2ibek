@@ -16,6 +16,12 @@ schema = (
     "2023.11.1/ibek.ioc.schema.json"
 )
 
+# entity types that create a pmac controller port and take CSG0..CSG7
+CONTROLLER_TYPES = ["pmac.PMAC", "pmac.GeoBrick", "pmac.PowerPMAC"]
+
+# pmacController.template only has state strings for groups 0 to 7
+MAX_CS_GROUP = 7
+
 
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
@@ -185,3 +191,66 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
                 entity.PMAC = raw.get("P", "")
                 entity.PORT = raw.get("name", "")
                 break
+
+
+def _sort_keys(entity: dict):
+    """
+    Restore the key order that do_dispatch applies: type first, then the
+    remaining keys sorted. finalize runs after that sort, so an entity it
+    adds a key to has to be put back in order itself.
+    """
+    sorted_items = dict(sorted(entity.items()))
+    entity_type = sorted_items.pop("type")
+    entity.clear()
+    entity["type"] = entity_type
+    entity.update(sorted_items)
+
+
+def finalize(ioc: Generic_IOC):
+    """
+    Copy each coordinate system group's name onto its controller.
+
+    pmacCreateCsGroup names the group, but the COORDINATE_SYS_GROUP mbbo takes
+    its state strings from the controller's CSG0..CSG7 template arguments.
+    Converting the group on its own left every CSGn empty, so the groups could
+    not be selected from an OPI screen - see ioc-pmac#40.
+    """
+    entities: list[Entity] = ioc.entities  # type: ignore
+
+    controllers = {
+        entity["name"]: entity
+        for entity in entities
+        if entity.get("type") in CONTROLLER_TYPES and entity.get("name")
+    }
+    if not controllers:
+        return
+
+    modified: list[str] = []
+    for entity in entities:
+        if entity.get("type") != "pmac.pmacCreateCsGroup":
+            continue
+
+        group_name = entity.get("GroupName")
+        group_number = entity.get("GroupNumber")
+        controller = controllers.get(entity.get("Controller"))
+        if controller is None or not group_name:
+            continue
+
+        if not isinstance(group_number, int) or not 0 <= group_number <= MAX_CS_GROUP:
+            print(
+                f"Warning: coordinate system group {group_name} has GroupNumber "
+                f"{group_number}, outside the range 0..{MAX_CS_GROUP} that "
+                "pmacController.template supports - its name is dropped"
+            )
+            continue
+
+        csg = f"CSG{group_number}"
+        if controller.get(csg):
+            # the controller already names this group, leave it alone
+            continue
+        controller[csg] = group_name
+        if entity["Controller"] not in modified:
+            modified.append(entity["Controller"])
+
+    for name in modified:
+        _sort_keys(controllers[name])

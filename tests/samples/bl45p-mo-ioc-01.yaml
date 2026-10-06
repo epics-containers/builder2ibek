@@ -24,6 +24,7 @@ entities:
     name: BRICK1port
 
   - type: pmac.GeoBrick
+    CSG0: Default
     P: BL45P-MO-STEP-01
     name: BRICK1
     pmacAsynPort: BRICK1port
