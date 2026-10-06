@@ -64,6 +64,9 @@ class Generic_IOC(BaseModel):
     entities: list[dict[str, Any]]
     raw_entities: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
     source_file: Path
+    # where the converted YAML is being written - any extra files a convertor
+    # generates belong next to it, not in the current working directory
+    out_dir: Path = Field(default=Path(), exclude=True)
     already_converted: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
 
 
