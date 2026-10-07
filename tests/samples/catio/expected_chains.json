@@ -1,0 +1,1456 @@
+{
+  "BL21I-DI-IOC-01": {
+    "couplers": [
+      {
+        "node": 0,
+        "label": null,
+        "slave_name": "DCS00026299",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026299"
+          },
+          {
+            "position": 1,
+            "type_name": "EK1122",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026199"
+          }
+        ]
+      },
+      {
+        "node": 1,
+        "label": "BL21I-DI-ERIO-05",
+        "slave_name": "DCS00026293",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026293"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026381"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026382"
+          },
+          {
+            "position": 3,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026258"
+          },
+          {
+            "position": 4,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026259"
+          },
+          {
+            "position": 5,
+            "type_name": "EL3602",
+            "revision": "0x00100000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00023720"
+          },
+          {
+            "position": 6,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026320"
+          },
+          {
+            "position": 7,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026321"
+          },
+          {
+            "position": 8,
+            "type_name": "EL2595",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026210"
+          },
+          {
+            "position": 9,
+            "type_name": "EL2595",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026211"
+          },
+          {
+            "position": 10,
+            "type_name": "EL9512",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026672"
+          },
+          {
+            "position": 11,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-05:MODSAM3",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG23",
+            "slave_name": "DCS00026706"
+          },
+          {
+            "position": 12,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-05:MODSAM4",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG24",
+            "slave_name": "DCS00026707"
+          },
+          {
+            "position": 13,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-05:MODSAM5",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG25",
+            "slave_name": "DCS00026708"
+          },
+          {
+            "position": 14,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-05:MODSAM6",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG26",
+            "slave_name": "DCS00026709"
+          },
+          {
+            "position": 15,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-05:MODSAM7",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG33",
+            "slave_name": "DCS00026710"
+          },
+          {
+            "position": 16,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026711"
+          }
+        ]
+      },
+      {
+        "node": 2,
+        "label": "BL21I-DI-ERIO-04",
+        "slave_name": "DCS00026292",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026292"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026377"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026380"
+          },
+          {
+            "position": 3,
+            "type_name": "EL2595",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-OP-LED-01",
+            "entity_type": "auto_EL2595",
+            "entity_name": "FS1.Led",
+            "slave_name": "DCS00024973"
+          },
+          {
+            "position": 4,
+            "type_name": "EL2595",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026214"
+          },
+          {
+            "position": 5,
+            "type_name": "EL9512",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026673"
+          },
+          {
+            "position": 6,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-04:MOD3",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG20",
+            "slave_name": "DCS00026712"
+          },
+          {
+            "position": 7,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-04:MOD4",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG21",
+            "slave_name": "DCS00026714"
+          },
+          {
+            "position": 8,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-04:MOD5",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG22",
+            "slave_name": "DCS00026713"
+          },
+          {
+            "position": 9,
+            "type_name": "EL9510",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026913"
+          },
+          {
+            "position": 10,
+            "type_name": "EL3356-0010",
+            "revision": "0x0018000a",
+            "declared_device": "BL21I-DI-ERIO-04:MOD12",
+            "entity_type": "auto_EL3356_0010",
+            "entity_name": "SCALES1",
+            "slave_name": "DCS00026910"
+          },
+          {
+            "position": 11,
+            "type_name": "EL3356-0010",
+            "revision": "0x0018000a",
+            "declared_device": "BL21I-DI-ERIO-04:MOD13",
+            "entity_type": "auto_EL3356_0010",
+            "entity_name": "SCALES2",
+            "slave_name": "DCS00026911"
+          },
+          {
+            "position": 12,
+            "type_name": "EL3356-0010",
+            "revision": "0x0019000a",
+            "declared_device": "BL21I-DI-ERIO-04:MOD14",
+            "entity_type": "auto_EL3356_0010",
+            "entity_name": "SCALES3",
+            "slave_name": "DCS00026977"
+          },
+          {
+            "position": 13,
+            "type_name": "EL3356-0010",
+            "revision": "0x0019000a",
+            "declared_device": "BL21I-DI-ERIO-04:MOD15",
+            "entity_type": "auto_EL3356_0010",
+            "entity_name": "SCALES4",
+            "slave_name": "DCS00026971"
+          },
+          {
+            "position": 14,
+            "type_name": "EL9505",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024957"
+          },
+          {
+            "position": 15,
+            "type_name": "EL2124",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024867"
+          },
+          {
+            "position": 16,
+            "type_name": "EL2124",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026627"
+          }
+        ]
+      },
+      {
+        "node": 3,
+        "label": "BL21I-DI-ERIO-09",
+        "slave_name": "DCS00026539",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026539"
+          },
+          {
+            "position": 1,
+            "type_name": "EL9512",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026674"
+          },
+          {
+            "position": 2,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-09:MOD1",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG27",
+            "slave_name": "DCS00026715"
+          },
+          {
+            "position": 3,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-09:MOD2",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG28",
+            "slave_name": "DCS00026716"
+          },
+          {
+            "position": 4,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-09:MOD3",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG29",
+            "slave_name": "DCS00026717"
+          },
+          {
+            "position": 5,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-09:MOD4",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG30",
+            "slave_name": "DCS00026718"
+          },
+          {
+            "position": 6,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-09:MOD5",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG31",
+            "slave_name": "DCS00026719"
+          },
+          {
+            "position": 7,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-09:MOD6",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG32",
+            "slave_name": "DCS00026720"
+          }
+        ]
+      },
+      {
+        "node": 4,
+        "label": null,
+        "slave_name": "DCS00026540",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026540"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3602",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026579"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3602",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026580"
+          },
+          {
+            "position": 3,
+            "type_name": "EL3602",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026581"
+          },
+          {
+            "position": 4,
+            "type_name": "EL3602",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026582"
+          },
+          {
+            "position": 5,
+            "type_name": "EL3602",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026583"
+          },
+          {
+            "position": 6,
+            "type_name": "EL3602",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026584"
+          },
+          {
+            "position": 7,
+            "type_name": "EL3602",
+            "revision": "0x00130000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026585"
+          },
+          {
+            "position": 8,
+            "type_name": "EK1122",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026441"
+          }
+        ]
+      },
+      {
+        "node": 5,
+        "label": null,
+        "slave_name": "DCS00024927",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024927"
+          },
+          {
+            "position": 1,
+            "type_name": "EK1122",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00023938"
+          }
+        ]
+      },
+      {
+        "node": 6,
+        "label": null,
+        "slave_name": "DCS00024933",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024933"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024797"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024798"
+          },
+          {
+            "position": 3,
+            "type_name": "EL4134",
+            "revision": "0x03fa0000",
+            "declared_device": "BL21I-MO-PIEZO-01",
+            "entity_type": "auto_EL4134",
+            "entity_name": "M1.Piezo",
+            "slave_name": "DCS00024817"
+          },
+          {
+            "position": 4,
+            "type_name": "EL2024",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024652"
+          },
+          {
+            "position": 5,
+            "type_name": "EL2595",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024965"
+          },
+          {
+            "position": 6,
+            "type_name": "EL2595",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-DI-LED-01",
+            "entity_type": "auto_EL2595",
+            "entity_name": "D1.Led",
+            "slave_name": "DCS00024966"
+          },
+          {
+            "position": 7,
+            "type_name": "EK1122",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00023939"
+          }
+        ]
+      },
+      {
+        "node": 7,
+        "label": "BL21I-DI-ERIO-01",
+        "slave_name": "DCS00024941",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024941"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00025131"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00025132"
+          },
+          {
+            "position": 3,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00025133"
+          },
+          {
+            "position": 4,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00025134"
+          },
+          {
+            "position": 5,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00025135"
+          },
+          {
+            "position": 6,
+            "type_name": "EL4134",
+            "revision": "0x03fa0000",
+            "declared_device": "BL21I-MO-PIEZO-02",
+            "entity_type": "auto_EL4134",
+            "entity_name": "M2.Piezo",
+            "slave_name": "DCS00026270"
+          },
+          {
+            "position": 7,
+            "type_name": "EL2595",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-DI-LED-03",
+            "entity_type": "auto_EL2595",
+            "entity_name": "D3A.Led",
+            "slave_name": "DCS00024967"
+          },
+          {
+            "position": 8,
+            "type_name": "EL2595",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-DI-LED-02",
+            "entity_type": "auto_EL2595",
+            "entity_name": "D2.Led",
+            "slave_name": "DCS00024778"
+          },
+          {
+            "position": 9,
+            "type_name": "EL9512",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026671"
+          },
+          {
+            "position": 10,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD6",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG01",
+            "slave_name": "DCS00026696"
+          },
+          {
+            "position": 11,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD7",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG02",
+            "slave_name": "DCS00026697"
+          },
+          {
+            "position": 12,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD8",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG03",
+            "slave_name": "DCS00026698"
+          },
+          {
+            "position": 13,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD9",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG04",
+            "slave_name": "DCS00026699"
+          },
+          {
+            "position": 14,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD10",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG05",
+            "slave_name": "DCS00026700"
+          },
+          {
+            "position": 15,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD11",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG06",
+            "slave_name": "DCS00026701"
+          },
+          {
+            "position": 16,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD12",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG07",
+            "slave_name": "DCS00026702"
+          },
+          {
+            "position": 17,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD13",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG08",
+            "slave_name": "DCS00026703"
+          },
+          {
+            "position": 18,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD14",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG09",
+            "slave_name": "DCS00026704"
+          },
+          {
+            "position": 19,
+            "type_name": "EL2024-0010",
+            "revision": "0x0012000a",
+            "declared_device": "BL21I-DI-ERIO-01:MOD15",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG10",
+            "slave_name": "DCS00026705"
+          },
+          {
+            "position": 20,
+            "type_name": "EK1122",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00023940"
+          }
+        ]
+      },
+      {
+        "node": 8,
+        "label": "BL21I-DI-ERIO-01",
+        "slave_name": "DCS00024940",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024940"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024799"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024800"
+          },
+          {
+            "position": 3,
+            "type_name": "EL3602",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024801"
+          },
+          {
+            "position": 4,
+            "type_name": "EL3124",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024549"
+          },
+          {
+            "position": 5,
+            "type_name": "EL2024",
+            "revision": "0x00110000",
+            "declared_device": "BL21I-DI-ERIO-01:MOD16",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG11",
+            "slave_name": "DCS00024653"
+          },
+          {
+            "position": 6,
+            "type_name": "EL2024",
+            "revision": "0x00110000",
+            "declared_device": "BL21I-DI-ERIO-01:MOD17",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG12",
+            "slave_name": "DCS00024654"
+          },
+          {
+            "position": 7,
+            "type_name": "EL2024",
+            "revision": "0x00110000",
+            "declared_device": "BL21I-DI-ERIO-01:MOD18",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG13",
+            "slave_name": "DCS00024668"
+          },
+          {
+            "position": 8,
+            "type_name": "EL2024",
+            "revision": "0x00110000",
+            "declared_device": "BL21I-DI-ERIO-01:MOD19",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG14",
+            "slave_name": "DCS00024669"
+          },
+          {
+            "position": 9,
+            "type_name": "EL2024",
+            "revision": "0x00110000",
+            "declared_device": "BL21I-DI-ERIO-01:MOD20",
+            "entity_type": "auto_EL2024_0010",
+            "entity_name": "DIG15",
+            "slave_name": "DCS00024670"
+          },
+          {
+            "position": 10,
+            "type_name": "EL2595",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024782"
+          },
+          {
+            "position": 11,
+            "type_name": "EK1122",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00023941"
+          },
+          {
+            "position": 12,
+            "type_name": "EK1122",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00023942"
+          }
+        ]
+      },
+      {
+        "node": 9,
+        "label": "BL21I-DI-ERIO-10",
+        "slave_name": "DCS00026726",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026726"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-DI-ERIO-10:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "HLS_AI1",
+            "slave_name": "DCS00026416"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00130000",
+            "declared_device": "BL21I-DI-ERIO-10:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "HLS_AI2",
+            "slave_name": "DCS00026553"
+          },
+          {
+            "position": 3,
+            "type_name": "EL3104",
+            "revision": "0x00130000",
+            "declared_device": "BL21I-DI-ERIO-10:MOD3",
+            "entity_type": "auto_EL3104",
+            "entity_name": "HLS_AI3",
+            "slave_name": "DCS00026554"
+          },
+          {
+            "position": 4,
+            "type_name": "EL3104",
+            "revision": "0x00130000",
+            "declared_device": "BL21I-DI-ERIO-10:MOD4",
+            "entity_type": "auto_EL3104",
+            "entity_name": "HLS_AI4",
+            "slave_name": "DCS00026555"
+          },
+          {
+            "position": 5,
+            "type_name": "EL3104",
+            "revision": "0x00130000",
+            "declared_device": "BL21I-DI-ERIO-10:MOD5",
+            "entity_type": "auto_EL3104",
+            "entity_name": "HLS_AI5",
+            "slave_name": "DCS00026556"
+          },
+          {
+            "position": 6,
+            "type_name": "EL3104",
+            "revision": "0x00130000",
+            "declared_device": "BL21I-DI-ERIO-10:MOD6",
+            "entity_type": "auto_EL3104",
+            "entity_name": "HLS_AI6",
+            "slave_name": "DCS00026557"
+          }
+        ]
+      }
+    ]
+  },
+  "BL21I-VA-IOC-01": {
+    "couplers": [
+      {
+        "node": 0,
+        "label": "BL21I-VA-ERIO-04",
+        "slave_name": "DCS00025070",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00025070"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-04:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC9",
+            "slave_name": "DCS00024905"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-04:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC10",
+            "slave_name": "DCS00025130"
+          },
+          {
+            "position": 3,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-04:MOD3",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC11",
+            "slave_name": "DCS00026220"
+          },
+          {
+            "position": 4,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-04:MOD4",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC12",
+            "slave_name": "DCS00026221"
+          },
+          {
+            "position": 5,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-04:MOD1",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI5",
+            "slave_name": "DCS00025092"
+          },
+          {
+            "position": 6,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-04:MOD2",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI6",
+            "slave_name": "DCS00025093"
+          }
+        ]
+      },
+      {
+        "node": 1,
+        "label": "BL21I-VA-ERIO-12",
+        "slave_name": "DCS00026851",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026851"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00130000",
+            "declared_device": "BL21I-VA-ERIO-12:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC13",
+            "slave_name": "DCS00026565"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00130000",
+            "declared_device": "BL21I-VA-ERIO-12:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC14",
+            "slave_name": "DCS00026570"
+          }
+        ]
+      },
+      {
+        "node": 2,
+        "label": "BL21I-VA-ERIO-03",
+        "slave_name": "DCS00024929",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024929"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-03:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC7",
+            "slave_name": "DCS00024890"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-03:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC8",
+            "slave_name": "DCS00024891"
+          },
+          {
+            "position": 3,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-03:MOD1",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI3",
+            "slave_name": "DCS00025081"
+          },
+          {
+            "position": 4,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-03:MOD2",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI4",
+            "slave_name": "DCS00025082"
+          }
+        ]
+      },
+      {
+        "node": 3,
+        "label": "BL21I-VA-ERIO-02",
+        "slave_name": "DCS00028304",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00028304"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-02:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC5",
+            "slave_name": "DCS00024912"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-02:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC6",
+            "slave_name": "DCS00024913"
+          },
+          {
+            "position": 3,
+            "type_name": "EL1014",
+            "revision": "0x00100000",
+            "declared_device": "BL21I-VA-ERIO-02:MOD3",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI7",
+            "slave_name": "DCS00023482"
+          },
+          {
+            "position": 4,
+            "type_name": "EL1014",
+            "revision": "0x00100000",
+            "declared_device": "BL21I-VA-ERIO-02:MOD4",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI8",
+            "slave_name": "DCS00023483"
+          }
+        ]
+      },
+      {
+        "node": 4,
+        "label": "BL21I-VA-ERIO-01",
+        "slave_name": "DCS00028806",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00028806"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-01:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC1",
+            "slave_name": "DCS00024908"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-01:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC2",
+            "slave_name": "DCS00024909"
+          },
+          {
+            "position": 3,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-01:MOD3",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC3",
+            "slave_name": "DCS00024910"
+          },
+          {
+            "position": 4,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-01:MOD4",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC4",
+            "slave_name": "DCS00024911"
+          },
+          {
+            "position": 5,
+            "type_name": "EL1014",
+            "revision": "0x00100000",
+            "declared_device": "BL21I-VA-ERIO-01:MOD5",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI1",
+            "slave_name": "DCS00023480"
+          },
+          {
+            "position": 6,
+            "type_name": "EL1014",
+            "revision": "0x00100000",
+            "declared_device": "BL21I-VA-ERIO-01:MOD6",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI2",
+            "slave_name": "DCS00023481"
+          }
+        ]
+      }
+    ]
+  },
+  "BL21I-VA-IOC-05": {
+    "couplers": [
+      {
+        "node": 0,
+        "label": "BL21I-VA-ERIO-05",
+        "slave_name": "DCS00026289",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026289"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-05:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC1",
+            "slave_name": "DCS00026229"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-05:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC2",
+            "slave_name": "DCS00026230"
+          },
+          {
+            "position": 3,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-05:MOD3",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI1",
+            "slave_name": "DCS00026204"
+          },
+          {
+            "position": 4,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-05:MOD4",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI2",
+            "slave_name": "DCS00026205"
+          }
+        ]
+      },
+      {
+        "node": 1,
+        "label": "BL21I-VA-ERIO-06",
+        "slave_name": "DCS00026290",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026290"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-06:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC3",
+            "slave_name": "DCS00026231"
+          },
+          {
+            "position": 2,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-06:MOD2",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC4",
+            "slave_name": "DCS00026232"
+          },
+          {
+            "position": 3,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-06:MOD3",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI3",
+            "slave_name": "DCS00026206"
+          },
+          {
+            "position": 4,
+            "type_name": "EL1014",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-06:MOD4",
+            "entity_type": "auto_EL1014",
+            "entity_name": "DIGI4",
+            "slave_name": "DCS00026207"
+          }
+        ]
+      },
+      {
+        "node": 2,
+        "label": null,
+        "slave_name": "DCS00026728",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026728"
+          },
+          {
+            "position": 1,
+            "type_name": "EL2024",
+            "revision": "0x00110000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00024655"
+          }
+        ]
+      }
+    ]
+  },
+  "BL21I-VA-IOC-06": {
+    "couplers": [
+      {
+        "node": 0,
+        "label": "BL21I-VA-ERIO-99",
+        "slave_name": "DCS00026847",
+        "terminals": [
+          {
+            "position": 0,
+            "type_name": "EK1100",
+            "revision": "0x00120000",
+            "declared_device": "",
+            "entity_type": null,
+            "entity_name": null,
+            "slave_name": "DCS00026847"
+          },
+          {
+            "position": 1,
+            "type_name": "EL3104",
+            "revision": "0x00120000",
+            "declared_device": "BL21I-VA-ERIO-99:MOD1",
+            "entity_type": "auto_EL3104",
+            "entity_name": "ADC1",
+            "slave_name": "DCS00026564"
+          }
+        ]
+      }
+    ]
+  }
+}

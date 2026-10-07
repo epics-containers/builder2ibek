@@ -14,7 +14,23 @@ from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
 
 
-def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
+def convert_to_ioc(
+    xml: Path, *, description: str = "", catio: Any = None
+) -> Generic_IOC:
+    """Convert a single builder XML file into an in-memory Generic_IOC.
+
+    ``catio`` is an optional ``builder2ibek.converters.ethercat.CatioContext``
+    used by the ``catio`` command to rewrite EtherCAT PV references. It is
+    ``None`` for a plain ``xml2yaml`` conversion.
+    """
+    builder = Builder()
+    builder.load(xml)
+    return dispatch(builder, xml, description=description, catio=catio)
+
+
+def write_ioc_yaml(ioc: Generic_IOC, yaml: Path, schema: str) -> None:
+    """Serialise an already converted Generic_IOC to an ibek YAML file"""
+
     def tidy_up(yaml):
         # add blank lines between major fields
         for field in [
@@ -25,11 +41,6 @@ def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
         ]:
             yaml = re.sub(rf"(\n{field})", "\n\\g<1>", yaml)
         return yaml
-
-    """Convert a single builder XML file into a single ibek YAML"""
-    builder = Builder()
-    builder.load(xml)
-    ioc = dispatch(builder, xml, description=description)
 
     ruamel = YAML()
 
@@ -49,7 +60,15 @@ def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 
 
-def dispatch(builder: Builder, filename, description: str = "") -> Generic_IOC:
+def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
+    """Convert a single builder XML file into a single ibek YAML"""
+    ioc = convert_to_ioc(xml, description=description)
+    write_ioc_yaml(ioc, yaml, schema)
+
+
+def dispatch(
+    builder: Builder, filename, description: str = "", catio: Any = None
+) -> Generic_IOC:
     """
     Dispatch every element in the XML to the correct convertor
     and build a generic IOC from the converted Entities
@@ -77,6 +96,13 @@ def dispatch(builder: Builder, filename, description: str = "") -> Generic_IOC:
         ],
         source_file=filename,
     )
+
+    if catio is not None:
+        # picked up by builder2ibek.converters.ethercat.finalize
+        ioc.catio = catio
+        # ioc.raw_entities is overwritten by every nested do_dispatch, so the
+        # unconverted elements are captured here, once, instead.
+        catio.raw_entities = [make_entity(element) for element in builder.elements]
 
     do_dispatch(builder, ioc)
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<devIocStats.devIocStatsHelper ioc="BL21I-VA-IOC-06" name="BL21I-VA-IOC-06.DEVIOCSTATS"/>
+	<autosave.Autosave bl="True" iocName="BL21I-VA-IOC-06" name="BL21I-VA-IOC-06.AUTOSAVE" path="/dls_sw/i21/epics/autosave"/>
+	<pvlogging.PvLogging access_file="/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf" name="VA6.PVLOGGING"/>
+	<ethercat.EthercatMaster name="ECATM" socket="/tmp/socket0"/>
+	<!--Start of BL21I-VA-ERIO-05-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026847" position="DCS00026847" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026564" position="DCS00026564" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-99:MOD1" PORT="DCS00026564" SCAN="1 second" name="ADC1"/>
+	<!--<rackFan.rackFan_rio name="VAFAN1"/>-->
+	<!--<rackFan.rackFan_rio DESC="Status of rack PSU" name="VAPSU1"/>-->
+</components>
