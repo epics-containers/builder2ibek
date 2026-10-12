@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<devIocStats.devIocStatsHelper ioc="BL21I-VA-IOC-05" name="BL21I-VA-IOC-05.DEVIOCSTATS"/>
+	<autosave.Autosave bl="True" iocName="BL21I-VA-IOC-05" name="BL21I-VA-IOC-05.AUTOSAVE" path="/dls_sw/i21/epics/autosave"/>
+	<pvlogging.PvLogging access_file="/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf" name="VA5.PVLOGGING"/>
+	<ethercat.EthercatMaster name="ECATM" socket="/tmp/socket0"/>
+	<!--Start of BL21I-VA-ERIO-05-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026289" position="DCS00026289" type_rev="EK1100 rev 0x00120000"/>
+	<!--ERIO-05, Module 1, EL3104-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026229" position="DCS00026229" type_rev="EL3104 rev 0x00120000"/>
+	<!--ERIO-05, Module 2, EL3104-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026230" position="DCS00026230" type_rev="EL3104 rev 0x00120000"/>
+	<!--ERIO-05, Module 3, EL1014-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026204" position="DCS00026204" type_rev="EL1014 rev 0x00120000"/>
+	<!--ERIO-05, Module 4, EL1014-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026205" position="DCS00026205" type_rev="EL1014 rev 0x00120000"/>
+	<!--Start of BL21I-VA-ERIO-06-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026290" position="DCS00026290" type_rev="EK1100 rev 0x00120000"/>
+	<!--ERIO-06, Module 1, EL3104-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026231" position="DCS00026231" type_rev="EL3104 rev 0x00120000"/>
+	<!--ERIO-06, Module 2, EL3104-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026232" position="DCS00026232" type_rev="EL3104 rev 0x00120000"/>
+	<!--ERIO-06, Module 3, EL1014-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026206" position="DCS00026206" type_rev="EL1014 rev 0x00120000"/>
+	<!--ERIO-06, Module 4, EL1014-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026207" position="DCS00026207" type_rev="EL1014 rev 0x00120000"/>
+	<!--ERIO-0?, Module ?, coupler EK1100
+
+use = ???
+(returned by the Ethercat chain, but not visible in drawing 1109314 page 8)-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026728" position="DCS00026728" type_rev="EK1100 rev 0x00120000"/>
+	<!--ERIO-0?, Module ?, EL1014
+
+use = ???
+(returned by the Ethercat chain, but not visible in drawing 1109314 page 8)-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024655" position="DCS00024655" type_rev="EL2024 rev 0x00110000"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-05:MOD1" PORT="DCS00026229" SCAN="1 second" name="ADC1"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-05:MOD2" PORT="DCS00026230" SCAN="1 second" name="ADC2"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-06:MOD1" PORT="DCS00026231" SCAN="1 second" name="ADC3"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-06:MOD2" PORT="DCS00026232" SCAN="1 second" name="ADC4"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-05:MOD3" PORT="DCS00026204" SCAN="I/O Intr" name="DIGI1"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-05:MOD4" PORT="DCS00026205" SCAN="I/O Intr" name="DIGI2"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-06:MOD3" PORT="DCS00026206" SCAN="I/O Intr" name="DIGI3"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-06:MOD4" PORT="DCS00026207" SCAN="I/O Intr" name="DIGI4"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-07:FANC-01" name="VAFAN7" rio_dinput="BL21I-VA-ERIO-05:MOD3:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio DESC="Status of rack PSU" device="BL21I-VA-RACK-07:PSU-01" name="VAPSU7" rio_dinput="BL21I-VA-ERIO-05:MOD3:CHANNEL3:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-08:FANC-01" name="VAFAN8" rio_dinput="BL21I-VA-ERIO-06:MOD3:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-08:PSU-01" name="VAPSU8" rio_dinput="BL21I-VA-ERIO-06:MOD3:CHANNEL3:INPUT"/>
+</components>

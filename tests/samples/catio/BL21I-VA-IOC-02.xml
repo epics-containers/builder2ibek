@@ -1,0 +1,618 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_AUTO_ADDR_LIST" value="NO"/>
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_ADDR_LIST" value="172.23.121.255"/>
+	<devIocStats.devIocStatsHelper ioc="BL21I-VA-IOC-02" name="BL21I-VA-IOC-02.DEVIOCSTATS"/>
+	<autosave.Autosave bl="True" iocName="BL21I-VA-IOC-02" name="BL21I-VA-IOC-02.AUTOSAVE" path="/dls_sw/i21/epics/autosave"/>
+	<pvlogging.PvLogging access_file="/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf" name="VA2.PVLOGGING"/>
+	<FINS.FINSUDPInit ip="10.121.3.1" name="fins_VLVCC1" simulation="localhost:11101"/>
+	<FINS.FINSUDPInit ip="10.121.3.2" name="fins_VLVCC2" simulation="localhost:11102"/>
+	<FINS.FINSUDPInit ip="10.121.3.3" name="fins_VLVCC3" simulation="localhost:11103"/>
+	<FINS.FINSUDPInit ip="10.121.3.4" name="fins_VLVCC4" simulation="localhost:11104"/>
+	<FINS.FINSUDPInit ip="10.121.3.5" name="fins_VLVCC5" simulation="localhost:11105"/>
+	<FINS.FINSUDPInit ip="10.121.3.6" name="fins_VLVCC6" simulation="localhost:11106"/>
+	<dlsPLC.read100 century="0" device="BL21I-VA-VLVCC-01" name="VLVCC1.0" port="fins_VLVCC1"/>
+	<dlsPLC.read100 century="1" device="BL21I-VA-VLVCC-01" name="VLVCC1.1" port="fins_VLVCC1"/>
+	<dlsPLC.read100 century="2" device="BL21I-VA-VLVCC-01" name="VLVCC1.2" port="fins_VLVCC1"/>
+	<dlsPLC.read100 century="3" device="BL21I-VA-VLVCC-01" name="VLVCC1.3" port="fins_VLVCC1"/>
+	<dlsPLC.read100 century="4" device="BL21I-VA-VLVCC-01" name="VLVCC1.4" port="fins_VLVCC1"/>
+	<dlsPLC.read100 century="8" device="BL21I-VA-VLVCC-01" name="VLVCC1.8" port="fins_VLVCC1"/>
+	<dlsPLC.read100 century="0" device="BL21I-VA-VLVCC-02" name="VLVCC2.0" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="1" device="BL21I-VA-VLVCC-02" name="VLVCC2.1" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="2" device="BL21I-VA-VLVCC-02" name="VLVCC2.2" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="3" device="BL21I-VA-VLVCC-02" name="VLVCC2.3" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="4" device="BL21I-VA-VLVCC-02" name="VLVCC2.4" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="8" device="BL21I-VA-VLVCC-02" name="VLVCC2.8" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="0" device="BL21I-VA-VLVCC-03" name="VLVCC3.0" port="fins_VLVCC3"/>
+	<dlsPLC.read100 century="1" device="BL21I-VA-VLVCC-03" name="VLVCC3.1" port="fins_VLVCC3"/>
+	<dlsPLC.read100 century="2" device="BL21I-VA-VLVCC-03" name="VLVCC3.2" port="fins_VLVCC3"/>
+	<dlsPLC.read100 century="3" device="BL21I-VA-VLVCC-03" name="VLVCC3.3" port="fins_VLVCC3"/>
+	<dlsPLC.read100 century="4" device="BL21I-VA-VLVCC-03" name="VLVCC3.4" port="fins_VLVCC3"/>
+	<dlsPLC.read100 century="8" device="BL21I-VA-VLVCC-03" name="VLVCC3.8" port="fins_VLVCC3"/>
+	<dlsPLC.read100 century="0" device="BL21I-VA-VLVCC-04" name="VLVCC4.0" port="fins_VLVCC4"/>
+	<dlsPLC.read100 century="1" device="BL21I-VA-VLVCC-04" name="VLVCC4.1" port="fins_VLVCC4"/>
+	<dlsPLC.read100 century="2" device="BL21I-VA-VLVCC-04" name="VLVCC4.2" port="fins_VLVCC4"/>
+	<dlsPLC.read100 century="3" device="BL21I-VA-VLVCC-04" name="VLVCC4.3" port="fins_VLVCC4"/>
+	<dlsPLC.read100 century="4" device="BL21I-VA-VLVCC-04" name="VLVCC4.4" port="fins_VLVCC4"/>
+	<dlsPLC.read100 century="8" device="BL21I-VA-VLVCC-04" name="VLVCC4.8" port="fins_VLVCC4"/>
+	<dlsPLC.read100 century="0" device="BL21I-VA-VLVCC-05" name="VLVCC5.0" port="fins_VLVCC5"/>
+	<dlsPLC.read100 century="1" device="BL21I-VA-VLVCC-05" name="VLVCC5.1" port="fins_VLVCC5"/>
+	<dlsPLC.read100 century="2" device="BL21I-VA-VLVCC-05" name="VLVCC5.2" port="fins_VLVCC5"/>
+	<dlsPLC.read100 century="3" device="BL21I-VA-VLVCC-05" name="VLVCC5.3" port="fins_VLVCC5"/>
+	<dlsPLC.read100 century="4" device="BL21I-VA-VLVCC-05" name="VLVCC5.4" port="fins_VLVCC5"/>
+	<dlsPLC.read100 century="8" device="BL21I-VA-VLVCC-05" name="VLVCC5.8" port="fins_VLVCC5"/>
+	<dlsPLC.read100 century="0" device="BL21I-VA-VLVCC-06" name="VLVCC6.0" port="fins_VLVCC6"/>
+	<dlsPLC.read100 century="1" device="BL21I-VA-VLVCC-06" name="VLVCC6.1" port="fins_VLVCC6"/>
+	<dlsPLC.read100 century="2" device="BL21I-VA-VLVCC-06" name="VLVCC6.2" port="fins_VLVCC6"/>
+	<dlsPLC.read100 century="3" device="BL21I-VA-VLVCC-06" name="VLVCC6.3" port="fins_VLVCC6"/>
+	<dlsPLC.read100 century="4" device="BL21I-VA-VLVCC-06" name="VLVCC6.4" port="fins_VLVCC6"/>
+	<dlsPLC.read100 century="5" device="BL21I-VA-VLVCC-06" name="VLVCC6.5" port="fins_VLVCC6"/>
+	<dlsPLC.read100 century="8" device="BL21I-VA-VLVCC-06" name="VLVCC6.8" port="fins_VLVCC6"/>
+	<dlsPLC.read100 century="10" device="BL21I-VA-VLVCC-06" name="VLVCC6.10" port="fins_VLVCC6"/>
+	<dlsPLC.vacValve addr="200" desc="Valve 20" device="BL21I-VA-VALVE-20" ilk1="IMG42" ilk15="Valve Fault" ilk2="IMG21 / IMG30 OK" ilk3="Tcryo &lt; 150K &amp; Cooling" ilk4="V29 Closed" name="V20" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="210" desc="Valve 21" device="BL21I-VA-VALVE-21" ilk1="Scroll21 at speed" ilk2="V30 Closed" name="V21" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="220" desc="Valve 22" device="BL21I-VA-VALVE-22" ilk1="V23 Open" ilk15="Valve Fault" ilk2="Turbo7 at speed" ilk3="IMG41" ilk4="IMG30" name="V22" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="230" desc="Valve 23" device="BL21I-VA-VALVE-23" ilk1="Scroll7 On at speed" name="V23" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="240" desc="Valve 25" device="BL21I-VA-VALVE-25" ilk1="V27 Open" ilk15="Valve Fault" ilk2="PIRG45" ilk3="Turbo5 at speed" name="V25" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="250" desc="Valve 26" device="BL21I-VA-VALVE-26" ilk1="V27 Open" ilk15="Valve Fault" ilk2="PIRG45" ilk3="Turbo6 at speed" ilk4="unused" name="V26" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="260" desc="Valve 27" device="BL21I-VA-VALVE-27" ilk1="Scroll5 On at speed" name="V27" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="270" desc="Valve 28" device="BL21I-VA-VALVE-28" ilk1="Scroll2 On at speed" name="V28" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="280" desc="Valve 29" device="BL21I-VA-VALVE-29" ilk1="V20 Closed" ilk2="Cryopump On" name="V29" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="290" desc="Valve 30" device="BL21I-VA-VALVE-30" ilk1="V21 Closed" ilk2="V20 Closed" name="V30" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValve addr="310" desc="Valve 80" device="BL21I-VA-VALVE-80" ilk1="Scroll4 On at speed" name="V80" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValveDebounce addr="40" desc="Fast Mask" device="BL21I-VA-FMASK-01" gilk0="IMG1 PIRG1" gilk1="IMG2 PIRG2" gilk2="IMG3 PIRG3" gilk3="IMG4 PIRG4" gilk4="IMG5 PIRG5" gilk5="IMG6 PIRG6" ilk1="runvac V1-4+4of6IMGs" ilk15="Fault" ilk2="V1 Open" ilk3="V2 Open" ilk4="V3 Open" ilk5="V4,5,6,7 Open" name="FM" port="fins_VLVCC1" valvetype="shutter" vlvcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.vacValveDebounce addr="10" desc="Valve 1" device="BL21I-VA-VALVE-01" gilk0="Gauge 1" gilk1="Gauge 2" gilk2="Gauge 3" gilk3="Gauge 4" gilk4="Gauge 5" gilk5="Gauge 6" ilk0="Air Pressure" ilk1="Initial/Run" ilk15="Valve Fault" ilk2="PIRG-01 &amp; Ser" ilk3="PIRG-02 &amp; Ser" ilk4="PIRG-03 &amp; Ser" name="V1" port="fins_VLVCC1" vlvcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.vacValveDebounce addr="20" desc="Valve 2" device="BL21I-VA-VALVE-02" gilk0="Gauge 1" gilk1="Gauge 2" gilk2="Gauge 3" gilk3="Gauge 4" gilk4="Gauge 5" gilk5="Gauge 6" ilk0="Air Pressure" ilk1="Initial/Run" ilk15="Valve Fault" ilk2="PIRG-02 &amp; Ser" ilk3="PIRG-04 &amp; Ser" name="V2" port="fins_VLVCC1" vlvcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.vacValveDebounce addr="30" desc="Valve 3" device="BL21I-VA-VALVE-03" gilk0="Gauge 1" gilk1="Gauge 2" gilk2="Gauge 3" gilk3="Gauge 4" gilk4="Gauge 5" gilk5="Gauge 6" ilk0="Air Pressure" ilk1="Initial/Run" ilk15="Valve Fault" ilk2="PIRG-03 &amp; Ser" ilk3="PIRG-05 &amp; Ser" name="V3" port="fins_VLVCC1" vlvcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.vacValveDebounce addr="10" desc="Valve 4" device="BL21I-VA-VALVE-04" gilk0="Gauge 6" gilk1="Gauge 7" gilk2="Gauge 8" ilk0="Air Pressure" ilk1="Initial/Run" ilk15="Valve Fault" ilk2="PIRG-04 &amp; Ser" ilk3="PIRG-06 &amp; Ser" name="V4" port="fins_VLVCC2" vlvcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.vacValveDebounce addr="20" desc="Valve 5" device="BL21I-VA-VALVE-05" gilk0="Gauge 6" gilk1="Gauge 7" gilk2="Gauge 8" ilk0="Air Pressure" ilk1="IMG6" ilk15="Valve Fault" ilk2="IMG7" ilk3="PIRG-06 &amp; Ser" ilk4="PIRG-07 &amp; Ser" name="V5" port="fins_VLVCC2" vlvcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.vacValveDebounce addr="30" desc="Valve 6" device="BL21I-VA-VALVE-06" gilk0="Gauge 6" gilk1="Gauge 7" gilk2="Gauge 8" ilk0="Air Pressure" ilk1="IMG7" ilk15="Valve Fault" ilk2="IMG8" ilk3="PIRG-07 &amp; Ser" ilk4="PIRG-08 &amp; Ser" name="V6" port="fins_VLVCC2" vlvcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.vacValveDebounce addr="10" desc="Valve 7" device="BL21I-VA-VALVE-07" gilk0="Gauge 9" gilk1="Gauge 10" gilk2="Gauge 11" gilk3="Gauge 12" ilk0="Air Pressure Healthy" ilk1="IMG-08" ilk15="Valve Fault" ilk2="IMG-09" ilk3="PIRG-40 / ABSB Open" ilk4="V40 Open" ilk5="PIRG-08 / Service" ilk6="PIRG-09 / Service" name="V7" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacValveDebounce addr="20" desc="Valve 8" device="BL21I-VA-VALVE-08" gilk0="Gauge 9" gilk1="Gauge 10" gilk2="Gauge 11" gilk3="Gauge 12" ilk0="Air Pressure Healthy" ilk1="IMG-09 / Service" ilk15="Valve Fault" ilk2="IMG-10 / Service" ilk3="FV9 Open &amp; Armed" ilk4="Guard Vac on PGM" ilk5="Turbo40 | V40Closed" ilk6="PIRG-09 / Service" ilk7="PIRG-10 / Service" name="V8" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacValveDebounce addr="60" con_label0="Out beam" con_label1="In beam" desc="Absorber 2" device="BL21I-VA-ABSB-02" ilk1="SH1" ilk2="FV9 Open" name="ABS2" port="fins_VLVCC3" sta_label1="Out of beam" sta_label3="In beam" valvetype="absorber" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacValveDebounce addr="50" desc="Shutter 1" device="BL21I-PS-SHTR-01" ilk0="Air Pressure" ilk1="Guard Line A" ilk15="Valve Fault" ilk2="Guard Line B" ilk3="V10 Open" ilk4="FV12 Open" ilk5="V13 Open Xor gas mode" ilk6="14,15,16 Open or gas mode" name="SH1" port="fins_VLVCC3" valvetype="shutter" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacValveDebounce addr="40" desc="Valve 10" device="BL21I-VA-VALVE-10" gilk0="Gauge 9" gilk1="Gauge 10" gilk2="Gauge 11" gilk3="Gauge 12" ilk0="Air Pressure" ilk1="IMG11" ilk15="Valve Fault" ilk2="IMG12" ilk3="PIRG-11 &amp; Ser" ilk4="PIRG-12 &amp; Ser" name="V10" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacValveDebounce addr="40" desc="Valve 14" device="BL21I-VA-VALVE-14" gilk0="Gauge 12" gilk1="Gauge 13" gilk2="Gauge 16" gilk3="Gauge 17" gilk4="Gauge 18" ilk0="Air Pressure" ilk1="IMG17" ilk15="Valve Fault" ilk2="IMG18" ilk3="IMG19" ilk4="PIRG-17 &amp; Ser" ilk5="PIRG-18 &amp; Ser" ilk6="Gas Cell Mode" name="V14" port="fins_VLVCC4" vlvcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.vacValveDebounce addr="10" desc="Valve 15" device="BL21I-VA-VALVE-15" gilk0="Gauge 19" gilk1="Gauge 20" gilk2="Gauge 21" gilk3="Gauge 22" gilk4="Gauge 23" ilk0="Air Pressure" ilk1="IMG18" ilk15="Valve Fault" ilk2="IMG19" ilk3="IMG20" ilk4="PIRG-19 &amp; Ser" ilk5="PIRG-20 &amp; Ser" name="V15" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValveDebounce addr="20" desc="Valve 16" device="BL21I-VA-VALVE-16" gilk0="Gauge 19" gilk1="Gauge 20" gilk2="Gauge 21" gilk3="Gauge 22" gilk4="Gauge 23" ilk0="Air Pressure" ilk1="IMG20" ilk15="Valve Fault" ilk2="IMG21" ilk3="V70 Closed" ilk4="FV Open &amp; Armed" ilk5="PIRG-20 &amp; Ser" ilk6="PIRG-21 &amp; Ser" name="V16" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValveDebounce addr="30" desc="Valve 17" device="BL21I-VA-VALVE-17" gilk0="Gauge 24" gilk1="Gauge 25" ilk0="Air Pressure" ilk1="IMG21" ilk15="Valve Fault" ilk2="IMG24" ilk3="V70 Closed" ilk4="PIRG-21 &amp; Ser" ilk5="PIRG-24 &amp; Ser" name="V17" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacValveDebounce addr="30" desc="Valve 40" device="BL21I-VA-VALVE-40" ilk0="Air Pressure" ilk1="IMG9" ilk15="Valve Fault" ilk2="IMG40" ilk3="Turbo40" name="V40" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacValveDebounce addr="850" desc="Valve 41" device="BL21I-VA-VALVE-41" ilk0="Scrol-40" ilk1="Turbo-40/120S" name="V41" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<!--<dlsPLC.vacValveDebounce addr="890" desc="Valve 42" device="BL21I-VA-VALVE-42" ilk0="Scrol-41" ilk1="PIRG-40/60S" name="V42" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>-->
+	<!--<dlsPLC.vacValveDebounce addr="10" desc="Valve 50" device="BL21I-VA-VALVE-50" name="V50" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>-->
+	<!--<dlsPLC.vacValveDebounce addr="20" desc="Valve 51" device="BL21I-VA-VALVE-51" gilk0="Gauge 12" gilk1="Gauge 13" ilk0="Air Pressure" ilk1="IMG12" ilk15="Valve Fault" ilk2="IMG13" ilk3="Valve 55 Closed" name="V51" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>-->
+	<!--<dlsPLC.vacValveDebounce addr="30" desc="Valve 52" device="BL21I-VA-VALVE-52" name="V52" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>-->
+	<!--<dlsPLC.vacValveDebounce addr="40" desc="Valve 53" device="BL21I-VA-VALVE-53" name="V53" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>-->
+	<!--<dlsPLC.vacValveDebounce addr="50" desc="Valve 54" device="BL21I-VA-VALVE-54" gilk0="Gauge 13" gilk1="Gauge 16" ilk0="Air Pressure" ilk1="IMG13" ilk15="Valve Fault" ilk2="IMG16" ilk3="Valve 55 Closed" name="V54" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>-->
+	<!--<dlsPLC.vacValveDebounce addr="60" desc="Valve 55" device="BL21I-VA-VALVE-55" gilk0="Gauge 13" gilk1="Gauge 14" ilk0="Air Pressure" ilk1="IMG13" ilk15="Valve Fault" ilk2="IMG14" ilk3="Valve 51 Closed" ilk4="Valve 54 Closed" name="V55" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>-->
+	<dlsPLC.vacPump addr="800" device="BL21I-VA-SCROL-01" name="SCR1" port="fins_VLVCC5" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-05"/>
+	<dlsPLC.vacPump addr="420" device="BL21I-VA-SCROL-02" name="SCR2" port="fins_VLVCC6" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="430" device="BL21I-VA-SCROL-04" name="SCR4" port="fins_VLVCC6" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="440" device="BL21I-VA-SCROL-05" name="SCR5" port="fins_VLVCC6" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="450" device="BL21I-VA-SCROL-07" name="SCR7" port="fins_VLVCC6" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="460" device="BL21I-VA-SCROL-08" name="SCR8" port="fins_VLVCC6" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="810" device="BL21I-VA-TURBO-01" ilk0="PIRG-14 OK" name="TRB1" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>
+	<dlsPLC.vacPump addr="340" device="BL21I-VA-TURBO-05" ilk0="V27 Open" name="TRB5" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="350" device="BL21I-VA-TURBO-06" ilk0="V27 Open" name="TRB6" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="360" device="BL21I-VA-TURBO-07" ilk0="V23 Open" name="TRB7" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="370" device="BL21I-VA-TURBO-08" ilk0="V28 Open" ilk1="Op / Service &amp; V31 Open" name="TRB8" port="fins_VLVCC6" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="490" device="BL21I-VA-CRYO-01" ilk0="V29 Closed" name="CRYO1" port="fins_VLVCC6" pumptype="cryo" sta_label1="T&gt;285K &amp; On" sta_label2="150K&lt;T&lt;285K &amp; On" sta_label3="T&lt;150K &amp; On" sta_label4="T&lt;150K &amp; Off" sta_label5="150K&lt;T&lt;285K &amp; Off" sta_label6="T&gt;285K &amp; Off" vlvcc="BL21I-VA-VLVCC-06"/>
+	<dlsPLC.vacPump addr="870" device="BL21I-VA-SCROL-40" name="SCR40" port="fins_VLVCC3" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacPump addr="880" device="BL21I-VA-SCROL-41" name="SCR41" port="fins_VLVCC3" pumptype="scroll" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.vacPump addr="820" device="BL21I-VA-TURBO-40" ilk0="Scrol-40 OK" ilk1="V41 Open" name="TRB40" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<!--<dlsPLC.vacValveBistable addr="60" cilk0="Valve Fault" cilk1="Gauge 13" cilk2="Gauge 14" con_label1="Open" con_label2="Close" con_label3="Reset" device="BL21I-VA-VALVE-55" ilk0="valve" ilk1="Air Pressure" ilk2="IMG13" ilk3="IMG14" ilk4="Valve 51 Closed" ilk5="Valve 54 Closed" name="V55" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>-->
+	<dlsPLC.vacValveBistable addr="50" cilk0="Arm Out" device="BL21I-VA-VALVE-55" ilk0="Air Pressure" ilk1="IMG13" ilk2="IMG14" ilk3="Valve 51 Closed" ilk4="Valve 54 Closed" name="V55" port="fins_VLVCC5" vlvcc="BL21I-VA-VLVCC-05"/>
+	<dlsPLC.externalValve device="FE21I-VA-VALVE-02" name="FEV2"/>
+	<dlsPLC.externalValve device="FE21I-RS-ABSB-01" name="FEABSB1" valvetype="absorber"/>
+	<dlsPLC.externalValve device="FE21I-PS-SHTR-01" name="FESHTR1" valvetype="shutter"/>
+	<dlsPLC.vacValveReadOnly addr="30" device="BL21I-VA-VALVE-13" name="V13" vlvcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.vacValveReadOnly addr="300" device="BL21I-VA-VALVE-31" name="V31" vlvcc="BL21I-VA-VLVCC-06"/>
+	<!--<dlsPLC.vacValveReadOnly addr="860" device="BL21I-VA-VALVE-40" name="V40" vlvcc="BL21I-VA-VLVCC-03"/>-->
+	<dlsPLC.vacValveReadOnly addr="20" device="BL21I-VA-VALVE-51" name="V51" vlvcc="BL21I-VA-VLVCC-05"/>
+	<dlsPLC.vacValveReadOnly addr="40" device="BL21I-VA-VALVE-54" name="V54" vlvcc="BL21I-VA-VLVCC-05"/>
+	<dlsPLC.fastValve addr="70" allowpv="" device="BL21I-VA-FVALV-09" gilk0="Gauge 9" gilk1="Gauge 10" gilk2="Gauge 11" gilk3="Gauge 12" gilk8="BL21I-VA-FVI-01" gilk9="BL21I-VA-FVI-02" ilk0="Remote mode" ilk1="Limits healthy" ilk2="Open limit OK" ilk3="Move time" ilk4="IMG10" ilk5="IMG11" ilk6="FCTCL-01 trig" name="V9" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.fastValve addr="70" device="BL21I-VA-FVALV-12" ilk0="Remote mode" ilk1="Limits healthy" ilk2="Open limit OK" ilk3="Move time" ilk4="IMG12" ilk5="IMG16" ilk6="FCTCL-01 trig" name="V12" port="fins_VLVCC4" vlvcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.temperature desc="Temp 1" device="BL21I-AL-DIAGO-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="DGN.Temp1" offset="10" port="fins_VLVCC1" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="M1 Temp 1" device="BL21I-OP-MIRR-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M1.Temp1" offset="11" port="fins_VLVCC1" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="M1 Temp 1" device="BL21I-OP-MIRR-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M1.Temp2" offset="12" port="fins_VLVCC1" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="M1 Temp 1" device="BL21I-OP-MIRR-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M1.Temp3" offset="13" port="fins_VLVCC1" temp=":TEMP3" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="ABS1 Temp 1" device="BL21I-RS-ABS-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="ABS1.Temp1" offset="30" port="fins_VLVCC1" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="GBC1 Temp 1" device="BL21I-RS-GBC-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="GBC1.Temp1" offset="14" port="fins_VLVCC1" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="GBC1 Temp 2" device="BL21I-RS-GBC-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="GBC1.Temp2" offset="15" port="fins_VLVCC1" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="D1 Temp 1" device="BL21I-DI-PHDGN-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="D1.Temp1" offset="16" port="fins_VLVCC1" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="S1 Temp Upper" device="BL21I-AL-SLITS-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S1.Temp1" offset="18" port="fins_VLVCC1" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="S1 Temp Lower" device="BL21I-AL-SLITS-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S1.Temp2" offset="19" port="fins_VLVCC1" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="S1 Temp Nearside" device="BL21I-AL-SLITS-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S1.Temp3" offset="20" port="fins_VLVCC1" temp=":TEMP3" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="S1 Temp Offside" device="BL21I-AL-SLITS-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S1.Temp4" offset="21" port="fins_VLVCC1" temp=":TEMP4" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="PS1 Temp 1" device="BL21I-RS-STAND-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PS1.Temp1" offset="31" port="fins_VLVCC1" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-01"/>
+	<dlsPLC.temperature desc="M2 Temp 1" device="BL21I-OP-MIRR-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M2.Temp1" offset="10" port="fins_VLVCC2" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="M2 Temp 2" device="BL21I-OP-MIRR-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M2.Temp2" offset="11" port="fins_VLVCC2" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="M2 Temp 3" device="BL21I-OP-MIRR-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M2.Temp3" offset="12" port="fins_VLVCC2" temp=":TEMP3" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S2 Temp Upper" device="BL21I-AL-SLITS-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S2.Temp1" offset="14" port="fins_VLVCC2" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S2 Temp Lower" device="BL21I-AL-SLITS-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S2.Temp2" offset="15" port="fins_VLVCC2" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S2 Temp Nearside" device="BL21I-AL-SLITS-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S2.Temp3" offset="16" port="fins_VLVCC2" temp=":TEMP3" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S2 Temp Offside" device="BL21I-AL-SLITS-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S2.Temp4" offset="17" port="fins_VLVCC2" temp=":TEMP4" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="D2 Temp 1" device="BL21I-DI-PHDGN-02" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="D2.Temp1" offset="18" port="fins_VLVCC2" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="D3A Temp 1" device="BL21I-DI-PHDGA-03" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="D3A.Temp1" offset="20" port="fins_VLVCC2" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="D3B Temp 1" device="BL21I-DI-PHDGB-03" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="D3B.Temp1" offset="21" port="fins_VLVCC2" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S3 Temp Upper" device="BL21I-AL-SLITS-03" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S3.Temp1" offset="22" port="fins_VLVCC2" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S3 Temp Lower" device="BL21I-AL-SLITS-03" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S3.Temp2" offset="23" port="fins_VLVCC2" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S3 Temp Nearside" device="BL21I-AL-SLITS-03" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S3.Temp3" offset="24" port="fins_VLVCC2" temp=":TEMP3" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="S3 Temp Offside" device="BL21I-AL-SLITS-03" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S3.Temp4" offset="25" port="fins_VLVCC2" temp=":TEMP4" tmpcc="BL21I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="VPG2 Temp" device="BL21I-OP-PGM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PGM.Temp1" offset="10" port="fins_VLVCC3" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.temperature desc="VPG4 Temp" device="BL21I-OP-PGM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PGM.Temp2" offset="11" port="fins_VLVCC3" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.temperature desc="VPG3 Temp" device="BL21I-OP-PGM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PGM.Temp3" offset="14" port="fins_VLVCC3" temp=":TEMP3" tmpcc="BL21I-VA-VLVCC-03"/>
+	<!--<dlsPLC.temperature desc="Not Connected" device="BL21I-OP-PGM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PGM.Temp4" offset="15" port="fins_VLVCC3" temp=":TEMP4" tmpcc="BL21I-VA-VLVCC-03"/>-->
+	<!--<dlsPLC.temperature desc="VPG4 Temp" device="BL21I-OP-PGM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PGM.Temp5" offset="16" port="fins_VLVCC3" temp=":TEMP5" tmpcc="BL21I-VA-VLVCC-03"/>-->
+	<dlsPLC.temperature desc="VPG1 Temp" device="BL21I-OP-PGM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PGM.Temp6" offset="17" port="fins_VLVCC3" temp=":TEMP6" tmpcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.temperature desc="PGM Mirror Temp" device="BL21I-OP-PGM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="PGM.Temp7" offset="18" port="fins_VLVCC3" temp=":TEMP7" tmpcc="BL21I-VA-VLVCC-03"/>
+	<!--Pressure of the cooling water to the PGM
+Related to the water flow to the mirror-->
+	<dlsPLC.temperature desc="Inlet PGM Grating Cooling Pressure" device="BL21I-OP-PGM-01" egu="Bar" high="6.0" hihi="6.2" hopr="6.2" lolo="0" lopr="0" low="0" name="PGM.CoolP1" offset="74" port="fins_VLVCC3" prec="3" scalefac="600" temp=":H2OP1" tmpcc="BL21I-VA-VLVCC-03"/>
+	<!--Pressure of the cooling water to the PGM
+Related to the water flow to the grating-->
+	<dlsPLC.temperature desc="Inlet PGM Mirror Cooling Pressure" device="BL21I-OP-PGM-01" egu="Bar" high="6.0" hihi="6.2" hopr="6.2" lolo="0" lopr="0" low="0" name="PGM.CoolP2" offset="75" port="fins_VLVCC3" prec="3" scalefac="600" temp=":H2OP2" tmpcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.temperature desc="D4 Temp 1" device="BL21I-DI-PHDGN-04" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="D4.Temp1" offset="19" port="fins_VLVCC3" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.temperature desc="D4 Temp 2" device="BL21I-DI-PHDGN-04" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="D4.Temp2" offset="20" port="fins_VLVCC3" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.temperature desc="Exit Slits Temp" device="BL21I-AL-SLITS-05" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="S5.Temp1" offset="10" port="fins_VLVCC4" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.temperature desc="M5 Smarpod Plate Temp" device="BL21I-OP-MIRR-05" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M5.Temp1" offset="14" port="fins_VLVCC4" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.temperature desc="M5 Motor Temp" device="BL21I-OP-MIRR-05" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M5.Temp2" offset="34" port="fins_VLVCC4" temp=":TEMP2" tmpcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.temperature desc="M5 Newport Plate Temp" device="BL21I-OP-MIRR-05" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M5.Temp3" offset="15" port="fins_VLVCC4" temp=":TEMP3" tmpcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.temperature desc="M5 Granite Plate Temp" device="BL21I-OP-MIRR-05" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M5.Temp4" offset="13" port="fins_VLVCC4" temp=":TEMP4" tmpcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.temperature desc="M4 Temp" device="BL21I-MO-POD-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="M4.Temp1" offset="38" port="fins_VLVCC4" temp=":TEMP1" tmpcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.genericDevice addr="830" device="BL21I-OP-PGM-01:H2OP:OVRD" ilk0="PGM-GRAT press healthy" ilk1="PGM-MIRR press healthy" name="H2OP" port="fins_VLVCC3" vlvcc="BL21I-VA-VLVCC-03"/>
+	<dlsPLC.flow DESC="GBC1 Flow 1" P="BL21I-RS-GBC-01" Q=":FLOW1" device="BL21I-VA-VLVCC-01" loaddress="4" lobit="2" loloaddress="808" lolobit="0" name="GBC1.Flow1"/>
+	<dlsPLC.flow DESC="S1 Flow 1" P="BL21I-AL-SLITS-01" Q=":FLOW1" device="BL21I-VA-VLVCC-01" loaddress="4" lobit="3" loloaddress="818" lolobit="0" name="S1.Flow1"/>
+	<dlsPLC.flow DESC="DGN Flow 1" P="BL21I-AL-DIAGO-01" Q=":FLOW1" device="BL21I-VA-VLVCC-01" loaddress="4" lobit="4" loloaddress="828" lolobit="0" name="DGN.Flow1"/>
+	<dlsPLC.flow DESC="M1 Flow 1" P="BL21I-OP-MIRR-01" Q=":FLOW1" device="BL21I-VA-VLVCC-01" loaddress="4" lobit="5" loloaddress="858" lolobit="0" name="M1.Flow1"/>
+	<dlsPLC.flow DESC="D1 Flow 1" P="BL21I-DI-PHDGN-01" Q=":FLOW1" device="BL21I-VA-VLVCC-01" loaddress="4" lobit="6" loloaddress="828" lolobit="2" name="D1.Flow1"/>
+	<dlsPLC.flow DESC="ABS1 Flow 1" P="BL21I-RS-ABSB-01" Q=":FLOW1" device="BL21I-VA-VLVCC-01" loaddress="4" lobit="7" loloaddress="868" lolobit="0" name="ABS1.Flow1"/>
+	<dlsPLC.flow DESC="PS1 Flow 1" P="BL21I-RS-STAND-01" Q=":FLOW1" device="BL21I-VA-VLVCC-01" loaddress="4" lobit="8" loloaddress="98" lolobit="13" name="PS1.Flow1"/>
+	<dlsPLC.flow DESC="S2 Flow 1" P="BL21I-AL-SLITS-02" Q=":FLOW1" device="BL21I-VA-VLVCC-02" loaddress="4" lobit="0" loloaddress="808" lolobit="0" name="S2.Flow1"/>
+	<dlsPLC.flow DESC="S3 Flow 1" P="BL21I-AL-SLITS-03" Q=":FLOW1" device="BL21I-VA-VLVCC-02" loaddress="4" lobit="1" loloaddress="818" lolobit="0" name="S3.Flow1"/>
+	<dlsPLC.flow DESC="D2 Flow 1" P="BL21I-DI-PHDGN-02" Q=":FLOW1" device="BL21I-VA-VLVCC-02" loaddress="4" lobit="2" loloaddress="828" lolobit="0" name="D2.Flow1"/>
+	<dlsPLC.flow DESC="D3A Flow 1" P="BL21I-DI-PHDGA-03" Q=":FLOW1" device="BL21I-VA-VLVCC-02" loaddress="4" lobit="3" loloaddress="838" lolobit="0" name="D3A.Flow1"/>
+	<dlsPLC.flow DESC="M2 Flow 1" P="BL21I-OP-MIRR-02" Q=":FLOW1" device="BL21I-VA-VLVCC-02" loaddress="4" lobit="4" loloaddress="848" lolobit="0" name="M2.Flow1"/>
+	<dlsPLC.flow DESC="0 Ord Stop Flow" P="BL21I-OP-PGM-01" Q=":FLOW1" device="BL21I-VA-VLVCC-03" loaddress="4" lobit="0" loloaddress="806" lolobit="0" name="PGM.Flow0"/>
+	<dlsPLC.flow DESC="PGM Grating" P="BL21I-OP-PGM-01" Q=":FLOW2" device="BL21I-VA-VLVCC-03" loaddress="4" lobit="1" loloaddress="806" lolobit="1" name="PGM.Flow1"/>
+	<dlsPLC.flow DESC="PGM Mirror" P="BL21I-OP-PGM-01" Q=":FLOW3" device="BL21I-VA-VLVCC-03" loaddress="4" lobit="2" loloaddress="806" lolobit="2" name="PGM.Flow2"/>
+	<dlsPLC.flow DESC="S4 Flow1" P="BL21I-AL-SLITS-04" Q=":FLOW1" device="BL21I-VA-VLVCC-03" loaddress="4" lobit="3" loloaddress="816" lolobit="0" name="S4.Flow1"/>
+	<dlsPLC.flow DESC="D4 Flow1" P="BL21I-DI-PHDGN-04" Q=":FLOW1" device="BL21I-VA-VLVCC-03" loaddress="4" lobit="4" loloaddress="816" lolobit="1" name="D4.Flow2"/>
+	<dlsPLC.flow DESC="Grating Chiller" P="BL21I-OP-PGM-01" Q=":FLOW4" device="BL21I-VA-VLVCC-03" loaddress="4" lobit="5" loloaddress="807" lolobit="3" name="PGM.Flow3"/>
+	<dlsPLC.flow DESC="Mirror Chiller" P="BL21I-OP-PGM-01" Q=":FLOW5" device="BL21I-VA-VLVCC-03" loaddress="4" lobit="6" loloaddress="808" lolobit="4" name="PGM.Flow4"/>
+	<dlsPLC.readInt16 P="BL21I-DI-GAS-01" Q=":ILK-OVERRIDE" addr="4" name="D7Override" vlvcc="BL21I-VA-VLVCC-04"/>
+	<dlsPLC.readInt16 P="BL21I-MO-ARM-01" Q=":TTH:SSEAL:NTRGN:STATUS:RAW" addr="1011" vlvcc="BL21I-VA-VLVCC-06"/>
+	<!--Raw data readout
+
+Helium transfer line with motorized needle valve from ICE Oxford Ltd used with the SMPL Helium Dewar.
+
+Required 0-10V input signal provided by BL21I-MP-TRIO-11 (module 11).-->
+	<dlsPLC.readInt16 P="BL21I-EA-SMPL-01" Q=":HE:TRANSFER:RAW_RBV" addr="501" vlvcc="BL21I-VA-VLVCC-06"/>
+	<!--Raw data demand
+
+Helium transfer line with motorized needle valve from ICE Oxford Ltd used with the SMPL Helium Dewar.
+
+Required 0-10V input signal provided by BL21I-MP-TRIO-11 (module 11).\n-->
+	<dlsPLC.writeInt16 P="BL21I-EA-SMPL-01" Q=":HE:TRANSFER:RAW" addr="500" port="fins_VLVCC6"/>
+	<records.calcout CALC="((A &amp; 49152) = 49152) " DOPT="Use CALC" DTYP="Soft Channel" INPA="BL21I-MO-ARM-01:TTH:SSEAL:NTRGN:STATUS:RAW CP" OOPT="On Change" OUT="BL21I-MO-ARM-01:TTH:SSEAL:NTRGN:STATUS PP" SCAN="Passive" record="BL21I-MO-ARM-01:TTH:SSEAL:NTRGN:STATUS:CALC"/>
+	<records.calcout CALC="(A-D)*B/C" DOPT="Use CALC" DTYP="Soft Channel" HHSV="MAJOR" HIHI="10.1" HOPR="10" HYST="0.05" INPA="BL21I-EA-SMPL-01:HE:TRANSFER:RAW_RBV CP" INPB="10" INPC="6000" INPD="0" LLSV="MAJOR" LOLO="-0.1" LOPR="0" OOPT="On Change" OUT="BL21I-EA-SMPL-01:HE:TRANSFER:VOLTAGE_RBV PP" SCAN="Passive" record="BL21I-EA-SMPL-01:HE:TRANSFER:SCALED_RBV"/>
+	<records.calcout CALC="(A*B/C)+D" DOPT="Use CALC" DTYP="Soft Channel" HHSV="MAJOR" HIHI="10.1" HOPR="10" HYST="0.05" INPA="BL21I-EA-SMPL-01:HE:TRANSFER:VOLTAGE CP" INPB="6000" INPC="10" INPD="0" LLSV="MAJOR" LOLO="-0.1" LOPR="0" OOPT="On Change" OUT="BL21I-EA-SMPL-01:HE:TRANSFER:RAW PP" SCAN="Passive" record="BL21I-EA-SMPL-01:HE:TRANSFER:SCALED"/>
+	<records.calcout CALC="((B=0)&amp;&amp;(A=C))||((B=1)&amp;&amp;(A=D))||((B=2)&amp;&amp;(A=E))" DESC="Check if voltage matches selected menu" DOPT="Use CALC" DTYP="Soft Channel" INPA="BL21I-EA-SMPL-01:HE:TRANSFER:VOLTAGE_RBV" INPB="BL21I-EA-SMPL-01:HE:TRANSFER:SELECT" INPC="BL21I-EA-SMPL-01:HE:TRANSFER:SELECT.ZRVL" INPD="BL21I-EA-SMPL-01:HE:TRANSFER:SELECT.ONVL" INPE="BL21I-EA-SMPL-01:HE:TRANSFER:SELECT.TWVL" OOPT="On Change" OUT="BL21I-EA-SMPL-01:HE:TRANSFER:MATCH_RBV PP" SCAN="Passive" record="BL21I-EA-SMPL-01:HE:TRANSFER:SELMATCH"/>
+	<records.ai DESC="Helium transfer line readout in volts" DTYP="Soft Channel" EGU="V" FLNK="BL21I-EA-SMPL-01:HE:TRANSFER:SELMATCH PP" PREC="3" SCAN="Passive" name="SMPL.HeTransferVoltage_rbv" record="BL21I-EA-SMPL-01:HE:TRANSFER:VOLTAGE_RBV"/>
+	<userIO.ao DESC="Dewar He Transfer Voltage" DRVH="10" DRVL="0" DTYP="Soft Channel" EGUF="" EGUL="" LINR="" OUT="" P="BL21I-EA-SMPL-01" PREC="3" R=":HE:TRANSFER:VOLTAGE" SCAN="Passive" name="SMPL.HeTransferVoltage"/>
+	<userIO.bi DESC="Matching voltage and menu readback" DTYP="Soft Channel" INP="" ONAM="In Position" P="BL21I-EA-SMPL-01" R=":HE:TRANSFER:MATCH_RBV" SCAN="Passive" ZNAM="Mismatch" name="SMPL.HeMenuMatch_rbv"/>
+	<records.mbbo DESC="Select Helium transfer line mode" DTYP="Raw Soft Channel" OMSL="supervisory" ONST="fully open" ONVL="5" OUT="BL21I-EA-SMPL-01:HE:TRANSFER:VOLTAGE PP" SCAN="Passive" TWST="optimal" TWVL="8" ZRST="fully close" ZRVL="10" name="SMPL.HeliumSelect" record="BL21I-EA-SMPL-01:HE:TRANSFER:SELECT"/>
+	<records.bi DTYP="Soft Channel" ONAM="On" SCAN="Passive" ZNAM="Off" record="BL21I-MO-ARM-01:TTH:SSEAL:NTRGN:STATUS"/>
+	<asyn.AsynIP name="vts_MPC1" port="bl21i-va-tserv-01:7001" simulation="localhost:11301"/>
+	<asyn.AsynIP name="vts_MPC2" port="bl21i-va-tserv-01:7002" simulation="localhost:11302"/>
+	<asyn.AsynIP name="vts_MPC3" port="bl21i-va-tserv-01:7003" simulation="localhost:11303"/>
+	<asyn.AsynIP name="vts_MPC4" port="bl21i-va-tserv-01:7004" simulation="localhost:11304"/>
+	<asyn.AsynIP name="vts_MPC5" port="bl21i-va-tserv-01:7005" simulation="localhost:11305"/>
+	<asyn.AsynIP name="vts_MPC6" port="bl21i-va-tserv-03:7001" simulation="localhost:11306"/>
+	<asyn.AsynIP name="vts_MPC7" port="bl21i-va-tserv-03:7002" simulation="localhost:11307"/>
+	<asyn.AsynIP name="vts_MPC8" port="bl21i-va-tserv-04:7001" simulation="localhost:11308"/>
+	<asyn.AsynIP name="vts_MPC9" port="bl21i-va-tserv-04:7002" simulation="localhost:11309"/>
+	<asyn.AsynIP name="vts_MPC40" port="bl21i-va-tserv-04:7003" simulation="localhost:11340"/>
+	<asyn.AsynIP name="vts_MPC10" port="bl21i-va-tserv-05:7001" simulation="localhost:11310"/>
+	<asyn.AsynIP name="vts_MPC11" port="bl21i-va-tserv-05:7002" simulation="localhost:11311"/>
+	<asyn.AsynIP name="vts_MPC12" port="bl21i-va-tserv-05:7003" simulation="localhost:11312"/>
+	<!--Disabled as currently not used-->
+	<!--<asyn.AsynIP name="vts_SPC1" port="bl21i-va-tserv-05:7008" simulation="localhost:11313"/>-->
+	<asyn.AsynIP name="vts_GCTLR1" port="bl21i-va-tserv-01:7009" simulation="localhost:11501"/>
+	<asyn.AsynIP name="vts_GCTLR2" port="bl21i-va-tserv-01:7010" simulation="localhost:11502"/>
+	<asyn.AsynIP name="vts_GCTLR3" port="bl21i-va-tserv-01:7011" simulation="localhost:11503"/>
+	<asyn.AsynIP name="vts_GCTLR4" port="bl21i-va-tserv-01:7012" simulation="localhost:11504"/>
+	<asyn.AsynIP name="vts_GCTLR5" port="bl21i-va-tserv-01:7013" simulation="localhost:11505"/>
+	<asyn.AsynIP name="vts_GCTLR6" port="bl21i-va-tserv-03:7009" simulation="localhost:11506"/>
+	<asyn.AsynIP name="vts_GCTLR7" port="bl21i-va-tserv-03:7010" simulation="localhost:11507"/>
+	<asyn.AsynIP name="vts_GCTLR8" port="bl21i-va-tserv-04:7009" simulation="localhost:11508"/>
+	<asyn.AsynIP name="vts_GCTLR9" port="bl21i-va-tserv-04:7010" simulation="localhost:11509"/>
+	<asyn.AsynIP name="vts_GCTLR10" port="bl21i-va-tserv-04:7011" simulation="localhost:11510"/>
+	<asyn.AsynIP name="vts_GCTLR11" port="bl21i-va-tserv-04:7012" simulation="localhost:11511"/>
+	<asyn.AsynIP name="vts_GCTLR12" port="bl21i-va-tserv-05:7009" simulation="localhost:11512"/>
+	<asyn.AsynIP name="vts_GCTLR13" port="bl21i-va-tserv-05:7010" simulation="localhost:11513"/>
+	<asyn.AsynIP name="vts_GCTLR14" port="bl21i-va-tserv-05:7011" simulation="localhost:11514"/>
+	<asyn.AsynIP name="vts_9XX_43" port="bl21i-va-tserv-20:7001"/>
+	<asyn.AsynIP name="vts_9XX_44" port="bl21i-va-tserv-20:7002"/>
+	<asyn.AsynIP name="vts_9XX_45" port="bl21i-va-tserv-20:7003"/>
+	<asyn.AsynIP name="vts_9XX_22" port="bl21i-va-tserv-20:7004"/>
+	<asyn.AsynIP name="vts_9XX_23" port="bl21i-va-tserv-21:7001"/>
+	<asyn.AsynIP name="vts_SCM10_01" port="bl21i-va-tserv-21:7003"/>
+	<!--Scientific Instruments single channel temperature monitor
+
+Used to monitor the cryo pump temperature in the sample vessel-->
+	<BL21I.SCM10 device="BL21I-VA-CRYO-01:SERIAL" name="SMPL.SCM10_01" port="vts_SCM10_01"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-01" name="MPC1" port="vts_MPC1"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-02" name="MPC2" port="vts_MPC2"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-03" name="MPC3" port="vts_MPC3"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-04" name="MPC4" port="vts_MPC4"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-05" name="MPC5" port="vts_MPC5"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-06" name="MPC6" port="vts_MPC6"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-07" name="MPC7" port="vts_MPC7"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-08" name="MPC8" port="vts_MPC8"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-09" name="MPC9" port="vts_MPC9"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-10" name="MPC10" port="vts_MPC10"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-11" name="MPC11" port="vts_MPC11"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-12" name="MPC12" port="vts_MPC12"/>
+	<digitelMpc.digitelMpc device="BL21I-VA-MPC-40" name="MPC40" port="vts_MPC40"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC1" device="BL21I-VA-IONP-01" name="IONP1" pump="1" size="300"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC1" device="BL21I-VA-IONP-02" name="IONP2" pump="2" size="375" text="BL21I-VA-IONP-02-03"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC1" device="BL21I-VA-IONP-03" name="IONP3" pump="2" size="375" text="BL21I-VA-IONP-02-03"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC2" device="BL21I-VA-IONP-04" name="IONP4" pump="1" size="400"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC2" device="BL21I-VA-IONP-05" name="IONP5" pump="2" size="450" text="BL21I-VA-IONP-05-06"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC2" device="BL21I-VA-IONP-06" name="IONP6" pump="2" size="450" text="BL21I-VA-IONP-05-06"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC3" device="BL21I-VA-IONP-07" name="IONP7" pump="1" size="500"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC3" device="BL21I-VA-IONP-08" name="IONP8" pump="2" size="500"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC4" device="BL21I-VA-IONP-09" name="IONP9" pump="1" size="450" text="BL21I-VA-IONP-09-10"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC4" device="BL21I-VA-IONP-10" name="IONP10" pump="1" size="450" text="BL21I-VA-IONP-09-10"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC4" device="BL21I-VA-IONP-11" name="IONP11" pump="2" size="400"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC5" device="BL21I-VA-IONP-12" name="IONP12" pump="1" size="150"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC5" device="BL21I-VA-IONP-13" name="IONP13" pump="2" size="300"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC6" device="BL21I-VA-IONP-14" name="IONP14" pump="1" size="500"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC6" device="BL21I-VA-IONP-15" name="IONP15" pump="2" size="150"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC7" device="BL21I-VA-IONP-16" name="IONP16" pump="1" size="500"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC7" device="BL21I-VA-IONP-17" name="IONP17" pump="2" size="500"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC8" device="BL21I-VA-IONP-18" name="IONP18" pump="1" size="150"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC8" device="BL21I-VA-IONP-19" name="IONP19" pump="2" size="500"/>
+	<!--<digitelMpc.digitelMpcIonp MPC="MPC8" device="BL21I-VA-IONP-20" name="IONP20" pump="2" size="45"/>-->
+	<digitelMpc.digitelMpcIonp MPC="MPC9" device="BL21I-VA-IONP-21" name="IONP21" pump="1" size="160"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC9" device="BL21I-VA-IONP-22" name="IONP22" pump="2" size="160"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC40" device="BL21I-VA-IONP-23" name="IONP23" pump="2" size="500"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC10" device="BL21I-VA-IONP-24" name="IONP24" pump="1" size="500"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC10" device="BL21I-VA-IONP-25" name="IONP25" pump="2" size="500" text="BL21I-VA-IONP-25-26"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC10" device="BL21I-VA-IONP-26" name="IONP26" pump="2" size="500" text="BL21I-VA-IONP-25-26"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC11" device="BL21I-VA-IONP-30" name="IONP30" pump="1" size="1000" text="BL21I-VA-IONP-30"/>
+	<!--<digitelMpc.digitelMpcIonp MPC="MPC11" device="BL21I-VA-IONP-28" name="IONP28" pump="2" size="1000" text="BL21I-VA-IONP-28"/>-->
+	<digitelMpc.digitelMpcIonp MPC="MPC12" device="BL21I-VA-IONP-27" name="IONP27" pump="1" size="500" text="BL21I-VA-IONP-27"/>
+	<digitelMpc.digitelMpcTsp ctlsrc="0" device="BL21I-VA-TSP-01" name="TSP1" port="vts_MPC12" unit="01"/>
+	<!--Disabled as currently not connected
+(Ion Pump 29 near Smpl Manipulator is never used)-->
+	<!--<digitelSpc.digitelSpc device="BL21I-VA-SPC-01" name="SPC1" port="vts_SPC1"/>-->
+	<!--Disabled as currently not connected (never used)-->
+	<!--<digitelSpc.digitelSpcIonp SPC="SPC1" device="BL21I-VA-IONP-29" name="IONP29" size="3"/>-->
+	<!--<mks9xx.mks9xx P="BL21I-VA-PIRG-22" PORT="MKS9XX_22" serialport="vts_9XX_22"/>-->
+	<!--<mks9xx.mks9xx P="BL21I-VA-PIRG-23" PORT="MKS9XX_23" serialport="vts_9XX_23"/>-->
+	<!--<mks9xx.mks9xx P="BL21I-VA-PIRG-43" PORT="MKS9XX_43" serialport="vts_9XX_43"/>-->
+	<!--<mks9xx.mks9xx P="BL21I-VA-PIRG-44" PORT="MKS9XX_44" serialport="vts_9XX_44"/>-->
+	<!--<mks9xx.mks9xx P="BL21I-VA-PIRG-45" PORT="MKS9XX_45" serialport="vts_9XX_45"/>-->
+	<mks9xx.mks9xxGauge P="BL21I-VA-GAUGE-22" id="22" name="GAUGE22" param_A="1" param_B="6" plog_adc_pv="BL21I-VA-ERIO-12:MOD1:INPUT4:VALUE"/>
+	<mks9xx.mks9xxGauge P="BL21I-VA-GAUGE-23" id="23" name="GAUGE23" param_A="1" param_B="6" plog_adc_pv="BL21I-VA-ERIO-12:MOD2:INPUT1:VALUE"/>
+	<mks9xx.mks9xxGauge P="BL21I-VA-GAUGE-43" id="43" name="GAUGE43" plog_adc_pv="BL21I-VA-ERIO-12:MOD1:INPUT1:VALUE"/>
+	<mks9xx.mks9xxGauge P="BL21I-VA-GAUGE-44" id="44" name="GAUGE44" plog_adc_pv="BL21I-VA-ERIO-12:MOD1:INPUT3:VALUE"/>
+	<mks9xx.mks9xxGauge P="BL21I-VA-GAUGE-45" id="45" name="GAUGE45" param_A="1" param_B="6" plog_adc_pv="BL21I-VA-ERIO-12:MOD1:INPUT2:VALUE"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-01" name="GCTLR1" port="vts_GCTLR1"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-02" name="GCTLR2" port="vts_GCTLR2"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-03" name="GCTLR3" port="vts_GCTLR3"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-04" name="GCTLR4" port="vts_GCTLR4"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-05" name="GCTLR5" port="vts_GCTLR5"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-06" name="GCTLR6" port="vts_GCTLR6"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-07" name="GCTLR7" port="vts_GCTLR7"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-08" name="GCTLR8" port="vts_GCTLR8"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-09" name="GCTLR9" port="vts_GCTLR9"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-10" name="GCTLR10" port="vts_GCTLR10"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-11" name="GCTLR11" port="vts_GCTLR11"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-12" name="GCTLR12" port="vts_GCTLR12"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-13" name="GCTLR13" port="vts_GCTLR13"/>
+	<mks937b.mks937b address="1" device="BL21I-VA-GCTLR-14" name="GCTLR14" port="vts_GCTLR14"/>
+	<mks937b.mks937bImg GCTLR="GCTLR1" channel="1" ctl_channel="0" device="BL21I-VA-IMG-01" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="IMG1" offwarn="1"/>
+	<mks937b.mks937bImg GCTLR="GCTLR1" channel="3" ctl_channel="1" device="BL21I-VA-IMG-02" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="IMG2" offwarn="1"/>
+	<mks937b.mks937bImg GCTLR="GCTLR2" channel="1" ctl_channel="0" device="BL21I-VA-IMG-03" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="IMG3" offwarn="1"/>
+	<mks937b.mks937bImg GCTLR="GCTLR2" channel="3" ctl_channel="1" device="BL21I-VA-IMG-04" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="IMG4"/>
+	<mks937b.mks937bImg GCTLR="GCTLR3" channel="1" ctl_channel="0" device="BL21I-VA-IMG-05" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="IMG5"/>
+	<mks937b.mks937bImg GCTLR="GCTLR4" channel="1" ctl_channel="0" device="BL21I-VA-IMG-06" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="IMG6"/>
+	<mks937b.mks937bImg GCTLR="GCTLR4" channel="3" ctl_channel="1" device="BL21I-VA-IMG-07" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="IMG7"/>
+	<mks937b.mks937bImg GCTLR="GCTLR5" channel="1" ctl_channel="0" device="BL21I-VA-IMG-08" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="IMG8"/>
+	<mks937b.mks937bImg GCTLR="GCTLR6" channel="1" ctl_channel="0" device="BL21I-VA-IMG-09" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="IMG9"/>
+	<mks937b.mks937bImg GCTLR="GCTLR6" channel="3" ctl_channel="1" device="BL21I-VA-IMG-10" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="IMG10"/>
+	<mks937b.mks937bImg GCTLR="GCTLR7" channel="1" ctl_channel="0" device="BL21I-VA-IMG-11" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="IMG11"/>
+	<!--IMG40 and PIRG40 are not related to each other, so the IMG Enable interlocks need to be ignored.
+i.e. control channel set to None (IMG Enable Gauge)
+and control mode set to Force On (IMG Enable Mode)-->
+	<mks937b.mks937bImg GCTLR="GCTLR7" channel="3" ctl_channel="2" device="BL21I-VA-IMG-40" ilk_write_access_pv="BL21I-VA-GAUGE-40:ILKSETSP:NOWRITE" img_ctl_setmode="0" name="IMG40"/>
+	<mks937b.mks937bImg GCTLR="GCTLR8" channel="1" device="BL21I-VA-IMG-12" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="IMG12"/>
+	<mks937b.mks937bImg GCTLR="GCTLR8" channel="3" ctl_channel="1" device="BL21I-VA-IMG-13" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="IMG13"/>
+	<mks937b.mks937bImg GCTLR="GCTLR11" channel="1" device="BL21I-VA-IMG-14" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="IMG14"/>
+	<!--<mks937b.mks937bImg GCTLR="GCTLR11" channel="3" ctl_channel="1" device="BL21I-VA-IMG-15" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="IMG15"/>-->
+	<mks937b.mks937bImg GCTLR="GCTLR9" channel="1" device="BL21I-VA-IMG-16" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="IMG16"/>
+	<mks937b.mks937bImg GCTLR="GCTLR9" channel="3" ctl_channel="1" device="BL21I-VA-IMG-17" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="IMG17"/>
+	<mks937b.mks937bImg GCTLR="GCTLR10" channel="1" device="BL21I-VA-IMG-18" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="IMG18"/>
+	<mks937b.mks937bImg GCTLR="GCTLR12" channel="1" device="BL21I-VA-IMG-19" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="IMG19"/>
+	<mks937b.mks937bImg GCTLR="GCTLR12" channel="3" ctl_channel="1" device="BL21I-VA-IMG-20" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="IMG20"/>
+	<mks937b.mks937bImg GCTLR="GCTLR13" channel="1" device="BL21I-VA-IMG-21" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="IMG21"/>
+	<!--IMG41 / IMG30 swapped for I21-777-->
+	<mks937b.mks937bImg GCTLR="GCTLR13" channel="3" ctl_channel="1" device="BL21I-VA-IMG-41" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="IMG41"/>
+	<mks937b.mks937bImg GCTLR="GCTLR14" channel="1" ctl_channel="2" device="BL21I-VA-IMG-30" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="IMG30"/>
+	<mks937b.mks937bImg GCTLR="GCTLR14" channel="3" ctl_channel="2" device="BL21I-VA-IMG-42" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="IMG42"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR1" channel="5" device="BL21I-VA-PIRG-01" name="PIRG1" offwarn="1"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR1" channel="6" device="BL21I-VA-PIRG-02" name="PIRG2" offwarn="1"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR2" channel="5" device="BL21I-VA-PIRG-03" name="PIRG3" offwarn="1"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR2" channel="6" device="BL21I-VA-PIRG-04" name="PIRG4"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR3" channel="5" device="BL21I-VA-PIRG-05" name="PIRG5"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR4" channel="5" device="BL21I-VA-PIRG-06" name="PIRG6"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR4" channel="6" device="BL21I-VA-PIRG-07" name="PIRG7"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR5" channel="5" device="BL21I-VA-PIRG-08" name="PIRG8"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR6" channel="5" device="BL21I-VA-PIRG-09" name="PIRG9"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR6" channel="6" device="BL21I-VA-PIRG-10" name="PIRG10"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR7" channel="5" device="BL21I-VA-PIRG-11" name="PIRG11"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR7" channel="6" device="BL21I-VA-PIRG-40" name="PGM.PIRG40"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR8" channel="5" device="BL21I-VA-PIRG-12" name="PIRG12"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR8" channel="6" device="BL21I-VA-PIRG-13" name="PIRG13"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR11" channel="5" device="BL21I-VA-PIRG-14" name="PIRG14"/>
+	<!--<mks937b.mks937bPirg GCTLR="GCTLR11" channel="6" device="BL21I-VA-PIRG-15" name="PIRG15"/>-->
+	<mks937b.mks937bPirg GCTLR="GCTLR9" channel="5" device="BL21I-VA-PIRG-16" name="PIRG16"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR9" channel="6" device="BL21I-VA-PIRG-17" name="PIRG17"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR10" channel="5" device="BL21I-VA-PIRG-18" name="PIRG18"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR12" channel="5" device="BL21I-VA-PIRG-19" name="PIRG19"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR12" channel="6" device="BL21I-VA-PIRG-20" name="PIRG20"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR13" channel="5" device="BL21I-VA-PIRG-21" name="PIRG21"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR13" channel="6" device="BL21I-VA-PIRG-41" name="PIRG41"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR14" channel="5" device="BL21I-VA-PIRG-30" name="PIRG30"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR14" channel="6" device="BL21I-VA-PIRG-42" name="PIRG42"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-01" dom="BL21I" id="01" name="GAUGE1" plog_adc_pv="BL21I-VA-ERIO-01:MOD1:INPUT1:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-01" dom="BL21I" id="02" name="GAUGE2" plog_adc_pv="BL21I-VA-ERIO-01:MOD1:INPUT2:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-02" dom="BL21I" id="03" name="GAUGE3" plog_adc_pv="BL21I-VA-ERIO-01:MOD1:INPUT3:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-02" dom="BL21I" id="04" name="GAUGE4" plog_adc_pv="BL21I-VA-ERIO-01:MOD1:INPUT4:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-03" dom="BL21I" id="05" name="GAUGE5" plog_adc_pv="BL21I-VA-ERIO-01:MOD2:INPUT1:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-04" dom="BL21I" id="06" name="GAUGE6" plog_adc_pv="BL21I-VA-ERIO-01:MOD2:INPUT3:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-04" dom="BL21I" id="07" name="GAUGE7" plog_adc_pv="BL21I-VA-ERIO-01:MOD2:INPUT4:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-05" dom="BL21I" id="08" name="GAUGE8" plog_adc_pv="BL21I-VA-ERIO-01:MOD3:INPUT1:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-06" dom="BL21I" id="09" name="GAUGE9" plog_adc_pv="BL21I-VA-ERIO-02:MOD1:INPUT1:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-06" dom="BL21I" id="10" name="GAUGE10" plog_adc_pv="BL21I-VA-ERIO-02:MOD1:INPUT2:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-07" dom="BL21I" id="11" name="GAUGE11" plog_adc_pv="BL21I-VA-ERIO-02:MOD1:INPUT3:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-07" dom="BL21I" id="40" name="GAUGE40" plog_adc_pv="BL21I-VA-ERIO-02:MOD1:INPUT4:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-08" dom="BL21I" id="12" name="GAUGE12" plog_adc_pv="BL21I-VA-ERIO-03:MOD1:INPUT1:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-08" dom="BL21I" id="13" name="GAUGE13" plog_adc_pv="BL21I-VA-ERIO-03:MOD1:INPUT2:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-11" dom="BL21I" id="14" name="GAUGE14" plog_adc_pv="BL21I-VA-ERIO-03:MOD2:INPUT3:VALUE"/>
+	<!--<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-11" dom="BL21I" id="15" name="GAUGE15" plog_adc_pv="BL21I-VA-ERIO-03:MOD2:INPUT4:VALUE"/>-->
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-09" dom="BL21I" id="16" name="GAUGE16" plog_adc_pv="BL21I-VA-ERIO-03:MOD1:INPUT3:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-09" dom="BL21I" id="17" name="GAUGE17" plog_adc_pv="BL21I-VA-ERIO-03:MOD1:INPUT4:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-10" dom="BL21I" id="18" name="GAUGE18" plog_adc_pv="BL21I-VA-ERIO-03:MOD2:INPUT1:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-12" dom="BL21I" id="19" name="GAUGE19" plog_adc_pv="BL21I-VA-ERIO-04:MOD3:INPUT1:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-12" dom="BL21I" id="20" name="GAUGE20" plog_adc_pv="BL21I-VA-ERIO-04:MOD3:INPUT2:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-13" dom="BL21I" id="21" name="GAUGE21" plog_adc_pv="BL21I-VA-ERIO-04:MOD3:INPUT3:VALUE"/>
+	<!--41 and 42 have separated IMGs and PIRGs, but gauge template is still required for IMG Enable interlocks-->
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-13" dom="BL21I" id="41" name="GAUGE41" plog_adc_pv="BL21I-VA-ERIO-04:MOD3:INPUT4:VALUE"/>
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-14" dom="BL21I" id="30" name="GAUGE30" plog_adc_pv="BL21I-VA-ERIO-04:MOD4:INPUT1:VALUE"/>
+	<!--41 and 42 have separated IMGs and PIRGs, but gauge template is still required for IMG Enable interlocks-->
+	<mks937b.mks937bGauge GCTLR="BL21I-VA-GCTLR-14" dom="BL21I" id="42" name="GAUGE42" plog_adc_pv="BL21I-VA-ERIO-04:MOD4:INPUT2:VALUE"/>
+	<mks937b.mks937bRelays GAUGE="IMG1" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="RLY1" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-8" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG1" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="RLY2" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG1" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="RLY3" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG1" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="RLY4" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="IMG2" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="RLY5" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-8" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG2" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="RLY6" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG2" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="RLY7" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG2" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="RLY8" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="PIRG1" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="RLY9" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG1" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="RLY10" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG2" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="RLY11" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG2" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="RLY12" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG3" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="RLY13" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG3" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="RLY14" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG3" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="RLY15" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG3" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="RLY16" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG4" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="RLY17" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG4" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="RLY18" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG4" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="RLY19" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG4" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="RLY20" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG3" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="RLY21" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG3" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="RLY22" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG4" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="RLY23" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG4" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="RLY24" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG5" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="RLY25" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG5" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="RLY26" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG5" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="RLY27" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG5" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="RLY28" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG5" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="RLY33" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG5" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="RLY34" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG6" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="RLY29" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG6" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="RLY30" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG6" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="RLY31" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG6" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="RLY32" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG7" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="RLY37" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG7" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="RLY38" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG7" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="RLY39" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG7" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="RLY40" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG6" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="RLY35" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG6" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="RLY36" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG7" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="RLY45" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG7" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="RLY46" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG8" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="RLY41" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG8" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="RLY42" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG8" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="RLY43" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG8" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="RLY44" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG8" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="RLY47" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG8" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="RLY48" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG9" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="RLY49" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG9" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="RLY50" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG9" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="RLY51" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG9" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="RLY52" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG10" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="RLY53" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG10" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="RLY54" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG10" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="RLY55" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG10" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="RLY56" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG9" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="RLY57" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG9" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="RLY58" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG10" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="RLY59" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG10" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="RLY60" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG11" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="RLY61" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG11" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="RLY62" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG11" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="RLY63" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG11" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="RLY64" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG40" ilk_write_access_pv="BL21I-VA-GAUGE-40:ILKSETSP:NOWRITE" name="RLY61a" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG40" ilk_write_access_pv="BL21I-VA-GAUGE-40:ILKSETSP:NOWRITE" name="RLY62a" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG40" ilk_write_access_pv="BL21I-VA-GAUGE-40:ILKSETSP:NOWRITE" name="RLY63a" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG40" ilk_write_access_pv="BL21I-VA-GAUGE-40:ILKSETSP:NOWRITE" name="RLY64a" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG11" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="RLY65" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG11" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="RLY66" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PGM.PIRG40" ilk_write_access_pv="BL21I-VA-GAUGE-40:ILKSETSP:NOWRITE" name="RLY65a" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PGM.PIRG40" ilk_write_access_pv="BL21I-VA-GAUGE-40:ILKSETSP:NOWRITE" name="RLY66a" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="10" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG12" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="RLY67" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG12" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="RLY68" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG12" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="RLY69" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG12" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="RLY70" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="IMG13" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="RLY71" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG13" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="RLY72" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG13" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="RLY73" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG13" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="RLY74" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="PIRG12" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="RLY75" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG12" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="RLY76" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG13" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="RLY77" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG13" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="RLY78" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG14" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="RLY79" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG14" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="RLY80" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG14" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="RLY81" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG14" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="RLY82" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<!--<mks937b.mks937bRelays GAUGE="IMG15" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="RLY83" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>-->
+	<!--<mks937b.mks937bRelays GAUGE="IMG15" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="RLY84" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>-->
+	<!--<mks937b.mks937bRelays GAUGE="IMG15" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="RLY85" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>-->
+	<!--<mks937b.mks937bRelays GAUGE="IMG15" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="RLY86" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>-->
+	<mks937b.mks937bRelays GAUGE="PIRG14" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="RLY87" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG14" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="RLY88" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<!--<mks937b.mks937bRelays GAUGE="PIRG15" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="RLY89" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>-->
+	<!--<mks937b.mks937bRelays GAUGE="PIRG15" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="RLY90" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>-->
+	<mks937b.mks937bRelays GAUGE="IMG16" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="RLY91" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG16" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="RLY92" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG16" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="RLY93" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG16" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="RLY94" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG17" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="RLY95" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG17" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="RLY96" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG17" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="RLY97" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG17" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="RLY98" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG16" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="RLY99" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG16" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="RLY100" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG17" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="RLY101" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG17" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="RLY102" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG18" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="RLY103" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG18" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="RLY104" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG18" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="RLY105" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG18" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="RLY106" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="PIRG18" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="RLY107" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG18" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="RLY108" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG19" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="RLY109" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG19" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="RLY110" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG19" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="RLY111" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG19" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="RLY112" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="IMG20" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="RLY113" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG20" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="RLY114" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG20" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="RLY115" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG20" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="RLY116" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="PIRG19" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="RLY117" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG19" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="RLY118" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG20" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="RLY119" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG20" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="RLY120" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="IMG21" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="RLY121" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-6" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG21" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="RLY122" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG21" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="RLY123" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG21" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="RLY124" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="IMG30" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="RLY125" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG30" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="RLY126" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG30" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="RLY127" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG30" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="RLY128" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="PIRG21" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="RLY129" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG21" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="RLY130" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG30" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="RLY131" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG30" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="RLY132" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_drvl="2.7e-10" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_lolo="2.6e-10" relay_lopr="2.7e-10" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off" relay_off_level="0.0"/>
+	<mks937b.mks937bRelays GAUGE="IMG41" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="RLY133" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG41" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="RLY134" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="2" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG41" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="RLY135" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="3" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG41" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="RLY136" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="4" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="IMG42" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="RLY137" relay_desc="Valve I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_low="9e-9" relay_number="5" relay_off_desc="Valve I/L Off" relay_off_level="1.1e-6"/>
+	<mks937b.mks937bRelays GAUGE="IMG42" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="RLY138" relay_desc="MPS I/L 1 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="6" relay_off_desc="MPS I/L 1 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG42" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="RLY139" relay_desc="MPS I/L 2 On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-7" relay_low="9e-9" relay_number="7" relay_off_desc="MPS I/L 2 Off" relay_off_level="1.1e-7"/>
+	<mks937b.mks937bRelays GAUGE="IMG42" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="RLY140" relay_desc="RGA I/L On" relay_drvh="1e-3" relay_high="1.5e-4" relay_hihi="1e-3" relay_hopr="1e-3" relay_level="1.0e-4" relay_low="9e-9" relay_number="8" relay_off_desc="RGA I/L Off" relay_off_level="1.1e-4"/>
+	<mks937b.mks937bRelays GAUGE="PIRG41" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="RLY141" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="9" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG41" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="RLY142" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="10" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG42" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="RLY143" relay_desc="Ion Pump I/L On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="11" relay_off_desc="Ion Pump I/L Off"/>
+	<mks937b.mks937bRelays GAUGE="PIRG42" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="RLY144" relay_desc="MPS I/L 1 On" relay_drvh="9.0e-1" relay_high="9.0e-1" relay_hihi="9.0e-1" relay_hopr="9.0e-1" relay_level="1.0e-2" relay_low="9e-9" relay_number="12" relay_off_desc="MPS I/L 1 Off"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG1" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="FRLY1"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG2" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-02:ILKSETSP:NOWRITE" name="FRLY2"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG3" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-03:ILKSETSP:NOWRITE" name="FRLY3"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG4" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-04:ILKSETSP:NOWRITE" name="FRLY4"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG5" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-05:ILKSETSP:NOWRITE" name="FRLY5"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG6" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-06:ILKSETSP:NOWRITE" name="FRLY6"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG7" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-07:ILKSETSP:NOWRITE" name="FRLY7"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG8" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-08:ILKSETSP:NOWRITE" name="FRLY8"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG9" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-09:ILKSETSP:NOWRITE" name="FRLY9"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG10" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-10:ILKSETSP:NOWRITE" name="FRLY10"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG11" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-11:ILKSETSP:NOWRITE" name="FRLY11"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG12" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-12:ILKSETSP:NOWRITE" name="FRLY12"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG13" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-13:ILKSETSP:NOWRITE" name="FRLY13"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG14" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-14:ILKSETSP:NOWRITE" name="FRLY14"/>
+	<!--<mks937b.mks937bFastRelay GAUGE="IMG15" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-15:ILKSETSP:NOWRITE" name="FRLY15"/>-->
+	<mks937b.mks937bFastRelay GAUGE="IMG16" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-16:ILKSETSP:NOWRITE" name="FRLY16"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG17" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-17:ILKSETSP:NOWRITE" name="FRLY17"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG18" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-18:ILKSETSP:NOWRITE" name="FRLY18"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG19" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-19:ILKSETSP:NOWRITE" name="FRLY19"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG20" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="FRLY20"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG21" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="FRLY21"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG30" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-30:ILKSETSP:NOWRITE" name="FRLY30"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG41" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-41:ILKSETSP:NOWRITE" name="FRLY41"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG42" frcsp_level="1.0e-5" ilk_write_access_pv="BL21I-VA-GAUGE-42:ILKSETSP:NOWRITE" name="FRLY42"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-01" gauge0="GAUGE1" gauge1="GAUGE2" img0="IMG1" img1="IMG2" ionp0="IONP1" ionp1="IONP2" ionp2="IONP3" name="SP1" pirg0="PIRG1" pirg1="PIRG2" valve0="FEV2"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-02" gauge0="GAUGE3" img0="IMG3" ionp0="IONP4" name="SP2" pirg0="PIRG3" valve0="V1"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-03" gauge0="GAUGE4" img0="IMG4" ionp0="IONP5" ionp1="IONP6" name="SP3" pirg0="PIRG4" valve0="V2"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-04" gauge0="GAUGE5" img0="IMG5" ionp0="IONP7" ionp1="IONP8" name="SP4" pirg0="PIRG5" valve0="V3"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-05" gauge0="GAUGE6" img0="IMG6" ionp0="IONP9" ionp1="IONP10" name="SP5" pirg0="PIRG6" valve0="V4"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-06" gauge0="GAUGE7" img0="IMG7" ionp0="IONP11" name="SP6" pirg0="PIRG7" valve0="V5"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-07" gauge0="GAUGE8" img0="IMG8" ionp0="IONP12" ionp1="IONP13" name="SP7" pirg0="PIRG8" valve0="V6"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-08" gauge0="GAUGE9" img0="IMG9" ionp0="IONP14" name="SP8" pirg0="PIRG9" valve0="V7"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-09" gauge0="GAUGE10" img0="IMG10" ionp0="IONP15" name="SP9" pirg0="PIRG10" valve0="V8"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-10" gauge0="GAUGE11" img0="IMG11" ionp0="IONP16" ionp1="IONP17" name="SP10" pirg0="PIRG11" valve0="V9"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-11" gauge0="GAUGE12" img0="IMG12" ionp0="IONP18" name="SP11" pirg0="PIRG12" valve0="V10"/>
+	<!--<vacuumSpace.space_b device="BL21I-VA-SPACE-12" gauge0="GAUGE13" img0="IMG13" ionp0="IONP19" name="SP12" pirg0="PIRG13" valve0="V51"/>-->
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-12" gauge0="GAUGE13" img0="IMG13" ionp0="IONP19" name="SP12" pirg0="PIRG13"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-13" gauge0="GAUGE16" img0="IMG16" ionp0="IONP21" name="SP13" pirg0="PIRG16" valve0="V12"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-14" gauge0="GAUGE17" img0="IMG17" ionp0="IONP22" name="SP14" pirg0="PIRG17" valve0="V13"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-15" gauge0="GAUGE18" gauge1="GAUGE19" img0="IMG18" img1="IMG19" ionp0="IONP23" ionp1="IONP24" name="SP15" pirg0="PIRG18" pirg1="PIRG19" valve0="V14"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-16" gauge0="GAUGE20" img0="IMG20" ionp0="IONP25" name="SP16" pirg0="PIRG20" valve0="V15"/>
+	<vacuumSpace.space_b device="BL21I-VA-SPACE-17" gauge0="GAUGE21" img0="IMG21" ionp0="IONP26" ionp1="IONP27" name="SP17" pirg0="PIRG21" valve0="V16"/>
+	<!--<dlsPLC.reboot_rga addr="108" device="BL21I-VA-RGA-02" name="RGARB2" port="fins_VLVCC1"/>-->
+	<!--<dlsPLC.reboot_rga addr="109" device="BL21I-VA-RGA-03" name="RGARB3" port="fins_VLVCC1"/>-->
+	<!--<dlsPLC.reboot_rga addr="110" device="BL21I-VA-RGA-04" name="RGARB4" port="fins_VLVCC2"/>-->
+	<dlsPLC.interlock addr="90" desc="Front End Absorber" device="BL21I-VA-VLVCC-01" ilk0="inivac V1-4 + IMG1-6" ilk1="V1 Ope&amp;No close req" ilk10="ABSORBER-01" ilk11="Critical MPS" ilk12="VLVCC-02 Permit" ilk13="Temp Absorber Lo Lo FLow" ilk14="Temp Absorber T1" ilk15="FM open" ilk2="V2 Ope&amp;No close req" ilk3="V3 Ope&amp;No close req" ilk4="V1,2,3 Air T/2" ilk5="Vac MPS Limits" ilk6="GBC-01" ilk7="SLITS-01" ilk8="DIAGON" ilk9="MIRROR-01" interlock=":INT1" name="VLVCC1.ILK1" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="800" desc="GBC-01" device="BL21I-VA-VLVCC-01" ilk0="GBC-01 Lo Lo Flow" ilk1="GBC-01 T1" ilk2="GBC-01 T2" ilk3="unused" interlock=":INT2" name="VLVCC1.ILK2" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="810" desc="SLITS-01" device="BL21I-VA-VLVCC-01" ilk0="SLITS-01 Lo Lo Flow" ilk1="SLITS-01 T1" ilk2="SLITS-01 T2" ilk3="SLITS-01 T3" ilk4="SLITS-01 T4" interlock=":INT3" name="VLVCC1.ILK3" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="820" desc="DIAGON and D1" device="BL21I-VA-VLVCC-01" ilk0="DIAGON Lo Lo FLow" ilk1="DIAGON T1" ilk2="D1 Lo Lo FLow" ilk3="D1 T1" interlock=":INT4" name="VLVCC1.ILK4" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="830" desc="Critical MPS" device="BL21I-VA-VLVCC-01" ilk0="FM closed &gt;100ms" interlock=":INT5" name="VLVCC1.ILK5" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="840" desc="Motion Limits" device="BL21I-VA-VLVCC-01" interlock=":INT6" name="VLVCC1.ILK6" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="850" desc="MIRROR-01" device="BL21I-VA-VLVCC-01" ilk0="MIRROR-01 Lo Lo Flow" ilk1="MIRROR MASK T" ilk2="MIRROR UPSTREAM T" ilk3="MIRROR COOLING BLOCK" ilk4="unused" interlock=":INT7" name="VLVCC1.ILK7" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="860" desc="ABSORBER-01" device="BL21I-VA-VLVCC-01" ilk0="ABSORBER-01 Lo Lo Flow" ilk1="ABSORBER-01 T1" ilk2="unused" interlock=":INT8" name="VLVCC1.ILK8" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="870" desc="Vac MPS Limits" device="BL21I-VA-VLVCC-01" ilk0="IMG-01 MPS1" ilk1="IMG-02 MPS1" ilk2="IMG-03 MPS1" ilk3="IMG-04 MPS1" ilk4="IMG-05 MPS1" ilk5="IMG-6,7,8,9 MPS1" interlock=":INT9" name="VLVCC1.ILK9" port="fins_VLVCC1"/>
+	<dlsPLC.interlock addr="90" desc="VLVCC-02" device="BL21I-VA-VLVCC-02" ilk0="SLITS-02" ilk1="SLITS-03" ilk2="PHDGN-02" ilk3="PHDGN-03" ilk4="MIRROR-02" ilk5="V4 Open" ilk6="V5 Open" ilk7="V6 Open" ilk8="VLVCC-03" interlock=":INT1" name="VLVCC2.ILK1" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="800" desc="SLITS-02" device="BL21I-VA-VLVCC-02" ilk0="SLITS-02 Lo Lo Flow" ilk1="SLITS-02 T1" ilk2="SLITS-02 T2" ilk3="SLITS-02 T3" ilk4="SLITS-02 T4" interlock=":INT2" name="VLVCC2.ILK2" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="810" desc="SLITS-03" device="BL21I-VA-VLVCC-02" ilk0="SLITS-03 Lo Lo Flow" ilk1="SLITS-03 T1" ilk2="SLITS-03 T2" ilk3="SLITS-03 T3" ilk4="SLITS-03 T4" interlock=":INT3" name="VLVCC2.ILK3" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="820" desc="PHDGN-02" device="BL21I-VA-VLVCC-02" ilk0="PHDGN-02 Lo Lo Flow" ilk1="PHDGN-02 T1" ilk2="PHDGN-02 T1" ilk3="unused" interlock=":INT4" name="VLVCC2.ILK4" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="830" desc="PHDGN-03" device="BL21I-VA-VLVCC-02" ilk0="PHDGN-03 Lo Lo Flow" ilk1="PHDGN-03 T1" ilk2="PHDGN-03 T1" interlock=":INT5" name="VLVCC2.ILK5" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="840" desc="MIRROR-02" device="BL21I-VA-VLVCC-02" ilk0="MIRROR-02 Lo Lo Flow" ilk1="MIRROR-02 T1" ilk2="MIRROR-02 T2" ilk3="MIRROR-02 T3" interlock=":INT6" name="VLVCC2.ILK6" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="90" desc="VLVCC-03" device="BL21I-VA-VLVCC-03" ilk0="V7 Open" ilk1="V8 Open" ilk2="PGM Interlocks" ilk3="OC1 Interlocks" ilk4="PIRG 40 IonP I/L" interlock=":INT1" name="VLVCC3.ILK1" port="fins_VLVCC3"/>
+	<dlsPLC.interlock addr="800" desc="PGM Interlocks" device="BL21I-VA-VLVCC-03" ilk0="PGM 0 Ord Stop Flow" ilk1="PGM Grating Flow" ilk2="PGM Mirror Flow" ilk3="PGM Mirror Temp" ilk4="PGM VPG1 Temp" ilk5="PGM VPG3 Temp" ilk6="PGM VPG2 Temp" ilk7="PGM VPG4 Temp" ilk8="H20 shutoff vlv open" interlock=":INT2" name="VLVCC3.ILK2" port="fins_VLVCC3"/>
+	<dlsPLC.interlock addr="810" desc="OC1 Interlocks" device="BL21I-VA-VLVCC-03" ilk0="S4 Water" ilk1="D4 Water" ilk2="ABS-02 T1" ilk3="D4 T1" interlock=":INT3" name="VLVCC3.ILK3" port="fins_VLVCC3"/>
+	<dlsPLC.interlock addr="800" desc="M4 M5 TTH Interlocks" device="BL21I-VA-VLVCC-04" ilk0="M4 Vert Fwd O/T" ilk1="M4 Vert Rev O/T" ilk2="M5 Vert Fwd O/T" ilk3="M5 Vert Rev O/T" ilk4="TTH Rot Fwd O/T" ilk5="TTH Rot Rev O/T" interlock=":INT1" name="M4.ILK1" port="fins_VLVCC4"/>
+	<!--<dlsPLC.interlock addr="800" desc="ELAN Interlocks" device="BL21I-VA-VLVCC-05" ilk0="ELAN Blah blah blah" ilk1="ELAN blah blah?" ilk2="Blah" ilk3="blahhhhhh" interlock=":INT1" name="ELAN.ILK1" port="fins_VLVCC5"/>-->
+	<records.calc CALC="(A+B+C)%65535=0" FLNK="BL21I-VA-VLVCC-04:INT:STATE_RBV" INPA="BL21I-VA-VLVCC-04:INT1:RAWILK CP" INPB="BL21I-VA-VLVCC-04:INT1:INIILK CP" INPC="BL21I-VA-VLVCC-04:INT1:ILK CP" SCAN="Passive" record="BL21I-VA-VLVCC-04:INT1:STATE_RBV"/>
+	<!--Records used to provide a summary monitor for all the interlocks on VLVCC-04 related to the spectrometer.
+
+See CSS gui, interlock summary screen.-->
+	<records.calc CALC="A" INPA="BL21I-VA-VLVCC-04:INT1:STATE_RBV" SCAN="Passive" record="BL21I-VA-VLVCC-04:INT:STATE_RBV"/>
+</components>

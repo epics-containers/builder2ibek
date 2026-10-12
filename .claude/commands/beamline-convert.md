@@ -25,6 +25,24 @@ files for beamline `$1`.
 List all XMLs found. Ask the user to confirm which ones to convert (default:
 all).
 
+## Step 2a — Set EtherCAT IOCs aside
+
+IOCs involved in an EtherCAT chain must **not** go through the standard
+`xml2yaml` fan-out. `xml2yaml` drops the EtherCAT entities but leaves every
+reference to the chain's PVs pointing at the dead legacy namespace. Those IOCs
+need `/catio-convert`, one run per chain.
+
+Find the scanner IOCs (one per chain) and their consumers:
+
+```bash
+grep -l "EthercatMaster" <makeIocs>/*.xml     # scanners — one per chain
+grep -l "ERIO-" <makeIocs>/*.xml              # scanners + consumers
+```
+
+Exclude both sets from Steps 3–5. Report them to the user and hand the whole
+BUILDER tree to `/catio-convert` afterwards — it discovers and converts all
+chains in one pass.
+
 ## Quick reference — xml2yaml syntax
 
 ```bash

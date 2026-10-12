@@ -65,6 +65,10 @@ class Generic_IOC(BaseModel):
     raw_entities: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
     source_file: Path
     already_converted: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
+    # Set only by `builder2ibek catio`, and consumed by the ethercat converter's
+    # finalizer. Declared here rather than leaned on `extra="allow"` so that it
+    # type-checks, and excluded so it can never reach the output YAML.
+    catio: Any = Field(default=None, exclude=True)
 
 
 # Generic XML classes ##########################################################

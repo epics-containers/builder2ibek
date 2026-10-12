@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<devIocStats.devIocStatsHelper ioc="BL21I-VA-IOC-01" name="BL21I-VA-IOC-01.DEVIOCSTATS"/>
+	<autosave.Autosave bl="True" iocName="BL21I-VA-IOC-01" name="BL21I-VA-IOC-01.AUTOSAVE" path="/dls_sw/i21/epics/autosave"/>
+	<pvlogging.PvLogging access_file="/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf" name="VA1.PVLOGGING"/>
+	<ethercat.EthercatMaster name="ECATM" socket="/tmp/socket0"/>
+	<!--Start of BL21I-VA-ERIO-04-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025070" position="DCS00025070" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024905" position="DCS00024905" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025130" position="DCS00025130" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026220" position="DCS00026220" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026221" position="DCS00026221" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025092" position="DCS00025092" type_rev="EL1014 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025093" position="DCS00025093" type_rev="EL1014 rev 0x00120000"/>
+	<!--Start of BL21I-VA-ERIO-12-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026851" position="DCS00026851" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026565" position="DCS00026565" type_rev="EL3104 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026570" position="DCS00026570" type_rev="EL3104 rev 0x00130000"/>
+	<!--Start of BL21I-VA-ERIO-03-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024929" position="DCS00024929" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024890" position="DCS00024890" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024891" position="DCS00024891" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025081" position="DCS00025081" type_rev="EL1014 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025082" position="DCS00025082" type_rev="EL1014 rev 0x00120000"/>
+	<!--Start of BL21I-VA-ERIO-02-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00028304" position="DCS00028304" type_rev="EK1100 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024912" position="DCS00024912" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024913" position="DCS00024913" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023482" position="DCS00023482" type_rev="EL1014 rev 0x00100000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023483" position="DCS00023483" type_rev="EL1014 rev 0x00100000"/>
+	<!--Expecting ERIO-02 Module 5 EL1014 from drawing 1091223 page 26
+But not in the slaveinfo -d chain on bl21i-va-rserv-01
+(see Jira 884 and 476)-->
+	<!--<ethercat.EthercatSlave master="ECATM"/>-->
+	<!--Expecting ERIO-02 Module 6 EL1014 from drawing 1091223 page 26
+But not in the slaveinfo -d chain on bl21i-va-rserv-01
+(see Jira 884 and 476)-->
+	<!--<ethercat.EthercatSlave master="ECATM"/>-->
+	<!--Start of BL21I-VA-ERIO-01
+
+(coupler replaced on 03/02/2023)-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00028806" position="DCS00028806" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024908" position="DCS00024908" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024909" position="DCS00024909" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024910" position="DCS00024910" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024911" position="DCS00024911" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023480" position="DCS00023480" type_rev="EL1014 rev 0x00100000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023481" position="DCS00023481" type_rev="EL1014 rev 0x00100000"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-01:MOD1" PORT="DCS00024908" SCAN="1 second" name="ADC1"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-01:MOD2" PORT="DCS00024909" SCAN="1 second" name="ADC2"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-01:MOD3" PORT="DCS00024910" SCAN="1 second" name="ADC3"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-01:MOD4" PORT="DCS00024911" SCAN="1 second" name="ADC4"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-02:MOD1" PORT="DCS00024912" SCAN="1 second" name="ADC5"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-02:MOD2" PORT="DCS00024913" SCAN="1 second" name="ADC6"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-03:MOD1" PORT="DCS00024890" SCAN="1 second" name="ADC7"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-03:MOD2" PORT="DCS00024891" SCAN="1 second" name="ADC8"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-04:MOD1" PORT="DCS00024905" SCAN="1 second" name="ADC9"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-04:MOD2" PORT="DCS00025130" SCAN="1 second" name="ADC10"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-04:MOD3" PORT="DCS00026220" SCAN="1 second" name="ADC11"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-04:MOD4" PORT="DCS00026221" SCAN="1 second" name="ADC12"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-12:MOD1" PORT="DCS00026565" SCAN="1 second" name="ADC13"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-VA-ERIO-12:MOD2" PORT="DCS00026570" SCAN="1 second" name="ADC14"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-01:MOD5" PORT="DCS00023480" SCAN="I/O Intr" name="DIGI1"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-01:MOD6" PORT="DCS00023481" SCAN="I/O Intr" name="DIGI2"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-03:MOD1" PORT="DCS00025081" SCAN="I/O Intr" name="DIGI3"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-03:MOD2" PORT="DCS00025082" SCAN="I/O Intr" name="DIGI4"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-04:MOD1" PORT="DCS00025092" SCAN="I/O Intr" name="DIGI5"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-04:MOD2" PORT="DCS00025093" SCAN="I/O Intr" name="DIGI6"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-02:MOD3" PORT="DCS00023482" SCAN="I/O Intr" name="DIGI7"/>
+	<ethercat.auto_EL1014 DEVICE="BL21I-VA-ERIO-02:MOD4" PORT="DCS00023483" SCAN="I/O Intr" name="DIGI8"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-01:FANC-01" name="VAFAN1" rio_dinput="BL21I-VA-ERIO-01:MOD5:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-01:PSU-01" name="VAPSU1" rio_dinput="BL21I-VA-ERIO-01:MOD6:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-02:FANC-01" name="VAFAN2" rio_dinput="BL21I-VA-ERIO-01:MOD5:CHANNEL3:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-02:PSU-01" name="VAPSU2" rio_dinput="BL21I-VA-ERIO-01:MOD6:CHANNEL3:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-03:FANC-01" name="VAFAN3" rio_dinput="BL21I-VA-ERIO-02:MOD4:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-03:PSU-01" name="VAPSU3" rio_dinput="BL21I-VA-ERIO-02:MOD4:CHANNEL3:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-04:FANC-01" name="VAFAN4" rio_dinput="BL21I-VA-ERIO-03:MOD3:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-04:PSU-01" name="VAPSU4" rio_dinput="BL21I-VA-ERIO-03:MOD3:CHANNEL3:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-05:FANC-01" name="VAFAN5" rio_dinput="BL21I-VA-ERIO-04:MOD5:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-05:PSU-01" name="VAPSU5" rio_dinput="BL21I-VA-ERIO-04:MOD5:CHANNEL3:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-06:FANC-01" name="VAFAN6" rio_dinput="BL21I-VA-ERIO-04:MOD6:CHANNEL1:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-VA-RACK-06:PSU-01" name="VAPSU6" rio_dinput="BL21I-VA-ERIO-04:MOD6:CHANNEL3:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-PS-FANC-01" name="PSFAN1" rio_dinput="BL21I-VA-ERIO-01:MOD5:CHANNEL2:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-PS-PSU-01" name="PSPSU1" rio_dinput="BL21I-VA-ERIO-01:MOD6:CHANNEL2:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-PS-FANC-02" name="PSFAN2" rio_dinput="BL21I-VA-ERIO-01:MOD5:CHANNEL4:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-PS-PSU-02" name="PSPSU2" rio_dinput="BL21I-VA-ERIO-01:MOD6:CHANNEL4:INPUT"/>
+	<rackFan.rackFan_rio device="BL21I-NT-RACK-01:FANC-01" name="NTFAN1" rio_dinput="BL21I-VA-ERIO-02:MOD3:CHANNEL1:INPUT"/>
+	<!--<rackFan.rackFan_rio device="BL21I-NT-RACK-01:PSU-01" name="NTPSU1" rio_dinput="BL21I-VA-ERIO-02:MOD6:CHANNEL1:INPUT"/>-->
+	<rackFan.rackFan_rio device="BL21I-NT-RACK-02:FANC-01" name="NTFAN2" rio_dinput="BL21I-VA-ERIO-02:MOD3:CHANNEL3:INPUT"/>
+	<!--<rackFan.rackFan_rio device="BL21I-NT-RACK-02:PSU-01" name="NTPSU2" rio_dinput="BL21I-VA-ERIO-02:MOD6:CHANNEL3:INPUT"/>-->
+	<rackFan.rackFan_rio device="BL21I-NT-RACK-03:FANC-01" name="NTFAN3" rio_dinput="BL21I-VA-ERIO-02:MOD4:CHANNEL2:INPUT"/>
+	<!--<rackFan.rackFan_rio device="BL21I-NT-RACK-03:PSU-01" name="NTPSU3" rio_dinput="BL21I-VA-ERIO-02:MOD6:CHANNEL2:INPUT"/>-->
+	<!--<rackFan.rackFan_rio device="BL21I-MO-RACK-01:FANC-01" name="MOFAN1" rio_dinput="BL21I-VA-ERIO-02:MOD6:CHANNEL4:INPUT"/>-->
+	<!--<rackFan.rackFan_rio device="BL21I-MO-RACK-01:PSU-01" name="MOPSU1" rio_dinput="BL21I-VA-ERIO-02:MOD5:CHANNEL1:INPUT"/>-->
+	<rackFan.rackFan_rio device="BL21I-MO-RACK-02:FANC-01" name="MOFAN2" rio_dinput="BL21I-VA-ERIO-02:MOD4:CHANNEL4:INPUT"/>
+	<!--<rackFan.rackFan_rio device="BL21I-MO-RACK-02:PSU-01" name="MOPSU2" rio_dinput="BL21I-VA-ERIO-02:MOD5:CHANNEL3:INPUT"/>-->
+	<rackFan.rackFan_rio device="BL21I-MO-RACK-03:FANC-01" name="MOFAN3" rio_dinput="BL21I-VA-ERIO-02:MOD3:CHANNEL2:INPUT"/>
+	<!--<rackFan.rackFan_rio device="BL21I-MO-RACK-03:PSU-01" name="MOPSU3" rio_dinput="BL21I-VA-ERIO-02:MOD5:CHANNEL2:INPUT"/>-->
+	<rackFan.rackFan_rio device="BL21I-MO-RACK-04:FANC-01" name="MOFAN4" rio_dinput="BL21I-VA-ERIO-02:MOD3:CHANNEL4:INPUT"/>
+	<!--<rackFan.rackFan_rio device="BL21I-MO-RACK-04:PSU-01" name="MOPSU4" rio_dinput="BL21I-VA-ERIO-02:MOD5:CHANNEL4:INPUT"/>-->
+</components>

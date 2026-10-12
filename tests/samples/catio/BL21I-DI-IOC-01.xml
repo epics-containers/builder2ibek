@@ -1,0 +1,542 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_MAX_ARRAY_BYTES" name="EPICS_CA_MAX_ARRAY_BYTES" value="500000"/>
+	<autosave.Autosave bl="True" iocName="BL21I-DI-IOC-01" name="BL21I-DI-IOC-01.AUTOSAVE" path="/dls_sw/i21/epics/autosave"/>
+	<pvlogging.PvLogging access_file="/dls_sw/prod/R3.14.12.7/support/pvlogging/1-4/data/access.acf" name="DI1.PVLOGGING"/>
+	<BL21I.M4ADCSupport DESC="M4 Drain Current Synchronised Capture" GenADCPrefix="BL21I-MO-POD-01:FEMTO1:ADC101" PVTRIGGER="BL21I-OP-SHTR-01:STATUS" name="M4.DrainC1.Capture" prefix="BL21I-MO-POD-01:FEMTO1:ADC101_CAP"/>
+	<!--Selects which measurement mode to use, which will impact the fast shutter state (see i21 electrical drawing 1116266 page8 for detailed shutter driver configuration).
+
+If FSXAS is selected, the fast shutter is controlled directly through the ERIO signal (usually open), but the valve is shut to prevent the beam reaching the detector.
+If Primary (Andor Marana-X), Spare (iKon-L Andor1 or XCAM), Polarimeter-Pi (iKon-L Andor2) or Polarimeter-Sigma (iKon-L Andor3) is selected, the fast shutter is automatically shut to prevent light damaging the detector if not ready to receive it, but the valve is open to let the beam through when ready. Opening/closing of the fast shutter is then linked to the detector's own shutter control (defined by driver).
+The ERIO mode is used for continuous scanning of sensitive samples, where the fast shutter is controlled directly through the ERIO signal (usually open), but the valve is kept open to radiate the beam away from the sample.
+
+Fast shutter drive mode depends on the output values of BL21I-DI-ERIO-04, EL2124, Module.15, Outputs.1-4
+Fast shutter status comes from BL21I-DI-ERIO-05, EL1014 Module.7, Input.4-->
+	<BL21I.FS1Control ERIO_CTRL="@asyn(DCS00024867)Channel1.Output" POLPI_CTRL="BL21I-EA-DET-02:CAM:AndorShutterMode" POLSIGMA_CTRL="BL21I-EA-DET-04:CAM:AndorShutterMode" PRIMARY_CTRL="BL21I-EA-DET-01:CAM:AndorShutterMode" RL-AB_SWITCH="@asyn(DCS00024867)Channel3.Output" RL-C_SWITCH="@asyn(DCS00024867)Channel2.Output" RL-D_SWITCH="@asyn(DCS00024867)Channel4.Output" SPARE_CTRL="BL21I-EA-DET-05:CAM:ShutterMode" STATUS_IN="@asyn(DCS00026321)Channel4.Input" VALVE_CTRL="BL21I-VA-VALVE-17" name="FS1.Control" prefix="BL21I-OP-SHTR-01"/>
+	<BL21I.FeedbackAutoPv DESC="M1 and M2 Feedback Control" FEEDBACK_TIME="5" PULSE_DELAY="9" name="M1.FeedbackControl" prefix="BL21I-OP-MIRR-01:FBCTRL"/>
+	<BL21I.S2DiodeDifference FEMTO1="BL21I-AL-SLITS-02:FEMTO4" FEMTO2="BL21I-AL-SLITS-02:FEMTO3" MINVAL="0.0000000001" P="BL21I-AL-SLITS-02" PREC="6" R=":XDIFF"/>
+	<BL21I.DewarScales LH_CONV="8" LOAD_CELL_1="BL21I-DI-ERIO-04:MOD12:RMB:VALUE" LOAD_CELL_2="BL21I-DI-ERIO-04:MOD13:RMB:VALUE" LOAD_CELL_3="BL21I-DI-ERIO-04:MOD14:RMB:VALUE" LOAD_CELL_4="BL21I-DI-ERIO-04:MOD15:RMB:VALUE" SCALING="200" name="SMPL.SCALES" prefix="BL21I-EA-SMPL-01:SCALES"/>
+	<!--Synchronised capture of multiple PVs-->
+	<binPoints.BinPointAll DESCRIPTION="draincurent_i" P="BL21I-EA-SMPL-01:DC_S:" R="BPTS:" R1="DC:" R10LNK="" R10RSTLNK="" R11LNK="" R11RSTLNK="" R12LNK="" R12RSTLNK="" R2="DC_I:" R3="IDGAP:" R4="PGME:" R5="CUR_CAP:" R6="REQ_CAP:" R7LNK="" R7RSTLNK="" R8LNK="" R8RSTLNK="" R9LNK="" R9RSTLNK="" TRIGGER_PV_NAME="BL21I-EA-SMPL-01:FEMTO1:ADC_ACQ:MONITOR"/>
+	<!--DC_S: Draincurrent synchronised accumulation
+DF_S: Diff synchronised accumulation
+FYDx_S: FY Diode x synchronised accumulation
+
+Poor naming due to long PV lengths (need to modify binPoints template)-->
+	<binPoints.BinPointAll DESCRIPTION="diff_i" P="BL21I-EA-SMPL-01:DF_S:" R="BPTS:" R1="DFF:" R10LNK="" R10RSTLNK="" R11LNK="" R11RSTLNK="" R12LNK="" R12RSTLNK="" R2="DFF_I:" R3="IDGAP:" R4="PGME:" R5="CUR_CAP:" R6="REQ_CAP:" R7LNK="" R7RSTLNK="" R8LNK="" R8RSTLNK="" R9LNK="" R9RSTLNK="" TRIGGER_PV_NAME="BL21I-EA-SMPL-01:FEMTO6:ADC_ACQ:MONITOR"/>
+	<binPoints.BinPointAll DESCRIPTION="m4c1" P="BL21I-MO-POD-01:C1_S:" R="BPTS:" R1="M4C1:" R10LNK="" R10RSTLNK="" R11LNK="" R11RSTLNK="" R12LNK="" R12RSTLNK="" R2="M4C1_I:" R3="IDGAP:" R4="PGME:" R5="CUR_CAP:" R6="REQ_CAP:" R7LNK="" R7RSTLNK="" R8LNK="" R8RSTLNK="" R9LNK="" R9RSTLNK="" TRIGGER_PV_NAME="BL21I-MO-POD-01:FEMTO1:ADC_ACQ:MONITOR"/>
+	<binPoints.BinPointAll DESCRIPTION="fydiode2_i" P="BL21I-EA-SMPL-01:F2_S:" R="BPTS:" R1="FYD:" R10LNK="" R10RSTLNK="" R11LNK="" R11RSTLNK="" R12LNK="" R12RSTLNK="" R2="FYD_I:" R3="IDGAP:" R4="PGME:" R5="CUR_CAP:" R6="REQ_CAP:" R7LNK="" R7RSTLNK="" R8LNK="" R8RSTLNK="" R9LNK="" R9RSTLNK="" TRIGGER_PV_NAME="BL21I-EA-SMPL-01:FEMTO5:ADC_ACQ:MONITOR"/>
+	<!--Draincurrent capture-->
+	<binPoints.BinPoint DESCRIPTION="draincurrent" P="BL21I-EA-SMPL-01:DC_S:" R="DC:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO1:ADC2_VALUE"/>
+	<binPoints.BinPoint DESCRIPTION="draincurrent integral" P="BL21I-EA-SMPL-01:DC_S:" R="DC_I:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO1:ADC2_INTEGRAL"/>
+	<binPoints.BinPoint DESCRIPTION="ID gap" P="BL21I-EA-SMPL-01:DC_S:" R="IDGAP:" VALUE_PV_NAME="SR21I-MO-SERVC-01:CURRGAPD"/>
+	<binPoints.BinPoint DESCRIPTION="PGM energy" P="BL21I-EA-SMPL-01:DC_S:" R="PGME:" VALUE_PV_NAME="BL21I-OP-PGM-01:ENERGY.RBV"/>
+	<binPoints.BinPoint DESCRIPTION="Current capture count" P="BL21I-EA-SMPL-01:DC_S:" R="CUR_CAP:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO1:ADC_ACQ:CURR_CAPS"/>
+	<binPoints.BinPoint DESCRIPTION="Number to capture" P="BL21I-EA-SMPL-01:DC_S:" R="REQ_CAP:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO1:ADC_ACQ:REQ_CAPS"/>
+	<!--DFF Capture-->
+	<binPoints.BinPoint DESCRIPTION="diff" P="BL21I-EA-SMPL-01:DF_S:" R="DFF:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO6:ADC1_VALUE"/>
+	<binPoints.BinPoint DESCRIPTION="diff integral" P="BL21I-EA-SMPL-01:DF_S:" R="DFF_I:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO6:ADC1_INTEGRAL"/>
+	<binPoints.BinPoint DESCRIPTION="ID gap" P="BL21I-EA-SMPL-01:DF_S:" R="IDGAP:" VALUE_PV_NAME="SR21I-MO-SERVC-01:CURRGAPD"/>
+	<binPoints.BinPoint DESCRIPTION="PGM energy" P="BL21I-EA-SMPL-01:DF_S:" R="PGME:" VALUE_PV_NAME="BL21I-OP-PGM-01:ENERGY.RBV"/>
+	<binPoints.BinPoint DESCRIPTION="Current capture count" P="BL21I-EA-SMPL-01:DF_S:" R="CUR_CAP:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO6:ADC_ACQ:CURR_CAPS"/>
+	<binPoints.BinPoint DESCRIPTION="Number to capture" P="BL21I-EA-SMPL-01:DF_S:" R="REQ_CAP:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO6:ADC_ACQ:REQ_CAPS"/>
+	<!--M4C1 Capture
+i.e. M4 drain current femto 1-->
+	<binPoints.BinPoint DESCRIPTION="m4c1" P="BL21I-MO-POD-01:C1_S:" R="M4C1:" VALUE_PV_NAME="BL21I-MO-POD-01:FEMTO1:ADC101_VALUE"/>
+	<binPoints.BinPoint DESCRIPTION="m4c1 integral" P="BL21I-MO-POD-01:C1_S:" R="M4C1_I:" VALUE_PV_NAME="BL21I-MO-POD-01:FEMTO1:ADC101_INTEGRAL"/>
+	<binPoints.BinPoint DESCRIPTION="ID gap" P="BL21I-MO-POD-01:C1_S:" R="IDGAP:" VALUE_PV_NAME="SR21I-MO-SERVC-01:CURRGAPD"/>
+	<binPoints.BinPoint DESCRIPTION="PGM energy" P="BL21I-MO-POD-01:C1_S:" R="PGME:" VALUE_PV_NAME="BL21I-OP-PGM-01:ENERGY.RBV"/>
+	<binPoints.BinPoint DESCRIPTION="Current capture count" P="BL21I-MO-POD-01:C1_S:" R="CUR_CAP:" VALUE_PV_NAME="BL21I-MO-POD-01:FEMTO1:ADC_ACQ:CURR_CAPS"/>
+	<binPoints.BinPoint DESCRIPTION="Number to capture" P="BL21I-MO-POD-01:C1_S:" R="REQ_CAP:" VALUE_PV_NAME="BL21I-MO-POD-01:FEMTO1:ADC_ACQ:REQ_CAPS"/>
+	<!--FY Diode 2 capture-->
+	<binPoints.BinPoint DESCRIPTION="FY diode 2 current" P="BL21I-EA-SMPL-01:F2_S:" R="FYD:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO5:ADC2_VALUE"/>
+	<binPoints.BinPoint DESCRIPTION="FY diode 2 integral" P="BL21I-EA-SMPL-01:F2_S:" R="FYD_I:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO5:ADC2_INTEGRAL"/>
+	<binPoints.BinPoint DESCRIPTION="ID gap" P="BL21I-EA-SMPL-01:F2_S:" R="IDGAP:" VALUE_PV_NAME="SR21I-MO-SERVC-01:CURRGAPD"/>
+	<binPoints.BinPoint DESCRIPTION="PGM energy" P="BL21I-EA-SMPL-01:F2_S:" R="PGME:" VALUE_PV_NAME="BL21I-OP-PGM-01:ENERGY.RBV"/>
+	<binPoints.BinPoint DESCRIPTION="Current capture count" P="BL21I-EA-SMPL-01:F2_S:" R="CUR_CAP:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO5:ADC_ACQ:CURR_CAPS"/>
+	<binPoints.BinPoint DESCRIPTION="Number to capture" P="BL21I-EA-SMPL-01:F2_S:" R="REQ_CAP:" VALUE_PV_NAME="BL21I-EA-SMPL-01:FEMTO5:ADC_ACQ:REQ_CAPS"/>
+	<!--These loop triggers are used by GDA to accumulate a particular number of ADC samples.-->
+	<BL21I.ADCAcquisition ADC_PREFIX="BL21I-EA-SMPL-01:FEMTO1:ADC2" P="BL21I-EA-SMPL-01:FEMTO1:" R="ADC_ACQ:"/>
+	<BL21I.ADCAcquisition ADC_PREFIX="BL21I-EA-SMPL-01:FEMTO6:ADC1" P="BL21I-EA-SMPL-01:FEMTO6:" R="ADC_ACQ:"/>
+	<BL21I.ADCAcquisition ADC_PREFIX="BL21I-MO-POD-01:FEMTO1:ADC101" P="BL21I-MO-POD-01:FEMTO1:" R="ADC_ACQ:"/>
+	<BL21I.ADCAcquisition ADC_PREFIX="BL21I-EA-SMPL-01:FEMTO5:ADC2" P="BL21I-EA-SMPL-01:FEMTO5:" R="ADC_ACQ:"/>
+	<BL21I.ADCAcquisitionGroup ADCAcq_PREFIX1="BL21I-EA-SMPL-01:FEMTO1:ADC_ACQ:" ADCAcq_PREFIX2="BL21I-EA-SMPL-01:FEMTO6:ADC_ACQ:" ADCAcq_PREFIX3="BL21I-MO-POD-01:FEMTO1:ADC_ACQ:" ADCAcq_PREFIX4="BL21I-EA-SMPL-01:FEMTO5:ADC_ACQ:" ADC_PREFIX1="BL21I-EA-SMPL-01:FEMTO1:ADC2" ADC_PREFIX2="BL21I-EA-SMPL-01:FEMTO6:ADC1" ADC_PREFIX3="BL21I-MO-POD-01:FEMTO1:ADC101" ADC_PREFIX4="BL21I-EA-SMPL-01:FEMTO5:ADC2" BPT_PREFIX1="BL21I-EA-SMPL-01:DC_S:BPTS:BINPOINTALL:" BPT_PREFIX2="BL21I-EA-SMPL-01:DF_S:BPTS:BINPOINTALL:" BPT_PREFIX3="BL21I-MO-POD-01:C1_S:BPTS:BINPOINTALL:" BPT_PREFIX4="BL21I-EA-SMPL-01:F2_S:BPTS:BINPOINTALL:" P="BL21I-EA-SMPL-01:" R="ADC_ACQ_GRP:"/>
+	<devIocStats.devIocStatsHelper ioc="BL21I-DI-IOC-01" name="BL21I-DI-IOC-01.DEVIOCSTATS"/>
+	<ethercat.EthercatMaster max_message="200000" name="ECATM" socket="/tmp/socket0"/>
+	<!--Start of BL21I-DI-ERIO-05 Spetrometer hall rail 1-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026299" position="DCS00026299" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026199" position="DCS00026199" type_rev="EK1122 rev 0x00120000"/>
+	<!--Start of BL21I-DI-ERIO-05 Spetrometer hall rail 1
+See electrical drawing 1116266-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026293" position="DCS00026293" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026381" position="DCS00026381" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026382" position="DCS00026382" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026258" position="DCS00026258" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026259" position="DCS00026259" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023720" position="DCS00023720" type_rev="EL3602 rev 0x00100000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026320" position="DCS00026320" type_rev="EL1014 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026321" position="DCS00026321" type_rev="EL1014 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026210" position="DCS00026210" type_rev="EL2595 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026211" position="DCS00026211" type_rev="EL2595 rev 0x00130000"/>
+	<!--<ethercat.EthercatSlave master="ECATM" name="DCS00026212" position="DCS00026212" type_rev="EL2595 rev 0x00130000"/>-->
+	<!--<ethercat.EthercatSlave master="ECATM" name="DCS00026213" position="DCS00026213" type_rev="EL2595 rev 0x00130000"/>-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026672" position="DCS00026672" type_rev="EL9512 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026706" position="DCS00026706" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026707" position="DCS00026707" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026708" position="DCS00026708" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026709" position="DCS00026709" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026710" position="DCS00026710" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026711" position="DCS00026711" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<!--Start of BL21I-DI-ERIO-04 Spetrometer hall rail 2-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026292" position="DCS00026292" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026377" position="DCS00026377" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026380" position="DCS00026380" type_rev="EL3602 rev 0x00120000"/>
+	<!--<ethercat.EthercatSlave master="ECATM" name="DCS00024971" position="DCS00024971" type_rev="EL2595 rev 0x00120000"/>-->
+	<!--<ethercat.EthercatSlave master="ECATM" name="DCS00024972" position="DCS00024972" type_rev="EL2595 rev 0x00120000"/>-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024973" position="DCS00024973" type_rev="EL2595 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026214" position="DCS00026214" type_rev="EL2595 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026673" position="DCS00026673" type_rev="EL9512 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026712" position="DCS00026712" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026714" position="DCS00026714" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026713" position="DCS00026713" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026913" position="DCS00026913" type_rev="EL9510 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026910" position="DCS00026910" type_rev="EL3356-0010 rev 0x0018000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026911" position="DCS00026911" type_rev="EL3356-0010 rev 0x0018000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026977" position="DCS00026977" type_rev="EL3356-0010 rev 0x0019000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026971" position="DCS00026971" type_rev="EL3356-0010 rev 0x0019000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024957" position="DCS00024957" type_rev="EL9505 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024867" position="DCS00024867" type_rev="EL2124 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026627" position="DCS00026627" type_rev="EL2124 rev 0x00110000"/>
+	<!--Start of BL21I-DI-ERIO-09 Spectrometer hall 2 Rail 2-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026539" position="DCS00026539" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026674" position="DCS00026674" type_rev="EL9512 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026715" position="DCS00026715" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026716" position="DCS00026716" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026717" position="DCS00026717" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026718" position="DCS00026718" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026719" position="DCS00026719" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026720" position="DCS00026720" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<!--Start of BL21I-DI-ERIO-08 Spectrometer hall 2 Rail 1-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026540" position="DCS00026540" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026579" position="DCS00026579" type_rev="EL3602 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026580" position="DCS00026580" type_rev="EL3602 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026581" position="DCS00026581" type_rev="EL3602 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026582" position="DCS00026582" type_rev="EL3602 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026583" position="DCS00026583" type_rev="EL3602 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026584" position="DCS00026584" type_rev="EL3602 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026585" position="DCS00026585" type_rev="EL3602 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026441" position="DCS00026441" type_rev="EK1122 rev 0x00120000"/>
+	<!--Start of BL21I-DI-ERIO-01 OH1 Modules-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024927" position="DCS00024927" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023938" position="DCS00023938" type_rev="EK1122 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024933" position="DCS00024933" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024797" position="DCS00024797" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024798" position="DCS00024798" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024817" position="DCS00024817" type_rev="EL4134 rev 0x03fa0000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024652" position="DCS00024652" type_rev="EL2024 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024965" position="DCS00024965" type_rev="EL2595 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024966" position="DCS00024966" type_rev="EL2595 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023939" position="DCS00023939" type_rev="EK1122 rev 0x00110000"/>
+	<!--Start of BL21I-DI-ERIO-02 OH2 Modules-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024941" position="DCS00024941" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025131" position="DCS00025131" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025132" position="DCS00025132" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025133" position="DCS00025133" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025134" position="DCS00025134" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00025135" position="DCS00025135" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026270" position="DCS00026270" type_rev="EL4134 rev 0x03fa0000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024967" position="DCS00024967" type_rev="EL2595 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024778" position="DCS00024778" type_rev="EL2595 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026671" position="DCS00026671" type_rev="EL9512 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026696" position="DCS00026696" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026697" position="DCS00026697" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026698" position="DCS00026698" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026699" position="DCS00026699" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026700" position="DCS00026700" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026701" position="DCS00026701" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026702" position="DCS00026702" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026703" position="DCS00026703" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026704" position="DCS00026704" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026705" position="DCS00026705" type_rev="EL2024-0010 rev 0x0012000a"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023940" position="DCS00023940" type_rev="EK1122 rev 0x00110000"/>
+	<!--Start of BL21I-DI-ERIO-03 OC1 Modules-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024940" position="DCS00024940" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024799" position="DCS00024799" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024800" position="DCS00024800" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024801" position="DCS00024801" type_rev="EL3602 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024549" position="DCS00024549" type_rev="EL3124 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024653" position="DCS00024653" type_rev="EL2024 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024654" position="DCS00024654" type_rev="EL2024 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024668" position="DCS00024668" type_rev="EL2024 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024669" position="DCS00024669" type_rev="EL2024 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024670" position="DCS00024670" type_rev="EL2024 rev 0x00110000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00024782" position="DCS00024782" type_rev="EL2595 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023941" position="DCS00023941" type_rev="EK1122 rev 0x00110000"/>
+	<!--Trailing Coupler (probably from first module (dunno))-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00023942" position="DCS00023942" type_rev="EK1122 rev 0x00110000"/>
+	<!--Start of BL21I-DI-ERIO-10 Lab 10 Area Modules-->
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026726" position="DCS00026726" type_rev="EK1100 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026416" position="DCS00026416" type_rev="EL3104 rev 0x00120000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026553" position="DCS00026553" type_rev="EL3104 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026554" position="DCS00026554" type_rev="EL3104 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026555" position="DCS00026555" type_rev="EL3104 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026556" position="DCS00026556" type_rev="EL3104 rev 0x00130000"/>
+	<ethercat.EthercatSlave master="ECATM" name="DCS00026557" position="DCS00026557" type_rev="EL3104 rev 0x00130000"/>
+	<ethercat.SdoControl index="32768" name="SDO.LED1" slave="DCS00024966"/>
+	<ethercat.SdoControl index="32768" name="SDO.LED2" slave="DCS00024778"/>
+	<ethercat.SdoControl index="32768" name="SDO.LED3" slave="DCS00024967"/>
+	<ethercat.SdoControl index="32768" name="SDO.LED4" slave="DCS00024973"/>
+	<ethercat.SdoEntryControl asynparameter="voltage" bit_length="16" description="Output Voltage" name="SDO.LED1.1" parentsdo="SDO.LED1" subindex="4"/>
+	<ethercat.SdoEntryControl asynparameter="svoltage" bit_length="16" description="Supply Voltage" name="SDO.LED1.2" parentsdo="SDO.LED1" subindex="3"/>
+	<ethercat.SdoEntryControl asynparameter="holdcurrent" bit_length="16" description="Hold Current" name="SDO.LED1.3" parentsdo="SDO.LED1" subindex="2"/>
+	<ethercat.SdoEntryControl asynparameter="swarnlevel" bit_length="8" description="Warning Level (supply)" name="SDO.LED1.4" parentsdo="SDO.LED1" subindex="17"/>
+	<ethercat.SdoEntryControl asynparameter="serrorlevel" bit_length="8" description="Error Level (supply)" name="SDO.LED1.5" parentsdo="SDO.LED1" subindex="18"/>
+	<ethercat.SdoEntryControl asynparameter="outwarnlevel" bit_length="8" description="Warning Level (output)" name="SDO.LED1.6" parentsdo="SDO.LED1" subindex="19"/>
+	<ethercat.SdoEntryControl asynparameter="outerrorlevel" bit_length="8" description="Error Level (output)" name="SDO.LED1.7" parentsdo="SDO.LED1" subindex="20"/>
+	<ethercat.SdoEntryControl asynparameter="voltage" bit_length="16" description="Output Voltage" name="SDO.LED2.1" parentsdo="SDO.LED2" subindex="4"/>
+	<ethercat.SdoEntryControl asynparameter="svoltage" bit_length="16" description="Supply Voltage" name="SDO.LED2.2" parentsdo="SDO.LED2" subindex="3"/>
+	<ethercat.SdoEntryControl asynparameter="holdcurrent" bit_length="16" description="Hold Current" name="SDO.LED2.3" parentsdo="SDO.LED2" subindex="2"/>
+	<ethercat.SdoEntryControl asynparameter="swarnlevel" bit_length="8" description="Warning Level (supply)" name="SDO.LED2.4" parentsdo="SDO.LED2" subindex="17"/>
+	<ethercat.SdoEntryControl asynparameter="serrorlevel" bit_length="8" description="Error Level (supply)" name="SDO.LED2.5" parentsdo="SDO.LED2" subindex="18"/>
+	<ethercat.SdoEntryControl asynparameter="outwarnlevel" bit_length="8" description="Warning Level (output)" name="SDO.LED2.6" parentsdo="SDO.LED2" subindex="19"/>
+	<ethercat.SdoEntryControl asynparameter="outerrorlevel" bit_length="8" description="Error Level (output)" name="SDO.LED2.7" parentsdo="SDO.LED2" subindex="20"/>
+	<ethercat.SdoEntryControl asynparameter="voltage" bit_length="16" description="Output Voltage" name="SDO.LED3.1" parentsdo="SDO.LED3" subindex="4"/>
+	<ethercat.SdoEntryControl asynparameter="svoltage" bit_length="16" description="Supply Voltage" name="SDO.LED3.2" parentsdo="SDO.LED3" subindex="3"/>
+	<ethercat.SdoEntryControl asynparameter="holdcurrent" bit_length="16" description="Hold Current" name="SDO.LED3.3" parentsdo="SDO.LED3" subindex="2"/>
+	<ethercat.SdoEntryControl asynparameter="swarnlevel" bit_length="8" description="Warning Level (supply)" name="SDO.LED3.4" parentsdo="SDO.LED3" subindex="17"/>
+	<ethercat.SdoEntryControl asynparameter="serrorlevel" bit_length="8" description="Error Level (supply)" name="SDO.LED3.5" parentsdo="SDO.LED3" subindex="18"/>
+	<ethercat.SdoEntryControl asynparameter="outwarnlevel" bit_length="8" description="Warning Level (output)" name="SDO.LED3.6" parentsdo="SDO.LED3" subindex="19"/>
+	<ethercat.SdoEntryControl asynparameter="outerrorlevel" bit_length="8" description="Error Level (output)" name="SDO.LED3.7" parentsdo="SDO.LED3" subindex="20"/>
+	<ethercat.SdoEntryControl asynparameter="voltage" bit_length="16" description="Output Voltage" name="SDO.LED4.1" parentsdo="SDO.LED4" subindex="4"/>
+	<ethercat.SdoEntryControl asynparameter="svoltage" bit_length="16" description="Supply Voltage" name="SDO.LED4.2" parentsdo="SDO.LED4" subindex="3"/>
+	<ethercat.SdoEntryControl asynparameter="holdcurrent" bit_length="16" description="Hold Current" name="SDO.LED4.3" parentsdo="SDO.LED4" subindex="2"/>
+	<ethercat.SdoEntryControl asynparameter="swarnlevel" bit_length="8" description="Warning Level (supply)" name="SDO.LED4.4" parentsdo="SDO.LED4" subindex="17"/>
+	<ethercat.SdoEntryControl asynparameter="serrorlevel" bit_length="8" description="Error Level (supply)" name="SDO.LED4.5" parentsdo="SDO.LED4" subindex="18"/>
+	<ethercat.SdoEntryControl asynparameter="outwarnlevel" bit_length="8" description="Warning Level (output)" name="SDO.LED4.6" parentsdo="SDO.LED4" subindex="19"/>
+	<ethercat.SdoEntryControl asynparameter="outerrorlevel" bit_length="8" description="Error Level (output)" name="SDO.LED4.7" parentsdo="SDO.LED4" subindex="20"/>
+	<!--DEVICE="SDO.LED1.1"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-01" PARAM="voltage" PORT="DCS00024966_SDO" R=":VOLTAGE" name="D1.LedSdo.1"/>
+	<!--DEVICE="SDO.LED1.2"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-01" PARAM="svoltage" PORT="DCS00024966_SDO" R=":SVOLTAGE" name="D1.LedSdo.2"/>
+	<!--DEVICE="SDO.LED1.3"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-01" PARAM="holdcurrent" PORT="DCS00024966_SDO" R=":HOLDCURR" name="D1.LedSdo.3"/>
+	<!--DEVICE="SDO.LED1.4"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-01" PARAM="swarnlevel" PORT="DCS00024966_SDO" R=":SUPWARNLVL" name="D1.LedSdo.4"/>
+	<!--DEVICE="SDO.LED1.5"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-01" PARAM="serrorlevel" PORT="DCS00024966_SDO" R=":SUPERRORLVL" name="D1.LedSdo.5"/>
+	<!--DEVICE="SDO.LED1.6"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-01" PARAM="outwarnlevel" PORT="DCS00024966_SDO" R=":OUTWARNLVL" name="D1.LedSdo.6"/>
+	<!--DEVICE="SDO.LED1.7"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-01" PARAM="outerrorlevel" PORT="DCS00024966_SDO" R=":OUTERRORLVL" name="D1.LedSdo.7"/>
+	<!--DEVICE="SDO.LED2.1"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-02" PARAM="voltage" PORT="DCS00024778_SDO" R=":VOLTAGE" name="D2.LedSdo.1"/>
+	<!--DEVICE="SDO.LED2.2"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-02" PARAM="svoltage" PORT="DCS00024778_SDO" R=":SVOLTAGE" name="D2.LedSdo.2"/>
+	<!--DEVICE="SDO.LED2.3"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-02" PARAM="holdcurrent" PORT="DCS00024778_SDO" R=":HOLDCURR" name="D2.LedSdo.3"/>
+	<!--DEVICE="SDO.LED2.4"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-02" PARAM="swarnlevel" PORT="DCS00024778_SDO" R=":SUPWARNLVL" name="D2.LedSdo.4"/>
+	<!--DEVICE="SDO.LED2.5"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-02" PARAM="serrorlevel" PORT="DCS00024778_SDO" R=":SUPERRORLVL" name="D2.LedSdo.5"/>
+	<!--DEVICE="SDO.LED2.6"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-02" PARAM="outwarnlevel" PORT="DCS00024778_SDO" R=":OUTWARNLVL" name="D2.LedSdo.6"/>
+	<!--DEVICE="SDO.LED2.7"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-02" PARAM="outerrorlevel" PORT="DCS00024778_SDO" R=":OUTERRORLVL" name="D2.LedSdo.7"/>
+	<!--DEVICE="SDO.LED3.1"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-03" PARAM="voltage" PORT="DCS00024967_SDO" R=":VOLTAGE" name="D3A.LedSdo.1"/>
+	<!--DEVICE="SDO.LED3.2"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-03" PARAM="svoltage" PORT="DCS00024967_SDO" R=":SVOLTAGE" name="D3A.LedSdo.2"/>
+	<!--DEVICE="SDO.LED3.3"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-03" PARAM="holdcurrent" PORT="DCS00024967_SDO" R=":HOLDCURR" name="D3A.LedSdo.3"/>
+	<!--DEVICE="SDO.LED3.4"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-03" PARAM="swarnlevel" PORT="DCS00024967_SDO" R=":SUPWARNLVL" name="D3A.LedSdo.4"/>
+	<!--DEVICE="SDO.LED3.5"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-03" PARAM="serrorlevel" PORT="DCS00024967_SDO" R=":SUPERRORLVL" name="D3A.LedSdo.5"/>
+	<!--DEVICE="SDO.LED3.6"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-03" PARAM="outwarnlevel" PORT="DCS00024967_SDO" R=":OUTWARNLVL" name="D3A.LedSdo.6"/>
+	<!--DEVICE="SDO.LED3.7"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-03" PARAM="outerrorlevel" PORT="DCS00024967_SDO" R=":OUTERRORLVL" name="D3A.LedSdo.7"/>
+	<!--DEVICE="SDO.LED4.1"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-04" PARAM="voltage" PORT="DCS00024973_SDO" R=":VOLTAGE" name="FS1.LedSdo.1"/>
+	<!--DEVICE="SDO.LED4.2"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-04" PARAM="svoltage" PORT="DCS00024973_SDO" R=":SVOLTAGE" name="FS1.LedSdo.2"/>
+	<!--DEVICE="SDO.LED4.3"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-04" PARAM="holdcurrent" PORT="DCS00024973_SDO" R=":HOLDCURR" name="FS1.LedSdo.3"/>
+	<!--DEVICE="SDO.LED4.4"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-04" PARAM="swarnlevel" PORT="DCS00024973_SDO" R=":SUPWARNLVL" name="FS1.LedSdo.4"/>
+	<!--DEVICE="SDO.LED4.5"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-04" PARAM="serrorlevel" PORT="DCS00024973_SDO" R=":SUPERRORLVL" name="FS1.LedSdo.5"/>
+	<!--DEVICE="SDO.LED4.6"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-04" PARAM="outwarnlevel" PORT="DCS00024973_SDO" R=":OUTWARNLVL" name="FS1.LedSdo.6"/>
+	<!--DEVICE="SDO.LED4.7"-->
+	<ethercat.SdoEntryTemplate P="BL21I-EA-LED-04" PARAM="outerrorlevel" PORT="DCS00024973_SDO" R=":OUTERRORLVL" name="FS1.LedSdo.7"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-DI-ERIO-10:MOD1" PORT="DCS00026416" SCAN="I/O Intr" name="HLS_AI1"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-DI-ERIO-10:MOD2" PORT="DCS00026553" SCAN="I/O Intr" name="HLS_AI2"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-DI-ERIO-10:MOD3" PORT="DCS00026554" SCAN="I/O Intr" name="HLS_AI3"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-DI-ERIO-10:MOD4" PORT="DCS00026555" SCAN="I/O Intr" name="HLS_AI4"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-DI-ERIO-10:MOD5" PORT="DCS00026556" SCAN="I/O Intr" name="HLS_AI5"/>
+	<ethercat.auto_EL3104 DEVICE="BL21I-DI-ERIO-10:MOD6" PORT="DCS00026557" SCAN="I/O Intr" name="HLS_AI6"/>
+	<ethercat.auto_EL2595 DEVICE="BL21I-DI-LED-01" DRVH="200" DRVL="0" PORT="DCS00024966" SCAN="1 second" label="D1 Backlight LED" name="D1.Led"/>
+	<ethercat.auto_EL2595 DEVICE="BL21I-DI-LED-02" DRVH="200" DRVL="0" PORT="DCS00024778" SCAN="1 second" label="D2 Backlight LED" name="D2.Led"/>
+	<ethercat.auto_EL2595 DEVICE="BL21I-DI-LED-03" DRVH="200" DRVL="0" PORT="DCS00024967" SCAN="1 second" label="D3A Backlight LED" name="D3A.Led"/>
+	<ethercat.auto_EL2595 DEVICE="BL21I-OP-LED-01" DRVH="20" DRVL="0" PORT="DCS00024973" SCAN="1 second" label="FS1 Indicator LED" name="FS1.Led"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD6" PORT="DCS00026696" SCAN="I/O Intr" name="DIG01"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD7" PORT="DCS00026697" SCAN="I/O Intr" name="DIG02"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD8" PORT="DCS00026698" SCAN="I/O Intr" name="DIG03"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD9" PORT="DCS00026699" SCAN="I/O Intr" name="DIG04"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD10" PORT="DCS00026700" SCAN="I/O Intr" name="DIG05"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD11" PORT="DCS00026701" SCAN="I/O Intr" name="DIG06"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD12" PORT="DCS00026702" SCAN="I/O Intr" name="DIG07"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD13" PORT="DCS00026703" SCAN="I/O Intr" name="DIG08"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD14" PORT="DCS00026704" SCAN="I/O Intr" name="DIG09"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD15" PORT="DCS00026705" SCAN="I/O Intr" name="DIG10"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD16" PORT="DCS00024653" SCAN="I/O Intr" name="DIG11"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD17" PORT="DCS00024654" SCAN="I/O Intr" name="DIG12"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD18" PORT="DCS00024668" SCAN="I/O Intr" name="DIG13"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD19" PORT="DCS00024669" SCAN="I/O Intr" name="DIG14"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-01:MOD20" PORT="DCS00024670" SCAN="I/O Intr" name="DIG15"/>
+	<!--<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-04:MOD3" PORT="DCS00026706" SCAN="I/O Intr" name="DIG16"/>-->
+	<!--<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-04:MOD4" PORT="DCS00026707" SCAN="I/O Intr" name="DIG17"/>-->
+	<!--<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-04:MOD5" PORT="DCS00026708" SCAN="I/O Intr" name="DIG18"/>-->
+	<!--<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-04:MOD6" PORT="DCS00026709" SCAN="I/O Intr" name="DIG19"/>-->
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-04:MOD3" PORT="DCS00026712" SCAN="I/O Intr" name="DIG20"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-04:MOD4" PORT="DCS00026714" SCAN="I/O Intr" name="DIG21"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-04:MOD5" PORT="DCS00026713" SCAN="I/O Intr" name="DIG22"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-05:MODSAM3" PORT="DCS00026706" SCAN="I/O Intr" name="DIG23"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-05:MODSAM4" PORT="DCS00026707" SCAN="I/O Intr" name="DIG24"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-05:MODSAM5" PORT="DCS00026708" SCAN="I/O Intr" name="DIG25"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-05:MODSAM6" PORT="DCS00026709" SCAN="I/O Intr" name="DIG26"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-09:MOD1" PORT="DCS00026715" SCAN="I/O Intr" name="DIG27"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-09:MOD2" PORT="DCS00026716" SCAN="I/O Intr" name="DIG28"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-09:MOD3" PORT="DCS00026717" SCAN="I/O Intr" name="DIG29"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-09:MOD4" PORT="DCS00026718" SCAN="I/O Intr" name="DIG30"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-09:MOD5" PORT="DCS00026719" SCAN="I/O Intr" name="DIG31"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-09:MOD6" PORT="DCS00026720" SCAN="I/O Intr" name="DIG32"/>
+	<ethercat.auto_EL2024_0010 DEVICE="BL21I-DI-ERIO-05:MODSAM7" PORT="DCS00026710" SCAN="I/O Intr" name="DIG33"/>
+	<ethercat.auto_EL4134 DEVICE="BL21I-MO-PIEZO-01" PORT="DCS00024817" SCAN="I/O Intr" name="M1.Piezo"/>
+	<ethercat.auto_EL4134 DEVICE="BL21I-MO-PIEZO-02" PORT="DCS00026270" SCAN="I/O Intr" name="M2.Piezo"/>
+	<!--<ethercat.auto_EL1014 DEVICE="BL21I-DI-ERIO-05:MOD6" PORT="DCS00026320" SCAN="I/O Intr" name="digsw01"/>-->
+	<!--<ethercat.auto_EL1014 DEVICE="BL21I-DI-ERIO-05:MOD7" PORT="DCS00026321" SCAN="I/O Intr" name="digsw02"/>-->
+	<ethercat.auto_EL3356_0010 DEVICE="BL21I-DI-ERIO-04:MOD12" PORT="DCS00026910" SCAN="I/O Intr" name="SCALES1"/>
+	<ethercat.auto_EL3356_0010 DEVICE="BL21I-DI-ERIO-04:MOD13" PORT="DCS00026911" SCAN="I/O Intr" name="SCALES2"/>
+	<ethercat.auto_EL3356_0010 DEVICE="BL21I-DI-ERIO-04:MOD14" PORT="DCS00026977" SCAN="I/O Intr" name="SCALES3"/>
+	<ethercat.auto_EL3356_0010 DEVICE="BL21I-DI-ERIO-04:MOD15" PORT="DCS00026971" SCAN="I/O Intr" name="SCALES4"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-AL-SLITS-02:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00025131" SAMPLES="100" SCAN="I/O Intr" name="S2.FemtoUpper_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-AL-SLITS-02:FEMTO2" INTSCAN="I/O Intr" PORT="DCS00025131" SAMPLES="100" SCAN="I/O Intr" name="S2.FemtoLower_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-AL-SLITS-02:FEMTO3" INTSCAN="I/O Intr" PORT="DCS00025132" SAMPLES="100" SCAN="I/O Intr" name="S2.FemtoNearside_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-AL-SLITS-02:FEMTO4" INTSCAN="I/O Intr" PORT="DCS00025132" SAMPLES="100" SCAN="I/O Intr" name="S2.FemtoOffside_Avg"/>
+	<!--<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-DI-PHGDA-03:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00025133" SAMPLES="100" SCAN="I/O Intr" name="D3A.Femto1_Avg"/>-->
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-DI-PHGDB-03:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00025133" SAMPLES="100" SCAN="I/O Intr" name="D3B.Femto1_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-AL-SLITS-03:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00025134" SAMPLES="100" SCAN="I/O Intr" name="S3.FemtoUpper_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-AL-SLITS-03:FEMTO2" INTSCAN="I/O Intr" PORT="DCS00025134" SAMPLES="100" SCAN="I/O Intr" name="S3.FemtoLower_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-AL-SLITS-03:FEMTO3" INTSCAN="I/O Intr" PORT="DCS00025135" SAMPLES="100" SCAN="I/O Intr" name="S3.FemtoOffside_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-AL-SLITS-03:FEMTO4" INTSCAN="I/O Intr" PORT="DCS00025135" SAMPLES="100" SCAN="I/O Intr" name="S3.FemtoNearside_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-DI-GAS-01:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00026377" SAMPLES="100" SCAN="I/O Intr" name="D7.GasCellWire_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-DI-GAS-01:FEMTO2" INTSCAN="I/O Intr" PORT="DCS00026377" SAMPLES="100" SCAN="I/O Intr" name="D7.GasCellPhotoDiode_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-OP-PGM-01:CHILLER1" INTSCAN="I/O Intr" PORT="DCS00024549" SAMPLES="100" SCAN="I/O Intr" name="PGM.ChillerPressure1"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-OP-PGM-01:CHILLER2" INTSCAN="I/O Intr" PORT="DCS00024549" SAMPLES="100" SCAN="I/O Intr" name="PGM.ChillerPressure2"/>
+	<ethercat.GenericADCTemplate CHANNEL="101" DEVICE="BL21I-MO-POD-01:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00026381" SAMPLES="100" SCAN="I/O Intr" name="M4.DrainC1.Avg"/>
+	<!--101 and 102 refer to the same ERIO input; I have added two samplers for this.-->
+	<ethercat.GenericADCTemplate CHANNEL="102" DEVICE="BL21I-MO-POD-01:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00026381" SAMPLES="100" SCAN="I/O Intr" name="M4.DrainC1.Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-MO-POD-01:FEMTO2" INTSCAN="I/O Intr" PORT="DCS00026381" SAMPLES="100" SCAN="I/O Intr" name="M4.DrainC2_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-DI-PHDGN-08:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00026382" SAMPLES="100" SCAN="I/O Intr" name="D8.Diode_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-OP-MIRR-01:HVPSU" INTSCAN="I/O Intr" PORT="DCS00024797" SAMPLES="1000" SCAN="I/O Intr" name="M1x.HvPsu_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-OP-MIRR-02:HVPSU" INTSCAN="I/O Intr" PORT="DCS00025133" SAMPLES="1000" SCAN="I/O Intr" name="M2x.HvPsu_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-OP-PGM-01:HVPSU" INTSCAN="I/O Intr" PORT="DCS00024801" SAMPLES="1000" SCAN="I/O Intr" name="PGMx.HvPsu_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-EA-SMPL-01:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00026382" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.Drain_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="202" DEVICE="BL21I-EA-SMPL-01:FEMTO1" INTSCAN="I/O Intr" PORT="DCS00026382" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.Drain_Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-EA-SMPL-01:FEMTO2" INTSCAN="I/O Intr" PORT="DCS00026579" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.FY1_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="102" DEVICE="BL21I-EA-SMPL-01:FEMTO2" INTSCAN="I/O Intr" PORT="DCS00026579" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.FY1_Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-EA-SMPL-01:FEMTO3" INTSCAN="I/O Intr" PORT="DCS00026579" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.FY3_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="202" DEVICE="BL21I-EA-SMPL-01:FEMTO3" INTSCAN="I/O Intr" PORT="DCS00026579" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.FY3_Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-EA-SMPL-01:FEMTO4" INTSCAN="I/O Intr" PORT="DCS00026580" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.Diff3_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="102" DEVICE="BL21I-EA-SMPL-01:FEMTO4" INTSCAN="I/O Intr" PORT="DCS00026580" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.Diff3_Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-EA-SMPL-01:FEMTO5" INTSCAN="I/O Intr" PORT="DCS00026580" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.FY2_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="202" DEVICE="BL21I-EA-SMPL-01:FEMTO5" INTSCAN="I/O Intr" PORT="DCS00026580" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.FY2_Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-EA-SMPL-01:FEMTO6" INTSCAN="I/O Intr" PORT="DCS00026581" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.Diff1_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="102" DEVICE="BL21I-EA-SMPL-01:FEMTO6" INTSCAN="I/O Intr" PORT="DCS00026581" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.Diff1_Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="2" DEVICE="BL21I-EA-SMPL-01:FEMTO7" INTSCAN="I/O Intr" PORT="DCS00026581" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.Diff2_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="202" DEVICE="BL21I-EA-SMPL-01:FEMTO7" INTSCAN="I/O Intr" PORT="DCS00026581" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.Diff2_Inst"/>
+	<ethercat.GenericADCTemplate CHANNEL="1" DEVICE="BL21I-EA-SMPL-01:FEMTO8" INTSCAN="I/O Intr" PORT="DCS00026258" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.ManipFemto_Avg"/>
+	<ethercat.GenericADCTemplate CHANNEL="102" DEVICE="BL21I-EA-SMPL-01:FEMTO8" INTSCAN="I/O Intr" PORT="DCS00026258" SAMPLES="1000" SCAN="I/O Intr" name="SMPL.samplers.inst.ManipFemto_Inst"/>
+	<ethercat.GenericADC channel="1" name="S2.Femto1_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00025131"/>
+	<ethercat.GenericADC channel="2" name="S2.Femto2_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00025131"/>
+	<ethercat.GenericADC channel="1" name="S2.Femto3_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00025132"/>
+	<ethercat.GenericADC channel="2" name="S2.Femto4_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00025132"/>
+	<!--<ethercat.GenericADC channel="1" name="D3A.Femto1_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00025133"/>-->
+	<ethercat.GenericADC channel="2" name="D3B.Femto2_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00025133"/>
+	<ethercat.GenericADC channel="1" name="S3.Femto1_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00025134"/>
+	<ethercat.GenericADC channel="2" name="S3.Femto2_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00025134"/>
+	<ethercat.GenericADC channel="1" name="S3.Femto3_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00025135"/>
+	<ethercat.GenericADC channel="2" name="S3.Femto4_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00025135"/>
+	<ethercat.GenericADC channel="1" name="D7.Femto1_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00026377"/>
+	<ethercat.GenericADC channel="2" name="D7.Femto2_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00026377"/>
+	<ethercat.GenericADC channel="1" name="PGM.WaterPress1" pdoentry="AIStandardChannel1.Value : EL3124 rev 0x00110000" slave="DCS00024549"/>
+	<ethercat.GenericADC channel="2" name="PGM.WaterPress2" pdoentry="AIStandardChannel2.Value : EL3124 rev 0x00110000" slave="DCS00024549"/>
+	<ethercat.GenericADC channel="101" name="M4.DrainC1.adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00026381"/>
+	<!--101 and 102 refer to the same ERIO input; I have added two samplers for this.-->
+	<ethercat.GenericADC channel="102" name="M4.DrainC1.adc_inst" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00026381"/>
+	<ethercat.GenericADC channel="2" name="M4.DrainC2_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00026381"/>
+	<ethercat.GenericADC channel="1" name="D8.Diode_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00026382"/>
+	<ethercat.GenericADC channel="1" name="M1.HvPsu_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00024797"/>
+	<ethercat.GenericADC channel="1" name="M2.HvPsu_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00120000" slave="DCS00025133"/>
+	<ethercat.GenericADC channel="2" name="PGM.HvPsu_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00024801"/>
+	<ethercat.GenericADC channel="2" name="SMPL.samplers.Drain_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00026382"/>
+	<ethercat.GenericADC channel="202" name="SMPL.samplers.Drain_inst" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00120000" slave="DCS00026382"/>
+	<ethercat.GenericADC channel="1" name="SMPL.samplers.FY1_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026579"/>
+	<ethercat.GenericADC channel="102" name="SMPL.samplers.FY1_inst" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026579"/>
+	<ethercat.GenericADC channel="2" name="SMPL.samplers.FY3_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00130000" slave="DCS00026579"/>
+	<ethercat.GenericADC channel="202" name="SMPL.samplers.FY3_inst" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00130000" slave="DCS00026579"/>
+	<ethercat.GenericADC channel="1" name="SMPL.samplers.Diff3_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026580"/>
+	<ethercat.GenericADC channel="102" name="SMPL.samplers.Diff3_inst" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026580"/>
+	<ethercat.GenericADC channel="2" name="SMPL.samplers.FY2_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00130000" slave="DCS00026580"/>
+	<ethercat.GenericADC channel="202" name="SMPL.samplers.FY2_inst" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00130000" slave="DCS00026580"/>
+	<ethercat.GenericADC channel="1" name="SMPL.samplers.Diff1_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026581"/>
+	<ethercat.GenericADC channel="102" name="SMPL.samplers.Diff1_inst" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026581"/>
+	<ethercat.GenericADC channel="2" name="SMPL.samplers.Diff2_adc" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00130000" slave="DCS00026581"/>
+	<ethercat.GenericADC channel="202" name="SMPL.samplers.Diff2_inst" pdoentry="AIInputsChannel2.Value : EL3602 rev 0x00130000" slave="DCS00026581"/>
+	<ethercat.GenericADC channel="1" name="SMPL.samplers.ManipFemto_adc" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026258"/>
+	<ethercat.GenericADC channel="102" name="SMPL.samplers.ManipFemto_inst" pdoentry="AIInputsChannel1.Value : EL3602 rev 0x00130000" slave="DCS00026258"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="1" OUTGB0="BL21I-DI-ERIO-01:MOD6:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD6:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD6:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD6:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-02" Q=":FEMTO1" gda_desc="S2 Femto Upper" gda_name="$(name)" name="S2.Femto1"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="1" OUTGB0="BL21I-DI-ERIO-01:MOD7:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD7:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD7:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD7:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-02" Q=":FEMTO2" gda_desc="S2 Femto Lower" gda_name="$(name)" name="S2.Femto2"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-01:MOD9:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD9:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD9:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD9:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-02" Q=":FEMTO3" gda_desc="S2 Femto Nearside" gda_name="$(name)" name="S2.Femto3"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-01:MOD8:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD8:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD8:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD8:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-02" Q=":FEMTO4" gda_desc="S2 Femto Offside" gda_name="$(name)" name="S2.Femto4"/>
+	<!--<femto.femto200 CGB0="" CGB1="" DTYP="Soft Channel" INITGAIN="0" OUTGB0="BL21I-DI-ERIO-01:MOD10:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD10:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD10:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD10:CHANNEL4:OUTPUT PP" P="BL21I-DI-PHGDA-03" Q=":FEMTO1" SGB0="" SGB1="" gda_desc="D3A Femto 1" gda_name="$(name)" name="D3A.Femto1"/>-->
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="0" OUTGB0="BL21I-DI-ERIO-01:MOD11:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD11:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD11:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD11:CHANNEL4:OUTPUT PP" P="BL21I-DI-PHGDB-03" Q=":FEMTO1" gda_desc="D3B Femto 1" gda_name="$(name)" name="D3B.Femto1"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="1" OUTGB0="BL21I-DI-ERIO-01:MOD12:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD12:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD12:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD12:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-03" Q=":FEMTO1" gda_desc="S3 Femto Upper" gda_name="$(name)" name="S3.Femto1"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="1" OUTGB0="BL21I-DI-ERIO-01:MOD13:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD13:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD13:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD13:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-03" Q=":FEMTO2" gda_desc="S3 Femto Lower" gda_name="$(name)" name="S3.Femto2"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-01:MOD14:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD14:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD14:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD14:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-03" Q=":FEMTO3" gda_desc="S3 Femto Offside" gda_name="$(name)" name="S3.Femto3"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-01:MOD15:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-01:MOD15:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-01:MOD15:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-01:MOD15:CHANNEL4:OUTPUT PP" P="BL21I-AL-SLITS-03" Q=":FEMTO4" gda_desc="S3 Femto Nearside" gda_name="$(name)" name="S3.Femto4"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-04:MOD3:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-04:MOD3:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-04:MOD3:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-04:MOD3:CHANNEL4:OUTPUT PP" P="BL21I-DI-GAS-01" Q=":FEMTO1" gda_desc="Gas Cell Wire" gda_name="$(name)" name="D7.Femto1"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-04:MOD4:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-04:MOD4:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-04:MOD4:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-04:MOD4:CHANNEL4:OUTPUT PP" P="BL21I-DI-GAS-01" Q=":FEMTO2" gda_desc="Gas Cell Photo Diode" gda_name="$(name)" name="D7.Femto2"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="4" OUTGB0="BL21I-DI-ERIO-05:MODSAM3:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-05:MODSAM3:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-05:MODSAM3:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-05:MODSAM3:CHANNEL4:OUTPUT PP" P="BL21I-MO-POD-01" Q=":FEMTO1" gda_desc="M4 Drain Current 1" gda_name="$(name)" name="M4.Femto1"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="6" OUTGB0="BL21I-DI-ERIO-05:MODSAM4:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-05:MODSAM4:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-05:MODSAM4:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-05:MODSAM4:CHANNEL4:OUTPUT PP" P="BL21I-MO-POD-01" Q=":FEMTO2" gda_desc="M4 Drain Current 2" gda_name="$(name)" name="M4.Femto2"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-05:MODSAM5:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-05:MODSAM5:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-05:MODSAM5:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-05:MODSAM5:CHANNEL4:OUTPUT PP" P="BL21I-DI-PHDGN-08" Q=":FEMTO1" gda_desc="M4 Photo Diode" gda_name="$(name)" name="D8.Femto1"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="5" OUTGB0="BL21I-DI-ERIO-05:MODSAM6:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-05:MODSAM6:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-05:MODSAM6:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-05:MODSAM6:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO1" gda_desc="Sample Drain Current" gda_name="$(name)" name="SMPL.Femto1"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="6" OUTGB0="BL21I-DI-ERIO-09:MOD1:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-09:MOD1:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-09:MOD1:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-09:MOD1:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO2" gda_desc="Sample FY Diode 1" gda_name="$(name)" name="SMPL.Femto2"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="6" OUTGB0="BL21I-DI-ERIO-09:MOD2:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-09:MOD2:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-09:MOD2:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-09:MOD2:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO3" gda_desc="Sample FY Diode 3" gda_name="$(name)" name="SMPL.Femto3"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="6" OUTGB0="BL21I-DI-ERIO-09:MOD3:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-09:MOD3:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-09:MOD3:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-09:MOD3:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO4" gda_desc="Sample Diffraction Diode 3" gda_name="$(name)" name="SMPL.Femto4"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="6" OUTGB0="BL21I-DI-ERIO-09:MOD4:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-09:MOD4:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-09:MOD4:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-09:MOD4:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO5" gda_desc="Sample FY Diode 2" gda_name="$(name)" name="SMPL.Femto5"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="2" OUTGB0="BL21I-DI-ERIO-09:MOD5:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-09:MOD5:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-09:MOD5:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-09:MOD5:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO6" gda_desc="Sample Diffraction Diode 1" gda_name="$(name)" name="SMPL.Femto6"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="6" OUTGB0="BL21I-DI-ERIO-09:MOD6:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-09:MOD6:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-09:MOD6:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-09:MOD6:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO7" gda_desc="Sample Diffraction Diode 2" gda_name="$(name)" name="SMPL.Femto7"/>
+	<femto.femto200 DTYP="Soft Channel" INITGAIN="6" OUTGB0="BL21I-DI-ERIO-05:MODSAM7:CHANNEL1:OUTPUT PP" OUTGB1="BL21I-DI-ERIO-05:MODSAM7:CHANNEL2:OUTPUT PP" OUTGB2="BL21I-DI-ERIO-05:MODSAM7:CHANNEL3:OUTPUT PP" OUTHIS="BL21I-DI-ERIO-05:MODSAM7:CHANNEL4:OUTPUT PP" P="BL21I-EA-SMPL-01" Q=":FEMTO8" gda_desc="Sample Manipulator Femto" gda_name="$(name)" name="SMPL.Femto8"/>
+	<femto.femto_ai DESC="S2 Femto 1" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025131_ADC1)VALUE" P="BL21I-AL-SLITS-02:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S2.Femto1_ai"/>
+	<femto.femto_ai DESC="S2 Femto 2" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025131_ADC2)VALUE" P="BL21I-AL-SLITS-02:FEMTO2" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S2.Femto2_ai"/>
+	<femto.femto_ai DESC="S2 Femto 3" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025132_ADC2)VALUE" P="BL21I-AL-SLITS-02:FEMTO3" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S2.Femto3_ai"/>
+	<femto.femto_ai DESC="S2 Femto 4" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025132_ADC1)VALUE" P="BL21I-AL-SLITS-02:FEMTO4" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S2.Femto4_ai"/>
+	<!--<femto.femto_ai DESC="D3A Femto 1" DTYPE="asynInt32" EGU="V" EGUF="-10" EGUL="10" INP="@asyn(DCS00025133_ADC1)VALUE" P="BL21I-DI-PHGDA-03:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="D3A.Femto1_ai"/>-->
+	<femto.femto_ai DESC="D3B Femto 1" DTYPE="asynInt32" EGU="V" EGUF="-10" EGUL="10" INP="@asyn(DCS00025133_ADC2)VALUE" P="BL21I-DI-PHGDB-03:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="D3B.Femto2_ai"/>
+	<femto.femto_ai DESC="S3 Femto 1" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025134_ADC1)VALUE" P="BL21I-AL-SLITS-03:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S3.Femto1_ai"/>
+	<femto.femto_ai DESC="S3 Femto 2" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025134_ADC2)VALUE" P="BL21I-AL-SLITS-03:FEMTO2" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S3.Femto2_ai"/>
+	<femto.femto_ai DESC="S3 Femto 3" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025135_ADC1)VALUE" P="BL21I-AL-SLITS-03:FEMTO3" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S3.Femto3_ai"/>
+	<femto.femto_ai DESC="S3 Femto 4" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00025135_ADC2)VALUE" P="BL21I-AL-SLITS-03:FEMTO4" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="S3.Femto4_ai"/>
+	<femto.femto_ai DESC="Gas Cell Wire" DTYPE="asynInt32" EGU="V" EGUF="-10" EGUL="10" INP="@asyn(DCS00026377_ADC1)VALUE" P="BL21I-DI-GAS-01:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="D7.Femto1_ai"/>
+	<femto.femto_ai DESC="Gas Cell Photo Diode" DTYPE="asynInt32" EGU="V" EGUF="-10" EGUL="10" INP="@asyn(DCS00026377_ADC2)VALUE" P="BL21I-DI-GAS-01:FEMTO2" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="D7.Femto2_ai"/>
+	<!--INP value for instantaneous reading-->
+	<!--<femto.femto_ai DTYPE="asynInt32" EGU="V" EGUF="-10" EGUL="10" INP="@asyn(DCS00026377)AIInputsChannel1.Value" PREC="6" Q=":I" SCAN=".1 sec" gda_name="$(name)"/>-->
+	<!--This is now the instantaneous reading.
+I am not sure if the one above could work, but it is undesirable as it does not offer any averaging over a period of time.-->
+	<femto.femto_ai DESC="M4 Drain Current 1" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026381_ADC102)VALUE" P="BL21I-MO-POD-01:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="M4.Femto1_ai"/>
+	<!--Need to include once support for multiple samplers per ADC input - use extra 'Type' or similar column to distinguish from above object.-->
+	<!--<femto.femto_ai DESC="M4 Drain Current 1 Instantaneous" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026381_ADC1)VALUE" P="BL21I-MO-POD-01:FEMTO1:INST" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="X.Femto1_ai_inst"/>-->
+	<femto.femto_ai DESC="M4 Drain Current 2" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026381_ADC2)VALUE" P="BL21I-MO-POD-01:FEMTO2" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="M4.Femto2_ai"/>
+	<femto.femto_ai DESC="D8 Photo Diode" DTYPE="asynInt32" EGU="V" EGUF="-10" EGUL="10" INP="@asyn(DCS00026382_ADC1)VALUE" P="BL21I-DI-PHDGN-08:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="D8.Femto3_ai"/>
+	<femto.femto_ai DESC="Sample Drain Current" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026382_ADC202)VALUE" P="BL21I-EA-SMPL-01:FEMTO1" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto1_ai"/>
+	<femto.femto_ai DESC="Sample FY1 Diode" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026579_ADC102)VALUE" P="BL21I-EA-SMPL-01:FEMTO2" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto2_ai"/>
+	<femto.femto_ai DESC="Sample Straight Diode" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026579_ADC202)VALUE" P="BL21I-EA-SMPL-01:FEMTO3" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto3_ai"/>
+	<femto.femto_ai DESC="Sample Rotating Diode" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026580_ADC102)VALUE" P="BL21I-EA-SMPL-01:FEMTO4" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto4_ai"/>
+	<femto.femto_ai DESC="Sample Fixed Diode 1" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026580_ADC202)VALUE" P="BL21I-EA-SMPL-01:FEMTO5" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto5_ai"/>
+	<femto.femto_ai DESC="Sample 2Theta Diode" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026581_ADC102)VALUE" P="BL21I-EA-SMPL-01:FEMTO6" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto6_ai"/>
+	<femto.femto_ai DESC="Sample Extra Diode" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026581_ADC202)VALUE" P="BL21I-EA-SMPL-01:FEMTO7" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto7_ai"/>
+	<femto.femto_ai DESC="Sample Manipulator Femto" DTYPE="asynInt32" EGU="V" EGUF="10" EGUL="-10" INP="@asyn(DCS00026258_ADC102)VALUE" P="BL21I-EA-SMPL-01:FEMTO8" PREC="6" Q=":I" SCAN="I/O Intr" gda_name="$(name)" name="SMPL.Femto8_ai"/>
+	<ethercat.PdoAssignment pdo_index="5633" slave="DCS00024966" smnumber="2"/>
+	<ethercat.PdoAssignment pdo_index="5633" slave="DCS00024778" smnumber="2"/>
+	<ethercat.PdoAssignment pdo_index="5633" slave="DCS00024967" smnumber="2"/>
+	<ethercat.PdoAssignment pdo_index="5633" slave="DCS00024973" smnumber="2"/>
+	<userIO.ai DESC="M1 Charge plate voltage" DTYP="asynInt32" EGU="V" EGUF="300" EGUL="-300" INP="@asyn(DCS00024797_ADC1)VALUE" LINR="2" P="BL21I-OP-MIRR-01:HVPSU" PREC="0" R=":I" SCAN="I/O Intr" name="M1.HvPsu"/>
+	<userIO.ai DESC="M2 Charge plate voltage" DTYP="asynInt32" EGU="V" EGUF="300" EGUL="-300" INP="@asyn(DCS00025133_ADC1)VALUE" LINR="2" P="BL21I-OP-MIRR-02:HVPSU" PREC="0" R=":I" SCAN="I/O Intr" name="M2.HvPsu"/>
+	<userIO.ai DESC="PGM Charge plate voltage" DTYP="asynInt32" EGU="V" EGUF="300" EGUL="-300" INP="@asyn(DCS00024801_ADC2)VALUE" LINR="2" P="BL21I-OP-PGM-01:HVPSU" PREC="0" R=":I" SCAN="I/O Intr" name="PGM.HvPsu"/>
+	<userIO.ai DESC="Outlet PGM mirror cooling pressure" DTYP="asynInt32" EGU="Bar" EGUF="6" EGUL="-6" INP="@asyn(DCS00024549_ADC2)VALUE" LINR="2" P="BL21I-OP-PGM-01:CHILLER2" PREC="3" R=":I" SCAN="I/O Intr" name="PGM.Chiller2PRS"/>
+	<userIO.bi DESC="M5 Limit 01" DTYP="asynInt32" INP="@asyn(DCS00026320)Channel1.Input" ONAM="On" P="BL21I-MO-ECM-02" R=":LIM01" SCAN="I/O Intr" ZNAM="Off" gda_desc="M5 Limit 01" name="M5.LIMIT1"/>
+	<userIO.bi DESC="M5 Limit 02" DTYP="asynInt32" INP="@asyn(DCS00026320)Channel2.Input" ONAM="On" P="BL21I-MO-ECM-02" R=":LIM02" SCAN="I/O Intr" ZNAM="Off" gda_desc="M5 Limit 02" name="M5.LIMIT2"/>
+	<userIO.bi DESC="M5 Limit 03" DTYP="asynInt32" INP="@asyn(DCS00026320)Channel3.Input" ONAM="On" P="BL21I-MO-ECM-02" R=":LIM03" SCAN="I/O Intr" ZNAM="Off" gda_desc="M5 Limit 03" name="M5.LIMIT3"/>
+	<userIO.bi DESC="M5 Limit 04" DTYP="asynInt32" INP="@asyn(DCS00026320)Channel4.Input" ONAM="On" P="BL21I-MO-ECM-02" R=":LIM04" SCAN="I/O Intr" ZNAM="Off" gda_desc="M5 Limit 04" name="M5.LIMIT4"/>
+	<userIO.bi DESC="M5 Limit 05" DTYP="asynInt32" INP="@asyn(DCS00026321)Channel1.Input" ONAM="On" P="BL21I-MO-ECM-02" R=":LIM05" SCAN="I/O Intr" ZNAM="Off" gda_desc="M5 Limit 05" name="M5.LIMIT5"/>
+	<userIO.bi DESC="M5 Limit 06" DTYP="asynInt32" INP="@asyn(DCS00026321)Channel2.Input" ONAM="On" P="BL21I-MO-ECM-02" R=":LIM06" SCAN="I/O Intr" ZNAM="Off" gda_desc="M5 Limit 06" name="M5.LIMIT6"/>
+	<userIO.bi DESC="M5 Limit 07" DTYP="asynInt32" INP="@asyn(DCS00026321)Channel3.Input" ONAM="On" P="BL21I-MO-ECM-02" R=":LIM07" SCAN="I/O Intr" ZNAM="Off" gda_desc="M5 Limit 07" name="M5.LIMIT7"/>
+	<!--<userIO.bi DESC="FS1 Status" DTYP="asynInt32" INP="@asyn(DCS00026321)Channel4.Input" ONAM="On" P="BL21I-OP-SHTR-01" R=":STATUS" SCAN="I/O Intr" ZNAM="Off" gda_desc="FS1 Status" name="FS1.STATUS"/>-->
+	<!--<userIO.bo DESC="Fast shutter control" DTYP="asynInt32" ONAM="OPEN" OUT="@asyn(DCS00024867)Channel1.Output" P="BL21I-OP-SHTR-01" PINI="YES" R=":CON" SCAN="Passive" ZNAM="CLOSED" name="FS1.CON"/>-->
+	<!--<userIO.bo DESC="Fast shutter source" DTYP="asynInt32" ONAM="XCAM" OUT="@asyn(DCS00024867)Channel3.Output" P="BL21I-OP-SHTR-01" PINI="YES" R=":SRC" SCAN="Passive" ZNAM="ERIO" name="FS1.SRC"/>-->
+	<!--LED controlled by binary output-->
+	<userIO.bo DESC="Sample Chamber Illumination" DTYP="asynInt32" HIGH="0" ONAM="On" OUT="@asyn(DCS00026627)Channel1.Output" P="BL21I-EA-SMPL-01" R=":BOLED1" SCAN="Passive" ZNAM="Off" name="SMPL.BOLED1"/>
+	<!--Dummy Coupling records for femtos which are not wired on this bwamline. Added to avoid need for a seperate GDA class and CSS screen for non coupling enabled femtos.-->
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-02:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-02:FEMTO2:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-02:FEMTO3:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-02:FEMTO4:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-DI-PHGDA-03:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-DI-PHGDB-03:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-03:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-03:FEMTO2:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-03:FEMTO3:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-AL-SLITS-03:FEMTO4:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-DI-GAS-01:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-DI-GAS-01:FEMTO2:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-MO-POD-01:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-MO-POD-01:FEMTO2:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-DI-PHDGN-08:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO1:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO2:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO3:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO4:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO5:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO6:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO7:ACDC"/>
+	<records.bo ONAM="DC" PINI="YES" VAL="1" ZNAM="AC" record="BL21I-EA-SMPL-01:FEMTO8:ACDC"/>
+	<records.ai DESC="HLS Height 1" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD1:INPUT1:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT01:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 2" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD1:INPUT2:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT02:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 3" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD1:INPUT3:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT03:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 4" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD1:INPUT4:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT04:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 5" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD2:INPUT1:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT05:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 6" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD2:INPUT2:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT06:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 7" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD2:INPUT3:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT07:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 8" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD2:INPUT4:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT08:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 9" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD3:INPUT1:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT09:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 10" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD3:INPUT2:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT10:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 11" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD3:INPUT3:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT11:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Height 12" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD3:INPUT4:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT12:LEVEL:SOURCE"/>
+	<records.ai DESC="HLS Temperature 1" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD4:INPUT1:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT01:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 2" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD4:INPUT2:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT02:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 3" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD4:INPUT3:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT03:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 4" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD4:INPUT4:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT04:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 5" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD5:INPUT1:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT05:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 6" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD5:INPUT2:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT06:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 7" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD5:INPUT3:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT07:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 8" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD5:INPUT4:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT08:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 9" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD6:INPUT1:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT09:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 10" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD6:INPUT2:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT10:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 11" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD6:INPUT3:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT11:TEMP:SOURCE"/>
+	<records.ai DESC="HLS Temperature 12" DTYP="Soft Channel" INP="BL21I-DI-ERIO-10:MOD6:INPUT4:VALUE CP" SCAN="Passive" record="BL21I-AL-HLS-01:POT12:TEMP:SOURCE"/>
+	<EPICS_BASE.dbpf name="gasfem1" pv="BL21I-DI-GAS-01:FEMTO2:I.ASLO" value="-1"/>
+	<EPICS_BASE.dbpf name="gasfem2" pv="BL21I-DI-GAS-01:FEMTO1:I.ASLO" value="1"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-MIRR-01:HVPSU:I.LOW" value="95"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-MIRR-01:HVPSU:I.LOLO" value="90"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-MIRR-02:HVPSU:I.LOW" value="95"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-MIRR-01:HVPSU:I.LOLO" value="90"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-PGM-01:HVPSU:I.LOW" value="95"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-PGM-01:HVPSU:I.LOLO" value="90"/>
+	<EPICS_BASE.dbpf pv="BL21I-DI-LED-01:DOXCURRENT:OUTPUTCURRENT" value="170"/>
+	<EPICS_BASE.dbpf pv="BL21I-DI-LED-03:DOXCURRENT:OUTPUTCURRENT" value="170"/>
+	<EPICS_BASE.dbpf pv="BL21I-DI-LED-02:DOXCURRENT:OUTPUTCURRENT" value="170"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-LED-01:DOXCURRENT:OUTPUTCURRENT" value="20"/>
+	<EPICS_BASE.dbpf pv="BL21I-OP-LED-01:HOLDCURR" value="20"/>
+	<EPICS_BASE.dbpf pv="BL21I-MO-POD-01:FEMTO1:GAIN" value="4"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO1:ADC2_AVERAGE" value="1000"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO2:ADC1_AVERAGE" value="1000"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO3:ADC2_AVERAGE" value="1000"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO4:ADC1_AVERAGE" value="1000"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO5:ADC2_AVERAGE" value="1000"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO6:ADC1_AVERAGE" value="1000"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO7:ADC2_AVERAGE" value="1000"/>
+	<EPICS_BASE.dbpf pv="BL21I-EA-SMPL-01:FEMTO8:ADC1_AVERAGE" value="1000"/>
+</components>

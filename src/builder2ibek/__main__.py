@@ -3,6 +3,7 @@ from pathlib import Path
 import typer
 
 from builder2ibek import __version__
+from builder2ibek.catio.cli import catio_cli
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
@@ -204,6 +205,58 @@ def reconvert(
         descriptions_json=descriptions_json,
         only=list(only) or None,
         json_out=json_out,
+    )
+
+
+@cli.command()
+def catio(
+    builder_path: Path = typer.Argument(
+        ...,
+        help="Path to a BLXXY-BUILDER support module (its etc/makeIocs is used) "
+        "or directly to a folder of builder IOC XMLs",
+    ),
+    services_repo: Path = typer.Option(
+        ..., "--services-repo", help="Path to the beamline services repo"
+    ),
+    strict: bool = typer.Option(
+        False,
+        "--strict/--no-strict",
+        help="Promote device-mod-mismatch to an error, so a chain whose "
+        "declared DEVICE names disagree with the bus positions is not converted",
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Do the full analysis and report, but write nothing"
+    ),
+    json_out: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON on stdout"
+    ),
+    node_prefix: str | None = typer.Option(
+        None,
+        "--node-prefix",
+        help="Override the fastcs-catio node_prefix template. {domain} and {n} "
+        "are replaced per chain; {:02d} is left for fastcs-catio",
+    ),
+    module_prefix: str | None = typer.Option(
+        None, "--module-prefix", help="Override the fastcs-catio module_prefix template"
+    ),
+    device_prefix: str | None = typer.Option(
+        None, "--device-prefix", help="Override the fastcs-catio device_prefix template"
+    ),
+):
+    """
+    Migrate a beamline's EtherCAT IOCs from the legacy ethercat support module
+    onto fastcs-catio: predict the new PV names, rewrite every consumer IOC's
+    references, and write one fastcs-catio IOC per chain.
+    """
+    catio_cli(
+        builder_path,
+        services_repo,
+        strict=strict,
+        dry_run=dry_run,
+        json_out=json_out,
+        node_prefix=node_prefix,
+        module_prefix=module_prefix,
+        device_prefix=device_prefix,
     )
 
 
