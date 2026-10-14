@@ -229,15 +229,17 @@ Open the `builder2ibek` repository in the devcontainer (first run
 1. Edit `src/builder2ibek/converters/<module>.py`
 2. Optionally edit the ibek support YAML in `ibek-support-dls/` or
    `ibek-support/` if the entity model also needs updating
-3. Re-convert all sample XML files and update expected outputs:
-   ```bash
-   cd tests/samples && ./make_samples.sh
-   ```
-4. Rebuild the global IOC YAML schema so VSCode validation reflects any
-   support YAML changes:
+3. Rebuild `$EPICS_ROOT/ibek-defs` and the global IOC YAML schema so that
+   `generate2` and VSCode validation both see any support YAML changes:
    ```bash
    ./update-schema
    ```
+4. Re-convert all sample XML files and update expected outputs:
+   ```bash
+   ./tests/samples/make_samples.sh
+   ```
+   See [](../explanations/golden-file-tests.md) for how the baselines are
+   reviewed and why `update-schema` must run first.
 5. Open the generated `.yaml` files in `tests/samples/` in VSCode and check
    for schema validation errors (requires the Red Hat YAML extension).
    If the extension does not pick up schema changes immediately, toggle
@@ -257,6 +259,8 @@ cd tests/samples && ./make_samples.sh
 
 Review the diff carefully — `make_samples.sh` overwrites the `.yaml` files
 from the current converter output, so only commit when the output is correct.
+See [](../explanations/golden-file-tests.md) for the full regenerate, review
+and commit workflow.
 
 The test suite runs all sample conversions automatically:
 
