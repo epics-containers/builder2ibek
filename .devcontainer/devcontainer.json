@@ -65,10 +65,11 @@
             "target": "/cache",
             "type": "volume"
         },
-        // Mount /dls_sw readonly; slave propagation ensures autofs submounts on the host
-        // are visible inside the container without needing to trigger them from within it
-        "type=bind,source=/dls_sw,target=/dls_sw,readonly,bind-propagation=slave",
-        "type=bind,source=/dls,target=/dls,readonly,bind-propagation=slave"
+        // /dls and /dls_sw as bindfs read-only views made by initializeCommand.sh,
+        // so autofs submounts are read-only too (a plain readonly bind is not
+        // recursive on the RHEL8 kernel)
+        "type=bind,source=${localEnv:HOME}/.cache/dls-ro/dls_sw,target=/dls_sw,readonly",
+        "type=bind,source=${localEnv:HOME}/.cache/dls-ro/dls,target=/dls,readonly"
     ],
     // Mount the parent as /workspaces so we can pip install peers as editable
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
