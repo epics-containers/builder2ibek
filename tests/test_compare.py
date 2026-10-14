@@ -3,7 +3,7 @@ from pathlib import Path
 from builder2ibek.dbcompare import compare_dbs
 
 
-def test_conmpare(samples: Path):
+def test_compare(samples: Path):
     old = samples / "SR03C-VA-IOC-01_expanded.db"
     new = samples / "sr03c-va-ioc-01.db"
     result = samples / "compare.diff"
