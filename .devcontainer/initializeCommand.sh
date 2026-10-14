@@ -27,8 +27,11 @@ for src in /dls /dls_sw; do
     mnt="$ro_root/${src#/}"
     mkdir -p "$mnt"
     if mountpoint -q "$mnt"; then
-        # a dead bindfs daemon leaves "Transport endpoint is not connected"
-        if ls "$mnt" >/dev/null 2>&1; then
+        # reuse only a live, read-only bindfs of $src; a dead daemon leaves
+        # "Transport endpoint is not connected"
+        read -r m_src m_type m_opts < <(findmnt -n -o SOURCE,FSTYPE,OPTIONS --mountpoint "$mnt")
+        if [[ $m_src == "$src" && $m_type == fuse* && ,$m_opts, == *,ro,* ]] &&
+            ls "$mnt" >/dev/null 2>&1; then
             continue
         fi
         fusermount -u "$mnt"
