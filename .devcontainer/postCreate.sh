@@ -30,3 +30,5 @@ fi
 # models from that folder and from the IOC config folder -- it never reads
 # ibek-support*/ directly, so without this every entity fails validation.
 ./update-schema
+
+install -m 0644 .devcontainer/claude-sandbox.conf /etc/claude-sandbox.conf
