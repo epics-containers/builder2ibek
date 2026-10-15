@@ -7,8 +7,12 @@ default_acf = re.compile(r"/dls_sw/.*/.*/support/pvlogging/1-4/data/access.acf")
 
 xml_component = "pvlogging"
 
+# the blacklist accumulates over all of an IOC's BlacklistPv entities - it is
+# keyed on the Generic_IOC being built (convert_file makes a fresh one per
+# conversion) so that converting more than one IOC in a single process, or the
+# same IOC twice, starts a fresh list each time
 blacklist: list[str] = []
-filename = ""
+current_ioc: Generic_IOC | None = None
 
 
 @globalHandler
@@ -29,14 +33,18 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "BlacklistPv":
         entity.type = "pvlogging.BlacklistPvs"
-        if not blacklist:
-            # blacklistFile and headers definitions
-            global filename
-            filename = ioc.source_file.stem.lower() + "_blacklist.txt"
+        # write the blacklist alongside the converted YAML, not into the cwd
+        out_file = ioc.out_dir / (ioc.source_file.stem.lower() + "_blacklist.txt")
+        global current_ioc
+        if ioc is not current_ioc:
+            # first BlacklistPv of this conversion: start a new list
+            blacklist.clear()
+            current_ioc = ioc
             blacklist.append(
                 "# Rename to 'pvlogging_excl.txt' and move to IOC config directory.\n"
             )
             blacklist.append("# The following PVs will be excluded from pvlogging")
+            print(f"writing pvlogging blacklist {out_file}")
         else:
             # remove previous blacklist entity, we only need one with all PVs
             for ent in ioc.entities:
@@ -47,7 +55,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # add new BlacklistPv entity to the list and write the list to file
         blacklist.append(entity.name)
         entity.blacklist = "\n".join(blacklist) + "\n"
-        with open(filename, "w") as blacklist_file:
+        with open(out_file, "w") as blacklist_file:
             blacklist_file.write(entity.blacklist)
 
         # the BlacklistPv entity declaration only require a pointer to the file
