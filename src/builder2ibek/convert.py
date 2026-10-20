@@ -102,10 +102,23 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
 
         ioc.already_converted.append(entity)
 
+    param_orders = {
+        info.yaml_component: info.param_order for info in module_infos.values()
+    }
+
     sorted_entities: list[Entity] = []
     for entity in ioc.entities:  # type: ignore
-        # sort the args by key
-        entity = Entity(sorted(entity.items()))  # type: ignore
+        # sort the args by the module's param_order, then alphabetically
+        order = param_orders.get(str(entity["type"]).split(".")[0], [])
+        entity = Entity(
+            sorted(
+                entity.items(),
+                key=lambda kv: (
+                    order.index(kv[0]) if kv[0] in order else len(order),
+                    kv[0],
+                ),
+            )
+        )  # type: ignore
         # but move type to the start of each entity
         entity = Entity(type=entity.pop("type"), **entity)
         sorted_entities.append(entity)
