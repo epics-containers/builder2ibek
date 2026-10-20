@@ -1,3 +1,5 @@
+from typing import Any
+
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
@@ -76,7 +78,7 @@ def finalize(ioc: Generic_IOC):
     NX102_MotorController. Insert them after that controller's last real axis.
     This runs after the param_order sort, so keys are written in that order.
     """
-    entities: list[Entity] = ioc.entities  # type: ignore
+    entities: list[dict[str, Any]] = ioc.entities
 
     controllers = [
         e["name"] for e in entities if e.get("type") == "motorPLC.NX102_MotorController"
