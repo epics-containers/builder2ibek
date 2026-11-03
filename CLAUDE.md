@@ -33,6 +33,7 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 | `ibek-support-dls/<module>/` | DLS entity models + install.yml |
 | `ibek-support/<module>/` | Community entity models |
 | `src/builder2ibek/converters/` | XML converters (one per module) |
+| `tools/pvi-from-edm/` | Separate tool: PVI from EDM screens, see its README |
 
 Find IOC XMLs using a module:
 ```bash

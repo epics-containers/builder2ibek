@@ -1,0 +1,176 @@
+# pvi-from-edm
+
+Generates PVI for ibek support modules from their EDM screens: a
+`*.pvi.device.yaml` per device and a `pvi:` section per entity, grouped and labelled
+as the screen has them, so the `.bob` screens a Generic IOC builds show what operators
+are used to.
+
+A separate tool, not part of `builder2ibek`: it imports nothing from it, adds nothing
+to its command line and is not packaged with it. It runs in the same environment
+because it needs what `builder2ibek` already depends on (`ibek`, `pvi`, PyYAML).
+
+It generates from the committed support YAML (`git show HEAD:...`), so a support repo
+must be a git checkout. Its output only adds lines to that YAML.
+
+## The classification adds friction, not protection
+
+EDM screens hide some writes until a condition holds: a mode, a password, a state.
+PVI screens have no such condition. So the tool moves those writes, the *gated* ones,
+to one `Protected Controls` sub-screen per device.
+
+**This adds friction and not protection.** It is one extra click. Every PV stays
+writable by anyone who can reach the IOC, from that screen, from a client, or from any
+other tool. **It never replaces IOC-side enforcement**: access security, interlocks and
+hardware limits are what protect a machine, and this tool changes none of them.
+
+**No one who knows the hardware has checked the classification.** It comes from record
+names, descriptions and screen text, by rule and by reading, with no IOC running. Treat
+every entry as a guess to review. A control marked `mode-only` may be dangerous, and one
+marked `dangerous` may be routine.
+
+A classification file is a list of entries, each with `module`, `entity`, `pv`, `class`,
+`evidence` and `judged`:
+
+| Class | Meaning | Where the write goes |
+|---|---|---|
+| `dangerous` | The screen warns of it, it asks for a password or engineering mode, or a rule or a reading of its name says it could affect plant | `Protected Controls` |
+| `unsure` | No evidence either way. A gated write missing from the file counts as this | `Protected Controls` |
+| `mode-only` | The gate only hides what does not apply: this hardware variant, this selected mode, the record's own `DISA` | Where the screen has it |
+| `momentary` | EDM writes one value on press and another on release, gated or not | `Protected Controls`, both values in one panel; on `.PROC` the press only, as any write processes the record |
+| `keep-on-main` | A site's decision that it must stay quick to reach, such as a stop | The device's first screen, whatever the rules say |
+
+Other fields say how much to trust an entry: `names_only` (judged from names and labels
+alone), `behind_dialog` (already behind a confirmation dialog, which stays, so only
+classified), `password_gated` (EDM asks for a password first; PVI has no such gate),
+`not_placed` (why a momentary PV has no widget). `judged` says who decided: `rule:*`, `read`,
+or `person`. To change one, edit its `class`, set `judged: person` so `classify` keeps your
+edit, and sweep again.
+
+With no classification file every gated write counts as `unsure`, so all of them move.
+
+## Usage
+
+Run from the root of the repo, with `uv run`. The tests are the tool's own, apart
+from the repo's:
+
+```bash
+uv run pytest tools/pvi-from-edm
+uv run python tools/pvi-from-edm/pvi_from_edm.py --help
+```
+
+Try it on a made-up site, with one module, and nothing else needed:
+
+```bash
+uv run python tools/pvi-from-edm/example/make_example.py pvi-from-edm-work/example
+
+# generate and validate; a dry run writes nothing to a support repo
+uv run python tools/pvi-from-edm/pvi_from_edm.py sweep --dry-run --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+
+# classify the gated writes, then generate again to use the result
+uv run python tools/pvi-from-edm/pvi_from_edm.py evidence --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+uv run python tools/pvi-from-edm/pvi_from_edm.py classify --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+uv run python tools/pvi-from-edm/pvi_from_edm.py sweep --dry-run --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+
+# check it against the screens and the .bob files, and look at it: open pvi-from-edm-work/example/work/review/index.html
+uv run python tools/pvi-from-edm/pvi_from_edm.py audit --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+uv run python tools/pvi-from-edm/pvi_from_edm.py review --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+
+# install in the support repo, and compare the two byte for byte
+uv run python tools/pvi-from-edm/pvi_from_edm.py sweep --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+uv run python tools/pvi-from-edm/pvi_from_edm.py check --config pvi-from-edm-work/example/pvi-from-edm.yaml --work-dir pvi-from-edm-work/example/work
+```
+
+On real support repos, here one public module of the submodules of this repo, with
+the default release roots under `/dls_sw`. With no settings, nothing is classified:
+
+```bash
+uv run python tools/pvi-from-edm/pvi_from_edm.py sweep --dry-run --repo ibek-support --repo ibek-support-dls --work-dir pvi-from-edm-work/real mks937b
+```
+
+| Subcommand | What it does |
+|---|---|
+| `sweep [folder ...]` | Generate and validate each module without PVI, and install what passes. `--dry-run` writes to no support repo. A full sweep resets each folder it generates to its committed state first, removing untracked device files. |
+| `check` | Compare a sweep's output with the support repos, byte for byte, and list anything else changed there. Reads them only. Exit 1 on a difference. Folders starting `_` are ignored. |
+| `generate <module> ...` | One module that has its own `<overrides>/<module>.yaml`. `--write` also writes it to its repo. |
+| `validate [folder ...]` | Validate again what a sweep generated. |
+| `audit` | Check a sweep from the EDM screens and the `.bob` files rather than from what the generator says it did. Exit 1 on a failure. |
+| `evidence` | Gather the facts on each gated write. |
+| `classify` | Write the classification file from the evidence. Entries with `judged: person` stay. `--out` writes elsewhere. |
+| `review [module ...]` | Pages drawing each EDM screen beside its generated `.bob`. |
+| `survey [folder ...]` | Estimate a sweep: no validation, nothing written to a repo. |
+| `dump-edl <file> ...` | Print a screen as rows sorted by coordinates. |
+
+Each module is checked with a test IOC instance made from its entity's parameters:
+`ibek` `generate2` and `generate` must agree, a `.bob` must appear, and `msi` must expand
+the result so every PV can be compared with the records the IOC would load. An entity that
+fails is left out, and the reason goes in `sweep-status.json`.
+
+## Options
+
+All subcommands take these. Paths given here beat the settings file.
+
+| Option | Default | Purpose |
+|---|---|---|
+| `--repo [KEY=]FOLDER` | none, required | A support repo folder, repeatable. Its key defaults to the folder name, and `repo:` in an override names it. |
+| `--config FILE` | none | The settings file below. |
+| `--prod-root`, `--work-root`, `--older-root` | under `/dls_sw` | Release roots, repeatable, in order of preference. |
+| `--msi` | under `/dls_sw`, then `PATH` | With none found, a parser of the tool's own is used, and `audit` fails. |
+| `--base-dbd`, `--support-dbd-glob` | under `/dls_sw` | Where record types' fields are defined. |
+| `--edm-colors` | none | An EDM `colors.list`, for review pages only. |
+| `--classification` | none | The classification file. |
+| `--classify-rules` | none | Rules judged by reading, for `classify`. |
+| `--overrides` | none | Per-module inputs. |
+| `--collisions` | none | A JSON list of device file names no sweep may use. |
+| `--work-dir` | `./pvi-from-edm-work` | Parent of the next four. |
+| `--output-dir`, `--sandbox-dir`, `--review-dir`, `--status-dir` | `<work-dir>/out`, `/sandbox`, `/review`, `<work-dir>` | Where the tool writes. |
+
+### Settings file
+
+Everything specific to a site lives outside this folder, and a run reads it by argument.
+Every key is optional, and a relative path is relative to the file:
+
+```yaml
+repos: {public: ../ibek-support, internal: ../ibek-support-site}
+public_repos: [public]              # device files here must not match hygiene_pattern
+hygiene_pattern: '\w+\.example\.org'
+prod_roots: [/releases/support]     # also work_roots, older_roots
+last_resort_modules: [ADCore, asyn] # answer templates included by bare name
+release_aliases: {stats: devStats}  # a folder whose releases go by another name
+msi: /epics/base/bin/msi            # also base_dbd, support_dbd_glob, edm_colors
+classification: classification.yaml
+classify_rules: classify-rules.yaml
+overrides: overrides
+collisions: stem-collisions.json
+hand_written:                       # a sweep never touches these folders
+  - {repo: public, folder: stats}
+forks:                              # generated once, installed in both
+  - {repo: public, folder: thing, twin_repo: internal, twin_folder: thing_site}
+reserved_stems:                     # device file names no other folder may take
+  - {stem: thing, repo: public, folder: thing}
+held_label_screens: [copied.edl]    # screens whose offLabel is a copy: use onLabel
+```
+
+### Overrides
+
+`<overrides>/<folder>.yaml` pins a folder: its `repo` and `release` are fixed there rather
+than found, and it may carry `devices`, with `subst`, `skip_links`, `link_labels`,
+`extra_screens` and `judgements` per device, and `skip_entities`. `<overrides>/<folder>.sweep.yaml`
+adds `skip_entities` or `no_field_records` to a normal sweep. Each is a judgement and gets
+reported.
+
+### Classification rules
+
+`classify` applies the rules in `classify.py`, by warning text, password gate and name,
+and the file named by `--classify-rules`, for what was judged by reading a site's modules.
+`read` entries come before the mode-only rules, `read_last` entries after them, and
+`engineering_gates` name the gates of an engineering mode. See `site_rules()` in `classify.py`.
+
+## Limits
+
+- A device with a field PV such as `X.PROC` has no `pv: true`: pvi writes a record name
+  `softIocPVA` rejects. No generated section has `pv: true`, so these devices get a `.bob` and
+  no PVI PV.
+- A password on an EDM screen has no equivalent here. Writes it guarded are on `Protected
+  Controls` with no password.
+- Generated labels come from where text sits on a screen, and some will be wrong.
+- No generated screen has been checked by a person against running hardware.

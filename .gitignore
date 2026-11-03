@@ -83,3 +83,6 @@ DONE
 _raw-convert-out
 
 *.kubeconfig
+
+# default work folder of tools/pvi-from-edm
+pvi-from-edm-work/

@@ -152,6 +152,7 @@ commands = [
 
 [tool.ruff]
 src = ["src", "tests"]
+extend-exclude = ["tools"] # standalone tools keep their own style and tests
 lint.ignore = [
     "C408",  # Unnecessary collection call - e.g. list(...) instead of [...]
     "UP007", # Do not complain about Optional[] (TODO: remove once typer is patched)
