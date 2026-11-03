@@ -129,6 +129,10 @@ asynSetOption("ty_42_7",0,"stop",2)
 
 
 # serial port settings from DL8516Channel
+
+DLS8516DevConfigure(43, 0, 0, 1)
+
+DLS8516DevConfigure(43, 1, 0, 1)
 # HostlinkInterposeInit(asyn_port)
 HostlinkInterposeInit("ty_42_0")
 # finsDEVInit(FINS_port_name, asyn_port)
