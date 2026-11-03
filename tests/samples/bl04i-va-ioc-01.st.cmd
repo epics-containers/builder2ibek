@@ -113,6 +113,8 @@ asynSetOption("ty_42_0",0,"parity","even")
 
 # serial port settings from DL8516Channel
 
+DLS8516DevConfigure(41, 0, 0, 1)
+
 # Hy8401ipConfigure(cardNum, VMESlotNum, IPSlotNum, interruptVector, intEnable, aiType, externalClock, clockRate, inhibit, samples, spacing, triggered)
 Hy8401ipConfigure(50, $(BL04I-VA-IOC-01.Slot5), 0, $(Vec6), 0, 0, 0, 15, 0, 1, 1, 0)
 

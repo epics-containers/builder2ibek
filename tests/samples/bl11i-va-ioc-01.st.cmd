@@ -130,6 +130,8 @@ asynSetOption("ty_41_5",0,"parity","even")
 
 # serial port settings from DL8516Channel
 
+DLS8516DevConfigure(42, 0, 0, 1)
+
 dbLoadRecords /ioc.db
 iocInit
 

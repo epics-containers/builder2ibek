@@ -127,6 +127,7 @@ entity_models:
           {{ "ty_%02d_%d" % (card.cardid, channel) }}
 
     # DLS8515DevConfigure deprecated for RTEMS - use AsynSerial settings
+    # except duplex and turnaround delay, which only DLS8516DevConfigure can set
     pre_init:
       - when: first
         value: |
@@ -151,6 +152,7 @@ entity_models:
           {%- if flow == "S" %}
           asynSetOption("{{port_name}}",0,"xonxoff","Y")
           {%- endif %}
+          DLS8516DevConfigure({{ card.cardid }}, {{ channel }}, {{ delay }}, {{ 1 if fullduplex else 0 }})
 
   - name: DLS8515
     description: |-

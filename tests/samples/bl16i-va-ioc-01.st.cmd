@@ -118,6 +118,8 @@ asynSetOption("ty_41_7",0,"stop",2)
 
 # serial port settings from DL8516Channel
 
+DLS8516DevConfigure(42, 0, 0, 1)
+
 # ErConfigurePMC card_id card_index
 ErConfigurePMC 1 0
 # HostlinkInterposeInit(asyn_port)
