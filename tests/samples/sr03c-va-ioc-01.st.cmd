@@ -63,6 +63,8 @@ drvEtherIP_define_PLC("VLVCC_01_EIP", "192.168.3.10", 0)
 asSetFilename $(PVLOGGING)/src/access.acf
 set_logging_enable 1
 set_max_array_length 10
+# devSnmp default of 60 OIDs per GET is too many for terminal servers
+snmpMaxVarsPerMsg(30)
 
 dbLoadRecords /ioc.db
 iocInit

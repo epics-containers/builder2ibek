@@ -3,6 +3,7 @@ from builder2ibek.types import Entity, Generic_IOC
 from builder2ibek.utils import make_bool
 
 xml_component = "slsDetector"
+yaml_component = "slsDetector_dls"
 
 
 @globalHandler

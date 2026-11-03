@@ -28,8 +28,8 @@ pattern
 
 file "$(ADCORE)/db/NDPosPlugin.template" {
 pattern 
-	{ "NDARRAY_PORT", "ADDR", "SCANRATE", "NDARRAY_ADDR", "ENABLED", "P",               "R",     "TIMEOUT", "PORT"     }
-	{ "DET3.cam",     "0",    "I/O Intr", "0",            "1",       "BL99P-EA-DET-03", ":POS:", "1",       "DET3.pos" }
+	{ "P",               "R",     "PORT",     "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE" }
+	{ "BL99P-EA-DET-03", ":POS:", "DET3.pos", "DET3.cam",     "1",       "0",    "0",            "1",       "I/O Intr", "1000",  "0",     "256"     }
 }
 
 file "$(FFMPEGSERVER)/db/ffmpegStream.template" {
