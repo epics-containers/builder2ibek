@@ -39,5 +39,9 @@ for src in /dls /dls_sw; do
     # bindfs adds allow_other by default, which fusermount refuses unless
     # /etc/fuse.conf has user_allow_other. Not needed under rootless podman:
     # container root maps to this UID, which owns the mount.
-    bindfs -r --no-allow-other "$src" "$mnt"
+    # bindfs always has the kernel check mode bits (default_permissions) and
+    # does not pass NFS ACLs through, so ACL-granted visit directories would
+    # read as Permission denied. --perms=a+rX shows everything as readable;
+    # the daemon then reads as this user and the NFS server applies the ACLs.
+    bindfs -r --no-allow-other --perms=a+rX "$src" "$mnt"
 done
