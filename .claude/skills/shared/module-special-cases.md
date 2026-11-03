@@ -29,7 +29,14 @@ The public module at `ibek-support/iocStats/` defines
 Do **not** create a `ibek-support-dls/devIocStats/` — the DLS-specific
 copy was removed as redundant.
 
-## `autosave` — already converted; never add DLS `dlssr*` entities
+## `autosave` — already converted; don't add DLS `dlssr*` entities to `ibek-support`
+
+A hybrid RTEMS IOC is the one case that differs. Its binary and db come from the
+DLS `autosave` build, so the `dlssr*` templates are available to it, and with
+`autosave.Autosave` it serves `$(P)SR_status` rather than the `$(device):SRSTATUS`
+names its VxWorks IOC had. Any client still reading those names sees nothing. If
+one needs them, the models belong in `ibek-support-dls` under their own module
+name, because upstream `autosave` has no such templates.
 
 `autosave` needs **no new entity models**. The converter at
 `src/builder2ibek/converters/autosave.py` already maps
