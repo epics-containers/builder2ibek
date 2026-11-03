@@ -20,7 +20,7 @@ entities:
   - type: epics.EpicsCaMaxArrayBytes
     max_bytes: 9000000
 
-  - type: ADAndor.andorCCD
+  - type: ADAndor_dls.andorCCD
     BUFFERS: 2000
     INSTALLPATH: /dls_sw/prod/R3.14.12.7/support/ANAndor/etc
     P: BL99P-EA-DET-03
