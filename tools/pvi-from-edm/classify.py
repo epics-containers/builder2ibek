@@ -16,7 +16,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent))
-from protect import UNGATED  # noqa: E402
+from protect import MOVED, UNGATED  # noqa: E402
 from settings import CFG  # noqa: E402
 
 # A warning as a sentence: legends such as "High Temp Trip" and headings such as
@@ -143,9 +143,10 @@ def build(rows: list[dict], previous: dict) -> list[dict]:
         if password_gated(r):
             e["password_gated"] = True
         out.append(e)
-    # these need not be gated, so the evidence may not list them
+    # these need not be gated, so the evidence may not list them; a sweep skips hand-written folders
     listed = {(e["module"], e["entity"], e["pv"]) for e in out}
-    out += [e for k, e in previous.items() if e["class"] in UNGATED and k not in listed]
+    hand = {folder for _, folder in CFG.hand_written}
+    out += [e for k, e in previous.items() if (e["class"] in UNGATED or e["module"] in hand) and k not in listed]
     out.sort(key=sort_key)
     return out
 
@@ -160,8 +161,11 @@ def write_review():
             for pv in d.get("protected", {}):
                 moved[(f.parent.name, d["entity"], pv)] = True
     modules: dict[str, list[dict]] = {}
+    hand = {folder for _, folder in CFG.hand_written}
     for e in entries:
         modules.setdefault(e["module"], []).append(e)
+        if e["module"] in hand and e["class"] in MOVED and not e.get("not_placed"):
+            moved[(e["module"], e["entity"], e["pv"])] = True
 
     def doubt(m: str) -> tuple:
         rows = modules[m]
@@ -180,8 +184,9 @@ def write_review():
             where = "behind its dialog" if e.get("behind_dialog") else "Protected Controls" if key in moved else "main screen"
             cells = [e["class"] + (" (names only)" if e.get("names_only") else "") + (" (password on EDM)" if e.get("password_gated") else ""), where, e["pv"], e["entity"], e["evidence"], e["judged"]]
             trs.append(f'<tr class="{html.escape(e["class"])}">' + "".join(f"<td>{html.escape(str(c))}</td>" for c in cells) + "</tr>")
+        page = "written by hand" if m in hand else f'<a href="{html.escape(m)}.html">module page</a>'
         parts.append(f'<details id="{html.escape(m)}" open><summary><b>{html.escape(m)}</b>: {cc["dangerous"]} dangerous, {cc["unsure"]} unsure, {cc["mode-only"]} mode-only; {n_moved} moved '
-                     f'(<a href="{html.escape(m)}.html">module page</a>)</summary><div class=wrap><table><tr><th>class</th><th>where</th><th>PV</th><th>entity</th><th>evidence</th><th>judged</th></tr>{"".join(trs)}</table></div></details>')
+                     f'({page})</summary><div class=wrap><table><tr><th>class</th><th>where</th><th>PV</th><th>entity</th><th>evidence</th><th>judged</th></tr>{"".join(trs)}</table></div></details>')
     css = """:root{color-scheme:light dark;--bg:#fff;--fg:#1c2327;--mute:#5d6b73;--line:#d5dcdf;--d:#fbe9e7;--u:#fff6dc;--m:#fff}
 @media (prefers-color-scheme:dark){:root{--bg:#14191c;--fg:#e4e9eb;--mute:#9aa8af;--line:#334048;--d:#3a2220;--u:#37301a;--m:#14191c}}
 body{background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;margin:0 auto;max-width:1200px;padding:16px}

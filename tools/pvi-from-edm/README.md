@@ -43,8 +43,10 @@ Other fields say how much to trust an entry: `names_only` (judged from names and
 alone), `behind_dialog` (already behind a confirmation dialog, which stays, so only
 classified), `password_gated` (EDM asks for a password first; PVI has no such gate),
 `not_placed` (why a momentary PV has no widget). `judged` says who decided: `rule:*`, `read`,
-or `person`. To change one, edit its `class`, set `judged: person` so `classify` keeps your
-edit, and sweep again.
+`person`, or `hand-written` for what the author of a hand-written device put on `Protected
+Controls`. To change one, edit its `class`, set `judged: person` so `classify` keeps your
+edit, and sweep again. `classify` keeps the entries of hand-written folders as they are, and
+`audit` holds those folders to them.
 
 With no classification file every gated write counts as `unsure`, so all of them move.
 
@@ -92,8 +94,8 @@ uv run python tools/pvi-from-edm/pvi_from_edm.py sweep --dry-run --repo ibek-sup
 | `sweep [folder ...]` | Generate and validate each module without PVI, and install what passes. `--dry-run` writes to no support repo. A full sweep resets each folder it generates to its committed state first, removing untracked device files. |
 | `check` | Compare a sweep's output with the support repos, byte for byte, and list anything else changed there. Reads them only. Exit 1 on a difference. Folders starting `_` are ignored. |
 | `generate <module> ...` | One module that has its own `<overrides>/<module>.yaml`. `--write` also writes it to its repo. |
-| `validate [folder ...]` | Validate again what a sweep generated. |
-| `audit` | Check a sweep from the EDM screens and the `.bob` files rather than from what the generator says it did. Exit 1 on a failure. |
+| `validate [folder ...]` | Validate again what a sweep generated. With `--upstream-root DIR`, validate the hand-written folders instead: see below. |
+| `audit` | Check a sweep from the EDM screens and the `.bob` files rather than from what the generator says it did. It holds hand-written folders that have been validated to their classification entries. Exit 1 on a failure. |
 | `evidence` | Gather the facts on each gated write. |
 | `classify` | Write the classification file from the evidence. Entries with `judged: person` stay. `--out` writes elsewhere. |
 | `review [module ...]` | Pages drawing each EDM screen beside its generated `.bob`. |
@@ -104,6 +106,34 @@ Each module is checked with a test IOC instance made from its entity's parameter
 `ibek` `generate2` and `generate` must agree, a `.bob` must appear, and `msi` must expand
 the result so every PV can be compared with the records the IOC would load. An entity that
 fails is left out, and the reason goes in `sweep-status.json`.
+
+### Hand-written folders
+
+A sweep skips the `hand_written` folders and `check` lists them as skipped. Validate them
+from the repo as they stand, against upstream rather than a release, with:
+
+```bash
+uv run python tools/pvi-from-edm/pvi_from_edm.py validate --upstream-root CHECKOUTS --config ... --work-dir ...
+```
+
+`CHECKOUTS/<folder>` is a checkout of the module at the version its `install.yml` builds: this
+tool neither clones nor checks out. A public folder with none fails; any other falls back on its
+release. Each checkout is laid out as a release under `<work-dir>/upstream-build` as its Db
+Makefile would, with `msi`, and read from there. Each entity then has the checks above, and the
+records it loads that no signal uses go in `validate.json`, and for a public folder in
+`left-out.json` with a reason. Only a helper's record type gives a reason; any other record says
+that none was recorded. `sweep` rewrites that file, so run this after it.
+
+`<overrides>/<folder>.sweep.yaml` holds what such a folder needs:
+
+```yaml
+upstream_deps: [ADCore]         # other checkouts its templates include, under CHECKOUTS
+upstream_build: prebuilt        # .db files under CHECKOUTS that a plain msi cannot make
+test_values:                    # a value of its own, where a stand-in loads other records
+  ThingWithChannels: {NCHANS: 16}
+```
+
+A device file included or extended from another folder is found in the repos, however deep.
 
 ## Options
 
@@ -155,8 +185,8 @@ held_label_screens: [copied.edl]    # screens whose offLabel is a copy: use onLa
 `<overrides>/<folder>.yaml` pins a folder: its `repo` and `release` are fixed there rather
 than found, and it may carry `devices`, with `subst`, `skip_links`, `link_labels`,
 `extra_screens` and `judgements` per device, and `skip_entities`. `<overrides>/<folder>.sweep.yaml`
-adds `skip_entities` or `no_field_records` to a normal sweep. Each is a judgement and gets
-reported.
+adds `skip_entities`, `no_field_records` or `test_values` to a normal sweep. Each is a judgement
+and gets reported.
 
 ### Classification rules
 
@@ -174,3 +204,5 @@ and the file named by `--classify-rules`, for what was judged by reading a site'
   Controls` with no password.
 - Generated labels come from where text sits on a screen, and some will be wrong.
 - No generated screen has been checked by a person against running hardware.
+- `review` has no EDM screen to set beside a hand-written folder. It lists them, with the result of
+  validating each, and their `.bob` files are in the sandbox folder.

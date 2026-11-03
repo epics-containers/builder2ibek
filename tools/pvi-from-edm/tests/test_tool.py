@@ -1198,3 +1198,74 @@ def test_audit_fails_a_lost_release_on_another_field(tmp_path, monkeypatch):
 def test_audit_wants_a_stop_on_the_first_screen(tmp_path, monkeypatch):
     assert _audit_one(tmp_path, monkeypatch, "M.STOP", "keep-on-main", "d.pvi.bob", {"Stop": "1", "StopRelease": "0"}) == []
     assert _audit_one(tmp_path, monkeypatch, "N.STOP", "keep-on-main", "d_ProtectedControls.pvi.bob", {"Stop": "1", "StopRelease": "0"})
+
+
+def test_classify_keeps_what_a_hand_written_folder_holds():
+    CFG.hand_written = {("one", "byhand")}
+    kept = dict(module="byhand", entity="e", pv="P", evidence="hand-written", judged="hand-written", names_only=False, behind_dialog=False, **{"class": "dangerous"})
+    other = dict(kept, module="swept")
+    assert classify.build([], {("byhand", "e", "P"): kept, ("swept", "e", "P"): other}) == [kept]
+
+
+def test_a_test_value_replaces_a_stand_in():
+    from validate import build_instance
+
+    em = dict(name="E", parameters=dict(N=dict(type="int"), M=dict(type="int", default=2), S=dict(type="str")))
+    me = build_instance(em, "m", values=dict(N=16, M=3))[1][-1]
+    assert (me["N"], me["M"], me["S"]) == (16, 3, "TEST-S")
+
+
+def test_included_devices_are_found_however_deep(tmp_path):
+    from validate import copy_included
+
+    for name, body in (("Top", "- type: Include\n  file_name: Mid\n"), ("Mid", "  - type: Include\n    file_name: Low\n"), ("Low", "")):
+        folder = CFG.repos["one"] / name.lower()
+        folder.mkdir(parents=True)
+        (folder / f"{name}.pvi.device.yaml").write_text(body)
+    defs = tmp_path / "defs"
+    defs.mkdir()
+    (defs / "Top.pvi.device.yaml").write_text("- type: Include\n  file_name: Mid\n- type: Include\n  file_name: NotAnywhere\n")
+    copy_included(defs)
+    assert sorted(f.name.split(".")[0] for f in defs.iterdir()) == ["Low", "Mid", "Top"]
+
+
+def test_a_macro_comes_back_in_the_form_of_the_device():
+    from validate import macro_form
+
+    entities = [dict(type="m.E", P="TEST-P", CHAN=1, H="TEST-H")]
+    assert macro_form("TEST-P:1:THING", entities, "$(P)$(Q):$(CHAN):") == "$(P)$(Q):$(CHAN):THING"
+    assert macro_form("X-TEST-H:Y", entities, "$(P):") == "X-$(H):Y"
+
+
+def test_a_parent_device_is_found_like_an_include(tmp_path):
+    from validate import copy_included
+
+    folder = CFG.repos["one"] / "base"
+    folder.mkdir(parents=True)
+    (folder / "Base.pvi.device.yaml").write_text("label: Base\n")
+    defs = tmp_path / "defs"
+    defs.mkdir()
+    (defs / "Top.pvi.device.yaml").write_text("label: Top\nparent: Base\nchildren: []\n")
+    copy_included(defs)
+    assert (defs / "Base.pvi.device.yaml").exists()
+
+
+def test_a_section_that_has_pv_true_keeps_one():
+    text = "entity_models:\n  - name: e\n    pvi:\n      yaml_path: e.pvi.device.yaml\n      pv: true\n      pv_prefix: $(P)\n"
+    assert validate.add_pv_true(text, "e").count("pv: true") == 1
+
+
+def test_only_a_section_with_pv_true_may_emit_pvi_records():
+    import audit
+
+    v = dict(generate_matches_generate2=True, n_record_star_in_files=2, n_record_star_under_msi=2, expander="msi")
+    assert not audit.clean(v)
+    assert audit.clean(dict(v, pv_true=True))
+
+
+def test_a_record_on_the_screen_a_button_opens_counts_as_shown(tmp_path):
+    from validate import shown_through_refs
+
+    (tmp_path / "Chan.pvi.device.yaml").write_text("children:\n- type: SignalR\n  read_pv: $(P):$(N):THING.VAL\n")
+    (tmp_path / "Top.pvi.device.yaml").write_text("children:\n- type: Group\n  children:\n  - type: DeviceRef\n    ui: Chan.pvi.bob\n    macros:\n      P: $(P)\n      N: '7'\n")
+    assert shown_through_refs(tmp_path / "Top.pvi.device.yaml") == {"$(P):7:THING"}

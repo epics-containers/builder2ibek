@@ -101,14 +101,18 @@ def cmd_generate(a) -> int:
     need_repos()
     if not CFG.overrides:
         raise SystemExit("generate works from <overrides>/<module>.yaml: give --overrides; for the rest use sweep")
+    if hand := sorted(m for m in a.modules if m in {folder for _, folder in CFG.hand_written}):
+        raise SystemExit(f"written by hand, so not generated: {', '.join(hand)}")
     generate(a.modules, a.write)
     return 0
 
 
 def cmd_validate(a) -> int:
-    from validate import definitions_map, validate_stage
+    from validate import definitions_map, validate_hand_written, validate_stage
 
     need_repos()
+    if a.upstream_root:
+        return validate_hand_written(a.folders, a.upstream_root.resolve())
     status = json.loads((CFG.status / "sweep-status.json").read_text())
     defs = definitions_map()
     bad = 0
@@ -213,6 +217,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--write", action="store_true", help="also write to its support repo")
     p = add("validate", cmd_validate, "validate again what a sweep generated")
     p.add_argument("folders", nargs="*", help="only these module folders")
+    p.add_argument("--upstream-root", type=Path, help="validate the hand-written folders instead, against the checkouts in this folder, one per module at the version it builds")
     add("audit", cmd_audit, "check the output of a sweep against the EDM screens and the .bob files; exit 1 on a failure")
     add("evidence", cmd_evidence, "gather the facts on each gated write, for classify")
     p = add("classify", cmd_classify, "write the classification file from the evidence; entries judged by a person stay")

@@ -364,6 +364,15 @@ def review(modules: list[str]):
                         f'<td>{v["screen_only"]}</td><td>{v["gated"]}</td><td>{v.get("protected", 0)}</td><td>{v["dialogs"]}</td><td>{v["judgements"]}</td><td>{esc(", ".join(v["how"]))}</td>'
                         f'<td>{esc(Path(v["release"]).name)}: {esc(v["release_how"])}</td></tr>')
         body.append("</table>")
+        hand = sorted((v for v in status.values() if v.get("status") == "hand_written" and v["repo"] == repo), key=lambda v: v["dir"])
+        if hand:
+            body.append("<h3>Written by hand</h3><p class=\"note\">No EDM screen to set beside them. Their .bob files are in the sandbox folder.</p><table><tr><th>module</th><th>validated against</th><th>entities passing</th><th>signals</th></tr>")
+            for v in hand:
+                vf = CFG.output / v["dir"] / "validate.json"
+                val = json.loads(vf.read_text()) if vf.exists() else None
+                cells = [val["against"], f'{len(val["ok_entities"])} of {len(val["entities"])}', sum(e.get("n_pvi_signals", 0) for e in val["entities"].values())] if val else ["not validated", "", ""]
+                body.append(f'<tr><td>{esc(v["dir"])}</td>' + "".join(f"<td>{esc(str(c))}</td>" for c in cells) + "</tr>")
+            body.append("</table>")
         others = sorted((v for v in status.values() if v.get("status") in ("failed", "skipped") and v["repo"] == repo), key=lambda v: (v["status"], v["cls"], v["dir"]))
         body.append("<h3>Not written</h3><table><tr><th>module</th><th>outcome</th><th>class</th><th>reason</th></tr>")
         for v in others:

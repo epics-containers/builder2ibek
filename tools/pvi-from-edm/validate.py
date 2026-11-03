@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dbparse import parse_db  # noqa: E402
 from fielddefs import fields_of  # noqa: E402
 from gen import entity_block, head_text  # noqa: E402
-from release import db_search_path  # noqa: E402
+from release import db_search_path, last_resort, pick  # noqa: E402
 from settings import CFG  # noqa: E402
 
 IBEK = str(Path(sys.executable).parent / "ibek")
@@ -57,13 +57,18 @@ def object_attrs(block: str, param: str) -> list[str]:
     return sorted(set(re.findall(rf"\b{re.escape(param)}\.(\w+)", block)))
 
 
-def build_instance(em: dict, module: str, numeric: bool = False) -> tuple[list[dict], list[dict]]:
-    """Stub entity models for object parameters, and the instance entities."""
+def build_instance(em: dict, module: str, numeric: bool = False, values: dict | None = None) -> tuple[list[dict], list[dict]]:
+    """Stub entity models for object parameters, and the instance entities. `values` gives
+    a parameter a value of its own, where a stand-in would load different records."""
+    values = values or {}
     block = yaml.safe_dump(em, width=100000)  # anchors expanded
     stubs: list[dict] = []
     entities: list[dict] = []
     me: dict = {"type": f"{module}.{em['name']}"}
     for name, p in (em.get("parameters") or {}).items():
+        if name in values:
+            me[name] = values[name]
+            continue
         if p.get("default") is not None:
             continue
         if p.get("type") == "object":
@@ -113,6 +118,25 @@ def dep_definitions(text: str, own: str, defs: dict[str, Path]) -> list[Path]:
         found.append(defs[m])
         todo.extend(foreign_modules(defs[m].read_text(errors="replace"), m))
     return found
+
+
+def device_files() -> dict[str, Path]:
+    """Every device file of the repos by its name, so an Include can find another module's."""
+    out: dict[str, Path] = {}
+    for repo in CFG.repos.values():
+        for f in sorted(repo.glob("*/*.pvi.device.yaml")):
+            out.setdefault(f.name.split(".")[0], f)
+    return out
+
+
+def copy_included(folder: Path):
+    """The device files that those in `folder` include or extend, however deep and from whichever module."""
+    known = device_files()
+    todo = list(folder.glob("*.pvi.device.yaml"))
+    while todo:
+        for name in re.findall(r"^\s*(?:- )?(?:file_name|parent):\s*(\S+)", todo.pop().read_text(), re.M):
+            if name in known and not (folder / f"{name}.pvi.device.yaml").exists():
+                todo.append(Path(shutil.copy(known[name], folder / f"{name}.pvi.device.yaml")))
 
 
 def strip_blocks(subst: str, search: list[Path], extra: list[Path]) -> tuple[str, list[str]]:
@@ -183,8 +207,22 @@ def marked_device(text: str) -> str:
 def add_pv_true(text: str, entity: str) -> str:
     s, e = entity_block(text, entity)
     lines = text.splitlines()
+    if any(lines[j].startswith("      pv: true") for j in range(s, e)):
+        return text
     i = next(j for j in range(s, e) if lines[j].startswith("      pv_prefix:"))
     return "\n".join([*lines[:i], "      pv: true", *lines[i:]]) + "\n"
+
+
+def macro_form(pv: str, entities: list[dict], prefix: str) -> str:
+    """A PV of a test instance in the macros of its device: the entity's `pv_prefix`, and
+    the stand-in text values of the rest."""
+    given = {k: str(v) for e in entities for k, v in e.items() if k not in ("type", "name")}
+    start = re.sub(r"\$\((\w+)\)", lambda m: given.get(m.group(1), ""), prefix)
+    head, tail = (prefix, pv[len(start) :]) if start and pv.startswith(start) else ("", pv)
+    stand_ins = {v: k for k, v in given.items() if v.startswith("TEST-")}
+    for value in sorted(stand_ins, key=len, reverse=True):
+        tail = tail.replace(value, f"$({stand_ins[value]})")
+    return head + tail
 
 
 def run_ibek(args: list[str], env: dict) -> subprocess.CompletedProcess:
@@ -215,7 +253,7 @@ def _validate_entity(module: str, em: dict, staged: Path, text: str, ov: dict, d
     (box / "ioc" / "config").mkdir(parents=True)
     for f in staged.glob("*.pvi.device.yaml"):
         shutil.copy(f, box / "pvi-defs" / f.name)
-    stubs, entities = build_instance(em, module, numeric)
+    stubs, entities = build_instance(em, module, numeric, (ov.get("test_values") or {}).get(em["name"]))
     inst = box / "test-ioc.ibek.ioc.yaml"
     inst.write_text(yaml.safe_dump(dict(ioc_name="test-ioc", description=f"test instance for {module}", entities=entities), sort_keys=False))
     stubf = box / "sweepstub.ibek.support.yaml"
@@ -226,6 +264,7 @@ def _validate_entity(module: str, em: dict, staged: Path, text: str, ov: dict, d
         for f in d.parent.glob("*.pvi.device.yaml"):
             if not (box / "pvi-defs" / f.name).exists():
                 shutil.copy(f, box / "pvi-defs" / f.name)
+    copy_included(box / "pvi-defs")
     all_defs = [sup, stubf, *dep_defs]
     env = {**os.environ, "EPICS_ROOT": str(box), "IOC_NAME": "test-ioc"}
     out = box / "runtime"
@@ -237,18 +276,21 @@ def _validate_entity(module: str, em: dict, staged: Path, text: str, ov: dict, d
         return res
     subst2 = (out / "ioc.subst").read_text()
     stcmd2 = (out / "st.cmd").read_text()
+    bobs2 = {f.name: f.read_bytes() for f in (box / "opi").glob("*.bob")}
     g1 = run_ibek(["generate", str(inst), *map(str, all_defs), "-o", str(out)], env)
     if g1.returncode:
         res.update(ok=False, cls="ibek_pvi", reason="generate: " + last_error(g1))
         return res
     subst = (out / "ioc.subst").read_text()
-    res["generate_matches_generate2"] = subst == subst2 and (out / "st.cmd").read_text() == stcmd2
+    bobs1 = {f.name: f.read_bytes() for f in (box / "opi").glob("*.bob")}
+    res["generate_matches_generate2"] = subst == subst2 and (out / "st.cmd").read_text() == stcmd2 and bobs1 == bobs2
     release = Path(ov["release"])
     search = db_search_path(release, [CFG.repos[ov["repo"]] / ov.get("dir", module)])
     for d in dep_defs:
         if d.parent not in search:
             search.append(d.parent)
     # what the instance itself emits: no PVI PV, so no record("*") in any file or under msi
+    res["pv_true"] = bool(em["pvi"].get("pv"))
     res["n_record_star_in_files"] = sum(f.read_text(errors="replace").count('record("*"') for f in out.rglob("*") if f.is_file())
     res["n_record_star_under_msi"] = len(expand_db(subst, search, out, box)["pvi"])
     # no PVI records to expand, so a copy with them, its field PVs marked, gives
@@ -279,6 +321,7 @@ def _validate_entity(module: str, em: dict, staged: Path, text: str, ov: dict, d
             defs = fields_of(real[bases[n]], release)
             if defs is None or fld not in defs:
                 bad_fields.append(f"{bases[n]}.{fld} ({real[bases[n]]})")
+    res["records_unused"] = {macro_form(n, entities, em["pvi"].get("pv_prefix") or ""): t for n, t in real.items() if n not in set(bases.values())}
     res["n_field_pvs"] = sum(1 for n in pvi if FIELD_MARK in n)
     res["field_pv_invalid"] = sorted(set(bad_fields))
     res.update(pvi_pv_missing_from_db=missing, pvi_pv_unexpanded=unexpanded)
@@ -369,3 +412,146 @@ def validate_stage(module: str, ov: dict, staged: Path, defs: dict | None = None
     res["hygiene"] = hygiene(staged) if ov["repo"] in CFG.public_repos else []
     res["ok_entities"] = sorted(k for k, v in res["entities"].items() if v.get("ok"))
     return res
+
+
+def layout_release(checkout: Path, build: Path, dep_dirs: list[Path], over: list[Path]) -> tuple[Path, list[str]]:
+    """A checkout laid out as a release in `build`, as its Db Makefile would: x.db from
+    x.substitutions with msi, or from x.template. `dep_dirs` are such releases it needs,
+    `over` folders whose files replace the ones built here. Returns it and what msi refused."""
+    msi = CFG.msi_path()
+    if msi is None:
+        raise SystemExit("validating against a checkout needs msi: give --msi")
+    db = build / "db"
+    shutil.rmtree(build, ignore_errors=True)
+    db.mkdir(parents=True)
+    (build / "dbd").mkdir()
+    sources = sorted(p for p in checkout.rglob("*") if p.is_file() and ".git" not in p.parts)
+    for s in sources:
+        if s.suffix in (".template", ".db", ".substitutions", ".vdb") and not (db / s.name).exists():
+            shutil.copy(s, db / s.name)
+        if s.name.endswith("Record.dbd") and not (build / "dbd" / s.name).exists():
+            shutil.copy(s, build / "dbd" / s.name)
+    for s in sources:
+        if s.suffix == ".template" and not (db / f"{s.stem}.db").exists():
+            shutil.copy(s, db / f"{s.stem}.db")
+    if dep_dirs:
+        (build / "configure").mkdir()
+        (build / "configure" / "RELEASE").write_text("".join(f"DEP{i}={d}\n" for i, d in enumerate(dep_dirs)))
+    inc = [a for d in [db, *(d / "db" for d in dep_dirs), *last_resort()] for a in ("-I", str(d))]
+    refused: list[str] = []
+    substitutions = sorted(s for s in db.glob("*.substitutions"))
+    for last in (False, True):  # they may build on each other
+        for s in substitutions:
+            p = subprocess.run([str(msi), *inc, "-S", str(s), "-o", str(db / f"{s.stem}.db")], capture_output=True, text=True, errors="replace")
+            if p.returncode and last:
+                refused.append(f"{s.name}: {p.stderr.strip()[-120:]}")
+    for d in over:
+        for f in d.glob("*.db"):
+            shutil.copy(f, db / f.name)
+    return build, refused
+
+
+LEFT_OUT_HELPERS = {"calc", "calcout", "scalcout", "acalcout", "fanout", "dfanout", "seq", "sseq", "sub", "asub", "transform", "compress", "subarray"}
+
+
+def left_out_rows(records: dict[str, str]) -> list[dict]:
+    """A hand-written device's unused records. A helper's type says why it is out; for any
+    other record the type is all a validation knows, so the reason says that."""
+    def why(rtype: str) -> str:
+        if rtype.lower() in LEFT_OUT_HELPERS:
+            return f"internal: {rtype} helper"
+        return f"not shown, reason not recorded: {rtype} record"
+
+    return [dict(pv=pv, reason=why(rtype)) for pv, rtype in sorted(records.items())]
+
+
+def shown_through_refs(device: Path) -> set[str]:
+    """PVs on the screens a device's buttons open: DeviceRefs to devices beside it, with the
+    macros the button passes. Field PVs count as their record."""
+    def refs(tree: list[dict]):
+        for c in tree:
+            if c.get("type") == "Group":
+                yield from refs(c["children"])
+            elif c.get("type") == "DeviceRef":
+                yield c
+
+    shown: set[str] = set()
+    for c in refs(yaml.safe_load(device.read_text()).get("children") or []):
+        target = device.parent / f"{c['ui'].split('.')[0]}.pvi.device.yaml"
+        if target.exists():
+            macros = {k: str(v) for k, v in (c.get("macros") or {}).items()}
+            for pv in re.findall(r"^\s*(?:read_pv|write_pv): (\S+)", target.read_text(), re.M):
+                shown.add(re.sub(r"\$\((\w+)\)", lambda m: macros.get(m.group(1), m.group(0)), pv).partition(".")[0])
+    return shown
+
+
+def validate_hand_written(folders: list[str], upstream_root: Path) -> int:
+    """Each hand-written folder, as it stands in its repo, against `<upstream_root>/<folder>`.
+    A public folder needs that checkout. Any other falls back on its release. Settings for a
+    folder are in <overrides>/<folder>.sweep.yaml: test_values, upstream_deps, upstream_build."""
+    defs = definitions_map()
+    work = CFG.status / "upstream-build"
+    built: dict[str, Path] = {}
+    bad = 0
+    status_path = CFG.status / "sweep-status.json"
+    status = json.loads(status_path.read_text()) if status_path.exists() else {}
+    left_path = CFG.status / "left-out.json"
+    left = json.loads(left_path.read_text()) if left_path.exists() else {}
+    for repo_key, folder in sorted(CFG.hand_written):
+        if folders and folder not in folders:
+            continue
+        repo = CFG.repos[repo_key]
+        yaml_name = next((repo / folder).glob("*.ibek.support.yaml")).name
+        extra = CFG.overrides / f"{folder}.sweep.yaml" if CFG.overrides else None
+        settings = (yaml.safe_load(extra.read_text()) if extra and extra.exists() else None) or {}
+        ov = dict(repo=repo_key, dir=folder, yaml=yaml_name, test_values=settings.get("test_values"))
+        checkout = upstream_root / folder
+        refused: list[str] = []
+        if checkout.is_dir():
+            dep_dirs = []
+            for dep in settings.get("upstream_deps", []):
+                if dep not in built:
+                    built[dep], more = layout_release(upstream_root / dep, work / dep, [], [])
+                    refused += more
+                dep_dirs.append(built[dep])
+            release, more = layout_release(checkout, work / folder, dep_dirs, [upstream_root / settings["upstream_build"]] if "upstream_build" in settings else [])
+            refused += more
+            commit = subprocess.run(["git", "-C", str(checkout), "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+            how = f"upstream checkout at {commit}"
+        elif repo_key in CFG.public_repos:
+            print(f"{folder}: no checkout at {checkout}: a public folder is validated against upstream", flush=True)
+            bad += 1
+            continue
+        else:
+            install = next(iter(yaml.safe_load(f.read_text()) for f in (repo / folder).glob("*.install.yml")), {})
+            module = re.search(r"^module:\s*(\S+)", (repo / folder / yaml_name).read_text(), re.M).group(1)
+            rel, how = pick(folder, module, install)
+            if rel is None:
+                print(f"{folder}: {how}", flush=True)
+                bad += 1
+                continue
+            release = rel
+        ov["release"] = str(release)
+        (CFG.output / folder).mkdir(parents=True, exist_ok=True)
+        val = validate_stage(folder, ov, repo / folder, defs)
+        val.update(against=how, msi_refused=refused)
+        (CFG.output / folder / "validate.json").write_text(json.dumps(val, indent=1, default=str))
+        status.setdefault(folder, dict(repo=repo_key, dir=folder, yaml=yaml_name, status="hand_written"))
+        if repo_key in CFG.public_repos:
+            left.pop(folder, None)
+            sup = yaml.safe_load((repo / folder / yaml_name).read_text())
+            for em in sup.get("entity_models") or []:
+                unused = val["entities"].get(em["name"], {}).get("records_unused")
+                if unused:
+                    stem = em["pvi"]["yaml_path"].split(".")[0]
+                    shown = shown_through_refs(repo / folder / em["pvi"]["yaml_path"])
+                    rows = {r["pv"]: r for r in left.setdefault(folder, {}).get(stem, [])} | {r["pv"]: r for r in left_out_rows({k: v for k, v in unused.items() if k not in shown})}
+                    left[folder][stem] = [rows[k] for k in sorted(rows)]
+        failed = {k: v.get("cls") for k, v in val["entities"].items() if not v.get("ok")}
+        problems = [*([val["yaml_purity"]] if val["yaml_purity"] else []), *val["hygiene"][:3]]
+        bad += bool(failed or problems)
+        print(f"{folder} ({how}): {len(val['ok_entities'])} of {len(val['entities'])} entities pass {failed or ''} {problems or ''}".rstrip(), flush=True)
+    status_path.parent.mkdir(parents=True, exist_ok=True)
+    status_path.write_text(json.dumps(status, indent=1, default=str))
+    left_path.write_text(json.dumps(left, indent=1))
+    return 1 if bad else 0

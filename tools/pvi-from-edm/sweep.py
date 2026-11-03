@@ -264,7 +264,8 @@ def finish(status: dict):
 def report_stale(gated: list[dict]):
     """Entries of the classification file that no longer match a gated write or a dialog."""
     known = {(g["module"], g["entity"], p.strip()) for g in gated for p in g["pv"].split(",")}
-    stale = sorted(k for k, e in load_classes().items() if k not in known and e["class"] not in UNGATED)
+    hand = {folder for _, folder in CFG.hand_written}
+    stale = sorted(k for k, e in load_classes().items() if k not in known and e["class"] not in UNGATED and k[0] not in hand)
     if stale:
         print(f"classification file: {len(stale)} entries match nothing, e.g. {stale[:3]}", flush=True)
 
@@ -346,6 +347,8 @@ def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False):
             status[it["dir"]].update(fork_status=main_st.get("status"))
     status_path.write_text(json.dumps(status, indent=1, default=str))
     finish(status)
+    if CFG.hand_written:
+        print(f"written by hand, skipped: {', '.join(sorted(d for _, d in CFG.hand_written))}", flush=True)
     if not folders:
         check_collisions()
 
@@ -402,5 +405,7 @@ def check() -> int:
                 extra.append(f"changed in the repo, not by the sweep: {repo_key}/{p}")
     for line in different + extra:
         print(line)
+    if CFG.hand_written:
+        print(f"written by hand, skipped: {', '.join(sorted(d for _, d in CFG.hand_written))}")
     print(f"compared {compared} files: {len(different)} different; {len(extra)} changed in a repo but not produced; {hand} changed in hand-written folders, not compared")
     return 1 if different or extra else 0

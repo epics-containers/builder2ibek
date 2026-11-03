@@ -267,3 +267,88 @@ def test_a_repo_must_be_the_top_of_a_git_checkout(example):
 def test_dump_edl_prints_rows(example):
     edl_file = example / "prod" / "support" / "demoHeater" / "1-0" / "data" / "demoHeater.edl"
     assert "read:$(P):TEMP" in run("dump-edl", edl_file).stdout
+
+
+# Validating hand-written folders against a checkout
+
+
+def _hand_written(example):
+    """demoHeater as a hand-written folder, its device including one from another folder."""
+    support = example / "support"
+    (example / "pvi-from-edm.yaml").write_text((example / "pvi-from-edm.yaml").read_text() + "hand_written: [{repo: demo, folder: demoHeater}]\n")
+    common = _common(example)
+    (support / "shared").mkdir()
+    (support / "shared" / "Shared.pvi.device.yaml").write_text(
+        "label: Shared\nchildren:\n- type: SignalR\n  name: Spare\n  read_pv: $(P):SPARE\n  read_widget:\n    type: TextRead\n"
+    )
+    run("sweep", "--jobs", 1, "--dry-run", *common)
+    return common
+
+
+def _install_by_hand(example):
+    """What a person would write: the generated device, the section, and an Include."""
+    run("sweep", "--dry-run", "--jobs", 1, *_common(example))
+    out = example / "work" / "out" / "demoHeater"
+    folder = example / "support" / "demoHeater"
+    (folder / "demoHeater.pvi.device.yaml").write_text((out / "demoHeater.pvi.device.yaml").read_text().replace("children:\n", "children:\n- type: Include\n  file_name: Shared\n", 1))
+    (folder / "demoHeater.ibek.support.yaml").write_text((out / "demoHeater.ibek.support.yaml").read_text())
+
+
+def _checkout(example, tmp_path):
+    """demoHeater's release as a checkout, with one more record, and a dependency holding SPARE."""
+    root = tmp_path / "upstream"
+    (root / "demoHeater" / "demoHeaterApp" / "Db").mkdir(parents=True)
+    for f in (example / "prod" / "support" / "demoHeater" / "1-0" / "db").iterdir():
+        (root / "demoHeater" / "demoHeaterApp" / "Db" / f.name).write_text(f.read_text() + 'record(ai, "$(P):SPARE") {}\nrecord(calc, "$(P):HELP") {}\nrecord(bo, "$(P):NOTSHOWN") {}\n')
+    return root
+
+
+def test_validate_takes_a_hand_written_folder_from_its_checkout(example, tmp_path):
+    _install_by_hand(example)
+    common = _hand_written(example)
+    p = run("validate", "--upstream-root", _checkout(example, tmp_path), *common)
+    assert "demoHeater (upstream checkout at" in p.stdout and "1 of 1 entities pass" in p.stdout, p.stdout
+    val = json.loads((example / "work" / "out" / "demoHeater" / "validate.json").read_text())["entities"]["controller"]
+    assert val["ok"] and val["generate_matches_generate2"] and "$(P):HELP" in val["records_unused"]
+
+
+def test_a_public_hand_written_folder_needs_its_checkout_and_lists_what_it_leaves_out(example, tmp_path):
+    _install_by_hand(example)
+    text = (example / "pvi-from-edm.yaml").read_text()
+    (example / "pvi-from-edm.yaml").write_text(text + "public_repos: [demo]\n")
+    common = _hand_written(example)
+    root = _checkout(example, tmp_path)
+    p = run("validate", "--upstream-root", tmp_path / "none", *common, check=False)
+    assert p.returncode == 1 and "no checkout" in p.stdout
+    run("validate", "--upstream-root", root, *common)
+    rows = {r["pv"]: r["reason"] for r in json.loads((example / "work" / "left-out.json").read_text())["demoHeater"]["demoHeater"]}
+    assert rows["$(P):HELP"] == "internal: calc helper"
+    assert rows["$(P):NOTSHOWN"] == "not shown, reason not recorded: bo record"
+    assert "$(P):SPARE" not in rows
+
+
+def test_the_audit_holds_a_hand_written_folder_to_its_classification(example, tmp_path):
+    _install_by_hand(example)
+    common = _hand_written(example)
+    run("validate", "--upstream-root", _checkout(example, tmp_path), *common)
+    device = (example / "support" / "demoHeater" / "demoHeater.pvi.device.yaml").read_text()
+    pv = next(ln.split(": ", 1)[1] for ln in device.splitlines() if ln.strip().startswith("write_pv:"))
+    (example / "classification.yaml").write_text(yaml.safe_dump([dict(module="demoHeater", entity="controller", pv=pv, evidence="hand-written", judged="hand-written", names_only=False, behind_dialog=False, **{"class": "dangerous"})]))
+    p = run("audit", *common, check=False)
+    assert p.returncode == 1, p.stdout
+    assert pv in json.dumps(json.loads((example / "work" / "audit.json").read_text())["protected"]["writable_elsewhere"])
+
+
+def test_generate_refuses_a_hand_written_folder(example):
+    text = (example / "pvi-from-edm.yaml").read_text()
+    (example / "pvi-from-edm.yaml").write_text(text + "hand_written: [{repo: demo, folder: demoHeater}]\n")
+    p = run("generate", "demoHeater", *_common(example), check=False)
+    assert p.returncode != 0 and "written by hand" in p.stderr
+
+
+def test_check_and_sweep_name_the_hand_written_folders_they_skip(example):
+    text = (example / "pvi-from-edm.yaml").read_text()
+    (example / "pvi-from-edm.yaml").write_text(text + "hand_written: [{repo: demo, folder: demoHeater}]\n")
+    common = _common(example)
+    assert "written by hand, skipped: demoHeater" in run("sweep", "--dry-run", "--jobs", 1, *common).stdout
+    assert "written by hand, skipped: demoHeater" in run("check", *common).stdout

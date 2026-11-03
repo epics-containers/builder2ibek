@@ -148,18 +148,42 @@ def audit_momentary(found: list, classes: list[dict], devices: dict) -> dict:
     return dict(rows=rows, bad=bad)
 
 
+def clean(v: dict) -> bool:
+    """A validated entity whose counts say what a pass has to mean. An entity with `pv: true`,
+    which only a hand-written section has, emits its PVI records by design."""
+    stars = v.get("pv_true") or (v.get("n_record_star_in_files") == 0 and v.get("n_record_star_under_msi") == 0)
+    return bool(v.get("generate_matches_generate2")) and stars and not v.get("pvi_pv_missing_from_db") and not v.get("pvi_pv_unexpanded") and not v.get("field_pv_invalid") and v.get("expander") == "msi"
+
+
 def main() -> int:
     status = json.loads((CFG.status / "sweep-status.json").read_text())
     classes = (yaml.safe_load(CFG.classification.read_text()) or []) if CFG.classification else []
     out: dict = dict(buttons=dict(checked=0, in_panel=0, reasons={}, missing=[], left_out=[], momentary=[]), merged={}, protected=dict(checked=0, on_protected=0, writable_elsewhere=[], not_on_protected=[]), keep_on_main=[], not_ok=[])
     devices = {}
+    not_validated = []
+    absent: set[str] = set()
     for key, st in status.items():
+        if st.get("status") == "hand_written":
+            vf = CFG.output / key / "validate.json"
+            if not vf.exists():
+                not_validated.append(key)
+                continue
+            val = json.loads(vf.read_text())
+            sup = yaml.safe_load((CFG.repos[st["repo"]] / st["dir"] / st["yaml"]).read_text())
+            for em in sup.get("entity_models") or []:
+                if em.get("pvi"):
+                    devices[(st["dir"], em["name"])] = (key, dict(file_stem=em["pvi"]["yaml_path"].split(".")[0]))
+            for name, v in val["entities"].items():
+                if not v.get("ok") or not clean(v):
+                    out["not_ok"].append((key, name, v.get("reason") or v.get("expander")))
+            absent.update({t for v in val["entities"].values() for t in v.get("missing_templates") or []})
+            continue
         if st.get("status") != "done":
             continue
         rep = json.loads((CFG.output / key / "report.json").read_text())
         val = json.loads((CFG.output / key / "validate.json").read_text())
         for name, v in val["entities"].items():
-            if v.get("ok") and (not v.get("generate_matches_generate2") or v.get("n_record_star_in_files") != 0 or v.get("n_record_star_under_msi") != 0 or v.get("pvi_pv_missing_from_db") or v.get("pvi_pv_unexpanded") or v.get("field_pv_invalid") or v.get("expander") != "msi"):
+            if v.get("ok") and not clean(v):
                 out["not_ok"].append((key, name, v.get("expander")))
         for stem, d in rep["devices"].items():
             if "error" in d or not (CFG.output / key / f"{d.get('file_stem')}.pvi.device.yaml").exists():
@@ -222,5 +246,6 @@ def main() -> int:
     for k in out["keep_on_main"]:
         print(f"  keep-on-main {k['module']} {k['pv']}: root={k['on_root']} protected={k['protected']} {k['bobs']}")
     print(f"password gated: {out['password_gated']}; entities not clean: {len(out['not_ok'])}")
+    print(f"written by hand: not validated {sorted(not_validated)}; templates an entity loads and upstream lacks {sorted(absent)}")
     print(f"behind-dialog entries on a first screen: {p.get('dialog_entry_on_first_screen', [])}")
     return 1 if out["momentary"]["bad"] or b["missing"] or out["merged_not_in_bob"] or p["writable_elsewhere"] or out["not_ok"] or not all(k["on_root"] and not k["protected"] for k in out["keep_on_main"]) else 0
