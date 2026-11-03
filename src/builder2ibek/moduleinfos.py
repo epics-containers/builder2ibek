@@ -13,6 +13,8 @@ class ModuleInfo:
     defaults: dict[str, dict[str, Any]]
     schema: str
     yaml_component: str
+    # parameters to write first, in this order; the rest follow alphabetically
+    param_order: list[str]
 
 
 module_infos: dict[str, ModuleInfo] = {}
@@ -40,6 +42,7 @@ for converter in converters:
                 getattr(module, "defaults", {}),
                 getattr(module, "schema", ""),
                 getattr(module, "yaml_component", xml_component),
+                getattr(module, "param_order", []),
             )
             if isinstance(xml_component, str):
                 module_infos[xml_component] = info

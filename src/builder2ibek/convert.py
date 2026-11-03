@@ -27,9 +27,11 @@ def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
         return yaml
 
     """Convert a single builder XML file into a single ibek YAML"""
+    yaml.parent.mkdir(parents=True, exist_ok=True)
+
     builder = Builder()
     builder.load(xml)
-    ioc = dispatch(builder, xml, description=description)
+    ioc = dispatch(builder, xml, yaml.parent, description=description)
 
     ruamel = YAML()
 
@@ -43,16 +45,22 @@ def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
 
     ruamel.indent(mapping=2, sequence=4, offset=2)
 
-    yaml.parent.mkdir(parents=True, exist_ok=True)
-
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 
 
-def dispatch(builder: Builder, filename, description: str = "") -> Generic_IOC:
+def dispatch(
+    builder: Builder,
+    filename,
+    out_dir: Path | None = None,
+    description: str = "",
+) -> Generic_IOC:
     """
     Dispatch every element in the XML to the correct convertor
     and build a generic IOC from the converted Entities
+
+    out_dir is the folder the converted YAML is written to; convertors that
+    generate additional files write them there.
     """
     if not description:
         description = (
@@ -76,6 +84,7 @@ def dispatch(builder: Builder, filename, description: str = "") -> Generic_IOC:
             {"type": "devIocStats.iocAdminSoft", "IOC": "{{ ioc_name | upper }}"},
         ],
         source_file=filename,
+        out_dir=out_dir or Path(),
     )
 
     do_dispatch(builder, ioc)
@@ -102,10 +111,23 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
 
         ioc.already_converted.append(entity)
 
+    param_orders = {
+        info.yaml_component: info.param_order for info in module_infos.values()
+    }
+
     sorted_entities: list[Entity] = []
     for entity in ioc.entities:  # type: ignore
-        # sort the args by key
-        entity = Entity(sorted(entity.items()))  # type: ignore
+        # sort the args by the module's param_order, then alphabetically
+        order = param_orders.get(str(entity["type"]).split(".")[0], [])
+        entity = Entity(
+            sorted(
+                entity.items(),
+                key=lambda kv: (
+                    order.index(kv[0]) if kv[0] in order else len(order),
+                    kv[0],
+                ),
+            )
+        )  # type: ignore
         # but move type to the start of each entity
         entity = Entity(type=entity.pop("type"), **entity)
         sorted_entities.append(entity)

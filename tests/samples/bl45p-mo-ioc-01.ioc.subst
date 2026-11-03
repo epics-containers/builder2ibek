@@ -22,8 +22,8 @@ pattern
 
 file "pmacController.template" {
 pattern 
-	{ "FEEDRATE", "CSG7", "CSG6", "CSG5", "CSG4", "CSG3", "CSG2", "CSG1", "CSG0", "P",                "TIMEOUT", "NAXES", "PORT"   }
-	{ "100",      "",     "",     "",     "",     "",     "",     "",     "",     "BL45P-MO-STEP-01", "4",       "8",     "BRICK1" }
+	{ "FEEDRATE", "CSG7", "CSG6", "CSG5", "CSG4", "CSG3", "CSG2", "CSG1", "CSG0",    "P",                "TIMEOUT", "NAXES", "PORT"   }
+	{ "100",      "",     "",     "",     "",     "",     "",     "",     "Default", "BL45P-MO-STEP-01", "4",       "8",     "BRICK1" }
 }
 
 file "dls_pmac_asyn_motor.template" {

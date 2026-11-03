@@ -78,6 +78,9 @@ bumping a submodule.
 - `/beamline-convert <beamline> [services-repo]` — convert all builder XML IOCs for a beamline
 - `/beamline-reconvert <beamline> [services-repo]` — re-run xml2yaml on all IOCs and validate schema
 - `/beamline-check <beamline> [services-repo]` — run ioc-check on all IOCs in a beamline
+- `/compose2helm <compose-repo>[/services/<name>] [helm-services-repo]` — port IOC
+  instances from a docker-compose services repo to a helm `ioc-instance` services
+  repo, bumping generic IOC images to their latest releases
 - `/ibek-concepts` — ibek entity model patterns (type: id/object, databases.args, Jinja2, auto_* entities, port references)
 - `/vdct-conversion` — VDCT `.vdb` → msi `.template` conversion and `auto_*` derivation
 - `/streamdevice-sweep` — **(work in progress)** sweep `/dls_sw/prod` for
