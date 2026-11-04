@@ -1838,12 +1838,10 @@ def process(module: str, write: bool, ov: dict | None = None, out_root: Path | N
             if "error" not in report["devices"][stem]:
                 done[stem] = stem
                 p["device"] = stem
-        except TimeoutError:
-            raise  # the whole module's, and says nothing about this entity
         except Exception as e:  # noqa: BLE001
             if not sweep:
                 raise
-            report["devices"][stem] = dict(entity=em["name"], error=f"{type(e).__name__}: {e}")
+            report["devices"][stem] = dict(entity=em["name"], cls="exception", error=f"{type(e).__name__}: {e}")
 
     # write entity pvi sections
     new = head
@@ -1912,10 +1910,10 @@ def build_device(p, ov, module, release, extra_db, roots, root_macros, report, o
     ctx.skip_links = set(ov.get("skip_links", [])) | set(dev_ov.get("skip_links", []))
     rootpath = data_path(ctx, p["edl"])
     if rootpath is None:
-        report["devices"][stem] = dict(entity=em["name"], error=f"root screen {p['edl']} not found")
+        report["devices"][stem] = dict(entity=em["name"], cls="no_root_screen", error=f"root screen {p['edl']} not found")
         return
     if sweep and not parse_edl(rootpath).format_ok:
-        report["devices"][stem] = dict(entity=em["name"], error=f"root screen {p['edl']} is not in the keyword EDL format")
+        report["devices"][stem] = dict(entity=em["name"], cls="root_screen_format", error=f"root screen {p['edl']} is not in the keyword EDL format")
         return
     device_id = file_stem(stem)
     ctx.screens.append(dict(file=p["edl"], path=str(rootpath), env=env, label="root"))
@@ -1977,6 +1975,7 @@ def build_device(p, ov, module, release, extra_db, roots, root_macros, report, o
     children, protected, unlisted = protect_writes(children, ctx, ov, module, em["name"])
     if sweep:
         tidy_labels(children, env, macros_of_device(children))
+    apply_signal_labels(children, dev_ov.get("signal_labels", {}))
     finish_labels(children)
     device = {"label": ov.get("labels", {}).get(stem, device_id), "children": clean(children)}
     placed = set()
@@ -1985,7 +1984,7 @@ def build_device(p, ov, module, release, extra_db, roots, root_macros, report, o
             if k in c:
                 placed.add(c[k])
     if sweep and not placed:
-        report["devices"][stem] = dict(entity=em["name"], error=f"no record of {p['tmpl']} is placed by {p['edl']}",
+        report["devices"][stem] = dict(entity=em["name"], cls="no_record_placed", error=f"no record of {p['tmpl']} is placed by {p['edl']}",
                                        on_screen_not_in_db={k: sorted(v) for k, v in ctx.unmatched.items()})
         return
     yaml_txt = (
@@ -2103,6 +2102,24 @@ def promote_only_screen(children: list[dict], ctx: Ctx) -> list[dict]:
     return only["children"]
 
 
+def apply_signal_labels(tree: list[dict], labels: dict[str, str]):
+    """Labels an override gives by element name, wherever the element sits: a moved write and
+    the read it leaves behind share a name. A name matching nothing stops the run."""
+    unused = set(labels)
+
+    def visit(nodes):
+        for c in nodes:
+            if c["name"] in labels:
+                c["label"] = labels[c["name"]]
+                unused.discard(c["name"])
+            if c["type"] == "Group":
+                visit(c["children"])
+
+    visit(tree)
+    if unused:
+        raise ValueError(f"signal_labels name nothing in the device: {', '.join(sorted(unused))}")
+
+
 def finish_labels(tree: list[dict]):
     """Last word on every label: junk macro labels go, so the name shows; long ones are cut."""
     for c in tree:
@@ -2182,10 +2199,12 @@ def macro_prefix(placed: list[str]) -> str:
     return f"$({names[0]}):" if names else p
 
 
-def generate(modules: list[str], write: bool):
-    """Modules with an override file of their own, one at a time."""
+def generate(modules: list[str], write: bool) -> list[dict]:
+    """Modules with an override file of their own, one at a time. Returns their reports."""
+    reports = []
     for m in modules:
         r = process(m, write)
+        reports.append(r)
         print(f"== {m} {r['release']}")
         for k, d in r["devices"].items():
             if "error" in d:
@@ -2198,3 +2217,4 @@ def generate(modules: list[str], write: bool):
             )
         for n, why in r["no_screen"]:
             print(f"  (no device) {n}: {why}")
+    return reports

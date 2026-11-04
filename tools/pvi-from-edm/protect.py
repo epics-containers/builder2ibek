@@ -11,6 +11,7 @@ and its readback keeps the same name on the main screen, so `pvi.<name>.r` and
 from __future__ import annotations
 
 import sys
+import re
 from pathlib import Path
 
 import yaml
@@ -113,12 +114,13 @@ def move(children: list[dict], targets: dict, read_widget_of, dropped_reads: set
     written: set[str] = set()
     read_left: set[str] = set()
 
-    def take(c: dict, path: tuple, row: dict | None) -> dict | None:
+    def take(c: dict, path: tuple, row: dict | None, column: str = "") -> dict | None:
         write, read = split(c, read_widget_of, dropped_reads)
         if row is not None and "label" not in write:
             # a row named after its first signal says nothing about the others
             title = row.get("label")
-            write["label"] = title if title and title != row["children"][0]["name"] else write["name"]
+            title = title if title and title != row["children"][0]["name"] else ""
+            write["label"] = (f"{title} {column}" if column else title) if title else write["name"]
         if c["write_pv"] not in written:
             written.add(c["write_pv"])
             origins.setdefault(path, []).append(write)
@@ -129,19 +131,26 @@ def move(children: list[dict], targets: dict, read_widget_of, dropped_reads: set
 
     def visit(tree: list[dict], path: tuple) -> list[dict]:
         out = []
+        header: list[str] = []  # on the first row of a grid, and heads the rows below it too
         for c in tree:
             if c["type"] == "Group":
                 is_row = c["layout"]["type"] == "Row"
                 if is_row:
                     n = len(c["children"])
+                    header = c["layout"].get("header") or header
+                    columns = [h.strip() for h in header] if len(header) == n else [""] * n
+                    moving = [k for k in c["children"] if "write_pv" in k and k["write_pv"] in targets and not k.get("_guarded")]
+                    start = len(origins.get(path, []))
                     kids = []
-                    for k in c["children"]:
-                        if "write_pv" in k and k["write_pv"] in targets and not k.get("_guarded"):
-                            left = take(k, path, c)
+                    for k, column in zip(c["children"], columns, strict=True):
+                        if any(k is m for m in moving):
+                            left = take(k, path, c, column if len(moving) > 1 else "")
                             if left is not None:
                                 kids.append(left)
                         else:
                             kids.append(k)
+                    if len(moving) > 1:
+                        tell_apart(origins.get(path, []), start)
                     if len(kids) != n and c["layout"].get("header"):
                         c["layout"].pop("header")  # its columns no longer line up
                     c["children"] = kids
@@ -156,6 +165,15 @@ def move(children: list[dict], targets: dict, read_widget_of, dropped_reads: set
             else:
                 out.append(c)
         return out
+
+    def tell_apart(signals: list[dict], start: int):
+        """The writes of one row share its label: with no column to go by, each says its
+        record's name. High comes before low, as limits do on a screen that shows both."""
+        row = signals[start:]
+        if len({c["label"] for c in row}) < len(row):
+            for c in row:
+                c["label"] = f"{c['label']} ({re.split(r'[.:]', c['write_pv'])[-1]})"
+        signals[start:] = sorted(row, key=lambda c: 0 if re.search(r"\bhigh\b", c["label"], re.I) else 1 if re.search(r"\blow\b", c["label"], re.I) else 0)
 
     rest = visit(children, ())
     grids = []

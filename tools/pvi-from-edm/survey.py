@@ -12,12 +12,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from gen import process  # noqa: E402
 from release import pick  # noqa: E402
-from settings import CFG  # noqa: E402
+from settings import CFG, ModuleTimeout  # noqa: E402
 from sweep import inventory, pinned  # noqa: E402
 
 
 def timeout(*_):
-    raise TimeoutError
+    raise ModuleTimeout("module timed out")
 
 
 def survey(folders: list[str]):
@@ -45,7 +45,7 @@ def survey(folders: list[str]):
             r["errors"] = [v["error"] for v in rep["devices"].values() if "error" in v]
             r["no_screen"] = len(rep["no_screen"])
             r["class"] = "ok" if devs else ("root screen missing" if r["errors"] else "no entity has a screen")
-        except Exception as e:  # noqa: BLE001
+        except (Exception, ModuleTimeout) as e:  # noqa: BLE001
             signal.alarm(0)
             r["class"] = "exception"
             r["exception"] = f"{type(e).__name__}: {e}"

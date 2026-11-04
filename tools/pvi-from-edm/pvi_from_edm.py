@@ -121,7 +121,9 @@ def cmd_check(a) -> int:
 
 
 def cmd_generate(a) -> int:
+    import yaml
     from gen import generate
+    from sweep import record_installed, sha256, uncommitted
 
     need_repos()
     if not CFG.overrides:
@@ -130,7 +132,20 @@ def cmd_generate(a) -> int:
         raise SystemExit(f"written by hand, so not generated: {', '.join(hand)}")
     for m in a.modules:
         need_file(CFG.overrides / f"{m}.yaml", "generate works from a module's own override file; for the rest use sweep")
-    generate(a.modules, a.write)
+    if a.write:
+        CFG.status.mkdir(parents=True, exist_ok=True)
+        pins = {m: yaml.safe_load((CFG.overrides / f"{m}.yaml").read_text()) for m in a.modules}
+        where = {m: (ov["repo"], ov.get("dir", m), ov.get("yaml", f"{m}.ibek.support.yaml")) for m, ov in pins.items()}
+        dirty = [p for w in where.values() for p in uncommitted(*w)]
+        if dirty and not a.overwrite_uncommitted:
+            print(f"refused: uncommitted changes this tool did not install: {', '.join(dirty)}; commit them, or give --overwrite-uncommitted to lose them", flush=True)
+            return 1
+    for m in a.modules:
+        report = generate([m], a.write)[0]
+        if a.write:
+            repo_key, folder, yaml_name = where[m]
+            files = [yaml_name, *(f"{d['file_stem']}.pvi.device.yaml" for d in report["devices"].values() if "error" not in d)]
+            record_installed({f"{repo_key}/{folder}/{f}": sha256(CFG.repos[repo_key] / folder / f) for f in files})
     return 0
 
 
@@ -249,7 +264,8 @@ def main(argv: list[str] | None = None) -> int:
     add("check", cmd_check, "compare the output of a sweep with the support repos, byte for byte; exit 1 on a difference")
     p = add("generate", cmd_generate, "one module with an override file of its own")
     p.add_argument("modules", nargs="+")
-    p.add_argument("--write", action="store_true", help="also write to its support repo")
+    p.add_argument("--write", action="store_true", help="also write to its support repo, which a folder with uncommitted changes this tool did not install refuses")
+    p.add_argument("--overwrite-uncommitted", action="store_true", help="with --write, overwrite even if that loses uncommitted changes")
     p = add("validate", cmd_validate, "validate again what a sweep generated")
     p.add_argument("folders", nargs="*", help="only these module folders")
     p.add_argument("--upstream-root", type=Path, help="validate the hand-written folders instead, against the checkouts in this folder, one per module at the version it builds")

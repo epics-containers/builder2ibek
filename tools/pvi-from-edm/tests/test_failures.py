@@ -2,7 +2,9 @@
 and a gated write stays gated however the screen gates it."""
 
 import json
+import os
 import shutil
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -78,7 +80,7 @@ def test_a_timeout_while_building_a_device_fails_the_module(site, monkeypatch):
     item = in_process(site)
 
     def late(*_):
-        raise TimeoutError("module timed out")
+        raise settings.ModuleTimeout("module timed out")
 
     monkeypatch.setattr(gen, "build_device", late)
     st = sweep.run_item(item)
@@ -172,14 +174,14 @@ def _done(**kw):
 
 
 def test_a_lost_entity_is_printed_with_its_reason_and_fails_the_run(capsys):
-    results = [_done(entity_failures={"one": dict(cls="test_instance", reason="'x' is undefined")}, device_errors={"two": "no record placed"})]
+    results = [_done(entity_failures={"one": dict(cls="test_instance", reason="'x' is undefined")}, device_errors={"two": dict(cls="no_record_placed", reason="no record placed")})]
     assert sweep.summarise(results) == 1
     out = capsys.readouterr().out
     assert "mod/one" in out and "'x' is undefined" in out and "mod/two" in out and "no record placed" in out
 
 
 def test_an_expected_loss_is_printed_and_does_not_fail_the_run(capsys):
-    CFG.expected_losses = {("mod", "one"): "needs a list the stand-in does not supply"}
+    CFG.expected_losses = {("mod", "one"): _loss(reason="needs a list the stand-in does not supply")}
     results = [_done(entity_failures={"one": dict(cls="test_instance", reason="'x' is undefined")})]
     assert sweep.summarise(results) == 0
     assert "needs a list the stand-in does not supply" in capsys.readouterr().out
@@ -188,28 +190,28 @@ def test_an_expected_loss_is_printed_and_does_not_fail_the_run(capsys):
 def test_an_expected_module_failure_needs_its_own_entry(capsys):
     failed = dict(dir="mod", status="failed", cls="no_screen_match", reason="none matches")
     assert sweep.summarise([failed]) == 1
-    CFG.expected_losses = {("mod", ""): "its screens are for another record set"}
+    CFG.expected_losses = {("mod", ""): _loss("no_screen_match", reason="its screens are for another record set")}
     assert sweep.summarise([failed]) == 0
     assert "its screens are for another record set" in capsys.readouterr().out
 
 
 @pytest.mark.parametrize("cls", ["tool_exception", "uncommitted_changes", "retries_exhausted"])
 def test_listing_a_module_as_expected_does_not_excuse_a_broken_run(cls):
-    CFG.expected_losses = {("mod", ""): "known"}
+    CFG.expected_losses = {("mod", ""): _loss(cls)}
     assert sweep.summarise([dict(dir="mod", status="failed", cls=cls, reason="x")]) == 1
 
 
 def test_an_expected_loss_entry_that_matches_nothing_is_reported(capsys):
-    CFG.expected_losses = {("mod", "gone"): "was lost"}
+    CFG.expected_losses = {("mod", "gone"): _loss()}
     assert sweep.summarise([_done()]) == 0
     assert "mod/gone" in capsys.readouterr().out
 
 
 def test_settings_read_expected_losses_and_refuse_one_with_no_reason(tmp_path):
     f = tmp_path / "s.yaml"
-    f.write_text("expected_losses:\n  - {folder: a, entity: b, reason: why}\n  - {folder: c, reason: all of it}\n")
-    assert settings.from_file(f).expected_losses == {("a", "b"): "why", ("c", ""): "all of it"}
-    f.write_text("expected_losses:\n  - {folder: a}\n")
+    f.write_text("expected_losses:\n  - {folder: a, entity: b, class: test_instance, matches: x, reason: why}\n  - {folder: c, class: no_release, reason: all of it}\n")
+    assert settings.from_file(f).expected_losses == {("a", "b"): {"class": "test_instance", "matches": "x", "reason": "why"}, ("c", ""): {"class": "no_release", "matches": "", "reason": "all of it"}}
+    f.write_text("expected_losses:\n  - {folder: a, class: no_release}\n")
     with pytest.raises(ValueError, match="reason"):
         settings.from_file(f)
 
@@ -610,3 +612,155 @@ def test_no_msi_is_said_by_a_sweep_and_an_audit(site):
     assert "no msi found" in plain("sweep", "--jobs", 1, "--dry-run").stdout
     p = plain("audit")
     assert p.returncode == 1 and "no msi was run" in p.stdout
+
+
+# A timeout an OSError handler would swallow
+
+
+def test_a_timeout_during_a_quiet_rmtree_still_fails_the_module(site, tmp_path, monkeypatch):
+    """shutil.rmtree(ignore_errors=True) drops any OSError, and the alarm fires only once."""
+    item = in_process(site)
+    doomed = tmp_path / "doomed"
+    doomed.mkdir()
+    (doomed / "f").write_text("x")
+    real_process = gen.process
+
+    def alarm_in_rmtree(*a, **kw):
+        real_unlink = os.unlink
+
+        def unlink(*a2, **kw2):
+            monkeypatch.setattr(os, "unlink", real_unlink)
+            signal.raise_signal(signal.SIGALRM)
+            return real_unlink(*a2, **kw2)
+
+        monkeypatch.setattr(os, "unlink", unlink)
+        shutil.rmtree(doomed, ignore_errors=True)
+        return real_process(*a, **kw)
+
+    monkeypatch.setattr(sweep, "process", alarm_in_rmtree)
+    st = sweep.run_item(item)
+    assert st["status"] == "failed" and st["cls"] == "tool_exception" and "timed out" in st["reason"]
+
+
+# What expected_losses excuses
+
+
+def _loss(cls="test_instance", matches="", reason="known"):
+    return {"class": cls, "matches": matches, "reason": reason}
+
+
+def test_an_expected_loss_excuses_only_its_own_class(capsys):
+    CFG.expected_losses = {("mod", "one"): _loss("test_instance")}
+    assert sweep.summarise([_done(entity_failures={"one": dict(cls="pv_missing", reason="3 PVs missing")})]) == 1
+    assert "lost, failing this run" in capsys.readouterr().out
+
+
+def test_an_expected_loss_excuses_only_the_text_it_names():
+    CFG.expected_losses = {("mod", "one"): _loss("test_instance", matches="'x' is undefined")}
+    assert sweep.summarise([_done(entity_failures={"one": dict(cls="test_instance", reason="Error: 'x' is undefined")})]) == 0
+    assert sweep.summarise([_done(entity_failures={"one": dict(cls="test_instance", reason="Error: 'y' is undefined")})]) == 1
+
+
+@pytest.mark.parametrize("cls", ["validator_error", "public_hygiene", "yaml_changed", "tool_exception"])
+def test_a_crash_or_a_refusal_is_never_an_expected_loss(cls):
+    CFG.expected_losses = {("mod", "one"): _loss(cls), ("mod", ""): _loss(cls)}
+    assert sweep.summarise([_done(entity_failures={"one": dict(cls=cls, reason="x")})]) == 1
+    assert sweep.summarise([dict(dir="mod", status="failed", cls=cls, reason="x")]) == 1
+
+
+def test_a_type_error_is_never_an_expected_loss_whatever_its_class():
+    CFG.expected_losses = {("mod", "one"): _loss("test_instance")}
+    assert sweep.summarise([_done(entity_failures={"one": dict(cls="test_instance", reason="TypeError: bad operand")})]) == 1
+
+
+def test_a_device_that_crashed_is_not_excused_by_an_entry_for_its_usual_loss():
+    CFG.expected_losses = {("mod", "dev"): _loss("no_record_placed")}
+    assert sweep.summarise([_done(device_errors={"dev": dict(cls="no_record_placed", reason="no record of a is placed by b")})]) == 0
+    assert sweep.summarise([_done(device_errors={"dev": dict(cls="exception", reason="KeyError: 'x'")})]) == 1
+
+
+def test_a_module_entry_does_not_excuse_a_crash_among_its_entities():
+    """A module that generates nothing takes one class, and that must not hide the others."""
+    CFG.expected_losses = {("mod", ""): _loss("test_instance")}
+    failed = dict(dir="mod", status="failed", cls="test_instance", reason="x", entity_failures={"a": dict(cls="test_instance", reason="x"), "b": dict(cls="validator_error", reason="KeyError")})
+    assert sweep.summarise([failed]) == 1
+
+
+def test_a_module_that_crashed_on_every_device_says_so(site, monkeypatch):
+    item = in_process(site)
+
+    def crash(*a):
+        raise KeyError("boom")
+
+    monkeypatch.setattr(gen, "build_device", crash)
+    st = sweep.run_item(item)
+    assert st["status"] == "failed" and st["cls"] == "tool_exception" and "boom" in st["reason"]
+
+
+def test_settings_refuse_an_expected_loss_with_no_class_or_one_that_cannot_be_excused(tmp_path):
+    f = tmp_path / "s.yaml"
+    f.write_text("expected_losses:\n  - {folder: a, reason: why}\n")
+    with pytest.raises(ValueError, match="class"):
+        settings.from_file(f)
+    f.write_text("expected_losses:\n  - {folder: a, class: validator_error, reason: why}\n")
+    with pytest.raises(ValueError, match="validator_error"):
+        settings.from_file(f)
+
+
+def test_an_expected_loss_for_a_folder_no_repo_has_is_reported(site):
+    text = (site / "pvi-from-edm.yaml").read_text()
+    (site / "pvi-from-edm.yaml").write_text(text + "expected_losses:\n  - {folder: demoHeatr, class: no_release, reason: a slip}\n")
+    p = run(site, "sweep", "--jobs", 1, "--dry-run", "demoHeater")
+    assert "expected_losses" in p.stdout and "demoHeatr" in p.stdout
+
+
+# generate --write
+
+
+def _pin(root):
+    (root / "overrides/demoHeater.yaml").write_text(yaml.safe_dump({"repo": "demo", "release": str(root / RELEASE)}))
+
+
+def test_generate_write_refuses_uncommitted_work(site):
+    _pin(site)
+    folder, y = _hand_work(site)
+    (folder / "demoHeater.pvi.device.yaml").write_text("label: mine\nchildren: []\n")
+    p = run(site, "generate", "demoHeater", "--write")
+    assert p.returncode == 1 and "uncommitted" in p.stdout + p.stderr
+    assert "# my edit" in y.read_text() and "mine" in (folder / "demoHeater.pvi.device.yaml").read_text()
+
+
+def test_generate_write_with_the_flag_overwrites(site):
+    _pin(site)
+    _folder, y = _hand_work(site)
+    p = run(site, "generate", "demoHeater", "--write", "--overwrite-uncommitted")
+    assert p.returncode == 0, p.stdout + p.stderr
+    assert "# my edit" not in y.read_text()
+
+
+def test_generate_without_write_ignores_uncommitted_work(site):
+    _pin(site)
+    _folder, y = _hand_work(site)
+    assert run(site, "generate", "demoHeater").returncode == 0
+    assert "# my edit" in y.read_text()
+
+
+def test_generate_write_records_what_it_installed(site):
+    _pin(site)
+    assert run(site, "generate", "demoHeater", "--write").returncode == 0
+    mine = json.loads((site / "work/installed.json").read_text())
+    assert {"demo/demoHeater/demoHeater.ibek.support.yaml", "demo/demoHeater/demoHeater.pvi.device.yaml"} <= set(mine)
+    # so writing again is no conflict with itself, and a sweep can tell it from a person's work
+    assert run(site, "generate", "demoHeater", "--write").returncode == 0
+
+
+# Device name collisions
+
+
+def test_a_device_name_collision_fails_a_full_sweep(site):
+    assert run(site, "sweep", "--jobs", 1, "--dry-run").returncode == 0
+    (site / "support/other").mkdir()
+    (site / "support/other/demoHeater.pvi.device.yaml").write_text("label: other\nchildren: []\n")
+    (site / DEMO / "demoHeater.pvi.device.yaml").write_text("label: x\nchildren: []\n")
+    p = run(site, "sweep", "--jobs", 1, "--dry-run")
+    assert p.returncode == 1 and "device name collisions" in p.stdout and "support/other" in p.stdout.replace("demo/", "support/")

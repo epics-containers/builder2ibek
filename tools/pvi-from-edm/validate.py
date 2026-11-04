@@ -397,8 +397,6 @@ def validate_stage(module: str, ov: dict, staged: Path, defs: dict | None = None
         box = root / re.sub(r"\W", "_", em["name"])
         try:
             r = validate_entity(mod_name, em, staged, text, ov, defs, box)
-        except TimeoutError:
-            raise  # the whole module's, and says nothing about this entity
         except Exception as e:  # noqa: BLE001
             r = dict(entity=em["name"], ok=False, cls="validator_error", reason=f"{type(e).__name__}: {e}")
         res["entities"][em["name"]] = r

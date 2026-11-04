@@ -12,6 +12,7 @@ import dbparse  # noqa: E402
 import edl  # noqa: E402
 import gen  # noqa: E402
 import release  # noqa: E402
+import settings  # noqa: E402
 import validate  # noqa: E402
 from settings import CFG  # noqa: E402
 
@@ -1275,10 +1276,49 @@ def test_a_module_timeout_is_no_failure_of_the_entity_it_lands_in(tmp_path, monk
     (tmp_path / "m.ibek.support.yaml").write_text("module: m\nentity_models:\n  - name: e\n    pvi: {yaml_path: e.pvi.device.yaml}\n")
 
     def times_out(*a):
-        raise TimeoutError("module timed out")
+        raise settings.ModuleTimeout("module timed out")
 
     monkeypatch.setattr(validate, "validate_entity", times_out)
     monkeypatch.setattr(validate, "head_text", lambda *a: "")
     monkeypatch.setattr(validate, "yaml_only_adds_pvi", lambda *a: "")
-    with pytest.raises(TimeoutError):
+    with pytest.raises(settings.ModuleTimeout):
         validate.validate_stage("m", dict(repo="one", dir="m", yaml="m.ibek.support.yaml"), tmp_path, {})
+
+
+def _limits_row(name, label, **layout):
+    return {"type": "Group", "name": f"Row{name}", "label": label, "layout": {"type": "Row", **layout}, "children": [_rw(f"{name}Llm", f"{name}:LLM", f"{name}:LLM"), _rw(f"{name}Hlm", f"{name}:HLM", f"{name}:HLM")]}
+
+
+def _moved(children, targets):
+    tree = protect.move(children, dict.fromkeys(targets, "dangerous"), lambda pv: {"type": "TextRead"}, set(), lambda name, key: "".join(name.split()))
+    sub = next(c for c in tree if c.get("label") == protect.SUB_LABEL)
+    return [(c["name"], c["label"]) for c in protect.walk_leaves(sub["children"])]
+
+
+def test_moved_writes_of_one_row_take_the_header_of_their_column_high_first():
+    """A header sits on the first row of its grid, and heads the rows below it too."""
+    grid = {"type": "Group", "name": "G", "layout": {"type": "Grid", "labelled": True}, "children": [_limits_row("A", "Upper", header=["Low Limit", "High Limit"]), _limits_row("B", "Lower")]}
+    assert _moved([grid], ["A:LLM", "A:HLM", "B:LLM", "B:HLM"]) == [
+        ("AHlm", "Upper High Limit"),
+        ("ALlm", "Upper Low Limit"),
+        ("BHlm", "Lower High Limit"),
+        ("BLlm", "Lower Low Limit"),
+    ]
+
+
+def test_moved_writes_of_one_row_with_no_header_are_told_apart():
+    grid = {"type": "Group", "name": "G", "layout": {"type": "Grid", "labelled": True}, "children": [_limits_row("A", "Upper")]}
+    assert _moved([grid], ["A:LLM", "A:HLM"]) == [("ALlm", "Upper (LLM)"), ("AHlm", "Upper (HLM)")]
+
+
+def test_one_moved_write_of_a_row_keeps_the_row_label():
+    grid = {"type": "Group", "name": "G", "layout": {"type": "Grid", "labelled": True}, "children": [_limits_row("A", "Upper", header=["Low Limit", "High Limit"])]}
+    assert _moved([grid], ["A:HLM"]) == [("AHlm", "Upper")]
+
+
+def test_signal_labels_name_any_element_and_a_mistyped_one_stops_the_run():
+    tree = [{"type": "Group", "name": "RowA", "label": "A", "layout": {"type": "Row"}, "children": [_r("A", "a"), _r("B", "b")]}]
+    gen.apply_signal_labels(tree, {"RowA": "Axis", "B": "Second"})
+    assert tree[0]["label"] == "Axis" and tree[0]["children"][1]["label"] == "Second"
+    with pytest.raises(ValueError, match="Bee"):
+        gen.apply_signal_labels(tree, {"Bee": "Second"})

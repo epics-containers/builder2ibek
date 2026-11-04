@@ -103,9 +103,9 @@ uv run python tools/pvi-from-edm/pvi_from_edm.py sweep --dry-run --repo ibek-sup
 
 | Subcommand | What it does |
 |---|---|
-| `sweep [folder ...]` | Generate and validate each module without PVI, and install what passes. `--dry-run` writes to no support repo. Named or not, each folder it generates is reset to its committed state first, removing untracked device files. It refuses a folder whose device files or support YAML have uncommitted changes it did not install itself: see below. Exit 1 if a module fails, an entity is lost or a folder named doesn't exist. |
+| `sweep [folder ...]` | Generate and validate each module without PVI, and install what passes. `--dry-run` writes to no support repo. Named or not, each folder it generates is reset to its committed state first, removing untracked device files. It refuses a folder whose device files or support YAML have uncommitted changes it did not install itself: see below. Exit 1 if a module fails, an entity is lost, a folder named doesn't exist, or a full run finds two folders sharing a device name. |
 | `check` | Compare a sweep's output with the support repos, byte for byte, and list anything else changed there. Reads them only. Exit 1 on a difference. Folders starting `_` are ignored. |
-| `generate <module> ...` | One module that has its own `<overrides>/<module>.yaml`. `--write` also writes it to its repo. |
+| `generate <module> ...` | One module that has its own `<overrides>/<module>.yaml`. `--write` also writes it to its repo, and refuses a folder with uncommitted changes as `sweep` does, unless given `--overwrite-uncommitted`. |
 | `validate [folder ...]` | Validate again what a sweep generated. With `--upstream-root DIR`, validate the hand-written folders instead: see below. |
 | `audit` | Check a sweep from the EDM screens and the `.bob` files rather than from what the generator says it did, including the writes behind a gated link. It holds hand-written folders that have been validated to their classification entries, and ends by listing what it did not check. Exit 1 on a failure. |
 | `evidence` | Gather the facts on each gated write. |
@@ -132,7 +132,12 @@ reads everything uncommitted as someone's work.
 
 A sweep ends with a summary: modules failed and entities lost, each with a reason, and
 warnings. Something a site knows it will lose goes in `expected_losses`, with why, so it does not
-fail the run; it is still printed. That covers no timeout, no refused folder and no crash.
+fail the run; it is still printed. An entry names the class of failure the summary prints, and
+`matches`, if given, is text the reason must hold: any other failure of that folder or entity still
+fails the run. No entry excuses a timeout, a refused folder, a crash (`tool_exception`, `exception`,
+`validator_error`, or a `TypeError` and the like in a reason), a change to a support YAML beyond its
+`pvi:` sections (`yaml_changed`) or a `public_hygiene` hit, and the settings refuse one that lists
+those classes. An entry for a folder no repo has is reported.
 
 A version warning means `install.yml` builds one version and validation read another. It does
 not fail a run. `accepted_versions` silences a difference once someone has looked at it, and warns
@@ -217,8 +222,8 @@ reserved_stems:                     # device file names no other folder may take
   - {stem: thing, repo: public, folder: thing}
 held_label_screens: [copied.edl]    # screens whose offLabel is a copy: use onLabel
 expected_losses:                    # lost and known: a run still exits 0, and prints them
-  - {folder: thing, entity: odd, reason: its template needs a list no stand-in supplies}
-  - {folder: other, reason: its screens address none of its records}
+  - {folder: thing, entity: odd, class: test_instance, matches: "'items' is undefined", reason: its template needs a list no stand-in supplies}
+  - {folder: other, class: no_screen_match, reason: its screens address none of its records}
 accepted_versions:                  # checked, and not to warn until either side moves
   - {folder: thing, install: 3.3.0, validated: 3-2-1, reason: the records are the same}
 accepted_msi_refusals:              # a .substitutions file msi may refuse, in a checkout
@@ -229,10 +234,11 @@ install_placeholders: [SOMEBUILD]   # install.yml versions that name no release
 ### Overrides
 
 `<overrides>/<folder>.yaml` pins a folder: its `repo` and `release` are fixed there rather
-than found, and it may carry `devices`, with `subst`, `skip_links`, `link_labels`,
-`extra_screens` and `judgements` per device, and `skip_entities`. `<overrides>/<folder>.sweep.yaml`
-adds `skip_entities`, `no_field_records` or `test_values` to a normal sweep. Each is a judgement
-and gets reported.
+than found, and it may carry `devices`, with `subst`, `skip_links`, `link_labels`, `signal_labels`,
+`extra_screens` and `judgements` per device, `entities`, with the `screen` and `macros` an entity's
+root is, and `skip_entities`. `<overrides>/<folder>.sweep.yaml` adds any of those, `no_field_records`
+or `test_values` to a normal sweep. Each is a judgement and gets reported. `signal_labels` gives
+labels by element name, and a name matching nothing stops the run.
 
 ### Classification rules
 

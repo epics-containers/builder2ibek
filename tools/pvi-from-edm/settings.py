@@ -14,6 +14,15 @@ from pathlib import Path
 import yaml
 
 
+class ModuleTimeout(BaseException):
+    """A module has run out of time. Not an OSError or an Exception, as TimeoutError is, since
+    the alarm fires once and a handler for those, such as a quiet `shutil.rmtree`, would lose it."""
+
+
+# failures that say a run went wrong: `expected_losses` may not list these
+NEVER_EXPECTED = {"tool_exception", "exception", "uncommitted_changes", "retries_exhausted", "validator_error", "public_hygiene", "yaml_changed"}
+
+
 @dataclass
 class Settings:
     # support repo folders, key -> folder; `repo:` in an override names a key
@@ -56,8 +65,9 @@ class Settings:
     # screens that leave a copied offLabel on buttons whose onLabel says what they do
     held_label_screens: set[str] = field(default_factory=set)
 
-    # what a run may lose and still exit 0: (folder, entity, or "" for the module) -> why
-    expected_losses: dict[tuple[str, str], str] = field(default_factory=dict)
+    # what a run may lose and still exit 0: (folder, entity, or "" for the module) ->
+    # {"class": the failure's class, "matches": text its reason must hold, "reason": why}
+    expected_losses: dict[tuple[str, str], dict[str, str]] = field(default_factory=dict)
     # version differences seen and accepted: (folder, install.yml's version, what was validated) -> why
     accepted_versions: dict[tuple[str, str, str], str] = field(default_factory=dict)
     # (folder, substitutions file) -> why msi may refuse it
@@ -123,7 +133,12 @@ def from_file(path: Path) -> Settings:
                 raise ValueError(f"{path}: an entry of {key} has no reason: {e}")
         return entries
 
-    s.expected_losses = {(e["folder"], e.get("entity", "")): e["reason"] for e in with_reason("expected_losses")}
+    for e in with_reason("expected_losses"):
+        if not e.get("class"):
+            raise ValueError(f"{path}: an entry of expected_losses has no class: {e}")
+        if e["class"] in NEVER_EXPECTED:
+            raise ValueError(f"{path}: expected_losses may not list a failure of class {e['class']}: {e}")
+        s.expected_losses[(e["folder"], e.get("entity", ""))] = {"class": e["class"], "matches": str(e.get("matches", "")), "reason": e["reason"]}
     s.accepted_versions = {(e["folder"], str(e["install"]), str(e["validated"])): e["reason"] for e in with_reason("accepted_versions")}
     s.accepted_msi_refusals = {(e["folder"], e["file"]): e["reason"] for e in with_reason("accepted_msi_refusals")}
     if s.support_dbd_glob and s.support_dbd_glob.count("{}") != 1:

@@ -22,7 +22,7 @@ import yaml  # noqa: E402
 from gen import process, screen_files  # noqa: E402
 from protect import UNGATED, load_classes  # noqa: E402
 from release import has_screens, pick, version_note  # noqa: E402
-from settings import CFG, Settings, install  # noqa: E402
+from settings import CFG, NEVER_EXPECTED, ModuleTimeout, Settings, install  # noqa: E402
 from validate import definitions_map, validate_stage  # noqa: E402
 
 
@@ -32,8 +32,8 @@ MODULE_TIMEOUT = 3600
 # of generating and validating a module, each without the entities the last one failed
 ROUNDS = 6
 
-# a failure that says the run went wrong, so an entry in `expected_losses` does not cover it
-BROKEN_RUN = {"tool_exception", "uncommitted_changes", "retries_exhausted"}
+# a failure's reason that says the tool or ibek crashed, whatever class it landed in
+CRASH_WORDS = re.compile(r"\b(TypeError|KeyError|AttributeError|IndexError|NameError|AssertionError|RecursionError)\b")
 
 
 def status_file() -> Path:
@@ -90,6 +90,11 @@ def installed() -> dict[str, str]:
     return json.loads(f.read_text()) if f.exists() else {}
 
 
+def record_installed(wrote: dict[str, str]):
+    CFG.status.mkdir(parents=True, exist_ok=True)
+    installed_file().write_text(json.dumps(installed() | wrote, indent=1, sort_keys=True))
+
+
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -144,15 +149,16 @@ def run_item(item: dict) -> dict:
     module_key = item["key"]
     st: dict = {k: item[k] for k in ("repo", "dir", "yaml", "module")}
     st["install_version"] = str(item["install"].get("version", ""))
-    signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError("module timed out")))
-    signal.alarm(MODULE_TIMEOUT)
+    signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(ModuleTimeout("module timed out")))
     try:
-        return _run(item, module_key, st)
-    except Exception as e:  # noqa: BLE001
+        try:
+            signal.alarm(MODULE_TIMEOUT)
+            return _run(item, module_key, st)
+        finally:
+            signal.alarm(0)
+    except (Exception, ModuleTimeout) as e:  # noqa: BLE001
         st.update(status="failed", cls="tool_exception", reason=f"{type(e).__name__}: {e}", where=traceback.format_exc().splitlines()[-3][:200])
         return st
-    finally:
-        signal.alarm(0)
 
 
 def _run(item: dict, key: str, st: dict) -> dict:
@@ -214,7 +220,7 @@ def _run(item: dict, key: str, st: dict) -> dict:
                   entity_failures={k: dict(cls=v[0], reason=v[1]) for k, v in failures.items()})
         return st
     devs = {k: v for k, v in rep["devices"].items() if "error" not in v}
-    errs = {k: v["error"] for k, v in rep["devices"].items() if "error" in v}
+    errs = {k: dict(cls=v["cls"], reason=v["error"]) for k, v in rep["devices"].items() if "error" in v}
     st.update(
         entities_no_pvi={n: why for n, why in rep["no_screen"]},
         entity_failures={k: dict(cls=v[0], reason=v[1]) for k, v in failures.items()},
@@ -233,11 +239,13 @@ def _run(item: dict, key: str, st: dict) -> dict:
         )
         st["regenerated_identically"] = same
     if not used:
-        if failures:
+        if crashed := [e["reason"] for e in errs.values() if e["cls"] == "exception"]:
+            st.update(status="failed", cls="tool_exception", reason="; ".join(crashed)[:300])
+        elif failures:
             st.update(status="failed", cls=sorted({v[0] for v in failures.values()})[0],
                       reason="; ".join(f"{k}: {v[1]}" for k, v in list(failures.items())[:3]))
         elif errs:
-            st.update(status="failed", cls="root_screen_unusable", reason="; ".join(errs.values())[:300])
+            st.update(status="failed", cls="root_screen_unusable", reason="; ".join(e["reason"] for e in errs.values())[:300])
         elif not any((em.get("databases") for em in sup.get("entity_models") or [])):
             st.update(status="skipped", cls="no_database", reason="no entity loads a database")
         elif has_screens(Path(ov["release"])):
@@ -369,30 +377,38 @@ def init_worker(settings: Settings):
     install(settings)
 
 
-def summarise(results: list[dict]) -> int:
+def never_expected(cls: str, why: str) -> bool:
+    return cls in NEVER_EXPECTED or bool(CRASH_WORDS.search(why))
+
+
+def summarise(results: list[dict], folders_known: set[str] | None = None) -> int:
     """What this run lost and what it warns of, after the progress lines. Exit status: 1 if
-    a module failed or an entity was lost that `expected_losses` does not name."""
+    a module failed or an entity was lost other than as `expected_losses` says it may be."""
     unexpected, expected, warnings = [], [], []
     seen: set[tuple[str, str]] = set()
     covered = {folder for st in results for folder in [st.get("dir")]}
 
-    def lost(folder: str, name: str, why: str):
+    def lost(folder: str, name: str, cls: str, why: str):
         seen.add((folder, name))
         where = f"{folder}/{name}" if name else folder
-        if (reason := CFG.expected_losses.get((folder, name))) and not (not name and why.split(":")[0] in BROKEN_RUN):
-            expected.append(f"  {where}: {why}: expected: {reason}")
+        entry = CFG.expected_losses.get((folder, name))
+        if entry and cls == entry["class"] and entry["matches"] in why and not never_expected(cls, why):
+            expected.append(f"  {where}: {cls}: {why}: expected: {entry['reason']}")
         else:
-            unexpected.append(f"  {where}: {why}")
+            unexpected.append(f"  {where}: {cls}: {why}")
 
     for st in sorted(results, key=lambda s: s.get("dir", "")):
         folder = st.get("dir", "")
+        failures = st.get("entity_failures") or {}
         if st.get("status") == "failed":
-            lost(folder, "", f"{st.get('cls')}: {st.get('reason', '')}")
+            lost(folder, "", st.get("cls", ""), st.get("reason", ""))
+            # one class stands for the module, and must not hide a crash among the others
+            for name, f in failures.items():
+                if never_expected(f.get("cls", ""), f.get("reason", "")):
+                    lost(folder, name, f.get("cls", ""), f.get("reason", ""))
             continue
-        for name, f in (st.get("entity_failures") or {}).items():
-            lost(folder, name, f"{f.get('cls')}: {f.get('reason', '')}")
-        for name, why in (st.get("device_errors") or {}).items():
-            lost(folder, name, why)
+        for name, f in {**failures, **(st.get("device_errors") or {})}.items():
+            lost(folder, name, f.get("cls", ""), f.get("reason", ""))
     for st in results:
         if st.get("status") == "done" and st.get("version_warning"):
             warnings.append(st["version_warning"])
@@ -415,12 +431,15 @@ def summarise(results: list[dict]) -> int:
     stale = sorted(k for k in CFG.expected_losses if k[0] in covered and k not in seen)
     if stale:
         print(f"expected_losses: entries that match nothing in this run: {', '.join(f'{a}/{b}' if b else a for a, b in stale)}", flush=True)
+    if folders_known is not None and (unknown := sorted({k[0] for k in CFG.expected_losses} - folders_known)):
+        print(f"expected_losses: no folder of that name in any repo: {', '.join(unknown)}", flush=True)
     return 1 if unexpected else 0
 
 
 def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False, overwrite: bool = False) -> int:
     """`folders` narrows the run; with `dry_run` no support repo is written. `overwrite` loses
-    uncommitted changes in the folders it generates. The exit status is summarise()'s."""
+    uncommitted changes in the folders it generates. Exit status 1 if summarise() says so, or
+    on a device name collision."""
     items = inventory()
     if unknown := sorted(set(folders) - {it["dir"] for it in items}):
         raise SystemExit(f"no support yaml committed in any repo for: {', '.join(unknown)}")
@@ -456,7 +475,7 @@ def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False, overwrite: 
     with multiprocessing.Pool(jobs, initializer=init_worker, initargs=(CFG,)) as pool:
         for st in pool.imap_unordered(run_item, todo):
             if wrote := st.pop("installed", None):
-                installed_file().write_text(json.dumps(installed() | wrote, indent=1, sort_keys=True))
+                record_installed(wrote)
             status[st["dir"]] = st
             results.append(st)
             status_path.write_text(json.dumps(status, indent=1, default=str))
@@ -474,12 +493,11 @@ def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False, overwrite: 
     finish(status)
     if CFG.hand_written:
         print(f"written by hand, skipped: {', '.join(sorted(d for _, d in CFG.hand_written))}", flush=True)
-    if not folders:
-        check_collisions()
-    return summarise(results)
+    clash = check_collisions() if not folders else {}
+    return summarise(results, {it["dir"] for it in items}) or int(bool(clash))
 
 
-def check_collisions():
+def check_collisions() -> dict[str, list[str]]:
     """Device names shared by unrelated folders overwrite each other in one generic IOC."""
     who: dict[str, list[str]] = {}
     twins = {f"{a}/{b}": f"{c}/{d}" for (c, d), (a, b) in CFG.forks.items()}
@@ -491,6 +509,7 @@ def check_collisions():
     old = {s for p in collision_files() for s in json.loads(p.read_text())}
     (CFG.status / "stem-collisions.json").write_text(json.dumps(sorted(old | set(clash)), indent=1))
     print("device name collisions:", clash, flush=True)
+    return clash
 
 
 def changed_in_repo(repo: Path, folder: str = "") -> list[str]:
