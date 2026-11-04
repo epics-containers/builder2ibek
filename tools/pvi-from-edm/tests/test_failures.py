@@ -455,6 +455,33 @@ def test_a_mode_only_write_behind_a_gated_link_stays(site):
     assert "Protected Controls" not in where["$(P):R0"] and "Protected Controls" in where["$(P):R1"]
 
 
+def _extra_screen(root, *objs):
+    """A screen beside the root the entity's override adds, as a search for screens adds one."""
+    rel = root / RELEASE
+    with (rel / "db/demoHeater.template").open("a") as f:
+        f.write('record(bo, "$(P):LOCK") {\n}\n')
+    (rel / "data/top.edl").write_text(small_screen(_entry("LOCK", 10), *objs))
+    (root / "overrides/demoHeater.sweep.yaml").write_text(yaml.safe_dump({"devices": {"demoHeater": {"extra_screens": [{"file": "top.edl", "label": "Top"}]}}}))
+
+
+@needs_msi
+def test_a_root_only_a_gated_link_opens_is_behind_that_gate(site):
+    _extra_screen(site, link_to("demoHeater.edl", gate="$(P):LOCK", y=60))
+    assert run(site, "sweep", "--jobs", 1, "--dry-run").returncode == 0
+    where = dict((pv, path) for path, pv in writes(site))
+    assert "Protected Controls" in where["$(P):SP"]
+    assert "Protected Controls" not in where["$(P):LOCK"]
+    assert run(site, "audit").returncode == 0
+
+
+@needs_msi
+def test_a_gated_link_back_from_a_screen_the_root_opens_gates_nothing(site):
+    _with_target(site, PLAIN, [_entry(n, 10 + 20 * i) for i, n in enumerate(PLAIN)] + [link_to("demoHeater.edl", y=150)], gate=None)
+    assert run(site, "sweep", "--jobs", 1, "--dry-run").returncode == 0
+    assert "Protected Controls" not in dict((pv, path) for path, pv in writes(site))["$(P):SP"]
+    assert run(site, "audit").returncode == 0
+
+
 @needs_msi
 def test_the_audit_covers_writes_behind_a_gated_link(site):
     _with_target(site, PLAIN, [_entry(n, 10 + 20 * i) for i, n in enumerate(PLAIN)])

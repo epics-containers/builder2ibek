@@ -235,6 +235,8 @@ class Ctx:
     gated: list = field(default_factory=list)
     link_gates: list = field(default_factory=list)  # gates of the links followed to this screen
     gated_refs: list = field(default_factory=list)  # gated links to a device of its own
+    gated_back: list = field(default_factory=list)  # gated links, from a screen beside the root, to one already open
+    beside_root: bool = False  # laying out a screen the root does not link to
     dialogs: list = field(default_factory=list)
     root_macros: dict = field(default_factory=dict)  # screen -> {screen macro: value}
     env_cur: dict = field(default_factory=dict)
@@ -1201,6 +1203,8 @@ def link_components(ctx: Ctx, ln: dict, fname: str, row: Row, device_stem: str) 
             }
         ]
     if tf in ctx.visiting:
+        if ln.get("gates") and ctx.beside_root:
+            ctx.gated_back.append(dict(file=tf, gates=ln["gates"], source=fname))
         return []
     if ctx.sweep and len(ctx.visiting) >= 5:
         ctx.external.append(f"{fname} -> {tf}: nested too deep, not followed")
@@ -1302,6 +1306,33 @@ def link_components(ctx: Ctx, ln: dict, fname: str, row: Row, device_stem: str) 
             "children": children,
         }
     ]
+
+
+def gate_what_is_behind(ctx: Ctx):
+    """A root found by search can be what a screen beside it opens through a gated link, so
+    that everything followed from the root is behind that gate. Only those links count: a
+    gated link back to the root from a screen it opens says nothing about how to get there."""
+    by_file: dict[str, list[dict]] = {}
+    for s in ctx.screens:
+        by_file.setdefault(s["file"], []).append(s)
+    for back in ctx.gated_back:
+        seen = {back["source"]}
+        todo = [back["file"]]
+        while todo:
+            file = todo.pop()
+            if file in seen:
+                continue
+            seen.add(file)
+            for s in by_file.get(file, []):
+                for o in parse_edl(Path(s["path"])).objects:
+                    for u in pv_uses(o):
+                        rec, fld = resolve(ctx, expand(u.pv, s["env"]))
+                        if u.role == "write" and rec:
+                            ctx.gated += [
+                                dict(pv=field_pv(rec, fld), field=fld, screen=file, gate_pv=gate, condition=f"{cond}, on the link to this screen", widget=o.cls, in_db=True, via_link=True)
+                                for gate, cond in back["gates"]
+                            ]
+                    todo += [ln["file"] if ln["file"].endswith(".edl") else ln["file"] + ".edl" for ln in links(o)]
 
 
 def screen_children(ctx: Ctx, groups: list[dict], fname: str, device_stem: str, nested=False) -> list[dict]:
@@ -1898,10 +1929,12 @@ def build_device(p, ov, module, release, extra_db, roots, root_macros, report, o
             return
         before = {c.get(k) for c in walk_signals(children) for k in ("read_pv", "write_pv") if k in c}
         ctx.visiting.append(file)
+        ctx.beside_root = True
         saved = ctx.env_cur
         ctx.env_cur = sub_env
         sub = screen_children(ctx, layout_screen(ctx, ep, sub_env), file, device_id, nested=True)
         ctx.env_cur = saved
+        ctx.beside_root = False
         ctx.visiting.pop()
         after = {c.get(k) for c in walk_signals(sub) for k in ("read_pv", "write_pv") if k in c}
         if not sub or (sweep and not (after - before)):
@@ -1937,6 +1970,7 @@ def build_device(p, ov, module, release, extra_db, roots, root_macros, report, o
                 add_sub(sc["path"].name, sc["path"].stem, sc["env"],
                         f"{sc['path'].name} found by search, shows {len(new)} more records: added as a sub-screen")
                 added += 1
+    gate_what_is_behind(ctx)
     children = dedupe(children, ctx)
     children = tidy_names(children)
     children = promote_only_screen(children, ctx)

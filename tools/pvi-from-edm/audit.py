@@ -109,18 +109,27 @@ def link_gated_writes(d: dict) -> set[str]:
     for s in d["screens"]:
         by_file.setdefault(s["file"], []).append(s)
 
-    def targets(s: dict, o, ln: dict) -> list[dict]:
+    def targets(s: dict, ln: dict) -> list[dict]:
         name = ln["file"] if ln["file"].endswith(".edl") else ln["file"] + ".edl"
         env = {**s["env"], **parse_symbols(ln["symbols"], s["env"])}
         found = by_file.get(name, [])
         return [t for t in found if t["env"] == env] or found
 
+    root = d["screens"][0] if d["screens"] else None
+    from_root: list[dict] = [root] if root else []
+    reached: set[int] = set()
+    while from_root:
+        s = from_root.pop()
+        if id(s) not in reached:
+            reached.add(id(s))
+            from_root += [t for o in parse_edl(Path(s["path"])).objects for ln in links(o) for t in targets(s, ln)]
     behind: list[dict] = []
     for s in d["screens"]:
         for o in parse_edl(Path(s["path"])).objects:
             if gate_conditions(o, s["env"]):
                 for ln in links(o):
-                    behind.extend(targets(s, o, ln))
+                    # the way back to the root from a screen it opens gates nothing
+                    behind.extend(t for t in targets(s, ln) if t is not root or id(s) not in reached)
     out: set[str] = set()
     seen: set[int] = set()
     while behind:
@@ -135,7 +144,7 @@ def link_gated_writes(d: dict) -> set[str]:
                     if rec:
                         out.add(field_pv(rec, fld))
             for ln in links(o):
-                behind.extend(targets(s, o, ln))
+                behind.extend(t for t in targets(s, ln) if t is not root or id(s) not in reached)
     return out
 
 

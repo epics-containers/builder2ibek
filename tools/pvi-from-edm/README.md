@@ -57,7 +57,8 @@ With no classification file every gated write counts as `unsure`, so all of them
 
 A gate on a link gates what it opens: every write on a screen behind a gated related display is a
 gated write, and if it would move then it moves, even from behind a confirmation dialog, with the
-dialog's text kept as its label. A gated link to a device of its own can't do that, as that
+dialog's text kept as its label. The same goes for a root found by search when a screen beside it
+opens that root through a gated link. A gated link to a device of its own can't do that, as that
 device is reached other ways too: `audit` counts those.
 
 ## Usage
