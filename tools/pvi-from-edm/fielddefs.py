@@ -22,8 +22,8 @@ def parse_dbd(text: str) -> dict[str, dict[str, str]]:
 
 @lru_cache(maxsize=None)
 def _common() -> dict[str, str]:
-    f = CFG.base_dbd / "dbCommon.dbd"
-    return dict(FIELD.findall(f.read_text(errors="replace"))) if f.exists() else {}
+    f = CFG.base_dbd / "dbCommon.dbd" if CFG.base_dbd else None
+    return dict(FIELD.findall(f.read_text(errors="replace"))) if f and f.exists() else {}
 
 
 @lru_cache(maxsize=None)
@@ -34,6 +34,8 @@ def _file(path: str) -> dict[str, dict[str, str]]:
 @lru_cache(maxsize=None)
 def _anywhere(rtype: str) -> dict[str, str] | None:
     """The newest release holding this record type, for types no dependency declares."""
+    if not CFG.support_dbd_glob:
+        return None
     # file names don't always match the type's case: sCalcoutRecord.dbd holds scalcout
     any_case = "".join(f"[{c.lower()}{c.upper()}]" for c in rtype)
     for f in sorted(glob.glob(CFG.support_dbd_glob.format(any_case)), reverse=True):
@@ -45,8 +47,8 @@ def _anywhere(rtype: str) -> dict[str, str] | None:
 @lru_cache(maxsize=None)
 def fields_of(rtype: str, release: Path) -> dict[str, str] | None:
     """Field name -> DBF type for a record type, or None if no definition is found."""
-    base = CFG.base_dbd / f"{rtype}Record.dbd"
-    if base.exists() and rtype in (found := _file(str(base))):
+    base = CFG.base_dbd / f"{rtype}Record.dbd" if CFG.base_dbd else None
+    if base and base.exists() and rtype in (found := _file(str(base))):
         return {**_common(), **found[rtype]}
     for rel in [release, *(d for _, d in deps(release))]:
         p = rel / "dbd" / f"{rtype}Record.dbd"

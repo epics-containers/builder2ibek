@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate *.pvi.device.yaml + entity `pvi:` sections from DLS EDM screens.
+"""Generate *.pvi.device.yaml + entity `pvi:` sections from EDM screens.
 
 Deterministic. Per-module inputs live in <overrides>/<module>.yaml, and every
 override is a judgement that is reported, so a judgement is never silent.
@@ -35,7 +35,7 @@ from edl import (  # noqa: E402
     text_of,
 )
 from fielddefs import STRINGISH, field_type, left_out_why  # noqa: E402
-from protect import on_main, SUB_LABEL, load_classes, move, targets_of, verify_move  # noqa: E402
+from protect import MOVED, SUB_LABEL, load_classes, move, on_main, targets_of, verify_move  # noqa: E402
 from release import db_search_path, deps, find_db  # noqa: E402
 from settings import CFG  # noqa: E402
 
@@ -231,8 +231,10 @@ class Ctx:
     visiting: list = field(default_factory=list)
     widget_group: dict = field(default_factory=dict)
     prefix: str = ""
-    sweep: bool = False  # the pilot's overrides run with sweep behaviour off
+    sweep: bool = False  # an override file of a module's own runs with this off
     gated: list = field(default_factory=list)
+    link_gates: list = field(default_factory=list)  # gates of the links followed to this screen
+    gated_refs: list = field(default_factory=list)  # gated links to a device of its own
     dialogs: list = field(default_factory=list)
     root_macros: dict = field(default_factory=dict)  # screen -> {screen macro: value}
     env_cur: dict = field(default_factory=dict)
@@ -401,6 +403,9 @@ def layout_screen(ctx: Ctx, path: Path, env: dict, depth: int = 0) -> list[dict]
                 for gate, cond in gate_conditions(o, env):
                     ctx.gated.append(dict(pv=full, field=fld, screen=fname, gate_pv=gate, condition=cond,
                                           widget=o.cls, in_db=rec is not None))
+                for gate, cond in ctx.link_gates:
+                    ctx.gated.append(dict(pv=full, field=fld, screen=fname, gate_pv=gate, condition=f"{cond}, on the link to this screen",
+                                          widget=o.cls, in_db=rec is not None, via_link=True))
                 if o.get("password"):
                     ctx.gated.append(dict(pv=full, field=fld, screen=fname, gate_pv="", condition="widget asks for a password",
                                           widget=o.cls, in_db=rec is not None))
@@ -412,6 +417,7 @@ def layout_screen(ctx: Ctx, path: Path, env: dict, depth: int = 0) -> list[dict]
         for ln in links(o):
             ln["env"] = {**env, **parse_symbols(ln["symbols"], env)}
             ln["obj"] = o
+            ln["gates"] = gate_conditions(o, env)
             link_objs.append(ln)
             pv_widgets.append(o)
     # a string record drawn exactly over a related-display button is its caption
@@ -1181,6 +1187,9 @@ def link_components(ctx: Ctx, ln: dict, fname: str, row: Row, device_stem: str) 
         name = unique_name(ctx, label, "ref:" + stem + str(macros))
         pvp = next(iter(macros.values()), "") if macros else ""
         ctx.device_refs[name] = stem
+        if ln.get("gates"):
+            ctx.gated_refs.append(dict(screen=fname, device=stem, gates=ln["gates"]))
+            ctx.judgements.append(f"{fname}: a gated link opens device {stem}: its button is always shown here, and that device's writes are not treated as gated")
         return [
             {
                 "type": "DeviceRef",
@@ -1223,6 +1232,8 @@ def link_components(ctx: Ctx, ln: dict, fname: str, row: Row, device_stem: str) 
         sym = parse_symbols(ln["symbols"], ctx.env_cur)
         label = " ".join(f"{k.title()} {v}" for k, v in sym.items() if "$(" not in v) or Path(tf).stem
     ctx.visiting.append(tf)
+    gates_before = len(ctx.link_gates)
+    ctx.link_gates.extend(ln.get("gates") or [])
     saved = ctx.env_cur
     ctx.env_cur = env2
     groups = layout_screen(ctx, target, env2)
@@ -1250,10 +1261,12 @@ def link_components(ctx: Ctx, ln: dict, fname: str, row: Row, device_stem: str) 
                 ctx.dialogs.append(dict(kind="small_dialog_inlined", screen=fname, dialog=tf, text="", pv=c["write_pv"],
                                         handled=f"no warning text: shown inline as `{label}`"))
         ctx.visiting.pop()
+        del ctx.link_gates[gates_before:]
         ctx.env_cur = saved
         return comps
     children = screen_children(ctx, groups, tf, device_stem, nested=True)
     ctx.visiting.pop()
+    del ctx.link_gates[gates_before:]
     ctx.env_cur = saved
     if not children:
         return []
@@ -1794,6 +1807,8 @@ def process(module: str, write: bool, ov: dict | None = None, out_root: Path | N
             if "error" not in report["devices"][stem]:
                 done[stem] = stem
                 p["device"] = stem
+        except TimeoutError:
+            raise  # the whole module's, and says nothing about this entity
         except Exception as e:  # noqa: BLE001
             if not sweep:
                 raise
@@ -1973,6 +1988,9 @@ def build_device(p, ov, module, release, extra_db, roots, root_macros, report, o
             g["handled"] = f"field left out: {ctx.fields_left[g['pv']]}"
         else:
             g["handled"] = "not placed"
+    for d in ctx.dialogs:
+        if d["kind"] == "confirmation_dialog" and all(x.strip() in protected for x in d["pv"].split(",")):
+            d["handled"] = f"moved to {SUB_LABEL}, its text on the row label"
     report["devices"][stem] = dict(
         entity=em["name"],
         file_stem=device_id,
@@ -1996,6 +2014,7 @@ def build_device(p, ov, module, release, extra_db, roots, root_macros, report, o
         device_macros=sorted(macros_of_device(device["children"])),
         macro_defaults={k: v for k, v in defaults.items()},
         gated=ctx.gated,
+        gated_refs=ctx.gated_refs,
         dialogs=ctx.dialogs,
         device_refs=dict(ctx.device_refs),
         protected=protected,
@@ -2011,9 +2030,16 @@ def protect_writes(children: list[dict], ctx: Ctx, ov: dict, module: str, entity
     classes = load_classes(Path(ov["protected_file"])) if ov.get("protected_file") else load_classes()
     # a momentary write goes to the sub-screen even from behind a confirmation dialog
     held = {k[2] for k, e in classes.items() if k[:2] == (module, entity) and e["class"] == "momentary"}
+    # so does one behind a gated link: the screen asked for the gate and the dialog, and this keeps the friction of both
+    for g in ctx.gated:
+        entry = classes.get((module, entity, g["pv"]))
+        if g.get("via_link") and (entry is None or entry["class"] in MOVED):
+            held.add(g["pv"])
     for c in walk_signals(children):
         if c.get("write_pv") in held:
-            c.pop("_guarded", None)
+            if c.pop("_guarded", None) and c.get("_warning"):
+                # out of the sub-screen that said what the question was about
+                c["label"] = f"{c['label']} ({re.split(r'[.:]', c['write_pv'])[-1]})"
     targets, unlisted = targets_of(children, ctx.gated, classes, module, entity)
     if unlisted:
         ctx.judgements.append(f"{len(unlisted)} gated writes are not in the classification file, so count as unsure: {', '.join(unlisted[:5])}")

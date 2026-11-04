@@ -166,7 +166,7 @@ def _parse_array(items: list[str]) -> list | dict:
         elif it:
             bare.append(_unquote(it))
     if pairs and not bare:
-        return [pairs[k] for k in sorted(pairs)]
+        return [pairs.get(i, "") for i in range(max(pairs) + 1)]
     return bare + [pairs[k] for k in sorted(pairs)]
 
 
@@ -347,6 +347,8 @@ def links(o: Obj) -> list[dict]:
         syms = as_list(o.get("symbols"))
         out = []
         for i, f in enumerate(files):
+            if not f:
+                continue
             out.append(
                 dict(
                     kind="related",
@@ -363,6 +365,8 @@ def links(o: Obj) -> list[dict]:
         syms = as_list(o.get("symbols"))
         out = []
         for i, f in enumerate(files):
+            if not f:
+                continue
             out.append(
                 dict(
                     kind="pip",

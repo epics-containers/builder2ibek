@@ -89,7 +89,7 @@ def screen() -> str:
 DBD_COMMON = "field(DESC,DBF_STRING)\nfield(SCAN,DBF_MENU)\nfield(PROC,DBF_UCHAR)\nfield(SEVR,DBF_MENU)\n"
 
 SETTINGS = """\
-# Paths are relative to this file. A real site lists its own roots, or takes the defaults.
+# Paths are relative to this file.
 repos:
   demo: support
 prod_roots: [prod/support]

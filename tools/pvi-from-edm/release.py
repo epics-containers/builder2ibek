@@ -1,4 +1,4 @@
-"""Find the DLS release a support module's screens and databases come from."""
+"""Find the release a support module's screens and databases come from."""
 
 from __future__ import annotations
 
@@ -11,6 +11,24 @@ sys.path.insert(0, str(Path(__file__).parent))
 from settings import CFG  # noqa: E402
 
 VERSION = re.compile(r"^(dls)?\d")
+
+
+EC_SUFFIX = re.compile(r"(ec\d*|-epics-containers\d*)$")
+
+
+def same_version(want: str, validated: str) -> bool:
+    """A version in an install.yml and a release's name are the same build: `3.3.0` is
+    `3-3-0`, and a suffix for the containers build changes nothing."""
+    return re.split(r"[-._]", EC_SUFFIX.sub("", want)) == re.split(r"[-._]", validated)
+
+
+def version_note(folder: str, want: str, validated: str) -> tuple[str, str]:
+    """(warning, acceptance) on what was validated, against what install.yml builds; each may be empty."""
+    if not want or want in CFG.install_placeholders or same_version(want, validated):
+        return "", ""
+    if why := CFG.accepted_versions.get((folder, want, validated)):
+        return "", f"{folder}: install.yml builds {want}, validated against {validated}: accepted: {why}"
+    return f"{folder}: install.yml builds {want}, validated against {validated}", ""
 
 
 def vkey(v: str) -> list:
@@ -44,7 +62,7 @@ def candidates(folder: str, module: str, install: dict) -> list[tuple[Path, str]
     """Releases in order of preference, each with how it was chosen."""
     names = names_for(folder, module, install)
     want = str(install.get("version", ""))
-    base = re.sub(r"(ec\d*|-epics-containers\d*)$", "", want)
+    base = EC_SUFFIX.sub("", want)
     out: list[tuple[Path, str]] = []
     for tree in CFG.prod:
         for n in names:

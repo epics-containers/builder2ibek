@@ -1,6 +1,7 @@
 """The command line, the settings file, and a whole run on the made-up example."""
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -19,6 +20,9 @@ import release  # noqa: E402
 import settings  # noqa: E402
 import sweep  # noqa: E402
 from settings import CFG  # noqa: E402
+
+
+needs_msi = pytest.mark.skipif(not shutil.which("msi"), reason="no msi on PATH")
 
 
 def run(*args, check=True):
@@ -167,6 +171,7 @@ def _common(root):
     return ["--config", root / "pvi-from-edm.yaml", "--work-dir", root / "work"]
 
 
+@needs_msi
 def test_a_whole_run_on_the_example(example):
     common = _common(example)
     repo = example / "support" / "demoHeater"
@@ -236,8 +241,8 @@ def test_a_hand_written_folder_is_not_compared_and_not_touched(example):
 def test_a_public_repo_fails_on_the_hygiene_pattern(example):
     text = (example / "pvi-from-edm.yaml").read_text()
     (example / "pvi-from-edm.yaml").write_text(text + "public_repos: [demo]\nhygiene_pattern: 'Temperature'\n")
-    out = run("sweep", "--jobs", 1, *_common(example)).stdout
-    assert "failed public_hygiene" in out
+    p = run("sweep", "--jobs", 1, *_common(example), check=False)
+    assert p.returncode == 1 and "failed public_hygiene" in p.stdout
     assert not (example / "support" / "demoHeater" / "demoHeater.pvi.device.yaml").exists()
 
 
@@ -303,6 +308,7 @@ def _checkout(example, tmp_path):
     return root
 
 
+@needs_msi
 def test_validate_takes_a_hand_written_folder_from_its_checkout(example, tmp_path):
     _install_by_hand(example)
     common = _hand_written(example)
@@ -312,6 +318,7 @@ def test_validate_takes_a_hand_written_folder_from_its_checkout(example, tmp_pat
     assert val["ok"] and val["generate_matches_generate2"] and "$(P):HELP" in val["records_unused"]
 
 
+@needs_msi
 def test_a_public_hand_written_folder_needs_its_checkout_and_lists_what_it_leaves_out(example, tmp_path):
     _install_by_hand(example)
     text = (example / "pvi-from-edm.yaml").read_text()
@@ -327,6 +334,7 @@ def test_a_public_hand_written_folder_needs_its_checkout_and_lists_what_it_leave
     assert "$(P):SPARE" not in rows
 
 
+@needs_msi
 def test_the_audit_holds_a_hand_written_folder_to_its_classification(example, tmp_path):
     _install_by_hand(example)
     common = _hand_written(example)

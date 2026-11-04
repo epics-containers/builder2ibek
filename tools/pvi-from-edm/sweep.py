@@ -6,6 +6,7 @@ is banked in <status>/sweep-status.json and <status>/log.md.
 from __future__ import annotations
 
 import datetime
+import hashlib
 import json
 import multiprocessing
 import re
@@ -20,13 +21,19 @@ sys.path.insert(0, str(Path(__file__).parent))
 import yaml  # noqa: E402
 from gen import process, screen_files  # noqa: E402
 from protect import UNGATED, load_classes  # noqa: E402
-from release import has_screens, pick  # noqa: E402
+from release import has_screens, pick, version_note  # noqa: E402
 from settings import CFG, Settings, install  # noqa: E402
 from validate import definitions_map, validate_stage  # noqa: E402
 
 
 # seconds; the largest module takes over 20 minutes on a busy machine
 MODULE_TIMEOUT = 3600
+
+# of generating and validating a module, each without the entities the last one failed
+ROUNDS = 6
+
+# a failure that says the run went wrong, so an entry in `expected_losses` does not cover it
+BROKEN_RUN = {"tool_exception", "uncommitted_changes", "retries_exhausted"}
 
 
 def status_file() -> Path:
@@ -70,6 +77,34 @@ def inventory() -> list[dict]:
             if ins:
                 inst = yaml.safe_load(git(repo, "show", f"HEAD:{d}/{ins[0]}")) or {}
             out.append(dict(repo=key, dir=d, yaml=y, module=m.group(1) if m else d, has_pvi=has, install=inst))
+    return out
+
+
+def installed_file() -> Path:
+    return CFG.status / "installed.json"
+
+
+def installed() -> dict[str, str]:
+    """What this tool last wrote to the repos: `<repo key>/<folder>/<file>` -> sha256."""
+    f = installed_file()
+    return json.loads(f.read_text()) if f.exists() else {}
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def uncommitted(repo_key: str, folder: str, yaml_name: str) -> list[str]:
+    """The files of a folder a sweep would delete or overwrite, with changes that git does
+    not have and that are not what this tool last installed there."""
+    repo = CFG.repos[repo_key]
+    mine = installed()
+    out = []
+    for rel in changed_in_repo(repo, folder):
+        name = rel.removeprefix(f"{folder}/")
+        path = repo / rel
+        if "/" not in name and (name == yaml_name or name.endswith(".pvi.device.yaml")) and path.exists() and mine.get(f"{repo_key}/{rel}") != sha256(path):
+            out.append(f"{repo_key}/{rel}")
     return out
 
 
@@ -123,6 +158,13 @@ def run_item(item: dict) -> dict:
 def _run(item: dict, key: str, st: dict) -> dict:
     repo = CFG.repos[item["repo"]]
     fixed = pinned(item["dir"])
+    fork = CFG.forks.get((item["repo"], item["dir"]))
+    dirty = [p for r, d in [(item["repo"], item["dir"]), *([fork] if fork else [])] for p in uncommitted(r, d, item["yaml"])]
+    if dirty:
+        st["uncommitted"] = dirty
+        if not item.get("dry_run") and not item.get("overwrite"):
+            st.update(status="failed", cls="uncommitted_changes", reason=f"uncommitted changes this tool did not install: {', '.join(dirty[:4])}; commit them, or give --overwrite-uncommitted to lose them")
+            return st
     if not fixed and not item.get("dry_run"):
         reset_folder(repo, item["dir"], item["yaml"])
         twin = CFG.forks.get((item["repo"], item["dir"]))
@@ -142,6 +184,9 @@ def _run(item: dict, key: str, st: dict) -> dict:
         if extra and extra.exists():
             ov.update(yaml.safe_load(extra.read_text()) or {})
     ov.update(dir=item["dir"], yaml=item["yaml"])
+    st["version_warning"], st["version_accepted"] = version_note(item["dir"], st["install_version"], Path(ov["release"]).name)
+    if not st["install_version"] or st["install_version"] in CFG.install_placeholders:
+        st["version_unnamed"] = True
     if not fixed:
         twins = {f"{item['repo']}/{item['dir']}"}
         t = CFG.forks.get((item["repo"], item["dir"]))
@@ -151,7 +196,7 @@ def _run(item: dict, key: str, st: dict) -> dict:
     failures: dict[str, tuple[str, str]] = {}
     defs = definitions_map()
     outdir = CFG.output / key
-    for _ in range(6):
+    for _ in range(ROUNDS):
         rep = process(key, False, ov, CFG.output)
         for name, why in rep["entity_failures"].items():
             failures.setdefault(name, ("unmapped_macro", why))
@@ -163,6 +208,11 @@ def _run(item: dict, key: str, st: dict) -> dict:
         for k, v in bad.items():
             failures[k] = (v.get("cls", "unknown"), v.get("reason", ""))
         ov.setdefault("skip_entities", {}).update({k: f"validation: {v.get('cls')}: {v.get('reason', '')}" for k, v in bad.items()})
+    else:
+        # each round found a new failure, and the last one's has not been taken out
+        st.update(status="failed", cls="retries_exhausted", reason=f"entities still failing after {ROUNDS} rounds: {', '.join(bad)}",
+                  entity_failures={k: dict(cls=v[0], reason=v[1]) for k, v in failures.items()})
+        return st
     devs = {k: v for k, v in rep["devices"].items() if "error" not in v}
     errs = {k: v["error"] for k, v in rep["devices"].items() if "error" in v}
     st.update(
@@ -206,10 +256,15 @@ def _run(item: dict, key: str, st: dict) -> dict:
     t = CFG.forks.get((item["repo"], item["dir"]))
     if t:
         targets.append(CFG.repos[t[0]] / t[1])
+    wrote: dict[str, str] = {}
     for tgt in [] if item.get("dry_run") else targets:
         for f in outdir.glob("*.pvi.device.yaml"):
             shutil.copy(f, tgt / f.name)
         (tgt / item["yaml"]).write_text(written_yaml)
+        key_of = next(k for k, r in CFG.repos.items() if r == tgt.parent)
+        wrote |= {f"{key_of}/{tgt.name}/{f.name}": sha256(tgt / f.name) for f in outdir.glob("*.pvi.device.yaml")}
+        wrote[f"{key_of}/{tgt.name}/{item['yaml']}"] = sha256(tgt / item["yaml"])
+    st["installed"] = wrote
     entities = [em["name"] for em in sup.get("entity_models") or [] if em.get("pvi")]
     rows = [v for v in devs.values() if v.get("file_stem", "") + ".pvi.device.yaml" in used]
     st.update(
@@ -241,6 +296,7 @@ def finish(status: dict):
     """Files derived from all reports: gated writes and left-out PVs."""
     gated = []
     left = {}
+    moved: set[tuple[str, str, str]] = set()
     for key, st in status.items():
         p = CFG.output / key / "report.json"
         if not p.exists() or st.get("status") in ("has_pvi", "hand_written", None):
@@ -253,21 +309,24 @@ def finish(status: dict):
             for g in d.get("gated", []):
                 gated.append(dict(kind="visibility_gated_write", module=st["dir"], repo=st["repo"], entity=d["entity"], pv=g["pv"],
                                   field=g["field"], screen=g["screen"], gate_pv=g["gate_pv"], condition=g["condition"],
-                                  widget=g["widget"], handled=g["handled"], written=written))
+                                  widget=g["widget"], handled=g["handled"], written=written, **({"via_link": True} if g.get("via_link") else {})))
             for c in d.get("dialogs", []):
                 gated.append(dict(kind=c["kind"], module=st["dir"], repo=st["repo"], entity=d["entity"], pv=c["pv"], screen=c["screen"],
                                   dialog=c["dialog"], text=c["text"], gate_pv="", condition="", handled=c["handled"], written=written))
+            for pv in d.get("protected", {}):
+                moved.add((st["dir"], d["entity"], pv))
             if written and d["left_out"]:
                 left.setdefault(st["dir"], {})[stem] = [x[0] for x in d["left_out"]]
     (CFG.status / "gated-writes.json").write_text(json.dumps(gated, indent=1))
     (CFG.status / "device-refs.json").write_text(json.dumps(device_refs(status), indent=1))
     (CFG.status / "left-out.json").write_text(json.dumps(left, indent=1))
-    report_stale(gated)
+    report_stale(gated, moved)
 
 
-def report_stale(gated: list[dict]):
-    """Entries of the classification file that no longer match a gated write or a dialog."""
-    known = {(g["module"], g["entity"], p.strip()) for g in gated for p in g["pv"].split(",")}
+def report_stale(gated: list[dict], moved: set[tuple[str, str, str]] = frozenset()):
+    """Entries of the classification file that no longer match a gated write, a dialog or a
+    write they moved."""
+    known = moved | {(g["module"], g["entity"], p.strip()) for g in gated for p in g["pv"].split(",")}
     hand = {folder for _, folder in CFG.hand_written}
     stale = sorted(k for k, e in load_classes().items() if k not in known and e["class"] not in UNGATED and k[0] not in hand)
     if stale:
@@ -310,11 +369,63 @@ def init_worker(settings: Settings):
     install(settings)
 
 
-def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False):
-    """`folders` narrows the run; with `dry_run` no support repo is written."""
+def summarise(results: list[dict]) -> int:
+    """What this run lost and what it warns of, after the progress lines. Exit status: 1 if
+    a module failed or an entity was lost that `expected_losses` does not name."""
+    unexpected, expected, warnings = [], [], []
+    seen: set[tuple[str, str]] = set()
+    covered = {folder for st in results for folder in [st.get("dir")]}
+
+    def lost(folder: str, name: str, why: str):
+        seen.add((folder, name))
+        where = f"{folder}/{name}" if name else folder
+        if (reason := CFG.expected_losses.get((folder, name))) and not (not name and why.split(":")[0] in BROKEN_RUN):
+            expected.append(f"  {where}: {why}: expected: {reason}")
+        else:
+            unexpected.append(f"  {where}: {why}")
+
+    for st in sorted(results, key=lambda s: s.get("dir", "")):
+        folder = st.get("dir", "")
+        if st.get("status") == "failed":
+            lost(folder, "", f"{st.get('cls')}: {st.get('reason', '')}")
+            continue
+        for name, f in (st.get("entity_failures") or {}).items():
+            lost(folder, name, f"{f.get('cls')}: {f.get('reason', '')}")
+        for name, why in (st.get("device_errors") or {}).items():
+            lost(folder, name, why)
+    for st in results:
+        if st.get("status") == "done" and st.get("version_warning"):
+            warnings.append(st["version_warning"])
+        if st.get("uncommitted") and st.get("status") != "failed":
+            warnings.append(f"{st['dir']}: uncommitted changes this tool did not install; a sweep that writes would refuse it: {', '.join(st['uncommitted'][:4])}")
+    counts: dict[str, int] = {}
+    for st in results:
+        counts[st.get("status", "?")] = counts.get(st.get("status", "?"), 0) + 1
+    print("summary: " + ", ".join(f"{n} {s}" for s, n in sorted(counts.items())), flush=True)
+    if unexpected:
+        print(f"lost, failing this run ({len(unexpected)}):", *unexpected, sep="\n", flush=True)
+    if expected:
+        print(f"lost, as expected ({len(expected)}):", *expected, sep="\n", flush=True)
+    if accepted := sorted(st["version_accepted"] for st in results if st.get("status") == "done" and st.get("version_accepted")):
+        print(f"version differences accepted ({len(accepted)}):", *[f"  {a}" for a in accepted], sep="\n", flush=True)
+    if warnings:
+        print(f"warnings ({len(warnings)}):", *[f"  WARNING {w}" for w in sorted(warnings)], sep="\n", flush=True)
+    if unnamed := sorted(st["dir"] for st in results if st.get("version_unnamed") and st.get("status") == "done"):
+        print(f"install.yml names no version, so the newest release was validated ({len(unnamed)}): {', '.join(unnamed)}", flush=True)
+    stale = sorted(k for k in CFG.expected_losses if k[0] in covered and k not in seen)
+    if stale:
+        print(f"expected_losses: entries that match nothing in this run: {', '.join(f'{a}/{b}' if b else a for a, b in stale)}", flush=True)
+    return 1 if unexpected else 0
+
+
+def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False, overwrite: bool = False) -> int:
+    """`folders` narrows the run; with `dry_run` no support repo is written. `overwrite` loses
+    uncommitted changes in the folders it generates. The exit status is summarise()'s."""
+    items = inventory()
+    if unknown := sorted(set(folders) - {it["dir"] for it in items}):
+        raise SystemExit(f"no support yaml committed in any repo for: {', '.join(unknown)}")
     CFG.status.mkdir(parents=True, exist_ok=True)
     CFG.output.mkdir(parents=True, exist_ok=True)
-    items = inventory()
     taken = reserved_stems(items)
     status_path = status_file()
     status = json.loads(status_path.read_text()) if status_path.exists() and folders else {}
@@ -323,6 +434,7 @@ def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False):
     for it in items:
         it["key"] = it["dir"]
         it["dry_run"] = dry_run
+        it["overwrite"] = overwrite
         where = (it["repo"], it["dir"])
         if where in CFG.hand_written:
             status[it["dir"]] = dict(repo=it["repo"], dir=it["dir"], yaml=it["yaml"], module=it["module"], status="hand_written")
@@ -336,14 +448,23 @@ def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False):
         it["taken"] = taken
         if not folders or it["dir"] in folders:
             todo.append(it)
+    swept = {it["dir"] for it in todo}
+    for name in sorted(set(folders) - swept):
+        print(f"{name}: not swept: {status[name]['status']}", flush=True)
     log(f"sweep run: {len(todo)} folders" + (" (dry run)" if dry_run else ""))
+    results = []
     with multiprocessing.Pool(jobs, initializer=init_worker, initargs=(CFG,)) as pool:
         for st in pool.imap_unordered(run_item, todo):
+            if wrote := st.pop("installed", None):
+                installed_file().write_text(json.dumps(installed() | wrote, indent=1, sort_keys=True))
             status[st["dir"]] = st
+            results.append(st)
             status_path.write_text(json.dumps(status, indent=1, default=str))
             line = f"{st['dir']} {st.get('status')} {st.get('cls', '')} {st.get('placed', '')}/{st.get('records', '')} {st.get('reason', '')[:120]}"
             log(line)
             print(line, flush=True)
+            if st.get("status") == "done" and st.get("version_warning"):
+                print(f"  WARNING {st['version_warning']}", flush=True)
     for it in items:
         where = (it["repo"], it["dir"])
         if where in twins:
@@ -355,6 +476,7 @@ def sweep(folders: list[str], jobs: int = 12, dry_run: bool = False):
         print(f"written by hand, skipped: {', '.join(sorted(d for _, d in CFG.hand_written))}", flush=True)
     if not folders:
         check_collisions()
+    return summarise(results)
 
 
 def check_collisions():
@@ -371,11 +493,17 @@ def check_collisions():
     print("device name collisions:", clash, flush=True)
 
 
-def changed_in_repo(repo: Path) -> list[str]:
-    """Paths git sees as changed or new, leaving out folders that start `_`."""
-    raw = subprocess.run(["git", "-C", str(repo), "status", "--porcelain", "-z", "-uall"], capture_output=True, text=True, check=True).stdout
-    paths = [entry[3:] for entry in raw.split("\0") if entry]
-    return [p for p in paths if not p.startswith("_")]
+def changed_in_repo(repo: Path, folder: str = "") -> list[str]:
+    """Paths git sees as changed or new, of one folder or of all but those that start `_`."""
+    raw = subprocess.run(["git", "-C", str(repo), "status", "--porcelain", "-z", "-uall", *(["--", folder] if folder else [])], capture_output=True, text=True, check=True).stdout
+    entries = iter(raw.split("\0"))
+    paths = []
+    for entry in entries:
+        if entry:
+            paths.append(entry[3:])
+            if entry[0] in "RC":
+                next(entries)  # the source of the rename
+    return [p for p in paths if folder or not p.startswith("_")]
 
 
 def check() -> int:

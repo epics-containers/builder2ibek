@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dbparse import parse_db  # noqa: E402
 from fielddefs import fields_of  # noqa: E402
 from gen import entity_block, head_text  # noqa: E402
-from release import db_search_path, last_resort, pick  # noqa: E402
+from release import db_search_path, last_resort, pick, version_note  # noqa: E402
 from settings import CFG  # noqa: E402
 
 IBEK = str(Path(sys.executable).parent / "ibek")
@@ -416,10 +416,25 @@ def validate_stage(module: str, ov: dict, staged: Path, defs: dict | None = None
     return res
 
 
-def layout_release(checkout: Path, build: Path, dep_dirs: list[Path], over: list[Path]) -> tuple[Path, list[str]]:
+NOT_BUILT = {"test", "tests", "example", "examples", "iocs", "iocboot", "docs", "documentation", "op", "opi"}
+
+
+def source_rank(rel: Path) -> int:
+    """Which file of a name a release is built from: a `Db` folder of an App, then a top
+    `db` folder, then anywhere, and last what a release does not build from."""
+    parts = rel.parts[:-1]
+    if any(p.lower() in NOT_BUILT or re.search(r"(test|example)", p, re.I) for p in parts):
+        return 3
+    if "Db" in parts:
+        return 0
+    return 1 if parts[:1] == ("db",) else 2
+
+
+def layout_release(checkout: Path, build: Path, dep_dirs: list[Path], over: list[Path]) -> tuple[Path, list[str], list[str]]:
     """A checkout laid out as a release in `build`, as its Db Makefile would: x.db from
     x.substitutions with msi, or from x.template. `dep_dirs` are such releases it needs,
-    `over` folders whose files replace the ones built here. Returns it and what msi refused."""
+    `over` folders whose files replace the ones built here. Returns it, what msi refused,
+    and any name for which two different files were as good as each other."""
     msi = CFG.msi_path()
     if msi is None:
         raise SystemExit("validating against a checkout needs msi: give --msi")
@@ -427,7 +442,15 @@ def layout_release(checkout: Path, build: Path, dep_dirs: list[Path], over: list
     shutil.rmtree(build, ignore_errors=True)
     db.mkdir(parents=True)
     (build / "dbd").mkdir()
-    sources = sorted(p for p in checkout.rglob("*") if p.is_file() and ".git" not in p.parts)
+    sources = sorted((p for p in checkout.rglob("*") if p.is_file() and ".git" not in p.parts), key=lambda p: (source_rank(p.relative_to(checkout)), p))
+    shadowed: list[str] = []
+    best: dict[str, Path] = {}
+    for s in sources:
+        if s.suffix not in (".template", ".db", ".substitutions", ".vdb"):
+            continue
+        first = best.setdefault(s.name, s)
+        if first != s and source_rank(first.relative_to(checkout)) == source_rank(s.relative_to(checkout)) and first.read_bytes() != s.read_bytes():
+            shadowed.append(f"{s.name}: used {first.relative_to(checkout)}, not {s.relative_to(checkout)}")
     for s in sources:
         if s.suffix in (".template", ".db", ".substitutions", ".vdb") and not (db / s.name).exists():
             shutil.copy(s, db / s.name)
@@ -450,7 +473,29 @@ def layout_release(checkout: Path, build: Path, dep_dirs: list[Path], over: list
     for d in over:
         for f in d.glob("*.db"):
             shutil.copy(f, db / f.name)
-    return build, refused
+    return build, refused, shadowed
+
+
+def checkout_version_problem(checkout: Path, version: str) -> str:
+    """Empty when a checkout is at the version install.yml builds, or that names none."""
+    if not version or version in CFG.install_placeholders:
+        return ""
+
+    def commit(rev: str) -> str:
+        return subprocess.run(["git", "-C", str(checkout), "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}"], capture_output=True, text=True).stdout.strip()
+
+    head = commit("HEAD")
+    if not head:
+        return f"install.yml builds {version}, and {checkout.name} is not a git checkout, so its version cannot be checked"
+    at = commit(version) or commit(f"v{version}")
+    if not at:
+        # a shallow fetch of one tag keeps the tag's name only here
+        fetched = subprocess.run(["git", "-C", str(checkout), "rev-parse", "--git-path", "FETCH_HEAD"], capture_output=True, text=True).stdout.strip()
+        record = (checkout / fetched).read_text().splitlines()[:1] if fetched and (checkout / fetched).is_file() else []
+        if record and record[0].startswith(head) and f"'{version}'" in record[0]:
+            return ""
+        return f"install.yml builds {version}, no such version in this checkout at {head[:7]}, so it cannot be checked"
+    return "" if at == head else f"install.yml builds {version} at {at[:7]}, the checkout is at {head[:7]}"
 
 
 LEFT_OUT_HELPERS = {"calc", "calcout", "scalcout", "acalcout", "fanout", "dfanout", "seq", "sseq", "sub", "asub", "transform", "compress", "subarray"}
@@ -495,37 +540,54 @@ def validate_hand_written(folders: list[str], upstream_root: Path) -> int:
     work = CFG.status / "upstream-build"
     built: dict[str, Path] = {}
     bad = 0
+    warnings: list[str] = []
+    accepted: list[str] = []
     status_path = CFG.status / "sweep-status.json"
     status = json.loads(status_path.read_text()) if status_path.exists() else {}
     left_path = CFG.status / "left-out.json"
     left = json.loads(left_path.read_text()) if left_path.exists() else {}
-    for repo_key, folder in sorted(CFG.hand_written):
-        if folders and folder not in folders:
-            continue
+    chosen = [(r, f) for r, f in sorted(CFG.hand_written) if not folders or f in folders]
+    if not chosen:
+        raise SystemExit(f"no hand-written folder to validate: {', '.join(folders)}" if folders else "no hand-written folder to validate: list them as hand_written in the settings")
+    for repo_key, folder in chosen:
         repo = CFG.repos[repo_key]
-        yaml_name = next((repo / folder).glob("*.ibek.support.yaml")).name
+        yaml_name = next((p.name for p in (repo / folder).glob("*.ibek.support.yaml")), None)
+        if yaml_name is None:
+            print(f"{folder}: no support yaml in {repo / folder}", flush=True)
+            bad += 1
+            continue
         extra = CFG.overrides / f"{folder}.sweep.yaml" if CFG.overrides else None
         settings = (yaml.safe_load(extra.read_text()) if extra and extra.exists() else None) or {}
         ov = dict(repo=repo_key, dir=folder, yaml=yaml_name, test_values=settings.get("test_values"))
         checkout = upstream_root / folder
         refused: list[str] = []
+        shadowed: list[str] = []
+        version_warning = ""
+        install = next(iter(yaml.safe_load(f.read_text()) for f in (repo / folder).glob("*.install.yml")), {}) or {}
+        install_version = str(install.get("version", ""))
         if checkout.is_dir():
             dep_dirs = []
             for dep in settings.get("upstream_deps", []):
                 if dep not in built:
-                    built[dep], more = layout_release(upstream_root / dep, work / dep, [], [])
+                    built[dep], more, again = layout_release(upstream_root / dep, work / dep, [], [])
                     refused += more
+                    shadowed += again
                 dep_dirs.append(built[dep])
-            release, more = layout_release(checkout, work / folder, dep_dirs, [upstream_root / settings["upstream_build"]] if "upstream_build" in settings else [])
+            release, more, again = layout_release(checkout, work / folder, dep_dirs, [upstream_root / settings["upstream_build"]] if "upstream_build" in settings else [])
             refused += more
+            shadowed += again
             commit = subprocess.run(["git", "-C", str(checkout), "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
             how = f"upstream checkout at {commit}"
+            if problem := checkout_version_problem(checkout, install_version):
+                if why := CFG.accepted_versions.get((folder, install_version, commit)):
+                    accepted.append(f"{folder}: {problem}: accepted: {why}")
+                else:
+                    version_warning = f"{folder}: {problem}"
         elif repo_key in CFG.public_repos:
             print(f"{folder}: no checkout at {checkout}: a public folder is validated against upstream", flush=True)
             bad += 1
             continue
         else:
-            install = next(iter(yaml.safe_load(f.read_text()) for f in (repo / folder).glob("*.install.yml")), {})
             module = re.search(r"^module:\s*(\S+)", (repo / folder / yaml_name).read_text(), re.M).group(1)
             rel, how = pick(folder, module, install)
             if rel is None:
@@ -533,10 +595,12 @@ def validate_hand_written(folders: list[str], upstream_root: Path) -> int:
                 bad += 1
                 continue
             release = rel
+            version_warning, note = version_note(folder, install_version, Path(rel).name)
+            accepted += [note] if note else []
         ov["release"] = str(release)
         (CFG.output / folder).mkdir(parents=True, exist_ok=True)
         val = validate_stage(folder, ov, repo / folder, defs)
-        val.update(against=how, msi_refused=refused)
+        val.update(against=how, msi_refused=refused, shadowed=shadowed, version_warning=version_warning)
         (CFG.output / folder / "validate.json").write_text(json.dumps(val, indent=1, default=str))
         status.setdefault(folder, dict(repo=repo_key, dir=folder, yaml=yaml_name, status="hand_written"))
         if repo_key in CFG.public_repos:
@@ -553,6 +617,21 @@ def validate_hand_written(folders: list[str], upstream_root: Path) -> int:
         problems = [*([val["yaml_purity"]] if val["yaml_purity"] else []), *val["hygiene"][:3]]
         bad += bool(failed or problems)
         print(f"{folder} ({how}): {len(val['ok_entities'])} of {len(val['entities'])} entities pass {failed or ''} {problems or ''}".rstrip(), flush=True)
+        notes = [version_warning] if version_warning else []
+        for r in refused:
+            name = r.split(":")[0]
+            if why := CFG.accepted_msi_refusals.get((folder, name)):
+                accepted.append(f"{folder}: msi refused {name}: accepted: {why}")
+            else:
+                notes.append(f"{folder}: msi refused {r}")
+        notes += [f"{folder}: two files of one name: {s}" for s in shadowed]
+        for n in notes:
+            print(f"  WARNING {n}", flush=True)
+        warnings += notes
+    if accepted:
+        print(f"accepted ({len(accepted)}):", *[f"  {a}" for a in accepted], sep="\n", flush=True)
+    if warnings:
+        print(f"warnings ({len(warnings)}):", *[f"  WARNING {w}" for w in warnings], sep="\n", flush=True)
     status_path.parent.mkdir(parents=True, exist_ok=True)
     status_path.write_text(json.dumps(status, indent=1, default=str))
     left_path.write_text(json.dumps(left, indent=1))

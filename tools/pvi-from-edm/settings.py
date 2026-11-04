@@ -1,7 +1,8 @@
 """Where the tool reads and writes, and what differs from one site to another.
 
 One object, `CFG`, set once by the command line (see `pvi_from_edm.py`) and handed to
-each worker process of a sweep. Nothing in the tool knows a path or a module by name.
+each worker process of a sweep. Nothing in the tool knows a path or a module by name:
+a site gives them on the command line or in its settings file.
 """
 
 from __future__ import annotations
@@ -13,10 +14,6 @@ from pathlib import Path
 import yaml
 
 
-def _paths(*names: str) -> list[Path]:
-    return [Path(n) for n in names]
-
-
 @dataclass
 class Settings:
     # support repo folders, key -> folder; `repo:` in an override names a key
@@ -26,16 +23,16 @@ class Settings:
     hygiene_pattern: str = ""
 
     # release roots, in order of preference
-    prod: list[Path] = field(default_factory=lambda: _paths("/dls_sw/prod/R3.14.12.7/support", "/dls_sw/prod/R7.0.7/support"))
-    work: list[Path] = field(default_factory=lambda: _paths("/dls_sw/work/R3.14.12.7/support", "/dls_sw/work/R7.0.7/support"))
-    older: list[Path] = field(default_factory=lambda: [Path(f"/dls_sw/prod/{v}/support") for v in ("R3.14.12.6", "R3.14.12.3", "R3.14.12.2", "R3.14.12.1", "R3.14.11", "R3.14.8.2")])
+    prod: list[Path] = field(default_factory=list)
+    work: list[Path] = field(default_factory=list)
+    older: list[Path] = field(default_factory=list)
     # included by bare name, with any RELEASE dependency hidden in files a release does not ship
-    last_resort_modules: list[str] = field(default_factory=lambda: ["ADCore", "asyn"])
+    last_resort_modules: list[str] = field(default_factory=list)
     # folder name -> the name its releases go by
     release_aliases: dict[str, str] = field(default_factory=dict)
-    msi: Path = Path("/dls_sw/epics/R7.0.7/base/bin/linux-x86_64/msi")
-    base_dbd: Path = Path("/dls_sw/epics/R7.0.7/base/dbd")
-    support_dbd_glob: str = "/dls_sw/prod/R3.14.12.7/support/*/*/dbd/{}Record.dbd"
+    msi: Path | None = None
+    base_dbd: Path | None = None
+    support_dbd_glob: str = ""
     edm_colors: Path | None = None
 
     # data the tool reads
@@ -59,9 +56,18 @@ class Settings:
     # screens that leave a copied offLabel on buttons whose onLabel says what they do
     held_label_screens: set[str] = field(default_factory=set)
 
+    # what a run may lose and still exit 0: (folder, entity, or "" for the module) -> why
+    expected_losses: dict[tuple[str, str], str] = field(default_factory=dict)
+    # version differences seen and accepted: (folder, install.yml's version, what was validated) -> why
+    accepted_versions: dict[tuple[str, str, str], str] = field(default_factory=dict)
+    # (folder, substitutions file) -> why msi may refuse it
+    accepted_msi_refusals: dict[tuple[str, str], str] = field(default_factory=dict)
+    # values of `version` in an install.yml that name no release
+    install_placeholders: set[str] = field(default_factory=set)
+
     def msi_path(self) -> Path | None:
         """The configured msi, or the one on PATH."""
-        if self.msi.exists():
+        if self.msi and self.msi.exists():
             return self.msi
         found = shutil.which("msi")
         return Path(found) if found else None
@@ -88,7 +94,7 @@ PLAIN_KEYS = {"hygiene_pattern", "last_resort_modules", "release_aliases", "supp
 def from_file(path: Path) -> Settings:
     """Settings from a YAML file. A relative path in it is relative to the file."""
     raw = yaml.safe_load(path.read_text()) or {}
-    known = {"repos", "public_repos", "hand_written", "forks", "reserved_stems", "held_label_screens", *PATH_KEYS, *PATH_LIST_KEYS, *PLAIN_KEYS}
+    known = {"repos", "public_repos", "hand_written", "forks", "reserved_stems", "held_label_screens", "expected_losses", "accepted_versions", "accepted_msi_refusals", "install_placeholders", *PATH_KEYS, *PATH_LIST_KEYS, *PLAIN_KEYS}
     if unknown := sorted(set(raw) - known):
         raise ValueError(f"{path}: unknown settings: {', '.join(unknown)}")
     base = path.resolve().parent
@@ -108,6 +114,18 @@ def from_file(path: Path) -> Settings:
     s.forks = {(e["repo"], e["folder"]): (e["twin_repo"], e["twin_folder"]) for e in raw.get("forks") or []}
     s.reserved_stems = [(e["stem"], e["repo"], e["folder"]) for e in raw.get("reserved_stems") or []]
     s.held_label_screens = set(raw.get("held_label_screens") or [])
-    if s.support_dbd_glob.count("{}") != 1:
+    s.install_placeholders = set(raw.get("install_placeholders") or [])
+
+    def with_reason(key: str) -> list[dict]:
+        entries = raw.get(key) or []
+        for e in entries:
+            if not e.get("reason"):
+                raise ValueError(f"{path}: an entry of {key} has no reason: {e}")
+        return entries
+
+    s.expected_losses = {(e["folder"], e.get("entity", "")): e["reason"] for e in with_reason("expected_losses")}
+    s.accepted_versions = {(e["folder"], str(e["install"]), str(e["validated"])): e["reason"] for e in with_reason("accepted_versions")}
+    s.accepted_msi_refusals = {(e["folder"], e["file"]): e["reason"] for e in with_reason("accepted_msi_refusals")}
+    if s.support_dbd_glob and s.support_dbd_glob.count("{}") != 1:
         raise ValueError(f"{path}: support_dbd_glob needs one {{}} for the record type")
     return s

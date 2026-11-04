@@ -67,11 +67,15 @@ def gather() -> list[dict]:
                     r["gates"].append([g["gate_pv"], g["condition"]])
                 if "behind" in g["handled"]:
                     r["behind_dialog"] = True
+                if g.get("via_link"):
+                    r["via_link"] = True
             else:
                 r["behind_dialog"] = True
                 r["dialog_text"].append(g["text"])
     byrep = defaultdict(list)
     for r in rows.values():
+        if r.get("via_link"):
+            r["behind_dialog"] = False  # it moves from behind its dialog
         byrep[r["module"]].append(r)
     for mod, rs in byrep.items():
         rep = json.loads((CFG.output / mod / "report.json").read_text())

@@ -42,7 +42,12 @@ def common_options() -> argparse.ArgumentParser:
 
 
 def configure(a: argparse.Namespace) -> Settings:
-    s = settings.from_file(a.config) if a.config else Settings()
+    if a.config and not a.config.is_file():
+        raise SystemExit(f"settings file not found: {a.config}")
+    try:
+        s = settings.from_file(a.config) if a.config else Settings()
+    except (ValueError, KeyError, TypeError, AttributeError) as e:
+        raise SystemExit(f"{a.config}: {e}") from e
     for item in a.repo:
         key, eq, folder = item.partition("=")
         if not eq:
@@ -80,18 +85,38 @@ def need_repos():
         raise SystemExit(f"classification file not found: {CFG.classification}")
 
 
+def need_site():
+    """What a run generating anything cannot go without."""
+    if not (CFG.prod or CFG.work or CFG.older):
+        raise SystemExit("no release to read: give --prod-root, or prod_roots in --config")
+    if not CFG.base_dbd:
+        raise SystemExit("no record definitions: give --base-dbd, or base_dbd in --config")
+    if not CFG.msi_path():
+        print("no msi found: PVs are compared by a parser of the tool's own, and audit will fail. Give --msi, or put msi on PATH", flush=True)
+
+
+def need_file(path: Path, what: str):
+    if not path.is_file():
+        raise SystemExit(f"{path} not found: {what}")
+
+
+def need_sweep():
+    need_file(CFG.status / "sweep-status.json", "run sweep first, or give the --work-dir of the one that ran")
+
+
 def cmd_sweep(a) -> int:
     from sweep import sweep
 
     need_repos()
-    sweep(a.folders, a.jobs, a.dry_run)
-    return 0
+    need_site()
+    return sweep(a.folders, a.jobs, a.dry_run, a.overwrite_uncommitted)
 
 
 def cmd_check(a) -> int:
     from sweep import check
 
     need_repos()
+    need_sweep()
     return check()
 
 
@@ -103,6 +128,8 @@ def cmd_generate(a) -> int:
         raise SystemExit("generate works from <overrides>/<module>.yaml: give --overrides; for the rest use sweep")
     if hand := sorted(m for m in a.modules if m in {folder for _, folder in CFG.hand_written}):
         raise SystemExit(f"written by hand, so not generated: {', '.join(hand)}")
+    for m in a.modules:
+        need_file(CFG.overrides / f"{m}.yaml", "generate works from a module's own override file; for the rest use sweep")
     generate(a.modules, a.write)
     return 0
 
@@ -113,6 +140,7 @@ def cmd_validate(a) -> int:
     need_repos()
     if a.upstream_root:
         return validate_hand_written(a.folders, a.upstream_root.resolve())
+    need_sweep()
     status = json.loads((CFG.status / "sweep-status.json").read_text())
     defs = definitions_map()
     bad = 0
@@ -133,12 +161,14 @@ def cmd_validate(a) -> int:
 def cmd_audit(a) -> int:
     import audit
 
+    need_sweep()
     return audit.main()
 
 
 def cmd_evidence(a) -> int:
     import evidence
 
+    need_file(CFG.status / "gated-writes.json", "run sweep first, or give the --work-dir of the one that ran")
     evidence.main()
     return 0
 
@@ -146,6 +176,7 @@ def cmd_evidence(a) -> int:
 def cmd_classify(a) -> int:
     import classify
 
+    need_file(CFG.status / "gated-evidence.json", "run evidence first")
     classify.main(a.out.resolve() if a.out else None)
     return 0
 
@@ -154,6 +185,7 @@ def cmd_review(a) -> int:
     import classify
     import render
 
+    need_sweep()
     render.review(a.modules)
     classify.write_review()
     print(CFG.review / "index.html")
@@ -164,6 +196,7 @@ def cmd_survey(a) -> int:
     from survey import survey
 
     need_repos()
+    need_site()
     CFG.status.mkdir(parents=True, exist_ok=True)
     survey(a.folders)
     return 0
@@ -173,6 +206,7 @@ def cmd_dump_edl(a) -> int:
     from edl import as_list, links, parse_edl, pv_uses, text_of
 
     for f in a.files:
+        need_file(f, "dump-edl reads EDM screens")
         s = parse_edl(f)
         print(f"=== {f.name} {s.w}x{s.h} title={s.title!r} objs={len(s.objects)}")
         for o in sorted(s.objects, key=lambda o: (o.y, o.x)):
@@ -207,10 +241,11 @@ def main(argv: list[str] | None = None) -> int:
         p.set_defaults(func=func)
         return p
 
-    p = add("sweep", cmd_sweep, "generate and validate every support module without PVI, and install the result in the support repos")
+    p = add("sweep", cmd_sweep, "generate and validate every support module without PVI, and install the result in the support repos. Each folder is first reset to its committed state; one with uncommitted changes this tool did not install is refused. Exit 1 if a module fails or an entity is lost that the settings do not expect")
     p.add_argument("folders", nargs="*", help="only these module folders")
     p.add_argument("--jobs", type=int, default=12)
     p.add_argument("--dry-run", action="store_true", help="write nothing to a support repo: results stay in the output folder")
+    p.add_argument("--overwrite-uncommitted", action="store_true", help="reset and overwrite a folder even if that loses uncommitted changes")
     add("check", cmd_check, "compare the output of a sweep with the support repos, byte for byte; exit 1 on a difference")
     p = add("generate", cmd_generate, "one module with an override file of its own")
     p.add_argument("modules", nargs="+")

@@ -13,7 +13,7 @@ from xml.etree import ElementTree as ET
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent))
-from edl import expand, parse_edl, pv_uses  # noqa: E402
+from edl import expand, gate_conditions, links, parse_edl, parse_symbols, pv_uses  # noqa: E402
 from gen import field_pv, is_panel, resolve, screen_extent, walk_signals  # noqa: E402
 from protect import MOVED, SUB_LABEL  # noqa: E402
 from settings import CFG  # noqa: E402
@@ -99,6 +99,96 @@ def audit_buttons(key: str, stem: str, d: dict, folder: Path) -> dict:
                     res["missing"].append(dict(module=key, device=stem, pv=full, value=value, screen=s["file"]))
     res["left_out"] = sorted(([a, b, c] for a, b, c in seen))
     return res
+
+
+def link_gated_writes(d: dict) -> set[str]:
+    """Every write on a screen reached only by way of a gated link, from the screens. A
+    screen the device was not built from has no record of this device's to find."""
+    records = dict.fromkeys(list(d["placed"]) + [r[0] for r in d["left_out"]], True)
+    by_file: dict[str, list[dict]] = {}
+    for s in d["screens"]:
+        by_file.setdefault(s["file"], []).append(s)
+
+    def targets(s: dict, o, ln: dict) -> list[dict]:
+        name = ln["file"] if ln["file"].endswith(".edl") else ln["file"] + ".edl"
+        env = {**s["env"], **parse_symbols(ln["symbols"], s["env"])}
+        found = by_file.get(name, [])
+        return [t for t in found if t["env"] == env] or found
+
+    behind: list[dict] = []
+    for s in d["screens"]:
+        for o in parse_edl(Path(s["path"])).objects:
+            if gate_conditions(o, s["env"]):
+                for ln in links(o):
+                    behind.extend(targets(s, o, ln))
+    out: set[str] = set()
+    seen: set[int] = set()
+    while behind:
+        s = behind.pop()
+        if id(s) in seen:
+            continue
+        seen.add(id(s))
+        for o in parse_edl(Path(s["path"])).objects:
+            for u in pv_uses(o):
+                if u.role == "write":
+                    rec, fld = resolve(Lookup(records), expand(u.pv, s["env"]))
+                    if rec:
+                        out.add(field_pv(rec, fld))
+            for ln in links(o):
+                behind.extend(targets(s, o, ln))
+    return out
+
+
+def device_bobs(key: str, stem: str) -> dict[str, dict]:
+    return {b.name: bob_writes(b) for b in (CFG.sandbox / key / "opi").glob(f"{stem}*.pvi.bob") if b.name.startswith((f"{stem}.", f"{stem}_"))}
+
+
+def audit_link_gates(devices: dict, classes: dict) -> dict:
+    """Writes behind a gated link are where their class says, in the .bob files."""
+    res: dict = dict(checked=0, on_protected=0, stay=0, placed_nowhere=[], wrong=[])
+    for (module, entity), (key, d) in sorted(devices.items()):
+        if "screens" not in d:
+            continue
+        pvs = link_gated_writes(d)
+        bobs = device_bobs(key, d["file_stem"]) if pvs else {}
+        for pv in sorted(pvs):
+            res["checked"] += 1
+            entry = classes.get((module, entity, pv))
+            where = sorted(n for n, w in bobs.items() if pv in w)
+            prot = [n for n in where if PROTECTED_BOB in n]
+            rest = [n for n in where if PROTECTED_BOB not in n]
+            if entry and entry["class"] not in MOVED:
+                res["stay"] += 1
+            elif not where:
+                res["placed_nowhere"].append((key, pv))
+                if pv in d["placed"]:
+                    res["wrong"].append((key, pv, "placed, but on no .bob"))
+            elif rest or not prot:
+                res["wrong"].append((key, pv, f"writable on {rest}"))
+            else:
+                res["on_protected"] += 1
+    return res
+
+
+def not_checked(status: dict, devices: dict, classes: list[dict], unseen_entries: int) -> list[str]:
+    """What this audit leaves out, so that a pass is not read as more than it is."""
+    by: dict[str, list[str]] = {}
+    for key, st in status.items():
+        by.setdefault(st.get("status", "?"), []).append(key)
+    lost = [f"{k}/{n}" for k, st in status.items() if st.get("status") == "done" for n in [*(st.get("entity_failures") or {}), *(st.get("device_errors") or {})]]
+    generated = [d for _, d in devices.values() if "screens" in d]
+    return [
+        f"modules that failed ({len(by.get('failed', []))}): {', '.join(sorted(by.get('failed', [])))}",
+        f"modules with nothing generated ({len(by.get('skipped', []))}), and folders with PVI at their commit ({len(by.get('has_pvi', []))})",
+        f"entities lost by a module that passed ({len(lost)}): {', '.join(sorted(lost))}",
+        f"classification entries whose entity has no device here: {unseen_entries} of {len(classes)}",
+        f"gated links to a device of its own, whose writes are not treated as gated: {sum(len(d.get('gated_refs', [])) for d in generated)}",
+        f"links not followed, so their screens' writes are not read: {sum(len(d.get('external', [])) for d in generated)}",
+        "hand-written folders: their classification entries only, none of their screens",
+        "writes other than message buttons: only where the classification file names them",
+        "behind_dialog entries: only that they are not on a first screen",
+        "labels, layout, and whether a classification is right",
+    ]
 
 
 def audit_momentary(found: list, classes: list[dict], devices: dict) -> dict:
@@ -200,13 +290,15 @@ def main() -> int:
                 b["reasons"][k] = b["reasons"].get(k, 0) + v
             for pv, acts in d.get("merged_buttons", {}).items():
                 out["merged"].setdefault(key, {})[pv] = acts
+    unseen_entries = 0
     for e in classes:
         dev = devices.get((e["module"], e["entity"]))
         if dev is None:
+            unseen_entries += 1
             continue
         key, d = dev
         stem = d["file_stem"]
-        bobs = {b.name: bob_writes(b) for b in (CFG.sandbox / key / "opi").glob(f"{stem}*.pvi.bob") if b.name.startswith((f"{stem}.", f"{stem}_"))}
+        bobs = device_bobs(key, stem)
         where = sorted(n for n, w in bobs.items() if e["pv"] in w)
         prot = [n for n in where if PROTECTED_BOB in n]
         rest = [n for n in where if PROTECTED_BOB not in n]
@@ -222,6 +314,8 @@ def main() -> int:
             out["protected"].setdefault("dialog_entry_on_first_screen", []).append((key, e["pv"]))
         if e["class"] == "keep-on-main":
             out["keep_on_main"].append(dict(module=key, pv=e["pv"], bobs=where, on_root=f"{stem}.pvi.bob" in where, protected=bool(prot)))
+    out["link_gates"] = audit_link_gates(devices, {(e["module"], e["entity"], e["pv"]): e for e in classes})
+    out["not_checked"] = not_checked(status, devices, classes, unseen_entries)
     out["momentary"] = audit_momentary(out["buttons"]["momentary"], classes, devices)
     out["merged_count"] = sum(len(v) for v in out["merged"].values())
     out["merged_not_in_bob"] = []
@@ -246,6 +340,14 @@ def main() -> int:
     for k in out["keep_on_main"]:
         print(f"  keep-on-main {k['module']} {k['pv']}: root={k['on_root']} protected={k['protected']} {k['bobs']}")
     print(f"password gated: {out['password_gated']}; entities not clean: {len(out['not_ok'])}")
+    if out["not_ok"]:
+        for row in out["not_ok"][:5]:
+            print(f"  not clean: {row}")
+        if any("msi" in str(row[2]) for row in out["not_ok"]):
+            print("  no msi was run for those, so their records were not compared as an IOC loads them: give --msi, or put msi on PATH")
+    g = out["link_gates"]
+    print(f"behind a gated link: {g['checked']} writes, {g['on_protected']} on Protected, {g['stay']} staying by their class, {len(g['placed_nowhere'])} placed nowhere; wrong: {g['wrong']}")
     print(f"written by hand: not validated {sorted(not_validated)}; templates an entity loads and upstream lacks {sorted(absent)}")
     print(f"behind-dialog entries on a first screen: {p.get('dialog_entry_on_first_screen', [])}")
-    return 1 if out["momentary"]["bad"] or b["missing"] or out["merged_not_in_bob"] or p["writable_elsewhere"] or out["not_ok"] or not all(k["on_root"] and not k["protected"] for k in out["keep_on_main"]) else 0
+    print("not checked:", *[f"  {line}" for line in out["not_checked"]], sep="\n")
+    return 1 if g["wrong"] or out["momentary"]["bad"] or b["missing"] or out["merged_not_in_bob"] or p["writable_elsewhere"] or out["not_ok"] or not all(k["on_root"] and not k["protected"] for k in out["keep_on_main"]) else 0

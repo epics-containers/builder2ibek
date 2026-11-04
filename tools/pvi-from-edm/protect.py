@@ -70,10 +70,10 @@ def targets_of(children: list[dict], gated: list[dict], classes: dict, module: s
         cls = entry["class"] if entry else "unsure"
         if cls in MOVED:
             targets[pv] = cls
-    # a momentary button need not be gated on its screen
+    # the file decides for any write it lists, gated on its screen or not
     for (mod, ent, pv), entry in classes.items():
-        if (mod, ent) == (module, entity) and entry["class"] == "momentary" and pv in written:
-            targets[pv] = "momentary"
+        if (mod, ent) == (module, entity) and entry["class"] in MOVED and pv in written:
+            targets[pv] = entry["class"]
     return targets, sorted(unlisted)
 
 
