@@ -30,6 +30,12 @@ entity_models:
           rio_dinput:
           DESC:
 
+    pvi:
+      yaml_path: rackFan_rio.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: rackFan
     description: |-
       Template for rack fan digital input indication via VME card also used for rack DUPLEX power supply status.
@@ -69,3 +75,9 @@ entity_models:
           DTYP:
           s:
           DESC:
+
+    pvi:
+      yaml_path: rackFan.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"

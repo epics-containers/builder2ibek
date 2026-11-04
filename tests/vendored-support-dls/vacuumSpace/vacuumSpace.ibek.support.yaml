@@ -199,6 +199,12 @@ entity_models:
       - file: $(VACUUMSPACE)/db/space.template
         args: { device, name, ionp, gauge, img, pirg, valve }
 
+    pvi:
+      yaml_path: space.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: space_bTemplate
     description: |-
       Simple vacuum space template. Requires Group wrappers for its inputs.
@@ -286,4 +292,10 @@ entity_models:
           valveIlRelay:
           mpsIlRelay2:
           mpsIlRelay1:
+
+    pvi:
+      yaml_path: space_b.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 

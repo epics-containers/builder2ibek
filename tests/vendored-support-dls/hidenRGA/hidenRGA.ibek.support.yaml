@@ -43,6 +43,13 @@ entity_models:
       - value: |
           seq(sncDegas, "P={{P}}{{Q}}")
 
+    pvi:
+      yaml_path: hiden_generic.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
   - name: hidenRGA_HMT
     description: |-
       Hiden HMT RC RGA, high-pressure variant, 100 amu.
@@ -81,6 +88,13 @@ entity_models:
     post_init:
       - value: |
           seq(sncDegas, "P={{P}}{{Q}}")
+
+    pvi:
+      yaml_path: hiden_HMT.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
 
   - name: hidenRGA_hpr20
     description: |-
@@ -124,6 +138,13 @@ entity_models:
       - value: |
           seq(sncDegas, "P={{P}}{{Q}}")
 
+    pvi:
+      yaml_path: hiden_hpr20.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
   - name: hidenRGA_qga
     description: |-
       Hiden QGA Quad Gas Analyser, 200 amu, Faraday detector.
@@ -162,3 +183,10 @@ entity_models:
     post_init:
       - value: |
           seq(sncDegas, "P={{P}}{{Q}}")
+
+    pvi:
+      yaml_path: hiden_qga.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"

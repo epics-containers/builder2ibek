@@ -916,6 +916,12 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: mx_cryojet.pvi.device.yaml
+      ui_macros:
+        P:
+      pv_prefix: "$(P):"
+
   - name: auto_Cryojet_Retraction
     description: |-
       Auto-generated entity for Cryojet_Retraction.template

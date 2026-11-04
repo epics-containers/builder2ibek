@@ -76,6 +76,13 @@ entity_models:
       - file: $(USERIO)/db/bi.template
         args: { P: null, R: null, DTYP: null, INP: null, SCAN: null, ZNAM: null, ONAM: null, ZSV: null, OSV: null, COSV: null, DESC: null, archiver_rate: null }
 
+    pvi:
+      yaml_path: bi.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
+
   - name: movingAverage
     description: |-
       TODO:ADD DESCRIPTION
@@ -193,6 +200,13 @@ entity_models:
           archiver_rate:
           DESC:
 
+    pvi:
+      yaml_path: bo.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
+
   - name: ai
     description: |-
       Template database for an Analogue In for user patch panels, etc.
@@ -283,6 +297,13 @@ entity_models:
           DESC:
           archiver_rate:
 
+    pvi:
+      yaml_path: ai.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
+
   - name: caLab_interface
     description: |-
       TODO:ADD DESCRIPTION
@@ -302,6 +323,12 @@ entity_models:
         args:
           HIGH:
           dom:
+
+    pvi:
+      yaml_path: caLab_interface.pvi.device.yaml
+      ui_macros:
+        dom:
+      pv_prefix: "$(dom)-EA-USER-01:"
 
   - name: bo_sim
     description: |-
@@ -386,6 +413,13 @@ entity_models:
           OUT:
           archiver_rate:
           DESC:
+
+    pvi:
+      yaml_path: bo.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
 
   - name: ao
     description: |-
@@ -494,6 +528,13 @@ entity_models:
           DESC:
           archiver_rate:
 
+    pvi:
+      yaml_path: ao.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
+
   - name: bi_sim
     description: |-
       TODO:ADD DESCRIPTION
@@ -578,6 +619,13 @@ entity_models:
           ONAM:
           archiver_rate:
           DESC:
+
+    pvi:
+      yaml_path: bi.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
 
   - name: sel
     description: |-
@@ -769,6 +817,13 @@ entity_models:
           DESC:
           archiver_rate:
 
+    pvi:
+      yaml_path: ai.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
+
   - name: ao_sim
     description: |-
       TODO:ADD DESCRIPTION
@@ -871,6 +926,13 @@ entity_models:
           EGU:
           DESC:
           archiver_rate:
+
+    pvi:
+      yaml_path: ao.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"
 
   - name: movAverageGroup
     description: |-

@@ -49,6 +49,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: flow.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
   - name: flow_asyn
     description: |-
       This template defines a bi records for representing low and lolo
@@ -107,6 +114,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: flow_asyn.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
   - name: flow_lolo
     description: |-
       This template defines a dummy LO record for devices which do not have
@@ -142,6 +156,13 @@ entity_models:
       - file: $(WATER)/db/flow-lolo.template
         args:
           .*:
+
+    pvi:
+      yaml_path: flow-lolo.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
 
   - name: flow_lo_only
     description: |-
@@ -209,6 +230,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: simulationflow.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
   - name: flow_rio
     description: |-
       This template defines LO and LOLO records
@@ -244,3 +272,10 @@ entity_models:
       - file: $(WATER)/db/flow-rio.template
         args:
           .*:
+
+    pvi:
+      yaml_path: flow-rio.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"

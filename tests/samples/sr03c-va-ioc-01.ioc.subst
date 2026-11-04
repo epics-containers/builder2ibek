@@ -70,8 +70,8 @@ pattern
 
 file "$(DLSPLC)/db/NX102_IRVacuum.template" {
 pattern 
-	{ "type",                  "entity_enabled", "P",                 "port"         }
-	{ "dlsPLC.NX102_IRVacuum", "True",           "SR03A-VA-VALVE-01", "VLVCC_01_EIP" }
+	{ "type",                  "entity_enabled", "P",                 "port",         "initial_tag",    "run_tag"    }
+	{ "dlsPLC.NX102_IRVacuum", "True",           "SR03A-VA-VALVE-01", "VLVCC_01_EIP", "Initial_Vacuum", "Run_Vacuum" }
 }
 
 file "$(TERMINALSERVER)/db/TerminalServer16.template" {

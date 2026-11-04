@@ -91,6 +91,12 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: cmsIon.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: cmsIon_CheckReset
     description: |-
       TODO:ADD DESCRIPTION
@@ -147,3 +153,9 @@ entity_models:
       - file: $(CMSION)/db/simulation_cmsIon.template
         args:
           .*:
+
+    pvi:
+      yaml_path: simulation_cmsIon.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
