@@ -35,6 +35,12 @@ entity_models:
           port:
           unit:
 
+    pvi:
+      yaml_path: digitelSpc.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: digitelSpcIonp
     description: |-
       Template database for digitel SPC - Ion Pump
@@ -75,3 +81,9 @@ entity_models:
           size:
           spon:
           spoff:
+
+    pvi:
+      yaml_path: digitelSpcIonp.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"

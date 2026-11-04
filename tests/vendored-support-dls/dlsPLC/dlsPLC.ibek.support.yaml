@@ -736,6 +736,13 @@ entity_models:
           combined_nelm: "{{master.combined_nelm}}"
           timeout:
 
+    pvi:
+      yaml_path: dlsPLC_fastVacuumLink.pvi.device.yaml
+      ui_macros:
+        device: "{{master.device}}"
+        id: "{{id}}"
+      pv_prefix: "$(device):TRIG_MULTI$(id)"
+
   - name: overrideRequestIndividual
     description: |-
       Template allowing override of individual interlock bits
@@ -774,6 +781,12 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_overrideRequestIndividual.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_overrideRequestIndividual.pvi.device.yaml
+      ui_macros:
+        P:
+      pv_prefix: "$(P):"
 
   - name: softwareVersion
     description: |-
@@ -828,6 +841,12 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_vacValveBistable.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_vacValveBistable.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: writeEnum
     description: |-
@@ -929,6 +948,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_writeEnum.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
+
   - name: flow
     description: |-
       This template defines a bi records for representing low and lolo
@@ -968,6 +994,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_flow.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_flow.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
 
   - name: readEnum
     description: |-
@@ -1060,6 +1093,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_readEnum.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_readEnum.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
 
   - name: motionInterlockPLC
     description: |-
@@ -1211,6 +1251,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_robotDXrealRW.pvi.device.yaml
+      ui_macros:
+        device:
+        variable:
+      pv_prefix: "$(device)$(variable)"
+
   - name: externalValve
     description: |-
       Valve interface for a valve that lives in another IOC
@@ -1337,6 +1384,12 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_dummyValve.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: fastValve
     description: |-
       Template database for a vacuum valve without debounce or raw air records
@@ -1396,6 +1449,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_fastValve.pvi.device.yaml
+      ui_macros:
+        EMPTY: ""
+        device:
+      pv_prefix: "$(device):"
+
   - name: NX102_mpsPermit
     description: |-
       TODO:ADD DESCRIPTION
@@ -1424,6 +1484,13 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_mpsPermit.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_mpsPermit.pvi.device.yaml
+      ui_macros:
+        DIRILK1:
+        device:
+      pv_prefix: "$(device):"
 
   - name: BeamRecords
     description: |-
@@ -1507,6 +1574,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_readFloat32.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_readFloat32.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
 
   - name: DCMHeater
     description: |-
@@ -1701,6 +1775,14 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_vacValve.pvi.device.yaml
+      ui_macros:
+        DIRILK1:
+        DIRILK2:
+        device:
+      pv_prefix: "$(device):"
+
   - name: read100
     description: |-
       Template that reads 100 blocks of memory into records so
@@ -1763,6 +1845,11 @@ entity_models:
         description: |-
           Optional.  Scale factor for temperature/setpoint (1 for new PLC templates, 10 for old where PLC reports in 10ths of a degree).  Defaults to 1.
         default: 1
+      scan:
+        type: str
+        description: |-
+          Optional.  Scan rate for the temperature readback. Defaults to 1 second
+        default: 1 second
       tempcal:
         type: int
         description: |-
@@ -1799,6 +1886,13 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_temperature.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_temperature.pvi.device.yaml
+      ui_macros:
+        device:
+        temp:
+      pv_prefix: "$(device)$(temp)"
 
   - name: NX102_readBool
     description: |-
@@ -1862,6 +1956,12 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_readBool.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_readBool.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device)"
 
   - name: PIDControl
     description: |-
@@ -2018,6 +2118,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_writeFloat32.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_writeFloat32.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
 
   - name: NX102_robotDX200_status
     description: |-
@@ -2217,6 +2324,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_valveIlkNameOverride.pvi.device.yaml
+      ui_macros:
+        device:
+        interlock:
+      pv_prefix: "$(device)$(interlock):"
+
   - name: temperature
     description: |-
       Template database for an individual temperature on a
@@ -2299,6 +2413,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_temperature.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_temperature.pvi.device.yaml
+      ui_macros:
+        device:
+        temp:
+      pv_prefix: "$(device)$(temp)"
 
   - name: motionLimitInterlock
     description: |-
@@ -2402,6 +2523,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_vacPump.pvi.device.yaml
+      ui_macros:
+        EMPTY: ""
+        device:
+      pv_prefix: "$(device):"
+
   - name: readInt32
     description: |-
       Read the Int32 value stored in 2 DM variables in a PLC
@@ -2452,6 +2580,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_readInt32.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
+
   - name: NX102_IRVacuum
     description: |-
       Template database for reading a bool from and NX PLC
@@ -2464,6 +2599,16 @@ entity_models:
         type: str
         description: |-
           Port name of ether_ip driver
+      initial_tag:
+        type: str
+        description: |-
+          Tag name of ether_ip initial vacuum read value
+        default: Initial_Vacuum
+      run_tag:
+        type: str
+        description: |-
+          Tag name of ether_ip run vacuum read value
+        default: Run_Vacuum
 
     databases:
 
@@ -2519,6 +2664,12 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_vacValveGroup.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_vacValveGroup.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_fastValve
     description: |-
@@ -2630,6 +2781,13 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_fastValve.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_fastValve.pvi.device.yaml
+      ui_macros:
+        DIRILK1:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_radmonreset
     description: |-
@@ -2871,6 +3029,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_vacValveSoftOpening.pvi.device.yaml
+      ui_macros:
+        EMPTY: ""
+        device:
+      pv_prefix: "$(device):"
+
   - name: genericDevice
     description: |-
       Template5B database for a vacuum valve without debounce or raw air records
@@ -2933,6 +3098,12 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_genericDevice.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_genericDevice.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_PreVacCoils_SMControl
     description: |-
@@ -3464,6 +3635,14 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_PreVacCoils_SMControl.pvi.device.yaml
+      ui_macros:
+        ctrlprefix:
+        device:
+        paramprefix:
+      pv_prefix: "$(device)"
+
   - name: vacValve
     description: |-
       Template database for a vacuum valve without debounce or raw air records
@@ -3502,6 +3681,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_vacValve.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_vacValve.pvi.device.yaml
+      ui_macros:
+        EMPTY: ""
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_sequence
     description: |-
@@ -3953,6 +4139,12 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_sequence.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: NX102_PreVacCoils_SMPort
     description: |-
       Template database for status info regarding a Port on PreVac Sample Manipulator.
@@ -4124,6 +4316,14 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_PreVacCoils_SMPort.pvi.device.yaml
+      ui_macros:
+        device:
+        posportID:
+        posportprefix:
+      pv_prefix: "$(device)$(posportprefix)$(posportID):"
+
   - name: NX102_reboot_rga
     description: |-
       Request NX102 PLC to power cycle an RGA on a particular tag being set.
@@ -4170,6 +4370,13 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_reboot_rga.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_reboot_rga.pvi.device.yaml
+      ui_macros:
+        device:
+        rbprefix:
+      pv_prefix: "$(device)$(rbprefix):"
 
   - name: NX102_readReal
     description: |-
@@ -4218,6 +4425,12 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_readReal.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_readReal.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device)"
 
   - name: NX102_readInt
     description: |-
@@ -4286,6 +4499,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_readInt.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
+
   - name: NX102_PID
     description: |-
       PID(x) interface for the NX102 PLC. Read only by default - only the R
@@ -4352,6 +4572,13 @@ entity_models:
           port:
           tag:
           tagidx:
+
+    pvi:
+      yaml_path: NX102_PID.pvi.device.yaml
+      ui_macros:
+        device:
+        device_suffix:
+      pv_prefix: "$(device)$(device_suffix):"
 
   - name: NX102_genericDevice
     description: |-
@@ -4453,6 +4680,12 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_genericDevice.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: reboot_rga
     description: |-
       Power cycle an RGA where the PLC code has been setup to power cycle when 1 is written to a particular DM variable
@@ -4476,6 +4709,12 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_reboot_rga.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_reboot_rga.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_realRW
     description: |-
@@ -4541,6 +4780,13 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_realRW.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_realRW.pvi.device.yaml
+      ui_macros:
+        device:
+        variable:
+      pv_prefix: "$(device)$(variable)"
 
   - name: NX102_vacValveDebounce
     description: |-
@@ -4628,6 +4874,14 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_vacValveDebounce.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_vacValveDebounce.pvi.device.yaml
+      ui_macros:
+        DIRILK1:
+        DIRILK2:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_vacPump
     description: |-
@@ -4769,6 +5023,12 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_vacPump.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: NX102_powerSupply
     description: |-
       Template showing the status of the power supply from the ether IP readings
@@ -4798,6 +5058,13 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_powerSupply.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_powerSupply.pvi.device.yaml
+      ui_macros:
+        device:
+        device_suffix: ""
+      pv_prefix: "$(device)$(device_suffix):"
 
   - name: feTemperature
     description: |-
@@ -4878,6 +5145,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_feTemperature.pvi.device.yaml
+      ui_macros:
+        device:
+        temp:
+      pv_prefix: "$(device)$(temp)"
+
   - name: NX102_interlock
     description: |-
       Template showing the status of various MPS interlocks in
@@ -4923,6 +5197,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_interlock.pvi.device.yaml
+      ui_macros:
+        device:
+        interlock:
+      pv_prefix: "$(device)$(interlock):"
+
   - name: NX102_digitalIn_Debounced
     description: |-
       TODO:ADD DESCRIPTION
@@ -4947,6 +5228,12 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_digitalIn_Debounced.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_digitalIn_Debounced.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_PreVacCoils_SMStaleBanner
     description: |-
@@ -5014,6 +5301,13 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_robotDXrealR.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_robotDXrealR.pvi.device.yaml
+      ui_macros:
+        device:
+        variable:
+      pv_prefix: "$(device)$(variable)"
 
   - name: NX102_PreVacCoils_SMIlkKeyEntry
     description: |-
@@ -5307,6 +5601,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_PreVacCoils_SMStatus.pvi.device.yaml
+      ui_macros:
+        device:
+        staprefix:
+      pv_prefix: "$(device)$(staprefix):"
+
   - name: interlock
     description: |-
       Template showing the status of various MPS interlocks in
@@ -5344,6 +5645,14 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_interlock.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_interlock.pvi.device.yaml
+      ui_macros:
+        EMPTY: ""
+        device:
+        interlock:
+      pv_prefix: "$(device)$(interlock):"
 
   - name: vacValveDebounce
     description: |-
@@ -5393,6 +5702,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: dlsPLC_vacValveDebounce.pvi.device.yaml
+      ui_macros:
+        EMPTY: ""
+        device:
+      pv_prefix: "$(device):"
+
   - name: readInt16
     description: |-
       Read the Int16 value stored in 1 DM variables in a PLC
@@ -5409,6 +5725,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_readInt16.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_readInt16.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
 
   - name: writeInt16
     description: |-
@@ -5429,6 +5752,13 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_writeInt16.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q)"
 
   - name: vacValveReadOnly
     description: |-
@@ -5460,6 +5790,12 @@ entity_models:
       - file: $(DLSPLC)/db/dlsPLC_vacValveReadOnly.template
         args:
           .*:
+
+    pvi:
+      yaml_path: dlsPLC_vacValveReadOnly.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_PreVacCoils_SMLVDT
     description: |-
@@ -5749,6 +6085,14 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_PreVacCoils_SMLVDT.pvi.device.yaml
+      ui_macros:
+        device:
+        lvdtID:
+        lvdtprefix:
+      pv_prefix: "$(device)$(lvdtprefix)$(lvdtID):"
+
   - name: overrideRequestMain
     description: |-
       Template allowing overrideRequestIndividual instances to be created
@@ -5838,6 +6182,13 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_feTemperature.pvi.device.yaml
+      ui_macros:
+        device:
+        temp:
+      pv_prefix: "$(device)$(temp)"
+
   - name: NX102_digitalIn
     description: |-
       TODO:ADD DESCRIPTION
@@ -5867,6 +6218,12 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_digitalIn.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_digitalIn.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_controller_status
     description: |-
@@ -6018,6 +6375,14 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: NX102_vacValveBistable.pvi.device.yaml
+      ui_macros:
+        DIRILK1:
+        DIRILK2:
+        device:
+      pv_prefix: "$(device):"
+
   - name: NX102_femto
     description: |-
       Femto current amplifier controlled through an Omron NX PLC.
@@ -6038,6 +6403,11 @@ entity_models:
           Optional.  Defaults to femtos         - etherip tag name of the femto
           data structure
         default: femtos
+      scan:
+        type: str
+        description: |-
+          Optional.  Scan rate for the femto readback. Defaults to .1 second
+        default: .1 second
       name:
         type: str
         description: |-
@@ -6048,6 +6418,12 @@ entity_models:
       - file: $(DLSPLC)/db/NX102_femto.template
         args:
           .*:
+
+    pvi:
+      yaml_path: NX102_femto.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: NX102_flowMeter
     description: |-

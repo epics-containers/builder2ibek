@@ -268,6 +268,12 @@ entity_models:
           mm11_label:
           mm00_mass:
 
+    pvi:
+      yaml_path: rga_asyn.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: rgaGroup
     description: |-
       TODO:ADD DESCRIPTION
@@ -327,6 +333,12 @@ entity_models:
     databases:
       - file: $(RGA)/db/rgaGroup.template
         args: { device: null, rga1: null, rga2: null, rga3: null, rga4: null, rga5: null, rga6: null, rga7: null, rga8: null }
+
+    pvi:
+      yaml_path: rgaGroup.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
 
   - name: rga
     description: |-
@@ -734,3 +746,9 @@ entity_models:
     databases:
       - file: $(RGA)/db/rga.template
         args: { device: null, port: null, channel: null, mm00_label: null, mm01_label: null, mm02_label: null, mm03_label: null, mm04_label: null, mm05_label: null, mm06_label: null, mm07_label: null, mm08_label: null, mm09_label: null, mm10_label: null, mm11_label: null, mm12_label: null, mm13_label: null, mm14_label: null, mm015_label: null, mm00_mass: null, mm01_mass: null, mm02_mass: null, mm03_mass: null, mm04_mass: null, mm05_mass: null, mm06_mass: null, mm07_mass: null, mm08_mass: null, mm09_mass: null, mm10_mass: null, mm11_mass: null, mm12_mass: null, mm13_mass: null, mm14_mass: null, mm15_mass: null, pjmm00_label: null, pjmm01_label: null, pjmm02_label: null, pjmm03_label: null, pjmm04_label: null, pjmm05_label: null, pjmm06_label: null, pjmm07_label: null, pjmm08_label: null, pjmm09_label: null, pjmm10_label: null, pjmm11_label: null, pjmm12_label: null, pjmm13_label: null, pjmm14_label: null, pjmm015_label: null, pjmm00_mass: null, pjmm01_mass: null, pjmm02_mass: null, pjmm03_mass: null, pjmm04_mass: null, pjmm05_mass: null, pjmm06_mass: null, pjmm07_mass: null, pjmm08_mass: null, pjmm09_mass: null, pjmm10_mass: null, pjmm11_mass: null, pjmm12_mass: null, pjmm13_mass: null, pjmm14_mass: null, pjmm15_mass: null }
+
+    pvi:
+      yaml_path: rga.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"

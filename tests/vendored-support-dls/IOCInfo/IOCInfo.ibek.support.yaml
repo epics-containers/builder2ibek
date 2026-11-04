@@ -45,3 +45,9 @@ entity_models:
           hihi:
           adel:
           hyst:
+
+    pvi:
+      yaml_path: IOCinfo.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"

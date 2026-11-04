@@ -96,6 +96,12 @@ entity_models:
         args:
           .*:
 
+    pvi:
+      yaml_path: BL-EVR-PMC.pvi.device.yaml
+      ui_macros:
+        device:
+      pv_prefix: "$(device):"
+
   - name: GeneralTime
     description: Add a PV to monitor the General Time
     parameters:

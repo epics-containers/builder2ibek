@@ -49,6 +49,13 @@ entity_models:
       - value: |
           seq recover, "P={{P}}"
 
+    pvi:
+      yaml_path: transfocator.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
+
   - name: BL04I_beamsizeCalc
     description: |-
       BL04I beam-size calculator for the transfocator.
@@ -67,3 +74,10 @@ entity_models:
       - file: $(TRANSFOCATOR)/db/BL04I_beamsizeCalc.template
         args:
           .*:
+
+    pvi:
+      yaml_path: BL04I_beamsizeCalc.pvi.device.yaml
+      ui_macros:
+        P:
+        Q:
+      pv_prefix: "$(P)$(Q):"
