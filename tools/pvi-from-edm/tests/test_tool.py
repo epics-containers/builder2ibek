@@ -1269,3 +1269,16 @@ def test_a_record_on_the_screen_a_button_opens_counts_as_shown(tmp_path):
     (tmp_path / "Chan.pvi.device.yaml").write_text("children:\n- type: SignalR\n  read_pv: $(P):$(N):THING.VAL\n")
     (tmp_path / "Top.pvi.device.yaml").write_text("children:\n- type: Group\n  children:\n  - type: DeviceRef\n    ui: Chan.pvi.bob\n    macros:\n      P: $(P)\n      N: '7'\n")
     assert shown_through_refs(tmp_path / "Top.pvi.device.yaml") == {"$(P):7:THING"}
+
+
+def test_a_module_timeout_is_no_failure_of_the_entity_it_lands_in(tmp_path, monkeypatch):
+    (tmp_path / "m.ibek.support.yaml").write_text("module: m\nentity_models:\n  - name: e\n    pvi: {yaml_path: e.pvi.device.yaml}\n")
+
+    def times_out(*a):
+        raise TimeoutError("module timed out")
+
+    monkeypatch.setattr(validate, "validate_entity", times_out)
+    monkeypatch.setattr(validate, "head_text", lambda *a: "")
+    monkeypatch.setattr(validate, "yaml_only_adds_pvi", lambda *a: "")
+    with pytest.raises(TimeoutError):
+        validate.validate_stage("m", dict(repo="one", dir="m", yaml="m.ibek.support.yaml"), tmp_path, {})

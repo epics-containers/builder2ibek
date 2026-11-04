@@ -25,6 +25,10 @@ from settings import CFG, Settings, install  # noqa: E402
 from validate import definitions_map, validate_stage  # noqa: E402
 
 
+# seconds; the largest module takes over 20 minutes on a busy machine
+MODULE_TIMEOUT = 3600
+
+
 def status_file() -> Path:
     return CFG.status / "sweep-status.json"
 
@@ -106,7 +110,7 @@ def run_item(item: dict) -> dict:
     st: dict = {k: item[k] for k in ("repo", "dir", "yaml", "module")}
     st["install_version"] = str(item["install"].get("version", ""))
     signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError("module timed out")))
-    signal.alarm(1200)
+    signal.alarm(MODULE_TIMEOUT)
     try:
         return _run(item, module_key, st)
     except Exception as e:  # noqa: BLE001
