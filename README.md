@@ -45,6 +45,31 @@ Regenerate expected outputs and schema:
 See [golden-file tests](https://github.com/epics-containers/builder2ibek/blob/main/docs/explanations/golden-file-tests.md)
 for how the baselines are reviewed and committed.
 
+## Bumping the ibek-support submodules
+
+CI can't reach `ibek-support-dls` on Diamond's GitLab, so the support YAMLs the
+samples need are vendored into `tests/vendored-support-dls/`. After moving the
+`ibek-support-dls` pin, refresh that copy in the same commit:
+
+```bash
+git -C ibek-support-dls checkout <sha>
+git add ibek-support-dls
+git commit -m "Bump ibek-support-dls to <sha>"
+python3 tests/vendor_support_dls.py --update
+git add tests/vendored-support-dls
+git commit --amend --no-edit
+uv run pytest
+```
+
+`--update` only runs once the new pin is committed, and two guard tests compare
+against the committed pin, not a staged one. So the suite stays red until both
+steps are done. If the tests show sample differences, regenerate with
+`./tests/samples/make_samples.sh` and review the diff before committing. A bump
+of `ibek-support` alone needs only the commit and the tests.
+
+See [testing and CI](https://github.com/epics-containers/builder2ibek/blob/main/.claude/skills/shared/testing-and-ci.md)
+for the details and the guards.
+
 <!-- README only content. Anything below this line won't be included in index.md -->
 
 <pre><font color="#AAAAAA">╭─ Commands ───────────────────────────────────────────────────────────────────╮</font>
