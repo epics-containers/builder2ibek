@@ -857,7 +857,7 @@ entities:
     port: ty_40_0
 
   - type: dlsPLC.interlock
-    addr: 7
+    addr: 70
     desc: Water Flow Interlocks
     device: BL04I-VA-VLVCC-01
     ilk0: I04 Filter
@@ -880,7 +880,7 @@ entities:
     port: ty_40_0.Hostlink
 
   - type: dlsPLC.interlock
-    addr: 9
+    addr: 90
     desc: Front End Permit
     device: BL04I-VA-VLVCC-01
     ilk0: Waterflows
@@ -902,8 +902,13 @@ entities:
     interlock: :INT2
     port: ty_40_0.Hostlink
 
+  - type: dlsPLC.read100
+    century: 3
+    device: BL04I-VA-VLVCC-01
+    port: ty_40_0.Hostlink
+
   - type: dlsPLC.interlock
-    addr: 39
+    addr: 390
     desc: Machine Beam Critical
     device: BL04I-VA-VLVCC-01
     ilk0: V11 Open

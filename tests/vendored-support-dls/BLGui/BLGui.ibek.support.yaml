@@ -1,0 +1,119 @@
+# yaml-language-server: $schema=../schemas/ibek.support.schema.json
+
+module: BLGui
+
+entity_models:
+  - name: device
+    description: |-
+      BLGui synoptic device entry (beamline GUI device list).
+    parameters:
+      P:
+        type: str
+        description: Device PV name
+      SHORTNAME:
+        type: str
+        description: Short name shown on the synoptic
+      DESCRIPTION:
+        type: str
+        description: Description
+      GDA_NAME:
+        type: str
+        description: GDA object name
+        default: ""
+      GDA_DESC:
+        type: str
+        description: GDA object description
+        default: ""
+      NFLOW:
+        type: int
+        description: Number of flow channels
+        default: 0
+      NTEMP:
+        type: int
+        description: Number of temperature channels
+        default: 0
+      NCURR:
+        type: int
+        description: Number of current channels
+        default: 0
+      MTYPE:
+        type: int
+        description: Module type code
+        default: 0
+      BL_SECTION:
+        type: str
+        description: Beamline section (Main/Shared/Branch/...)
+      BL_ORDER:
+        type: int
+        description: Ordering index along the beamline
+    databases:
+      - file: $(BLGUI)/db/BLGui-device.template
+        args:
+          .*:
+
+  - name: status
+    description: |-
+      BLGui device status calc record (aggregates up to 12 inputs).
+    parameters:
+      P:
+        type: str
+        description: Status PV name
+      CALC:
+        type: str
+        description: CALC expression
+      PHAS:
+        type: int
+        description: Processing phase
+        default: 0
+      INPA:
+        type: str
+        default: "0"
+        description: Input A
+      INPB:
+        type: str
+        default: "0"
+        description: Input B
+      INPC:
+        type: str
+        default: "0"
+        description: Input C
+      INPD:
+        type: str
+        default: "0"
+        description: Input D
+      INPE:
+        type: str
+        default: "0"
+        description: Input E
+      INPF:
+        type: str
+        default: "0"
+        description: Input F
+      INPG:
+        type: str
+        default: "0"
+        description: Input G
+      INPH:
+        type: str
+        default: "0"
+        description: Input H
+      INPI:
+        type: str
+        default: "0"
+        description: Input I
+      INPJ:
+        type: str
+        default: "0"
+        description: Input J
+      INPK:
+        type: str
+        default: "0"
+        description: Input K
+      INPL:
+        type: str
+        default: "0"
+        description: Input L
+    databases:
+      - file: $(BLGUI)/db/BLGui-status.template
+        args:
+          .*:

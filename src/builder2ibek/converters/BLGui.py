@@ -3,11 +3,43 @@ from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "BLGui"
 
+# parameter types of the BLGui entity models in ibek-support-dls
+STATUS_STR = ["P", "CALC"] + [f"INP{c}" for c in "ABCDEFGHIJKL"]
+STATUS_INT = ["PHAS"]
+DEVICE_STR = ["P", "SHORTNAME", "DESCRIPTION", "GDA_NAME", "GDA_DESC", "BL_SECTION"]
+DEVICE_INT = ["NFLOW", "NTEMP", "NCURR", "MTYPE", "BL_ORDER"]
+
+
+def _coerce(entity: Entity, str_params: list[str], int_params: list[str]):
+    # the generic converter turns numeric-looking XML values into numbers
+    # (e.g. CALC="0", INPA="0") and keeps zero-padded ones as strings
+    for p in str_params:
+        if entity.get(p) is not None:
+            entity[p] = str(entity[p])
+    for p in int_params:
+        if entity.get(p) is not None:
+            entity[p] = int(entity[p])
+
 
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
-    BLGui entities are legacy EDM synoptic display support and have no
-    equivalent in epics-containers. Drop all of them.
+    XML to YAML specialist convertor function for the BLGui support module
+
+    auto_BLGui_status and auto_BLGui_device become BLGui.status and
+    BLGui.device: they serve the DEVSTA / INFO PVs that synoptic screens read.
+    The other BLGui entities are EDM display support only and are dropped.
     """
-    entity.delete_me()
+    # name is a gui association label, not referenced by other entities
+    entity.remove("name")
+
+    if entity_type == "auto_BLGui_status":
+        entity.type = "BLGui.status"
+        _coerce(entity, STATUS_STR, STATUS_INT)
+
+    elif entity_type == "auto_BLGui_device":
+        entity.type = "BLGui.device"
+        _coerce(entity, DEVICE_STR, DEVICE_INT)
+
+    else:
+        entity.delete_me()
