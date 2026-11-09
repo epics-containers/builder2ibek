@@ -47,6 +47,19 @@ def test_read_existing_description(tmp_path: Path):
     assert rc._read_existing_description(missing) == ""
 
 
+def test_existing_has_blgui(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+    ioc_yaml = tmp_path / "ioc.yaml"
+    assert not rc._existing_has_blgui(ioc_yaml)
+    ioc_yaml.write_text("ioc_name: t\nentities:\n  - type: epics.EpicsEnvSet\n")
+    assert not rc._existing_has_blgui(ioc_yaml)
+    ioc_yaml.write_text("ioc_name: t\nentities:\n  - type: BLGui.status\n")
+    assert rc._existing_has_blgui(ioc_yaml)
+
+    ioc_yaml.write_text("entities: [unclosed\n")
+    assert not rc._existing_has_blgui(ioc_yaml)
+    assert str(ioc_yaml) in capsys.readouterr().err
+
+
 def _fake_services_repo(tmp_path: Path, ioc_name: str) -> Path:
     """Create a minimal services repo with a single ioc.yaml."""
     repo = tmp_path / "fake-services"

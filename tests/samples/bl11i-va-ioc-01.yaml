@@ -759,7 +759,7 @@ entities:
     vlvcc: BL11I-VA-VLVCC-02
 
   - type: dlsPLC.interlock
-    addr: 7
+    addr: 70
     desc: Waterflow Interlocks
     device: BL11I-VA-VLVCC-01
     ilk0: GBC Water
@@ -770,7 +770,7 @@ entities:
     port: ty_40_3.Hostlink
 
   - type: dlsPLC.interlock
-    addr: 9
+    addr: 90
     desc: Front End Absorber
     device: BL11I-VA-VLVCC-01
     ilk0: Water OK
@@ -791,8 +791,13 @@ entities:
     interlock: :INT2
     port: ty_40_3.Hostlink
 
+  - type: dlsPLC.read100
+    century: 0
+    device: BL11I-VA-TMPCC-01
+    port: ty_40_2.Hostlink
+
   - type: dlsPLC.interlock
-    addr: 1
+    addr: 10
     desc: Temperatures Zone 1
     device: BL11I-VA-TMPCC-01
     ilk0: GBC Temp 1
@@ -803,7 +808,7 @@ entities:
     port: ty_40_2.Hostlink
 
   - type: dlsPLC.interlock
-    addr: 2
+    addr: 20
     desc: Temperatures Zone 2
     device: BL11I-VA-TMPCC-01
     ilk0: S1 ApA Temp 1
@@ -817,8 +822,13 @@ entities:
     interlock: :INT2
     port: ty_40_2.Hostlink
 
+  - type: dlsPLC.read100
+    century: 3
+    device: BL11I-VA-VLVCC-01
+    port: ty_40_3.Hostlink
+
   - type: dlsPLC.interlock
-    addr: 39
+    addr: 390
     desc: Machine Beam Critical
     device: BL11I-VA-VLVCC-01
     ilk0: Valve1 Open

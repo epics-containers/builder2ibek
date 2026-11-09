@@ -1298,7 +1298,7 @@ entities:
     port: ty_41_0
 
   - type: dlsPLC.interlock
-    addr: 7
+    addr: 70
     desc: Waterflow Interlocks
     device: BL19I-VA-VLVCC-01
     ilk0: A1 Water Flow
@@ -1314,7 +1314,7 @@ entities:
     port: ty_41_0.Hostlink
 
   - type: dlsPLC.interlock
-    addr: 9
+    addr: 90
     desc: Front End Absorber
     device: BL19I-VA-VLVCC-01
     ilk0: Water OK
@@ -1334,8 +1334,13 @@ entities:
     interlock: :INT2
     port: ty_41_0.Hostlink
 
+  - type: dlsPLC.read100
+    century: 0
+    device: BL19I-VA-TMPCC-01
+    port: ty_41_7.Hostlink
+
   - type: dlsPLC.interlock
-    addr: 1
+    addr: 10
     desc: Temperatures Zone 1
     device: BL19I-VA-TMPCC-01
     ilk0: S1 T1
@@ -1356,8 +1361,13 @@ entities:
     interlock: :INT1
     port: ty_41_7.Hostlink
 
+  - type: dlsPLC.read100
+    century: 3
+    device: BL19I-VA-VLVCC-01
+    port: ty_41_0.Hostlink
+
   - type: dlsPLC.interlock
-    addr: 39
+    addr: 390
     desc: Machine Beam Critical
     device: BL19I-VA-VLVCC-01
     ilk0: Run Vac 4 of IMG1-5

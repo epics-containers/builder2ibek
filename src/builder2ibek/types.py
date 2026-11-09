@@ -67,6 +67,9 @@ class Generic_IOC(BaseModel):
     # where the converted YAML is being written - any extra files a convertor
     # generates belong next to it, not in the current working directory
     out_dir: Path = Field(default=Path(), exclude=True)
+    # emit BLGui.status / BLGui.device (xml2yaml --blgui); only for generic
+    # IOCs whose binary includes the BLGui module
+    blgui: bool = Field(default=False, exclude=True)
     already_converted: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
 
 

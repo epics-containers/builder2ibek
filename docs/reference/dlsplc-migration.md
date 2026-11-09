@@ -151,14 +151,19 @@ ilkE → ilk14
 ilkF → ilk15
 ```
 
-The `addr` argument is used **directly** (not multiplied by 10). However, if
-your original interlock used a reduced address because `vacuumValveRead2` was
-subtracting an offset, **add that offset back**:
+`interlock.interlock` `addr` is a 10-word block number in the PLC DM area
+(block `nn` starts at DM `nn×10`); `dlsPLC.interlock` `addr` is the first DM
+address. The converter multiplies by 10:
 
 ```
-# Old: addr=07 with vacuumValveRead2 READFROM2=800 → effective DM=807
-# New: addr=807
+# Old: addr=07 → reads BLOCK07 = DM70..79
+# New: addr=70
 ```
+
+`dlsPLC.interlock` reads its words from the `$(device):DM<century>XX` records
+of a `dlsPLC.read100` for century `addr ÷ 100` (e.g. `addr=390` needs
+century 3). The converter adds a `dlsPLC.read100` for that device and century,
+on the interlock's port, unless the IOC already has one.
 
 ### `overrideRequestMain` — `outaddr`
 
@@ -277,7 +282,7 @@ in builder XML; ibek uses the `device` PV name instead).
 **New ioc.yaml** (ilkA–ilkF → ilk10–ilk15; blank fields dropped):
 ```yaml
 - type: dlsPLC.interlock
-  addr: 7
+  addr: 70
   desc: Water Flow Interlocks
   device: BL04I-VA-VLVCC-01
   ilk0: I04 Filter
@@ -347,7 +352,8 @@ The following conversions happen without manual intervention when you run
 | `vacuumValve.vacuumValveRead` → `dlsPLC.read100` (century=0) | `converters/vacuumValve.py` |
 | `vacuumValve.vacuumValve` / `vacuumValve_callback` → `dlsPLC.vacValve` with `valve×10` | `converters/vacuumValve.py` |
 | `vacuumValve.vacuumValveGroup` → `dlsPLC.vacValveGroup` | `converters/vacuumValve.py` |
-| `interlock.interlock` → `dlsPLC.interlock` with hex→int on ilk fields | `converters/interlock.py` |
+| `interlock.interlock` → `dlsPLC.interlock` with `addr×10` and hex→int on ilk fields | `converters/interlock.py` |
+| `dlsPLC.read100` added for each `dlsPLC.interlock` century the IOC does not already read | `converters/interlock.py` |
 | `interlock.overrideRequestMain` → `dlsPLC.overrideRequestMain` with outaddr | `converters/interlock.py` |
 | `interlock.overrideRequestIndividual` → `dlsPLC.overrideRequestIndividual` (FIELD dropped) | `converters/interlock.py` |
 | Blank `ilk*` fields dropped from all dlsPLC entities | `converters/dlsPLC.py` |
