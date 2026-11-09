@@ -42,6 +42,9 @@ XML = """<?xml version="1.0" ?>
   <BLGui.auto_BLGui_device BL_ORDER="3" BL_SECTION="ALL" DESCRIPTION="Gate"
     GDA_DESC="Gate Valve" GDA_NAME="GV1" MTYPE="0" NCURR="0" NFLOW="1"
     NTEMP="2" P="BL01C-VA-VALVE-01" SHORTNAME="1" name=".OB2"/>
+  <!-- older BLGui XMLs omit BL_SECTION and BL_ORDER -->
+  <BLGui.auto_BLGui_device DESCRIPTION="Periscope" MTYPE="0" NCURR="0"
+    NFLOW="0" NTEMP="0" P="BL01C-OP-PERI-01" SHORTNAME="P1"/>
 </components>
 """
 
@@ -113,5 +116,13 @@ def test_blgui_status_and_device(tmp_path: Path):
             "NTEMP": 2,
             "P": "BL01C-VA-VALVE-01",
             "SHORTNAME": "1",
+        },
+        {
+            "type": "BLGui.device",
+            "BL_ORDER": 0,
+            "BL_SECTION": "",
+            "DESCRIPTION": "Periscope",
+            "P": "BL01C-OP-PERI-01",
+            "SHORTNAME": "P1",
         },
     ]
