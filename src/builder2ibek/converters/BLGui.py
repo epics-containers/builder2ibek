@@ -1,5 +1,6 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import is_jinja
 
 xml_component = "BLGui"
 
@@ -19,12 +20,8 @@ def _coerce(entity: Entity, str_params: list[str], int_params: list[str]):
     for p in int_params:
         # a cross-reference such as $(NTEMP) arrives as a Jinja string that
         # ibek renders; leave it for ibek to resolve
-        if entity.get(p) is not None and not _is_jinja(entity[p]):
+        if entity.get(p) is not None and not is_jinja(entity[p]):
             entity[p] = int(entity[p])
-
-
-def _is_jinja(value) -> bool:
-    return isinstance(value, str) and "{{" in value
 
 
 @globalHandler

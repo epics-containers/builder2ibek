@@ -11,6 +11,7 @@ with blgui=True (xml2yaml --blgui), and are dropped by default.
 
 from pathlib import Path
 
+import jinja2
 import pytest
 from ruamel.yaml import YAML
 
@@ -223,7 +224,7 @@ def test_added_read100_follows_interlock_onto_hostlink(interlock_first: bool):
     }
 
 
-def test_cross_referenced_century_and_addr_are_skipped():
+def test_cross_referenced_century_and_addr(capsys: pytest.CaptureFixture[str]):
     ioc = Generic_IOC(
         ioc_name="test",
         description="test",
@@ -237,7 +238,7 @@ def test_cross_referenced_century_and_addr_are_skipped():
             },
             {
                 "type": "dlsPLC.interlock",
-                "addr": "{{ ADDR | int }}",
+                "addr": "{{ ((ADDR | int) | int) * 10 }}",
                 "device": "BL01C-VA-VLVCC-01",
                 "port": "VLVCC1.Hostlink",
             },
@@ -245,7 +246,44 @@ def test_cross_referenced_century_and_addr_are_skipped():
     )
     before = [dict(e) for e in ioc.entities]
     interlock.finalize(ioc)
+    # nothing to add or dedupe against, but no crash and a warning
     assert ioc.entities == before
+    err = capsys.readouterr().err
+    assert "BL01C-VA-VLVCC-01" in err and "dlsPLC.read100" in err
+
+
+@pytest.mark.parametrize("xml_value, ref_type", [("07", "string"), ("39", "int")])
+def test_cross_referenced_addr_is_scaled_in_the_expression(xml_value, ref_type):
+    # make_entity writes $(ADDR) as "{{ ADDR | <type> }}" from ADDR's own value
+    entity = Entity(
+        type="interlock.interlock",
+        addr=f"{{{{ ADDR | {ref_type} }}}}",
+        device="BL01C-VA-VLVCC-01",
+    )
+    interlock.handler(entity, "interlock", None)
+    rendered = jinja2.Template(entity.addr).render(ADDR=xml_value)
+    assert int(rendered) == int(xml_value) * 10
+
+
+def test_cross_referenced_override_request_main_outaddr():
+    entity = Entity(
+        type="interlock.overrideRequestMain",
+        addr="{{ ADDR | string }}",
+        out=0,
+        P="BL01C-VA-VLVCC-01",
+        Q=":OVERRIDE",
+    )
+    entity["in"] = 1
+    interlock.handler(entity, "overrideRequestMain", None)
+    assert int(jinja2.Template(entity.outaddr).render(ADDR="08")) == 81
+    assert "addr" not in entity and "in" not in entity
+
+
+@pytest.mark.parametrize("bad", ["0x40", "7.5", "ADDR"])
+def test_non_integer_addr_still_raises(bad):
+    entity = Entity(type="interlock.interlock", addr=bad, device="D")
+    with pytest.raises(ValueError):
+        interlock.handler(entity, "interlock", None)
 
 
 def test_blgui_coerce_leaves_cross_references():

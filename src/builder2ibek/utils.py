@@ -2,6 +2,7 @@
 General utility functions to assist conversion
 """
 
+import re
 from typing import Any
 
 from builder2ibek.types import Entity
@@ -17,6 +18,33 @@ def make_bool(value: Any):
         raise (ValueError(f"Cannot convert {value} to a boolean"))
 
     return result
+
+
+_JINJA_RE = re.compile(r"^\{\{(.*)\}\}$", re.S)
+
+
+def is_jinja(value: Any) -> bool:
+    """
+    True for a Jinja expression string, as make_entity writes for a $(MACRO)
+    cross-reference (e.g. "{{ X | int }}"); ibek renders it.
+    """
+    return isinstance(value, str) and "{{" in value
+
+
+def jinja_int(value: Any) -> str:
+    """
+    value as an integer term for use inside a Jinja expression: a literal for
+    plain values (int() raises on anything that is not an integer), or the
+    body of a whole-string Jinja expression cast to int, so that
+    f"{{{{ {jinja_int(v)} * 10 }}}}" scales "{{ X | int }}" (or a zero-padded
+    "{{ X | string }}") numerically.
+    """
+    if not is_jinja(value):
+        return str(int(value))
+    match = _JINJA_RE.match(value.strip())
+    if not match:
+        raise ValueError(f"cannot do arithmetic on partly templated value {value!r}")
+    return f"(({match.group(1).strip()}) | int)"
 
 
 def hex_to_int(entity: Entity, prefix: str):
