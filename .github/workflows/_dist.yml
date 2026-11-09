@@ -29,9 +29,15 @@ jobs:
       - name: Check for packaging errors
         run: uvx twine check --strict dist/*
 
+      # The runner's system python can be older than requires-python, so
+      # install into a venv on the version named in .python-version.
       - name: Install produced wheel
-        run: python -m pip install dist/*.whl
+        run: >
+          uv venv "$RUNNER_TEMP/wheel-venv" &&
+          uv pip install --python "$RUNNER_TEMP/wheel-venv" dist/*.whl
 
       - name: Test module --version works using the installed wheel
         # If more than one module in src/ replace with module name to test
-        run: python -m $(ls --hide='*.egg-info' src | head -1) --version
+        run: >
+          "$RUNNER_TEMP/wheel-venv/bin/python"
+          -m $(ls --hide='*.egg-info' src | head -1) --version
