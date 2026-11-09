@@ -39,9 +39,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     elif entity_type == "auto_BLGui_device":
         entity.type = "BLGui.device"
-        # older BLGui releases had no BL_SECTION / BL_ORDER macros, so some
-        # XMLs omit them; the model requires both. They only feed a gda
-        # comment tag in BLGui-device.template.
+        # some XMLs omit BL_SECTION / BL_ORDER; the model requires both, and
+        # they only feed a gda comment tag in BLGui-device.template.
         if entity.get("BL_SECTION") is None:
             entity.BL_SECTION = ""
         if entity.get("BL_ORDER") is None:
