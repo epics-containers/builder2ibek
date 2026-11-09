@@ -5,6 +5,14 @@ from builder2ibek.utils import hex_to_int
 xml_component = "interlock"
 
 
+def _as_int(value) -> int | None:
+    """value as an int, or None for a cross-reference (a Jinja string)."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
@@ -20,8 +28,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # interlock.interlock addr is a 10-word block number in the PLC DM
         # area (block nn = DM nn*10, zero-padded in the XML as "07");
         # dlsPLC.interlock addr is the first DM address of the interlock.
-        if entity.addr is not None:
-            entity.addr = int(entity.addr) * 10
+        # A cross-referenced addr arrives as a Jinja string and is left as is.
+        block = _as_int(entity.addr)
+        if block is not None:
+            entity.addr = block * 10
 
     if entity_type == "overrideRequestMain":
         entity.type = "dlsPLC.overrideRequestMain"
@@ -46,7 +56,9 @@ def finalize(ioc: Generic_IOC):
     of a dlsPLC.read100 for century addr//100. A read100 for that device and
     century may come from the XML (dlsPLC.read100, vacuumValveRead,
     temperaturePLCRead) anywhere in the IOC; add one only where none exists,
-    just before the first interlock that needs it.
+    just before the first interlock that needs it. A century or addr given
+    as a cross-reference (a Jinja string ibek renders) is not known here, so
+    it is skipped.
 
     The new read100 takes the interlock's port. dlsPLC.finalize repoints
     serial ports to their FINS .Hostlink port for both alike, whichever of
@@ -55,16 +67,17 @@ def finalize(ioc: Generic_IOC):
     entities = ioc.entities
 
     present = {
-        (e.get("device"), int(e["century"]))
+        (e.get("device"), _as_int(e.get("century")))
         for e in entities
-        if e.get("type") == "dlsPLC.read100" and e.get("century") is not None
+        if e.get("type") == "dlsPLC.read100"
     }
 
     i = 0
     while i < len(entities):
         e = entities[i]
-        if e.get("type") == "dlsPLC.interlock" and e.get("addr") is not None:
-            key = (e.get("device"), int(e["addr"]) // 100)
+        addr = _as_int(e.get("addr"))
+        if e.get("type") == "dlsPLC.interlock" and addr is not None:
+            key = (e.get("device"), addr // 100)
             if key not in present:
                 present.add(key)
                 read100 = {

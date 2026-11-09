@@ -17,8 +17,14 @@ def _coerce(entity: Entity, str_params: list[str], int_params: list[str]):
         if entity.get(p) is not None:
             entity[p] = str(entity[p])
     for p in int_params:
-        if entity.get(p) is not None:
+        # a cross-reference such as $(NTEMP) arrives as a Jinja string that
+        # ibek renders; leave it for ibek to resolve
+        if entity.get(p) is not None and not _is_jinja(entity[p]):
             entity[p] = int(entity[p])
+
+
+def _is_jinja(value) -> bool:
+    return isinstance(value, str) and "{{" in value
 
 
 @globalHandler

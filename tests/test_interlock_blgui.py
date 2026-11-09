@@ -15,8 +15,8 @@ import pytest
 from ruamel.yaml import YAML
 
 from builder2ibek.convert import convert_file
-from builder2ibek.converters import dlsPLC, interlock
-from builder2ibek.types import Generic_IOC
+from builder2ibek.converters import BLGui, dlsPLC, interlock
+from builder2ibek.types import Entity, Generic_IOC
 from tests.conftest import requires_support
 
 XML = """<?xml version="1.0" ?>
@@ -221,3 +221,34 @@ def test_added_read100_follows_interlock_onto_hostlink(interlock_first: bool):
         "device": "BL01C-VA-VLVCC-01",
         "port": "ty_40_0.Hostlink",
     }
+
+
+def test_cross_referenced_century_and_addr_are_skipped():
+    ioc = Generic_IOC(
+        ioc_name="test",
+        description="test",
+        source_file=Path("ioc.xml"),
+        entities=[
+            {
+                "type": "dlsPLC.read100",
+                "century": "{{ CENTURY | int }}",
+                "device": "BL01C-VA-VLVCC-01",
+                "port": "VLVCC1.Hostlink",
+            },
+            {
+                "type": "dlsPLC.interlock",
+                "addr": "{{ ADDR | int }}",
+                "device": "BL01C-VA-VLVCC-01",
+                "port": "VLVCC1.Hostlink",
+            },
+        ],
+    )
+    before = [dict(e) for e in ioc.entities]
+    interlock.finalize(ioc)
+    assert ioc.entities == before
+
+
+def test_blgui_coerce_leaves_cross_references():
+    entity = Entity(NFLOW="{{ NTEMP | int }}", NTEMP=2, P=1.5)
+    BLGui._coerce(entity, ["P"], ["NFLOW", "NTEMP"])
+    assert entity == {"NFLOW": "{{ NTEMP | int }}", "NTEMP": 2, "P": "1.5"}
