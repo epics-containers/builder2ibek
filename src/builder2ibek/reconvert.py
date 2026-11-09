@@ -94,7 +94,12 @@ def _existing_has_blgui(ioc_yaml: Path) -> bool:
         return False
     try:
         data = YAML(typ="safe").load(ioc_yaml)
-    except Exception:
+    except Exception as e:  # noqa: BLE001 — any parse failure means "unknown"
+        print(
+            f"warning: cannot parse {ioc_yaml} to check for BLGui entities, "
+            f"reconverting without --blgui: {type(e).__name__}: {e}",
+            file=sys.stderr,
+        )
         return False
     if not isinstance(data, dict):
         return False
