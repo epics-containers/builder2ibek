@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dlsPLC migration reference &#8212; builder2ibek 2.3.1.dev43+g2777a40f0 documentation</title>
+    <title>dlsPLC migration reference &#8212; builder2ibek 2.3.1.dev51+g10d7978f8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=17c063be"></script>
+    <script src="../_static/documentation_options.js?v=38f5153a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -773,13 +773,17 @@ ilkE → ilk14
 ilkF → ilk15
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">addr</span></code> argument is used <strong>directly</strong> (not multiplied by 10). However, if
-your original interlock used a reduced address because <code class="docutils literal notranslate"><span class="pre">vacuumValveRead2</span></code> was
-subtracting an offset, <strong>add that offset back</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old: addr=07 with vacuumValveRead2 READFROM2=800 → effective DM=807</span>
-<span class="c1"># New: addr=807</span>
+<p><code class="docutils literal notranslate"><span class="pre">interlock.interlock</span></code> <code class="docutils literal notranslate"><span class="pre">addr</span></code> is a 10-word block number in the PLC DM area
+(block <code class="docutils literal notranslate"><span class="pre">nn</span></code> starts at DM <code class="docutils literal notranslate"><span class="pre">nn×10</span></code>); <code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code> <code class="docutils literal notranslate"><span class="pre">addr</span></code> is the first DM
+address. The converter multiplies by 10:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Old: addr=07 → reads BLOCK07 = DM70..79</span>
+<span class="c1"># New: addr=70</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code> reads its words from the <code class="docutils literal notranslate"><span class="pre">$(device):DM&lt;century&gt;XX</span></code> records
+of a <code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code> for century <code class="docutils literal notranslate"><span class="pre">addr</span> <span class="pre">÷</span> <span class="pre">100</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">addr=390</span></code> needs
+century 3). The converter adds a <code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code> for that device and century,
+on the interlock’s port, unless the IOC already has one.</p>
 </section>
 <section id="overriderequestmain-outaddr">
 <h3><code class="docutils literal notranslate"><span class="pre">overrideRequestMain</span></code> — <code class="docutils literal notranslate"><span class="pre">outaddr</span></code><a class="headerlink" href="#overriderequestmain-outaddr" title="Link to this heading">#</a></h3>
@@ -886,7 +890,7 @@ in builder XML; ibek uses the <code class="docutils literal notranslate"><span c
 </div>
 <p><strong>New ioc.yaml</strong> (ilkA–ilkF → ilk10–ilk15; blank fields dropped):</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dlsPLC.interlock</span>
-<span class="w">  </span><span class="nt">addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span>
+<span class="w">  </span><span class="nt">addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">70</span>
 <span class="w">  </span><span class="nt">desc</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Water Flow Interlocks</span>
 <span class="w">  </span><span class="nt">device</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BL04I-VA-VLVCC-01</span>
 <span class="w">  </span><span class="nt">ilk0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">I04 Filter</span>
@@ -965,19 +969,22 @@ in builder XML; ibek uses the <code class="docutils literal notranslate"><span c
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">vacuumValve.vacuumValveGroup</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.vacValveGroup</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">converters/vacuumValve.py</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.interlock</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code> with hex→int on ilk fields</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.interlock</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code> with <code class="docutils literal notranslate"><span class="pre">addr×10</span></code> and hex→int on ilk fields</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">converters/interlock.py</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestMain</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestMain</span></code> with outaddr</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.read100</span></code> added for each <code class="docutils literal notranslate"><span class="pre">dlsPLC.interlock</span></code> century the IOC does not already read</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">converters/interlock.py</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestIndividual</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestIndividual</span></code> (FIELD dropped)</p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestMain</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestMain</span></code> with outaddr</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">converters/interlock.py</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>Blank <code class="docutils literal notranslate"><span class="pre">ilk*</span></code> fields dropped from all dlsPLC entities</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">interlock.overrideRequestIndividual</span></code> → <code class="docutils literal notranslate"><span class="pre">dlsPLC.overrideRequestIndividual</span></code> (FIELD dropped)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">converters/interlock.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Blank <code class="docutils literal notranslate"><span class="pre">ilk*</span></code> fields dropped from all dlsPLC entities</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">converters/dlsPLC.py</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.fastVacuumChannel</span></code> id zero-padded to 2 digits</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dlsPLC.fastVacuumChannel</span></code> id zero-padded to 2 digits</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">converters/dlsPLC.py</span></code></p></td>
 </tr>
 </tbody>

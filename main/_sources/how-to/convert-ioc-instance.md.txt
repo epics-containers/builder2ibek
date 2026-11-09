@@ -69,6 +69,10 @@ Each XML element maps to an ibek entity type: `<module.Class attribute="value"/>
 uv run builder2ibek xml2yaml BL11I-CS-IOC-09.xml --yaml bl11i-cs-ioc-09.yaml
 ```
 
+BLGui entities (`auto_BLGui_status`, `auto_BLGui_device`) are dropped unless
+you pass `--blgui`. Pass it only when the generic IOC binary includes the
+BLGui module; it then emits `BLGui.status` and `BLGui.device`.
+
 For the example above this produces `bl11i-cs-ioc-09.yaml`:
 
 ```yaml

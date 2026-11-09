@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.3.1.dev43+g2777a40f0 documentation</title>
+    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.3.1.dev51+g10d7978f8 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=17c063be"></script>
+    <script src="../_static/documentation_options.js?v=38f5153a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -547,6 +547,9 @@ IOC’s installed support tree.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>builder2ibek<span class="w"> </span>xml2yaml<span class="w"> </span>BL11I-CS-IOC-09.xml<span class="w"> </span>--yaml<span class="w"> </span>bl11i-cs-ioc-09.yaml
 </pre></div>
 </div>
+<p>BLGui entities (<code class="docutils literal notranslate"><span class="pre">auto_BLGui_status</span></code>, <code class="docutils literal notranslate"><span class="pre">auto_BLGui_device</span></code>) are dropped unless
+you pass <code class="docutils literal notranslate"><span class="pre">--blgui</span></code>. Pass it only when the generic IOC binary includes the
+BLGui module; it then emits <code class="docutils literal notranslate"><span class="pre">BLGui.status</span></code> and <code class="docutils literal notranslate"><span class="pre">BLGui.device</span></code>.</p>
 <p>For the example above this produces <code class="docutils literal notranslate"><span class="pre">bl11i-cs-ioc-09.yaml</span></code>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json</span>
 
