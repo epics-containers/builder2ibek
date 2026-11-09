@@ -73,8 +73,9 @@ BLGui entities (`auto_BLGui_status`, `auto_BLGui_device`) are dropped unless
 you pass `--blgui`. Pass it only when the generic IOC binary includes the
 BLGui module; it then emits `BLGui.status` and `BLGui.device`.
 `builder2ibek reconvert` passes `--blgui` itself for each IOC whose existing
-`ioc.yaml` contains `BLGui.*` entities, so they survive a reconvert; if that
-file cannot be parsed it warns and reconverts without `--blgui`. There is no
+`ioc.yaml` contains `BLGui.*` entities, so it regenerates them from the XML.
+BLGui entities added to `ioc.yaml` by hand are not kept. If that file cannot be
+parsed it warns and reconverts without `--blgui`. There is no
 option to force this on or off.
 
 For the example above this produces `bl11i-cs-ioc-09.yaml`:

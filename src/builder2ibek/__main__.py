@@ -203,7 +203,8 @@ def reconvert(
     Re-run xml2yaml on all IOCs for a beamline's services repo and
     optionally schema-validate each result with ibek generate2. Sequential
     inside one EPICS_ROOT tempdir. An IOC whose existing ioc.yaml has
-    BLGui.* entities is reconverted with --blgui, so they are kept.
+    BLGui.* entities is reconverted with --blgui, which
+    regenerates them from the XML.
     """
     reconvert_cli(
         beamline,
