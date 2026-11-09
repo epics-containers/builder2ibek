@@ -5,7 +5,8 @@ interlock.interlock addr is a 10-word block number (block nn = DM nn*10);
 dlsPLC.interlock addr is the first DM address, and the interlock needs a
 dlsPLC.read100 for century addr//100 on its device.
 
-BLGui auto_BLGui_status / auto_BLGui_device map to BLGui.status / BLGui.device.
+BLGui auto_BLGui_status / auto_BLGui_device map to BLGui.status / BLGui.device
+with blgui=True (xml2yaml --blgui), and are dropped by default.
 """
 
 from pathlib import Path
@@ -52,11 +53,11 @@ XML = """<?xml version="1.0" ?>
 """
 
 
-def _convert(tmp_path: Path) -> list[dict]:
+def _convert(tmp_path: Path, blgui: bool = False) -> list[dict]:
     xml = tmp_path / "ioc.xml"
     xml.write_text(XML)
     yaml = tmp_path / "ioc.yaml"
-    convert_file(xml, yaml, "/epics/ibek-defs/ioc.schema.json")
+    convert_file(xml, yaml, "/epics/ibek-defs/ioc.schema.json", blgui=blgui)
     return YAML(typ="safe").load(yaml.read_text())["entities"]
 
 
@@ -97,10 +98,20 @@ def test_interlock_adds_missing_read100_once(tmp_path: Path):
 
 
 @requires_support
-def test_blgui_status_and_device(tmp_path: Path):
+def test_blgui_dropped_by_default(tmp_path: Path):
     entities = _convert(tmp_path)
+    assert not [e for e in entities if e["type"].startswith("BLGui.")]
+
+
+@requires_support
+def test_blgui_status_and_device_with_blgui_flag(tmp_path: Path):
+    entities = _convert(tmp_path, blgui=True)
+    # params equal to a model default (INPx="0", NCURR=0, ...) are dropped
+    # only where the BLGui support YAML is present; the samples do not use
+    # BLGui, so CI's vendored ibek-support-dls copy does not include it.
+    # Compare only the params that are never defaulted.
     blgui = [e for e in entities if e["type"].startswith("BLGui.")]
-    assert blgui == [
+    expected = [
         {
             "type": "BLGui.status",
             "CALC": "0",
@@ -129,6 +140,12 @@ def test_blgui_status_and_device(tmp_path: Path):
             "SHORTNAME": "P1",
         },
     ]
+    assert len(blgui) == len(expected)
+    for got, want in zip(blgui, expected, strict=True):
+        assert {k: got.get(k) for k in want} == want
+        assert "name" not in got
+        # numeric-looking links stay strings, as the model types them
+        assert all(isinstance(v, str) for k, v in got.items() if k.startswith("INP"))
 
 
 XML_SOURCES = """<?xml version="1.0" ?>

@@ -43,11 +43,18 @@ def xml2yaml(
         "",
         help="Short description of the IOC's device (e.g. 'Geobrick 06')",
     ),
+    blgui: bool = typer.Option(
+        False,
+        "--blgui/--no-blgui",
+        help="Emit BLGui.status / BLGui.device entities (DEVSTA and INFO PVs). "
+        "Only for generic IOCs whose binary includes the BLGui module; "
+        "otherwise BLGui entities are dropped.",
+    ),
 ):
     if not yaml:
         yaml = xml.absolute().with_suffix("yaml")
 
-    convert_file(xml, yaml, schema, description=description)
+    convert_file(xml, yaml, schema, description=description, blgui=blgui)
 
 
 @cli.command()

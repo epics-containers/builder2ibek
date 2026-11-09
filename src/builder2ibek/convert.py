@@ -14,7 +14,9 @@ from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
 
 
-def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
+def convert_file(
+    xml: Path, yaml: Path, schema: str, description: str = "", blgui: bool = False
+):
     def tidy_up(yaml):
         # add blank lines between major fields
         for field in [
@@ -31,7 +33,7 @@ def convert_file(xml: Path, yaml: Path, schema: str, description: str = ""):
 
     builder = Builder()
     builder.load(xml)
-    ioc = dispatch(builder, xml, yaml.parent, description=description)
+    ioc = dispatch(builder, xml, yaml.parent, description=description, blgui=blgui)
 
     ruamel = YAML()
 
@@ -54,6 +56,7 @@ def dispatch(
     filename,
     out_dir: Path | None = None,
     description: str = "",
+    blgui: bool = False,
 ) -> Generic_IOC:
     """
     Dispatch every element in the XML to the correct convertor
@@ -85,6 +88,7 @@ def dispatch(
         ],
         source_file=filename,
         out_dir=out_dir or Path(),
+        blgui=blgui,
     )
 
     do_dispatch(builder, ioc)

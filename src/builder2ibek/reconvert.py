@@ -88,6 +88,22 @@ def _read_existing_description(ioc_yaml: Path) -> str:
     return str(value)
 
 
+def _existing_has_blgui(ioc_yaml: Path) -> bool:
+    """True when the existing ioc.yaml was converted with xml2yaml --blgui."""
+    if not ioc_yaml.is_file():
+        return False
+    try:
+        data = YAML(typ="safe").load(ioc_yaml)
+    except Exception:
+        return False
+    if not isinstance(data, dict):
+        return False
+    return any(
+        isinstance(e, dict) and str(e.get("type", "")).startswith("BLGui.")
+        for e in data.get("entities") or []
+    )
+
+
 @dataclass
 class ReconvertResult:
     beamline: str
@@ -167,11 +183,14 @@ def run_reconvert(
         xml = Path(cand["xml"])
         ioc_yaml = Path(cand["ioc_yaml"])
         description = descriptions.get(ioc_name) or _read_existing_description(ioc_yaml)
+        blgui = _existing_has_blgui(ioc_yaml)
         try:
             # Route any stray converter prints to stderr so `--json` on
             # stdout stays parseable.
             with contextlib.redirect_stdout(sys.stderr):
-                convert_file(xml, ioc_yaml, IOC_SCHEMA, description=description)
+                convert_file(
+                    xml, ioc_yaml, IOC_SCHEMA, description=description, blgui=blgui
+                )
             result.reconverted.append({"ioc_name": ioc_name, "status": "ok"})
         except Exception as e:  # noqa: BLE001 — report any converter error
             result.conversion_errors.append(

@@ -70,6 +70,11 @@ filename and its contents (e.g. "Geobrick 06", "Vacuum system",
 uv run builder2ibek xml2yaml $1 --yaml $INSTANCE_DIR/config/ioc.yaml --description "<description>"
 ```
 
+Add `--blgui` only when the target generic IOC's binary includes the BLGui
+module (e.g. RTEMS / DLS-build hybrids): it emits `BLGui.status` and
+`BLGui.device` for the XML's `auto_BLGui_*` entities. Without it they are
+dropped.
+
 ### 1d. Review ioc.yaml and fix converters
 
 Read the generated `ioc.yaml`. **Do not read large referenced files yet** —

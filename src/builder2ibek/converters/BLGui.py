@@ -26,14 +26,22 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     XML to YAML specialist convertor function for the BLGui support module
 
-    auto_BLGui_status and auto_BLGui_device become BLGui.status and
-    BLGui.device: they serve the DEVSTA / INFO PVs that synoptic screens read.
-    The other BLGui entities are EDM display support only and are dropped.
+    By default every BLGui entity is dropped: most generic IOC images do not
+    include the BLGui module, so its entities would fail schema validation.
+
+    With `xml2yaml --blgui` (for generic IOCs whose binary includes BLGui,
+    such as the RTEMS / DLS-build hybrids) auto_BLGui_status and
+    auto_BLGui_device become BLGui.status and BLGui.device: they serve the
+    DEVSTA / INFO PVs that synoptic screens read. The other BLGui entities
+    are EDM display support only and are dropped either way.
     """
     # name is a gui association label, not referenced by other entities
     entity.remove("name")
 
-    if entity_type == "auto_BLGui_status":
+    if not ioc.blgui:
+        entity.delete_me()
+
+    elif entity_type == "auto_BLGui_status":
         entity.type = "BLGui.status"
         _coerce(entity, STATUS_STR, STATUS_INT)
 

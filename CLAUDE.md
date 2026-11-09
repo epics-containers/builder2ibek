@@ -49,6 +49,7 @@ grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -m
 ```bash
 # Convert a single IOC XML to ibek YAML:
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
+#   --blgui  emit BLGui.status/device; only when the generic IOC binary has BLGui
 
 # Testing:
 uv run pytest

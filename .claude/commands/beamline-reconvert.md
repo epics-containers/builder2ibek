@@ -35,7 +35,7 @@ uv run builder2ibek reconvert $1 --services-repo <services-repo> --json
 Discovers BUILDER XMLs (work area first, prod fallback), matches lowercased
 XML stems to `<services-repo>/services/<ioc-name>/config/ioc.yaml`,
 re-runs `xml2yaml` for each match (preserving the existing `description`
-field), then schema-validates every reconverted ioc.yaml with
+field, and `--blgui` when the existing ioc.yaml has `BLGui.*` entities), then schema-validates every reconverted ioc.yaml with
 `ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir.
 
 Flags: `--no-validate` skips the generate2 pass; `--only <ioc-name>`
