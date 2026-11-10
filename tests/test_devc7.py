@@ -46,10 +46,12 @@ BL99J-EA-IOC-05 {PROD7}/BL99J-EA-IOC-05/3-1/{LX}/stBL99J-EA-IOC-05.sh
 BL99J-MO-IOC-06 {WORK}/BL99J-MO-IOC-06/{LX}/stBL99J-MO-IOC-06.sh
 BL99J-BL-IOC-07 {PROD}/BL/1-0/bin/linux-x86_64/stBL99J-BL-IOC-07.boot
 BL99J-ML-MALC-01 /dls_sw/work/R3.14.12.7/ioc/BL99J/BL99J-ML-MALC-01/malc.yaml
-BL99J-MO-IOC-08 {PROD}/BL99J-MO-IOC-08/1-0/bin/linux-x86_64/stBL99J-MO-IOC-08.sh
+
+BL99J-MO-IOC-08\t{PROD}/BL99J-MO-IOC-08/1-0/bin/linux-x86_64/stBL99J-MO-IOC-08.sh
 BL99J-CS-IOC-09 {PROD}/BL99J-CS-IOC-09/1-0/bin/linux-x86_64/stBL99J-CS-IOC-09.sh
 BL99J-EA-IOC-99 {PROD}/BL99J-EA-IOC-99/1-0/bin/linux-x86_64/stBL99J-EA-IOC-99.sh
 BL99I-MO-IOC-01 {PROD_I}/BL99I-MO-IOC-01/4-0/{LX}/stBL99I-MO-IOC-01.sh
+BL99J-EA-IOC-14 {PROD}/BL99J-EA-IOC-14/1-0/{LX}/stBL99J-EA-IOC-14.sh
 """
 
 SOFT_IOCS = {
@@ -57,19 +59,22 @@ SOFT_IOCS = {
 autoProcServControl 7099
 BL99J-MO-IOC-01 7001
 BL99J-MO-IOC-06 7002 manualstart
-BL99J-MO-IOC-08 7003   # comment
+
+\t
+BL99J-MO-IOC-08\t7003\t# comment
 BL99J-MO-IOC-10 7004
 BL99J-MO-IOC-11 7005
 """,
     "bl99j-ea-serv-01": """\
 BL99J-EA-IOC-02 7001
-BL99J-EA-IOC-05 7002
+BL99J-EA-IOC-05 7002 5066
 BL99J-BL-IOC-07 7003
 BL99J-ML-MALC-01 7004
 BL99J-CS-IOC-09 7005
 BL99J-NO-IOC-12 7006
 BL99J-EA-IOC-99 7008
 BL99I-MO-IOC-01 7007
+BL99J-EA-IOC-14 7009
 """,
 }
 REAL_IOCS = {
@@ -87,7 +92,7 @@ BUILDS = [
     f"{PROD}/BL99J-MO-IOC-08/1-0/bin/linux-x86_64/stBL99J-MO-IOC-08.sh",
     f"{PROD}/BL99J-CS-IOC-09/1-0/bin/linux-x86_64/stBL99J-CS-IOC-09.sh",
     f"{PROD}/BL99J-CS-IOC-09/1-0/bin/linux-x86_64/stBL99J-CS-IOC-09-sim.sh",
-    # not in the redirect table: newest build wins, 1-10 > 1-9
+    # not in the redirect table: reported, 1-10 > 1-9
     f"{PROD}/BL99J-MO-IOC-10/1-9/bin/linux-x86_64/stBL99J-MO-IOC-10.sh",
     f"{PROD}/BL99J-MO-IOC-10/1-10/bin/linux-x86_64/stBL99J-MO-IOC-10.sh",
     f"{PROD}/BL99J-MO-IOC-11/1-0/bin/windows-x64/stBL99J-MO-IOC-11.bat",
@@ -132,14 +137,10 @@ def services_repo(tmp_path: Path) -> Path:
     return repo
 
 
-def _plan(services_repo: Path, dls_sw: Path, prefix: str = "BL99J") -> devc7.Plan:
-    return devc7.build_plan(
-        prefix,
-        services_repo,
-        init_dir=dls_sw / "prod/etc/init",
-        redirect_table=dls_sw / "prod/etc/redirector/redirect_table",
-        dls_sw=dls_sw,
-    )
+def _plan(
+    services_repo: Path, dls_sw: Path, prefix: str = "BL99J", enable: bool = False
+) -> devc7.Plan:
+    return devc7.build_plan(prefix, services_repo, dls_sw=dls_sw, enable=enable)
 
 
 def _by_ioc(plan: devc7.Plan) -> dict[str, devc7.PlanEntry]:
@@ -155,6 +156,36 @@ def test_standard_prod_ioc_gets_version_and_domain(services_repo, dls_sw):
     assert entry.source_ref.endswith("redirect_table:2")
     assert entry.values == {"iocVersion": "2-3", "epicsDomain": "BL99J"}
     assert entry.folder == "bl99j-mo-ioc-01"
+    assert any(
+        n.startswith("duplicate redirect entries (lines 2, 3)") for n in entry.notes
+    )
+
+
+def test_tabs_and_blank_lines(services_repo, dls_sw):
+    entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-MO-IOC-08"]
+    assert entry.action == "add"
+    assert entry.values == {"iocVersion": "1-0", "epicsDomain": "BL99J"}
+    assert entry.notes == []
+
+
+def test_launch_arguments_noted(services_repo, dls_sw):
+    entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-EA-IOC-05"]
+    assert "launch arguments on bl99j-ea-serv-01: 5066" in entry.notes
+
+
+def test_new_folders_disabled_unless_enabled(services_repo, dls_sw):
+    entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-MO-IOC-01"]
+    assert not entry.enabled
+    assert "stopped on bl99j-mo-serv-01" in entry.enabled_comment
+    entry = _by_ioc(_plan(services_repo, dls_sw, enable=True))["BL99J-MO-IOC-01"]
+    assert entry.enabled
+    assert entry.enabled_comment == ""
+
+
+def test_manualstart_always_disabled(services_repo, dls_sw):
+    entry = _by_ioc(_plan(services_repo, dls_sw, enable=True))["BL99J-MO-IOC-06"]
+    assert not entry.enabled
+    assert entry.enabled_comment.startswith("manualstart on bl99j-mo-serv-01")
 
 
 def test_same_domain_as_location_needs_no_domain(services_repo, dls_sw):
@@ -180,8 +211,14 @@ def test_epics_version_set_when_not_default(services_repo, dls_sw):
         ("BL99J-DI-IOC-04", "RTEMS IOC (RTEMS-beatnik)"),
         ("BL99J-ML-MALC-01", "Malcolm YAML definition, not an IOC startup script"),
         ("BL99J-EA-IOC-99", "services folder exists (ibek)"),
-        ("BL99J-NO-IOC-12", "not in the redirect table and no build in /dls_sw/prod"),
-        ("BL99J-MO-IOC-11", "Windows IOC (windows-x64)"),
+        ("BL99J-NO-IOC-12", "in launch list but no redirect entry, so it cannot boot"),
+        ("BL99J-MO-IOC-10", "in launch list but no redirect entry, so it cannot boot"),
+        ("BL99J-MO-IOC-11", "in launch list but no redirect entry, so it cannot boot"),
+        (
+            "BL99J-EA-IOC-14",
+            f"boot script missing: {PROD}/BL99J-EA-IOC-14/1-0/{LX}/"
+            "stBL99J-EA-IOC-14.sh",
+        ),
     ],
 )
 def test_skips(services_repo, dls_sw, ioc, reason):
@@ -190,12 +227,24 @@ def test_skips(services_repo, dls_sw, ioc, reason):
     assert entry.reason == reason
 
 
-def test_fallback_to_newest_build(services_repo, dls_sw):
-    entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-MO-IOC-10"]
-    assert entry.action == "add"
-    assert entry.source == "newest-build"
-    assert entry.version == "1-10"
-    assert "not in the redirect table" in entry.notes
+def test_no_redirect_reports_newest_build(services_repo, dls_sw):
+    entries = _by_ioc(_plan(services_repo, dls_sw))
+    assert entries["BL99J-MO-IOC-10"].source == "none"
+    assert entries["BL99J-MO-IOC-10"].notes == [
+        f"newest build: {PROD}/BL99J-MO-IOC-10/1-10/{LX}/stBL99J-MO-IOC-10.sh"
+    ]
+    assert entries["BL99J-NO-IOC-12"].notes == ["newest build: none in /dls_sw/prod"]
+
+
+def test_version_key():
+    versions = ["2020-R7-Run2-2", "2020-Run5-1", "1-9", "1-10", "0-4-1"]
+    assert sorted(versions, key=devc7._version_key) == [
+        "0-4-1",
+        "1-9",
+        "1-10",
+        "2020-R7-Run2-2",
+        "2020-Run5-1",
+    ]
 
 
 def test_work_area_ioc_uses_ioc_path(services_repo, dls_sw):
@@ -204,8 +253,8 @@ def test_work_area_ioc_uses_ioc_path(services_repo, dls_sw):
         "iocPath": "/dls_sw/work/R3.14.12.7/support/BL99J-BUILDER/iocs"
     }
     assert entry.version == "work"
+    assert "runs from /dls_sw/work: needs a release" in entry.notes
     assert "newest prod build is 1-4" in entry.notes
-    assert "manualstart on bl99j-mo-serv-01" in entry.notes
 
 
 def test_shared_ioc_folder_gets_explicit_entrypoint(services_repo, dls_sw):
@@ -254,8 +303,12 @@ def test_apply_writes_folders(services_repo, dls_sw):
     assert "REPLACE" not in text
     assert "# work ####" in text  # comments kept
     assert "securityContext" not in text
+    assert "# Not deployed until the IOC is stopped on bl99j-mo-serv-01" in text
     values = YAML(typ="safe").load(text)
-    assert values == {"dev-c7": {"iocVersion": "2-3", "epicsDomain": "BL99J"}}
+    assert values == {
+        "global": {"enabled": False},
+        "dev-c7": {"iocVersion": "2-3", "epicsDomain": "BL99J"},
+    }
 
     bl = YAML(typ="safe").load(
         (services_repo / "services/bl99j-bl-ioc-07/values.yaml").read_text()
@@ -265,15 +318,42 @@ def test_apply_writes_folders(services_repo, dls_sw):
     ]
 
 
-def test_apply_never_overwrites(services_repo, dls_sw):
+def test_apply_enabled(services_repo, dls_sw):
+    devc7.apply_plan(_plan(services_repo, dls_sw, enable=True))
+    text = (services_repo / "services/bl99j-mo-ioc-01/values.yaml").read_text()
+    assert "global:" not in text
+    manual = YAML(typ="safe").load(
+        (services_repo / "services/bl99j-mo-ioc-06/values.yaml").read_text()
+    )
+    assert manual["global"] == {"enabled": False}
+
+
+@pytest.mark.parametrize("kind", ["folder", "dangling-link"])
+def test_apply_writes_nothing_if_any_target_exists(services_repo, dls_sw, kind):
+    services = services_repo / "services"
+    before = sorted(p.name for p in services.iterdir())
     plan = _plan(services_repo, dls_sw)
-    # a folder that appears between planning and writing is left alone
-    racing = services_repo / "services/bl99j-mo-ioc-01"
-    racing.mkdir()
-    (racing / "keep").write_text("mine")
-    devc7.apply_plan(plan)
-    assert sorted(p.name for p in racing.iterdir()) == ["keep"]
-    assert _by_ioc(plan)["BL99J-MO-IOC-01"].action == "skip"
+    # a target that appears between planning and writing
+    racing = services / "bl99j-mo-ioc-08"
+    if kind == "folder":
+        racing.mkdir()
+    else:
+        racing.symlink_to("nowhere")
+    with pytest.raises(FileExistsError, match="bl99j-mo-ioc-08"):
+        devc7.apply_plan(plan)
+    assert sorted(p.name for p in services.iterdir()) == sorted(
+        [*before, "bl99j-mo-ioc-08"]
+    )
+
+
+def test_dangling_link_counts_as_existing(services_repo, dls_sw):
+    (services_repo / "services/bl99j-mo-ioc-08").symlink_to("nowhere")
+    entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-MO-IOC-08"]
+    assert entry.reason == "services folder exists (other)"
+
+
+def test_apply_twice_adds_nothing(services_repo, dls_sw):
+    devc7.apply_plan(_plan(services_repo, dls_sw))
 
     # a second run plans nothing and reports what exists
     again = _plan(services_repo, dls_sw)
@@ -282,6 +362,18 @@ def test_apply_never_overwrites(services_repo, dls_sw):
         _by_ioc(again)["BL99J-MO-IOC-08"].reason
         == "services folder exists (dev-c7 legacy)"
     )
+
+
+def test_render_values_disabled():
+    text = devc7.render_values("# head\n\ndev-c7:\n", {"iocVersion": "1-0"}, "why")
+    assert text == (
+        "# head\n\n# why\nglobal:\n  enabled: false\n\ndev-c7:\n  iocVersion: 1-0\n"
+    )
+
+
+def test_render_values_tab_indent():
+    text = devc7.render_values("dev-c7:\n\tiocVersion: REPLACE\n", {"a": "b"})
+    assert text == "dev-c7:\n\ta: b\n"
 
 
 def test_render_values_without_placeholder():
@@ -315,10 +407,6 @@ def _cli_args(services_repo: Path, dls_sw: Path) -> list[str]:
         "BL99J",
         "--services-repo",
         str(services_repo),
-        "--init-dir",
-        str(dls_sw / "prod/etc/init"),
-        "--redirect-table",
-        str(dls_sw / "prod/etc/redirector/redirect_table"),
         "--dls-sw",
         str(dls_sw),
     ]
@@ -336,12 +424,38 @@ def test_cli_dry_run_and_json(services_repo, dls_sw):
     data = json.loads(result.output)
     assert data["prefix"] == "BL99J"
     assert data["location"] == "bl99i"
+    # --dls-sw moves the init and redirector defaults with it
+    assert data["sources"][0] == str(dls_sw / "prod/etc/redirector/redirect_table")
 
 
 def test_cli_apply(services_repo, dls_sw):
     result = CliRunner().invoke(cli, [*_cli_args(services_repo, dls_sw), "--apply"])
     assert result.exit_code == 0, result.output
     assert (services_repo / "services/bl99j-mo-ioc-01/values.yaml").is_file()
+
+
+def test_cli_explicit_sources(services_repo, dls_sw, tmp_path):
+    init = tmp_path / "init"
+    (init / "bl99j-x-serv-01").mkdir(parents=True)
+    (init / "bl99j-x-serv-01/soft-iocs").write_text("BL99J-MO-IOC-01 7001\n")
+    args = [
+        *_cli_args(services_repo, dls_sw),
+        "--init-dir",
+        str(init),
+        "--json",
+    ]
+    data = json.loads(CliRunner().invoke(cli, args).output)
+    assert [e["ioc"] for e in data["entries"]] == ["BL99J-MO-IOC-01"]
+
+
+def test_cli_write_error(services_repo, dls_sw, monkeypatch):
+    def fail(_plan):
+        raise PermissionError("read-only")
+
+    monkeypatch.setattr(devc7, "apply_plan", fail)
+    result = CliRunner().invoke(cli, [*_cli_args(services_repo, dls_sw), "--apply"])
+    assert result.exit_code == 1
+    assert "read-only" in result.output
 
 
 def test_cli_missing_services(tmp_path, dls_sw):

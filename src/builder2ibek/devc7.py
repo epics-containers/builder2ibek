@@ -15,8 +15,13 @@ from:
 - the redirect table, ``<redirector>/redirect_table`` (``IOC BOOT-SCRIPT``).
   The redirector takes the first line whose first field is the IOC name.
 
-An IOC that is live but has no redirect entry falls back to its newest build
-under ``/dls_sw/prod/<epics>/ioc/<PREFIX>/<IOC>/``.
+An IOC that is live but has no redirect entry cannot boot, so it is skipped;
+the report shows its newest build under ``/dls_sw/prod/<epics>/ioc/<PREFIX>/``.
+
+Every new folder is written with ``global.enabled: false`` unless asked
+otherwise: the IOC must be stopped on its IOC server before its cluster copy
+is deployed, because with hostNetwork both copies would serve the same PVs.
+A ``manualstart`` IOC is always written disabled.
 
 Nothing here writes outside the services repo.
 """
@@ -24,9 +29,11 @@ Nothing here writes outside the services repo.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import sys
+import textwrap
 from dataclasses import asdict, dataclass, field
 from pathlib import Path, PurePosixPath
 
@@ -39,7 +46,8 @@ INIT_DIR = DLS_SW / "prod/etc/init"
 REDIRECT_TABLE = DLS_SW / "prod/etc/redirector/redirect_table"
 DEFAULT_EPICS = "R3.14.12.7"
 TEMPLATE = ".legacy_ioc_template"
-PLACEHOLDER_RE = re.compile(r"^(\s*)iocVersion:.*REPLACE.*$", re.MULTILINE)
+PLACEHOLDER_RE = re.compile(r"^([ \t]*)iocVersion:.*REPLACE.*$", re.MULTILINE)
+DEVC7_KEY_RE = re.compile(r"^dev-c7:", re.MULTILINE)
 
 # Launch-list entries that start a service rather than an IOC (from the
 # DLS-wide server sweep).
@@ -63,6 +71,7 @@ class LaunchEntry:
     kind: str  # soft-iocs or real-iocs
     source: str  # file:line
     manualstart: bool = False
+    args: list[str] = field(default_factory=list)  # after the port
 
 
 @dataclass
@@ -72,11 +81,13 @@ class PlanEntry:
     action: str  # add or skip
     reason: str = ""
     version: str = ""
-    source: str = ""  # redirector, newest-build or none
+    source: str = ""  # redirector or none
     source_ref: str = ""  # file:line the boot script was read from
     boot: str = ""
     servers: list[str] = field(default_factory=list)
     values: dict[str, object] = field(default_factory=dict)
+    enabled: bool = False
+    enabled_comment: str = ""  # why the folder is written disabled
     notes: list[str] = field(default_factory=list)
 
 
@@ -90,14 +101,15 @@ class Plan:
     retired: list[dict[str, str]] = field(default_factory=list)
 
 
-def read_redirect_table(path: Path) -> dict[str, tuple[str, str]]:
-    """IOC name -> (boot script, file:line). The first entry wins."""
-    table: dict[str, tuple[str, str]] = {}
+def read_redirect_table(path: Path) -> dict[str, list[tuple[str, str]]]:
+    """IOC name -> every (boot script, file:line) for it, in file order.
+    The redirector uses the first."""
+    table: dict[str, list[tuple[str, str]]] = {}
     for lineno, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
         fields = line.split()
         if len(fields) < 2 or line.startswith("#"):
             continue
-        table.setdefault(fields[0], (fields[1], f"{path}:{lineno}"))
+        table.setdefault(fields[0], []).append((fields[1], f"{path}:{lineno}"))
     return table
 
 
@@ -111,19 +123,25 @@ def read_init(init_dir: Path) -> dict[str, list[LaunchEntry]]:
                 fields = line.split("#", 1)[0].split()
                 if not fields:
                     continue
+                # soft-iocs: IOC PORT [args]; real-iocs: IOC HOST PORT [args]
+                extra = fields[2 if kind == "soft-iocs" else 3 :]
                 entries.setdefault(fields[0], []).append(
                     LaunchEntry(
                         server=path.parent.name,
                         kind=kind,
                         source=f"{path}:{lineno}",
-                        manualstart="manualstart" in fields[1:],
+                        manualstart="manualstart" in extra,
+                        args=[a for a in extra if a != "manualstart"],
                     )
                 )
     return entries
 
 
 def _version_key(version: str) -> tuple:
-    return (tuple(int(n) for n in re.findall(r"\d+", version)), version)
+    """Sort key for a DLS release: only whole ``-``/``.``-separated tokens
+    count as numbers, so the R7 in ``2020-R7-Run2-2`` is text."""
+    tokens = re.split(r"[-.]", version)
+    return tuple((1, int(t), "") if t.isdigit() else (0, 0, t) for t in tokens)
 
 
 def _local(path: str, dls_sw: Path) -> Path:
@@ -220,13 +238,11 @@ def derive_values(
     elif work and work["name"] == ioc and _default_glob_ok(boot, ioc, dls_sw):
         version = "work"
         values["iocPath"] = work["ioc_path"]
-        notes.append("runs from /dls_sw/work, not a released version")
+        notes.append("runs from /dls_sw/work: needs a release")
     else:
         version = "work" if boot.startswith("/dls_sw/work/") else ""
         _explicit_entrypoint(boot, values)
         notes.append("non-standard entrypoint: workingDir and args set, review")
-    if not _local(boot, dls_sw).exists():
-        notes.append(f"boot script not found: {boot}")
     return values, version, notes
 
 
@@ -251,11 +267,16 @@ def build_plan(
     prefix: str,
     services_repo: Path,
     *,
-    init_dir: Path = INIT_DIR,
-    redirect_table: Path = REDIRECT_TABLE,
+    init_dir: Path | None = None,
+    redirect_table: Path | None = None,
     dls_sw: Path = DLS_SW,
+    enable: bool = False,
 ) -> Plan:
+    """Plan the folders. ``init_dir`` and ``redirect_table`` default to their
+    place under ``dls_sw``."""
     prefix = normalize_beamline(prefix)
+    init_dir = init_dir or dls_sw / INIT_DIR.relative_to(DLS_SW)
+    redirect_table = redirect_table or dls_sw / REDIRECT_TABLE.relative_to(DLS_SW)
     redirect = read_redirect_table(redirect_table)
     launches = read_init(init_dir)
     location = read_location(services_repo)
@@ -276,9 +297,8 @@ def build_plan(
     )
 
     for ioc in sorted(name for name in redirect if ours(name) and name not in launches):
-        plan.retired.append(
-            {"ioc": ioc, "boot": redirect[ioc][0], "source": redirect[ioc][1]}
-        )
+        boot, ref = redirect[ioc][0]
+        plan.retired.append({"ioc": ioc, "boot": boot, "source": ref})
 
     for ioc in sorted(name for name in launches if ours(name)):
         entry = PlanEntry(ioc=ioc, folder=ioc.lower(), action="skip")
@@ -287,26 +307,39 @@ def build_plan(
             for e in launches[ioc]
         ]
         plan.entries.append(entry)
+        for launch in launches[ioc]:
+            if launch.args:
+                entry.notes.append(
+                    f"launch arguments on {launch.server}: {' '.join(launch.args)}"
+                )
 
         if ioc in redirect:
-            entry.boot, entry.source_ref = redirect[ioc]
+            entry.boot, entry.source_ref = redirect[ioc][0]
             entry.source = "redirector"
+            if len(redirect[ioc]) > 1:
+                lines = ", ".join(ref.rsplit(":", 1)[1] for _, ref in redirect[ioc])
+                entry.notes.append(
+                    f"duplicate redirect entries (lines {lines}): the first is used;"
+                    " a duplicate breaks the boot on Linux, fix the table"
+                )
         else:
-            entry.boot = newest_build(ioc, prefix, dls_sw) or ""
-            entry.source = "newest-build" if entry.boot else "none"
-            entry.source_ref = entry.boot
-            entry.notes.append("not in the redirect table")
+            entry.source = "none"
+            newest = newest_build(ioc, prefix, dls_sw)
+            entry.notes.append(f"newest build: {newest or 'none in /dls_sw/prod'}")
 
         folder = services / entry.folder
-        if folder.exists():
+        if os.path.lexists(folder):
             entry.reason = f"services folder exists ({_folder_kind(folder)})"
             continue
         if not entry.boot:
-            entry.reason = "not in the redirect table and no build in /dls_sw/prod"
+            entry.reason = "in launch list but no redirect entry, so it cannot boot"
             continue
         reason = _classify_os(entry.boot)
         if reason:
             entry.reason = reason
+            continue
+        if not _local(entry.boot, dls_sw).exists():
+            entry.reason = f"boot script missing: {entry.boot}"
             continue
 
         entry.values, entry.version, notes = derive_values(
@@ -316,11 +349,25 @@ def build_plan(
         if entry.version == "work":
             released = newest_build(ioc, prefix, dls_sw)
             match = PROD_RE.match(released or "")
-            if match:
-                entry.notes.append(f"newest prod build is {match['version']}")
+            entry.notes.append(
+                f"newest prod build is {match['version']}"
+                if match
+                else "no prod build yet"
+            )
+        servers = ", ".join(e.server for e in launches[ioc])
         manual = [e.server for e in launches[ioc] if e.manualstart]
         if manual:
-            entry.notes.append(f"manualstart on {', '.join(manual)}")
+            entry.enabled_comment = (
+                f"manualstart on {', '.join(manual)}: procServ keeps it stopped"
+                " until someone starts it, so the cluster copy is not started either"
+            )
+        elif not enable:
+            entry.enabled_comment = (
+                f"Not deployed until the IOC is stopped on {servers} (or removed"
+                " from its soft-iocs): with hostNetwork both copies would serve the"
+                " same PVs. Set enabled: true to deploy."
+            )
+        entry.enabled = not entry.enabled_comment
         entry.action = "add"
     return plan
 
@@ -332,9 +379,19 @@ def _scalar(value: object) -> str:
     return text if loaded == text and ":" not in text else json.dumps(text)
 
 
-def render_values(template: str, values: dict[str, object]) -> str:
+def render_values(
+    template: str, values: dict[str, object], disabled_because: str = ""
+) -> str:
     """Replace the template's iocVersion placeholder with ``values``,
-    keeping every comment."""
+    keeping every comment. ``disabled_because`` adds ``global.enabled:
+    false`` with that comment."""
+    if disabled_because:
+        match = DEVC7_KEY_RE.search(template)
+        if not match:
+            raise ValueError(f"no dev-c7: key in {TEMPLATE}/values.yaml")
+        comment = "".join(f"# {line}\n" for line in textwrap.wrap(disabled_because, 76))
+        block = f"{comment}global:\n  enabled: false\n\n"
+        template = template[: match.start()] + block + template[match.start() :]
     lines: list[str] = []
     for key, value in values.items():
         if isinstance(value, list):
@@ -355,21 +412,28 @@ def render_values(template: str, values: dict[str, object]) -> str:
 
 
 def apply_plan(plan: Plan) -> list[Path]:
+    """Write the planned folders. Every target is checked first, and nothing
+    is written if any of them exists (as a file, folder or dangling link)."""
     services = Path(plan.services_repo) / "services"
     template = services / TEMPLATE
     if not (template / "values.yaml").is_file():
         raise FileNotFoundError(f"{template}/values.yaml not found")
     template_text = (template / "values.yaml").read_text()
+    adds = [e for e in plan.entries if e.action == "add"]
+    rendered = {
+        e.folder: render_values(template_text, e.values, e.enabled_comment)
+        for e in adds
+    }
+    clashes = [e.folder for e in adds if os.path.lexists(services / e.folder)]
+    if clashes:
+        raise FileExistsError(
+            f"nothing written: already in {services}: {', '.join(clashes)}"
+        )
     written: list[Path] = []
-    for entry in plan.entries:
-        if entry.action != "add":
-            continue
+    for entry in adds:
         dest = services / entry.folder
-        if dest.exists():  # never overwrite
-            entry.action, entry.reason = "skip", "services folder appeared"
-            continue
         shutil.copytree(template, dest, symlinks=True)
-        (dest / "values.yaml").write_text(render_values(template_text, entry.values))
+        (dest / "values.yaml").write_text(rendered[entry.folder])
         written.append(dest)
     return written
 
@@ -381,19 +445,25 @@ def render_plan(plan: Plan, applied: bool) -> str:
         "sources: " + ", ".join(plan.sources),
         "",
     ]
-    rows = [("IOC", "ACTION", "VERSION", "SOURCE", "DETAIL")]
+    rows = [("IOC", "ACTION", "VERSION", "SOURCE", "ENABLED", "DETAIL")]
     for e in plan.entries:
         if e.action == "add":
             detail = ", ".join(f"{k}={v}" for k, v in e.values.items())
+            if e.enabled:
+                enabled = "yes"
+            elif e.enabled_comment.startswith("manualstart"):
+                enabled = "no (manualstart)"
+            else:
+                enabled = "no"
         else:
-            detail = e.reason
-        rows.append((e.ioc, e.action, e.version or "-", e.source, detail))
-    widths = [max(len(r[i]) for r in rows) for i in range(4)]
+            detail, enabled = e.reason, "-"
+        rows.append((e.ioc, e.action, e.version or "-", e.source, enabled, detail))
+    widths = [max(len(r[i]) for r in rows) for i in range(5)]
     for row in rows:
         out.append(
-            "  ".join(c.ljust(w) for c, w in zip(row[:4], widths, strict=True))
+            "  ".join(c.ljust(w) for c, w in zip(row[:5], widths, strict=True))
             + "  "
-            + row[4]
+            + row[5]
         )
     notes = [(e.ioc, n) for e in plan.entries for n in e.notes]
     if notes:
@@ -404,8 +474,14 @@ def render_plan(plan: Plan, applied: bool) -> str:
         out += ["", "retired (in the redirect table, in no launch list), left out:"]
         out += [f"  {r['ioc']}: {r['boot']}" for r in plan.retired]
     adds = sum(e.action == "add" for e in plan.entries)
+    disabled = sum(e.action == "add" and not e.enabled for e in plan.entries)
     verb = "added" if applied else "to add (dry run; --apply writes them)"
-    out += ["", f"{adds} folder(s) {verb}"]
+    out += [
+        "",
+        f"{adds} folder(s) {verb}; {disabled} with global.enabled: false.",
+        "Deploy each IOC only after stopping it on its IOC server: with"
+        " hostNetwork both copies would serve the same PVs.",
+    ]
     return "\n".join(out)
 
 
@@ -415,8 +491,9 @@ def devc7_cli(
     *,
     apply: bool = False,
     json_out: bool = False,
-    init_dir: Path = INIT_DIR,
-    redirect_table: Path = REDIRECT_TABLE,
+    enable: bool = False,
+    init_dir: Path | None = None,
+    redirect_table: Path | None = None,
     dls_sw: Path = DLS_SW,
 ) -> int:
     if not (services_repo / "services").is_dir():
@@ -429,10 +506,11 @@ def devc7_cli(
             init_dir=init_dir,
             redirect_table=redirect_table,
             dls_sw=dls_sw,
+            enable=enable,
         )
         if apply:
             apply_plan(plan)
-    except (FileNotFoundError, ValueError) as exc:
+    except (OSError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     if json_out:

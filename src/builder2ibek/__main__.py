@@ -6,7 +6,7 @@ from builder2ibek import __version__
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
-from builder2ibek.devc7 import DLS_SW, INIT_DIR, REDIRECT_TABLE, devc7_cli
+from builder2ibek.devc7 import DLS_SW, devc7_cli
 from builder2ibek.migrate_autosave import migrate_folder
 from builder2ibek.reconvert import reconvert_cli
 
@@ -236,11 +236,22 @@ def dev_c7(
     json_out: bool = typer.Option(
         False, "--json", help="Emit the plan as JSON on stdout"
     ),
-    init_dir: Path = typer.Option(
-        INIT_DIR, help="DLS init configuration: <server>/soft-iocs and real-iocs"
+    enable: bool = typer.Option(
+        False,
+        "--enable",
+        help="Write new folders with global.enabled: true (default false, so "
+        "each IOC is deployed only after it is stopped on its IOC server). "
+        "manualstart IOCs are always written disabled.",
     ),
-    redirect_table: Path = typer.Option(
-        REDIRECT_TABLE, help="DLS IOC redirector table: IOC name -> boot script"
+    init_dir: Path | None = typer.Option(
+        None,
+        help="DLS init configuration: <server>/soft-iocs and real-iocs "
+        "[default: <dls-sw>/prod/etc/init]",
+    ),
+    redirect_table: Path | None = typer.Option(
+        None,
+        help="DLS IOC redirector table: IOC name -> boot script "
+        "[default: <dls-sw>/prod/etc/redirector/redirect_table]",
     ),
     dls_sw: Path = typer.Option(
         DLS_SW, help="Root that /dls_sw paths resolve under (for tests)"
@@ -251,15 +262,17 @@ def dev_c7(
     dev-c7 legacy IOC, running the build it boots from today.
 
     Live IOCs are those in the init launch lists; each one's version comes
-    from the redirect table, or else from its newest build in /dls_sw/prod
-    (flagged). Windows, vxWorks and RTEMS IOCs, IOCs that already have a
-    services folder, and retired IOCs are reported and left out.
+    from the redirect table. Live IOCs with no redirect entry, Windows,
+    vxWorks and RTEMS IOCs, IOCs that already have a services folder, and
+    retired IOCs are reported and left out. New folders are written with
+    global.enabled: false unless --enable is given.
     """
     code = devc7_cli(
         beamline,
         services_repo,
         apply=apply,
         json_out=json_out,
+        enable=enable,
         init_dir=init_dir,
         redirect_table=redirect_table,
         dls_sw=dls_sw,
