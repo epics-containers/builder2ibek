@@ -5,7 +5,6 @@ folders, with a stub `ibek` on PATH, so it tests the checks and not ibek.
 """
 
 import os
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -21,8 +20,15 @@ def _support(root: Path, folder: str, filename: str, body: str) -> Path:
     return path
 
 
-def _run(root: Path) -> subprocess.CompletedProcess:
-    shutil.copy(SCRIPT, root / "update-schema")
+def _run(root: Path, allow: tuple[str, ...] = ()) -> subprocess.CompletedProcess:
+    """Run a copy of update-schema in root, with `allow` as its clash allowlist."""
+    marker = "module_clash_allowlist=(\n"
+    text = SCRIPT.read_text()
+    assert marker in text
+    entries = "".join(f'    "{entry}"\n' for entry in allow)
+    script = root / "update-schema"
+    script.write_text(text.replace(marker, marker + entries))
+    script.chmod(0o755)
     bin_dir = root / "bin"
     bin_dir.mkdir()
     ibek = bin_dir / "ibek"
@@ -74,31 +80,27 @@ def test_byte_identical_fork_passes(tree: Path):
     assert result.returncode == 0, result.stderr
 
 
+FAKE_PAIR = "ibek-support-dls/Clash ibek-support/clash"
+
+
 def test_allowlisted_pair_passes(tree: Path):
+    _support(tree, "ibek-support/clash", "clash.ibek.support.yaml", "module: clash\n")
     _support(
-        tree, "ibek-support/oxCryo", "oxCryo.ibek.support.yaml", "module: oxCryo\n"
+        tree, "ibek-support-dls/Clash", "Clash.ibek.support.yaml", "module: Clash\n"
     )
-    _support(
-        tree, "ibek-support-dls/OXCryo", "OXCryo.ibek.support.yaml", "module: OXCryo\n"
-    )
-    result = _run(tree)
+    result = _run(tree, allow=(FAKE_PAIR,))
     assert result.returncode == 0, result.stderr
     assert "known pending duplicate" in result.stderr
 
 
 def test_allowlist_names_folders_not_modules(tree: Path):
+    _support(tree, "ibek-support/clash", "clash.ibek.support.yaml", "module: clash\n")
     _support(
-        tree, "ibek-support/oxCryo", "oxCryo.ibek.support.yaml", "module: oxCryo\n"
+        tree, "ibek-support-dls/clash2", "clash2.ibek.support.yaml", "module: CLASH\n"
     )
-    _support(
-        tree,
-        "ibek-support-dls/oxcryo2",
-        "oxcryo2.ibek.support.yaml",
-        "module: OXCRYO\n",
-    )
-    result = _run(tree)
+    result = _run(tree, allow=(FAKE_PAIR,))
     assert result.returncode == 1
-    assert "ibek-support-dls/oxcryo2" in result.stderr
+    assert "ibek-support-dls/clash2" in result.stderr
 
 
 def test_missing_module_fails(tree: Path):
