@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Create a builder2ibek converter for a support module &#8212; builder2ibek 2.4.1.dev7+ga9b04fe9e documentation</title>
+    <title>Create a builder2ibek converter for a support module &#8212; builder2ibek 2.4.1.dev10+g3d79de119 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=87d65312"></script>
+    <script src="../_static/documentation_options.js?v=a55076fd"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -553,7 +553,10 @@ values, or structure from the raw XML attributes.  Common cases:</p>
 <tr class="row-even"><td><p>One XML element should be deleted (e.g. replaced by an ibek default)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">entity.delete_me()</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>One XML element should expand to two ibek entities</p></td>
+<tr class="row-odd"><td><p>The module is deprecated and must not be converted (e.g. procServControl, adPython)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ioc.wont_convert(entity,</span> <span class="pre">reason)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>One XML element should expand to two ibek entities</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">entity.add_entity(Entity({...}))</span></code></p></td>
 </tr>
 </tbody>
@@ -661,6 +664,13 @@ converted booleans and empty strings.</p>
 <span class="n">ioc</span><span class="o">.</span><span class="n">entities</span>    <span class="c1"># list of all entity dicts already processed</span>
 </pre></div>
 </div>
+<p>To leave out an entity that builder2ibek won’t convert, and tell the user why:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ioc</span><span class="o">.</span><span class="n">wont_convert</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It deletes the entity and records a warning. <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">reconvert</span></code> print
+one warning per entity type per IOC, naming the IOC, the entity type, the count
+and the reason, followed by any per-entity notes.</p>
 </section>
 <hr class="docutils" />
 <section id="example-1-simple-field-rename-and-removal">

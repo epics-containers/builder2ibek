@@ -46,6 +46,7 @@ values, or structure from the raw XML attributes.  Common cases:
 | The entity type itself must change (module renamed in ibek) | `entity.type = "newModule.NewClass"` |
 | An XML element maps to a different ibek module entirely | `entity.type = "dlsPLC.something"` |
 | One XML element should be deleted (e.g. replaced by an ibek default) | `entity.delete_me()` |
+| The module is deprecated and must not be converted (e.g. procServControl, adPython) | `ioc.wont_convert(entity, reason)` |
 | One XML element should expand to two ibek entities | `entity.add_entity(Entity({...}))` |
 
 ---
@@ -123,6 +124,16 @@ Read-only access to the IOC-level context:
 ioc.ioc_name    # IOC name string
 ioc.entities    # list of all entity dicts already processed
 ```
+
+To leave out an entity that builder2ibek won't convert, and tell the user why:
+
+```python
+ioc.wont_convert(entity, reason, note="")
+```
+
+It deletes the entity and records a warning. `xml2yaml` and `reconvert` print
+one warning per entity type per IOC, naming the IOC, the entity type, the count
+and the reason, followed by any per-entity notes.
 
 ---
 
