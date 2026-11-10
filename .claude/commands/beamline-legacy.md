@@ -124,8 +124,8 @@ user.
 
 For each IOC, once the services commit is merged:
 
-1. Stop the IOC on its IOC server (or remove it from that server's
-   `soft-iocs`).
+1. Stop the IOC on its IOC server. Removing it from that server's
+   `soft-iocs` only stops it starting again; it does not stop a running IOC.
 2. Deploy and start its cluster copy: `ec deploy`, then
    `ec start --commit <service>`, or enable it in the deployment repo.
    Without `--commit`, ec only patches the live Argo Application, and a later
