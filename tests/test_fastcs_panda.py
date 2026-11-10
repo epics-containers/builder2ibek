@@ -115,7 +115,12 @@ def _conforms(value: Any, schema: dict, defs: dict, where: str = "") -> list[str
     if "const" in schema and value != schema["const"]:
         return [f"{where}: {value!r} is not {schema['const']!r}"]
     kind = schema.get("type")
-    python_types = {"object": dict, "array": list, "string": str, "null": type(None)}
+    python_types: dict[str, type] = {
+        "object": dict,
+        "array": list,
+        "string": str,
+        "null": type(None),
+    }
     if kind in python_types and not isinstance(value, python_types[kind]):
         return [f"{where}: {value!r} is not {kind}"]
     errors = []
