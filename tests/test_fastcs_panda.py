@@ -23,6 +23,7 @@ from builder2ibek.fastcs_panda import (
     CONTROLLER_TYPE,
     FASTCS_PANDABLOCKS_IMAGE,
     beamline_data_dir,
+    short_address,
 )
 
 SCHEMA = "/epics/ibek-defs/ioc.schema.json"
@@ -525,3 +526,168 @@ def test_reconvert_reports_a_refusal(tmp_path: Path, monkeypatch: pytest.MonkeyP
     assert result.reconverted == [{"ioc_name": IOC.lower(), "status": "refused"}]
     assert result.validation == []
     assert [w for w in result.warnings if "refused" in w["warning"]]
+
+
+def _ibek_instance(services: Path, values: str) -> Path:
+    """The IOC's own ibek folder, as /ioc-convert leaves it"""
+    instance = services / IOC.lower()
+    (instance / "config").mkdir(parents=True)
+    (instance / "config" / "ioc.yaml").write_text("entities: []\n")
+    (instance / "values.yaml").write_text(values)
+    return instance
+
+
+def test_real_chart_and_templates_are_kept(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    instance = _ibek_instance(services, "ioc-instance:\n  image: x\n")
+    (instance / "Chart.yaml").write_text("name: my-own-chart\n")
+    (instance / "templates").mkdir()
+    (instance / "templates" / "extra.yaml").write_text("kind: ConfigMap\n")
+
+    yaml = instance / "config" / "ioc.yaml"
+    result = convert_file(_xml(tmp_path), yaml, SCHEMA)
+
+    assert (instance / "Chart.yaml").read_text() == "name: my-own-chart\n"
+    assert (instance / "templates" / "extra.yaml").is_file()
+    assert not (instance / "templates").is_symlink()
+    kept = [w for w in result.warnings if "a real" in w]
+    assert len(kept) == 2
+    assert [w for w in kept if str(instance / "Chart.yaml") in w and "real file" in w]
+    assert [w for w in kept if str(instance / "templates") in w and "real folder" in w]
+
+
+def test_ibek_values_security_context_and_hostpath_carry_over(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    instance = _ibek_instance(
+        services,
+        "ioc-instance:\n"
+        "  image: ghcr.io/epics-containers/ioc-adpandablocks:1.0\n"
+        "  startupExecutable: /epics/ioc/startup.sh\n"
+        "  securityContext:\n    runAsUser: 37733\n    runAsGroup: 37733\n"
+        "  dataVolume:\n    pvc: false\n    hostPath: /dls/b01-1/data/2026\n",
+    )
+    result = convert_file(_xml(tmp_path), instance / "config" / "ioc.yaml", SCHEMA)
+
+    values = _load(instance / "values.yaml")["ioc-instance"]
+    assert values["image"] == FASTCS_PANDABLOCKS_IMAGE
+    assert values["securityContext"] == {"runAsUser": 37733, "runAsGroup": 37733}
+    assert values["dataVolume"] == {"pvc": False, "hostPath": "/dls/b01-1/data/2026"}
+    # nothing else was set, so no backup
+    assert not (instance / "values.yaml.ibek").exists()
+    (note,) = [n for n in result.notes if "replaced the ibek" in n]
+    assert "carrying over securityContext and dataVolume.hostPath" in note
+
+
+def test_ibek_values_with_other_keys_are_kept_as_backup(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    original = (
+        "ioc-instance:\n  image: x\n  hostNetwork: true\n  nodeName: bl01c-sc-ioc-01\n"
+    )
+    instance = _ibek_instance(services, original)
+    result = convert_file(_xml(tmp_path), instance / "config" / "ioc.yaml", SCHEMA)
+
+    assert (instance / "values.yaml.ibek").read_text() == original
+    assert "hostNetwork" not in (instance / "values.yaml").read_text()
+    (note,) = [n for n in result.notes if "replaced the ibek" in n]
+    assert str(instance / "values.yaml.ibek") in note
+    assert "hostNetwork, nodeName" in note
+
+
+def test_ibek_schema_at_the_folder_root_is_removed(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    instance = _ibek_instance(services, "ioc-instance:\n  image: x\n")
+    (instance / "ioc.schema.json").write_text("{}\n")
+    result = convert_file(_xml(tmp_path), instance / "config" / "ioc.yaml", SCHEMA)
+    assert not (instance / "ioc.schema.json").exists()
+    assert [n for n in result.notes if "ioc.schema.json" in n]
+
+
+def test_dedicated_refusal_names_every_panda_left_unwritten(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    taken = services / "elsewhere" / "config"
+    taken.mkdir(parents=True)
+    (taken / "controller.yaml").write_text(
+        "controllers:\n  - id: BL01C-MO-PANDA-02\n    address: 10.0.0.2\n"
+    )
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    result = convert_file(_xml(tmp_path, SECOND_PANDA), yaml, SCHEMA)
+
+    assert result.fastcs_instances == []
+    assert result.refused == ["BL01C-MO-PANDA-01", "BL01C-MO-PANDA-02"]
+    (summary,) = [w for w in result.warnings if "nothing was written" in w]
+    assert "2 PandA(s): BL01C-MO-PANDA-01, BL01C-MO-PANDA-02" in summary
+
+
+@pytest.mark.parametrize("edit", [("127.0.0.1", "127.0.0.2"), ("PANDA-01", "PANDA-9")])
+def test_hand_edited_controllers_are_left_for_a_manual_merge(
+    tmp_path: Path, edit: tuple[str, str]
+):
+    services = _services_repo(tmp_path)
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    xml = _xml(tmp_path, MIXED_DEVICES)
+    convert_file(xml, yaml, SCHEMA)
+
+    controller = services / "bl01c-mo-panda-01" / "config" / "controller.yaml"
+    controller.write_text(controller.read_text().replace(*edit))
+    edited = controller.read_text()
+    yaml.unlink()
+
+    result = convert_file(xml, yaml, SCHEMA)
+
+    # the mixed IOC's ioc.yaml is still regenerated
+    assert result.ioc_yaml_written and yaml.is_file()
+    assert controller.read_text() == edited
+    (note,) = [n for n in result.notes if "merge by hand" in n]
+    assert str(controller) in note
+
+
+def test_panda_named_like_the_mixed_ioc_gets_its_own_folder(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    name = "BL01C-MO-PANDA-01"
+    xml = _xml(tmp_path, MIXED_DEVICES, name=name)
+    yaml = services / name.lower() / "config" / "ioc.yaml"
+    result = convert_file(xml, yaml, SCHEMA)
+
+    assert result.ioc_yaml_written and yaml.is_file()
+    panda = services / "bl01c-mo-panda-01-panda"
+    assert result.fastcs_instances == [panda]
+    assert (panda / "config" / "controller.yaml").is_file()
+    assert not (services / name.lower() / "config" / "controller.yaml").exists()
+
+
+@pytest.mark.parametrize(
+    "address, short",
+    [
+        ("PANDA-01.diamond.ac.uk", "panda-01"),
+        ("panda-01", "panda-01"),
+        ("172.23.59.50", "172.23.59.50"),
+    ],
+)
+def test_short_address(address: str, short: str):
+    assert short_address(address) == short
+
+
+def test_duplicate_matches_short_hostnames(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    taken = services / "elsewhere" / "config"
+    taken.mkdir(parents=True)
+    (taken / "controller.yaml").write_text(
+        "controllers:\n  - id: SOMETHING-ELSE\n"
+        "    address: panda-02.invalid.diamond.ac.uk\n"
+    )
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    result = convert_file(_xml(tmp_path, SECOND_PANDA + MIXED_DEVICES), yaml, SCHEMA)
+    assert result.refused == ["BL01C-MO-PANDA-02"]
+
+
+def test_ip_addresses_are_not_shortened(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    taken = services / "elsewhere" / "config"
+    taken.mkdir(parents=True)
+    # 127.0.0.2 shares "127" with the PandA's 127.0.0.1, and must not match it
+    (taken / "controller.yaml").write_text(
+        "controllers:\n  - id: SOMETHING-ELSE\n    address: 127.0.0.2\n"
+    )
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    result = convert_file(_xml(tmp_path), yaml, SCHEMA)
+    assert result.refused == []
