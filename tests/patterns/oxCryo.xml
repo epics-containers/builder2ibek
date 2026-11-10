@@ -3,5 +3,4 @@
 	<OXCryo.OXCS700 P="BL15J-CG-CSTRM-01" PORT="TS_1" Q="" gda_desc="Oxford Cryostream" gda_name="ENV.CSTRM1" name="BL15J-CG-CSTRM-01"/>
 	<OXCryo.OXCB800 P="BL15J-CG-COBRA-01" PORT="TS_2" Q="" gda_desc="Oxford Cobra" gda_name="ENV.COBRA1" name="BL15J-CG-COBRA-01"/>
 	<OXCryo.OXNH700 P="BL15J-CG-HELIX-01" PORT="HELIX2port" Q="" gda_desc="Helix in EH2" gda_name="ENV.HELIX2" name="HELIX2"/>
-	<OXCryo.OXCS1000 DISABLE_COMMS="0" P="BL04J-EA-CSTRM-01" PORT="ty_60_7" Q="" name="CSTRM1"/>
 </components>
