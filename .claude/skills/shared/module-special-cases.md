@@ -116,8 +116,8 @@ referencing a motor on another device, and `$(P)$(motor)` cannot express it.
 adPython is deprecated in favour of ADExternal. b2i won't convert it,
 whatever `ibek-support-dls` contains: `converters/adPython.py` leaves every
 adPython entity out of the ioc.yaml, and `xml2yaml` and `reconvert` print a
-won't-convert warning naming the IOC, the entity type and the reason. Its
-`ibek-support-dls/adPython` folder is being removed. Don't add a support YAML
+won't-convert warning naming the IOC, the entity type and the reason.
+`ibek-support-dls` has no adPython folder. Don't add a support YAML
 for it, and don't restore its entities by hand in a converted ioc.yaml. Flag
 the IOC to the user as needing ADExternal.
 ADExternal has no support YAML yet. Whether an automatic adPython to ADExternal
@@ -199,8 +199,8 @@ PandA PV. The image tag is the single constant `FASTCS_PANDABLOCKS_IMAGE` in
 `fastcs_panda.py`; bumping it means vendoring that release's `schema.json`
 into `tests/samples/fastcs-pandablocks/`.
 
-Don't add ADPandABlocks support YAML to `ibek-support`. The
-`ibek-support-dls/ADPandABlocks` folder is removed in a separate MR.
+Don't add ADPandABlocks support YAML to `ibek-support`. The `ibek-support-dls`
+ADPandABlocks folder is removed in a separate MR.
 
 ## `procServControl` — not used in containers
 
@@ -209,8 +209,8 @@ replace it. b2i won't convert it, whatever `ibek-support-dls` contains:
 `converters/procServControl.py` leaves every procServControl entity
 (`procServControl`, `procServControlGui`) out of the ioc.yaml, and `xml2yaml`
 and `reconvert` print a won't-convert warning naming the IOC, the entity type
-and the reason. Its `ibek-support-dls/procServControl` folder is being
-removed. Don't add a support YAML for it, and don't restore its entities by
+and the reason. `ibek-support-dls` has no procServControl folder. Don't add a
+support YAML for it, and don't restore its entities by
 hand in a converted ioc.yaml.
 
 To drop another module the same way, call `ioc.wont_convert(entity, reason)`
