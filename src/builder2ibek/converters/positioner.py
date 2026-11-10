@@ -17,33 +17,33 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
 
     elif entity_type == "motorpositioner":
+        name = entity.get("name")
         entity.remove("name")
 
         # motorpositioner.template links to the motor as $(P)$(motor), with P
         # taken from the parent multipositioner. So motor is the motor record's
-        # suffix, not its full PV: M for pmac and basic motors, Q for
-        # softMotorForPiezo. As in XMLbuilder, the motor's P must match the
-        # parent's, or the links would point at another device.
+        # suffix, not its full PV. As in XMLbuilder, the motor is any entity
+        # with the referenced name, whatever its type, and its record is
+        # $(P)$(M), or $(P)$(Q) for softMotorForPiezo. The motor's P must match
+        # the parent's, or the links would point at another device.
         # EGU is copied from the motor.
-        motor_types = (
-            "dls_pmac_asyn_motor",
-            "dls_pmac_asyn_motor_no_coord",
-            "basic_asyn_motor",
-            "softMotorForPiezo",
-        )
-        motors = [
-            e
-            for e in ioc.raw_entities
-            if any(e.get("type", "").endswith(t) for t in motor_types)
-            and e.get("name") == entity.motor
-        ]
+        motors = [e for e in ioc.raw_entities if e.get("name") == entity.motor]
 
         if len(motors) != 1:
             raise ValueError(
-                f"Expected one motor with name '{entity.motor}', found {len(motors)}"
+                f"Expected one entity named '{entity.motor}' as the motor of "
+                f"motorpositioner '{name}', found {len(motors)}"
             )
 
         motor = motors[0]
+        motor_type = motor.get("type", "")
+        motor_pv = motor.get("M", motor.get("Q"))
+        if motor.get("P") is None or motor_pv is None:
+            raise ValueError(
+                f"Motor '{motor['name']}' of type '{motor_type}' has no P with M "
+                f"or Q, so its motor record PV is unknown"
+            )
+
         parents = [
             e
             for e in ioc.raw_entities
@@ -61,9 +61,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
                 f"multipositioner '{entity.MP}' prefix '{parents[0].get('P')}'"
             )
 
-        motor_pv = motor.get("M", motor.get("Q"))
-        if motor_pv is None:
-            raise ValueError(f"Motor '{motor['name']}' has neither M nor Q")
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
 

@@ -3,7 +3,8 @@ Tests for the positioner converter's motorpositioner handling.
 
 motorpositioner.template links to its motor as $(P)$(motor), with P taken
 from the parent multipositioner, so the converter must set motor to the motor
-record's suffix and refuse a motor whose prefix differs (issue #103).
+record's suffix and refuse a motor whose prefix differs (issue #103). As in
+XMLbuilder, the motor is found by name whatever its type.
 """
 
 from pathlib import Path
@@ -59,5 +60,57 @@ def test_motor_prefix_must_match_the_multipositioner(tmp_path: Path):
     STRA="Out" STRB="In" name="OTHER.MP"/>
   <positioner.motorpositioner DESC="y" MP="OTHER.MP" PREC="3" Q=":Y:P"
     VALB="1" motor="STAGE.Y" name="OTHER.YP"/>
+""",
+        )
+
+
+def test_any_motor_type_is_found_by_name(tmp_path: Path):
+    # XMLbuilder accepted any MotorRecord: here a coordinate system motor and
+    # an auto_* soft motor whose template makes the record $(P)$(M)
+    mps = _motorpositioners(
+        tmp_path,
+        """
+  <pmac.dls_pmac_cs_asyn_motor ADDR="9" DESC="CS Y" EGU="mm" M=":CS:Y"
+    MRES="0.0001" P="BL01C-MO-STAGE-01" PORT="BRICK1.CS2" PREC="5"
+    name="STAGE.CSY"/>
+  <BL24B.auto_pgmAutoDecouple DECOUPLING_DISTANCE="1" DESC="soft" EGU="deg"
+    M=":SOFT" P="BL01C-MO-STAGE-01" REAL_MOTOR="REAL" name="STAGE.SOFT"/>
+  <positioner.multipositioner DESC="stage" MP=":MP" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="STAGE.MP"/>
+  <positioner.motorpositioner DESC="cs" MP="STAGE.MP" PREC="3" Q=":CS:P"
+    VALB="1" motor="STAGE.CSY" name="STAGE.CSP"/>
+  <positioner.motorpositioner DESC="soft" MP="STAGE.MP" PREC="3" Q=":SOFT:P"
+    VALB="1" motor="STAGE.SOFT" name="STAGE.SOFTP"/>
+""",
+    )
+
+    assert [(m["motor"], m["EGU"]) for m in mps] == [
+        (":CS:Y", "mm"),
+        (":SOFT", "deg"),
+    ]
+
+
+def test_motor_without_m_or_q_names_its_type(tmp_path: Path):
+    with pytest.raises(ValueError, match="of type 'positioner.multipositioner'"):
+        _motorpositioners(
+            tmp_path,
+            """
+  <positioner.multipositioner DESC="stage" MP=":MP" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="STAGE.MP"/>
+  <positioner.motorpositioner DESC="y" MP="STAGE.MP" PREC="3" Q=":Y:P"
+    VALB="1" motor="STAGE.MP" name="STAGE.YP"/>
+""",
+        )
+
+
+def test_missing_motor_names_the_motorpositioner(tmp_path: Path):
+    with pytest.raises(ValueError, match="motorpositioner 'STAGE.YP', found 0"):
+        _motorpositioners(
+            tmp_path,
+            """
+  <positioner.multipositioner DESC="stage" MP=":MP" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="STAGE.MP"/>
+  <positioner.motorpositioner DESC="y" MP="STAGE.MP" PREC="3" Q=":Y:P"
+    VALB="1" motor="NOSUCH" name="STAGE.YP"/>
 """,
         )
