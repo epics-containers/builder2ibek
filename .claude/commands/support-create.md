@@ -45,6 +45,14 @@ entity models, not create from scratch.
 [module-special-cases.md](../skills/shared/module-special-cases.md) and check whether
 the module has non-standard naming or location.
 
+**If no folder exists, don't create one yet.** Follow
+[new-module-folder.md](../skills/shared/new-module-folder.md): check for a
+ruling, an existing folder or runtime pattern, and a public upstream, then ask
+the user where the folder goes, or whether to create it at all. When run as a
+subagent, stop here and report those findings to the orchestrator, unless its
+prompt already gives the user's answer for this module (the repo to create it
+in).
+
 ## Step 2 — Locate the module
 
 If `$2` (known path) is provided, use it directly.
@@ -88,11 +96,10 @@ Apply the **type inference rules** from
 submodules. If step 1 found an existing folder in either location, always
 use that same location. Never create a second copy in the other submodule.
 
-- If the module is DLS-specific (no upstream open-source project):
-  write to `ibek-support-dls/<module>/`
-- If it could benefit other facilities (e.g. asyn, StreamDevice, motor):
-  write to `ibek-support/<module>/`
-- When uncertain, default to `ibek-support-dls/`
+A new folder goes where the user's answer from Step 1 says. That answer
+follows [new-module-folder.md](../skills/shared/new-module-folder.md): a module
+with a public upstream belongs in `ibek-support/<module>/`, built from the
+upstream; `ibek-support-dls/<module>/` is for modules with no public source.
 
 ## Step 5b — Handle XML template entities
 
@@ -178,7 +185,12 @@ the expected outcome mid-task, not a failure.
 
 ## Step 10 — Report
 
-Return a summary of:
+If you stopped at Step 1 to ask about a new folder, return the module, the
+IOCs that need it and the findings of the
+[new-module-folder.md](../skills/shared/new-module-folder.md) checks, and
+nothing else.
+
+Otherwise, return a summary of:
 - Files created or modified (with paths)
 - Entity models defined (list of `<module>.<Entity>` names)
 - Any uncertainties (e.g. "could not find builder.py", "unclear pre_init")

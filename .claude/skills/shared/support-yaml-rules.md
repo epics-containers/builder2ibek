@@ -76,6 +76,9 @@ See [ibek-concepts](../ibek-concepts/SKILL.md) for full details. Key reminders:
 folder. If the module already exists in one location, use that location —
 never create a second copy in the other submodule.
 
+**New folders:** before creating a new module folder in either submodule,
+follow [new-module-folder.md](new-module-folder.md) and ask the user.
+
 ## Reference examples
 
 Always look at existing support YAMLs before creating new ones:

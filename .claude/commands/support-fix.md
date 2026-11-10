@@ -54,6 +54,11 @@ error, determine the fix type:
 
 ## Step 3 — Apply fixes
 
+Fix within the module folders that already exist. If a fix needs a new module
+folder in `ibek-support-dls/` or `ibek-support/`, don't create it: follow
+[new-module-folder.md](../skills/shared/new-module-folder.md), which ends in
+asking the user, or in reporting back when you are a subagent.
+
 Follow the rules in [support-yaml-rules.md](../skills/shared/support-yaml-rules.md)
 when modifying the support YAML. For converter fixes, follow the pattern in
 existing converters.

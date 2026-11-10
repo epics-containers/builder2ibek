@@ -15,6 +15,7 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 - **Do PRs and releases in a background subagent**: pushing, opening the PR, watching CI, merging, tagging and waiting for images. That keeps the main thread free to talk to the user. If a permission check stops a subagent merging, it reports that and the user decides; the main thread doesn't watch CI.
 - **Do searches the user asks for in a background subagent**, so the conversation can continue and the main context stays clean. That covers usage counts, sweeps of `/dls_sw`, and code or web searches. The subagent returns the conclusion and its limits, not the raw output.
 - **No duplicate modules** across `ibek-support/` and `ibek-support-dls/` — each module lives in exactly one. Always check both before creating a new folder. Sole exception: a forked module (e.g. `ether_ip` / `ether_ip_dls`) may appear in both when the two `*.ibek.support.yaml` are byte-identical and only `install.yml` differs — an IOC builds exactly one of them.
+- **Ask the user before creating any new module folder** in `ibek-support-dls/` or `ibek-support/`; subagents report back instead. See [new-module-folder.md](.claude/skills/shared/new-module-folder.md).
 
 ## Services Repo
 
