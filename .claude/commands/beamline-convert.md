@@ -44,7 +44,11 @@ support YAML), do a quick pre-pass:
 3. Deduplicate the list of modules needing support YAMLs across all IOCs
 4. Read [module-special-cases.md](../skills/shared/module-special-cases.md) — skip
    modules that don't need support YAMLs and use correct folder names
-5. Launch **one support-create subagent per unique module** (all in parallel):
+5. For each module with **no folder in either submodule**, follow
+   [new-module-folder.md](../skills/shared/new-module-folder.md) and ask the
+   user, one AskUserQuestion per module, naming every IOC that uses it. Drop
+   the modules the user says not to create, and list their IOCs in the report.
+6. Launch **one support-create subagent per remaining module** (all in parallel):
 
 > Read `/workspaces/builder2ibek/.claude/commands/support-create.md` and
 > follow its instructions to create a support YAML for the following module.
@@ -52,8 +56,11 @@ support YAML), do a quick pre-pass:
 > Module name: `<module>`
 > Known path from _RELEASE: `<resolved-path>`
 > Entity types used across IOCs: [list]
+> New folder: `<the user's answer: "create in ibek-support from <upstream>"
+> or "create in ibek-support-dls">`, or "none: the folder exists". Without an
+> answer from the user here, don't create a folder: stop and report back.
 
-5. After all complete, run `./update-schema` once.
+7. After all complete, run `./update-schema` once.
 
 ## Step 4 — Convert each IOC
 
@@ -67,7 +74,11 @@ For each IOC XML, spawn a `general-purpose` subagent:
 >
 > Note: support YAMLs for all modules have already been created in Step 3.
 > Phase 2 (support YAML creation) should find them already present — only
-> create entity models that are still missing.
+> create entity models that are still missing. Don't create a new module
+> folder in `ibek-support-dls/` or `ibek-support/`: if one is needed, report
+> the module and the
+> `/workspaces/builder2ibek/.claude/skills/shared/new-module-folder.md`
+> findings back instead.
 >
 > Report your results when complete.
 

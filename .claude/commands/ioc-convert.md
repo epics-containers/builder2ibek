@@ -175,6 +175,13 @@ Parse the final ioc.yaml. For each entity type `<module>.<Entity>`:
    before concluding anything is missing.
 3. If it exists, check whether the specific entity model is present inside it.
 4. Collect all modules where the support YAML or entity model is missing.
+5. For each module with **no folder in either submodule**, follow
+   [new-module-folder.md](../skills/shared/new-module-folder.md): check for a
+   ruling, a runtime pattern and a public upstream, then ask the user with
+   AskUserQuestion where to create it, or whether to. Drop the modules the
+   user says not to create, and report their IOC entities as not converted.
+   If you are a subagent and can't ask, don't launch Phase 2 for those
+   modules: report them and your findings to your caller.
 
 Also note for each module: entity type names used and sample parameter values.
 
@@ -207,6 +214,12 @@ For each module, construct a prompt:
 > `ibek-support/` or `ibek-support-dls/`. Check both directories first. If
 > the module already exists in one location, use that location — never
 > create a second copy in the other submodule.
+>
+> **New folder:** `<the user's answer: "create in ibek-support from <upstream>"
+> or "create in ibek-support-dls">`, or "none: the folder exists". If the
+> folder doesn't exist and this line gives no answer from the user, don't
+> create it: stop and report the module and the
+> `/workspaces/builder2ibek/.claude/skills/shared/new-module-folder.md` findings back.
 >
 > Write (or update) the support YAML. Return a brief summary of what you
 > created/changed.
@@ -270,6 +283,10 @@ Group all errors by the module they implicate. For each group, launch one
 > ```
 >
 > Relevant db file(s) to check: `<known-path>/db/<file>.db`
+>
+> Don't create a new module folder in `ibek-support-dls/` or `ibek-support/`.
+> If the fix needs one, stop and report it back, following
+> `/workspaces/builder2ibek/.claude/skills/shared/new-module-folder.md`.
 >
 > Return a summary of what you changed and whether a converter fix was needed.
 

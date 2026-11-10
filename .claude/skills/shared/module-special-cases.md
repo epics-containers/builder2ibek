@@ -1,7 +1,10 @@
 # Module Special Cases
 
-Some modules have non-standard naming or locations. **Always consult this list
-before creating a support YAML or looking up a module.**
+Some modules have non-standard naming or locations, and some are deliberately
+not converted. **Always consult this list before creating a support YAML or
+looking up a module.** A module with no section here still needs the checks in
+[new-module-folder.md](new-module-folder.md), and the user's answer, before a
+new folder is created for it.
 
 ## `epics` — provided by ibek, not a support module
 
@@ -215,6 +218,24 @@ hand in a converted ioc.yaml.
 
 To drop another module the same way, call `ioc.wont_convert(entity, reason)`
 from its converter (`Generic_IOC.wont_convert` in `types.py`).
+
+## `gdaPlugins` — use the `detectorPlugins` runtime pattern
+
+The `detectorPlugins` pattern in `ibek-runtime-support` (entity models
+`gdaPlugins` and `detectorPlugins`) replaces a gdaPlugins support module.
+`converters/gdaPlugins.py` expands the XML element into `ADCore` entities.
+Don't create a gdaPlugins folder in either support repo.
+
+## `OXCryo` — use `ibek-support/oxCryo`
+
+`converters/OXCryo.py` maps the `OXCryo` entities (`OXCS700`, `OXNH700`,
+`OXCB700`, `OXCB800`) to `oxCryo.*` in `ibek-support/oxCryo/`. Don't create an
+`OXCryo` folder in either support repo.
+
+## `motorSmarAct`, `simHDF5Detector` — in `ibek-support`
+
+Both live in `ibek-support/`, built from their public upstreams. Don't create
+them in `ibek-support-dls/`.
 
 ## `dlsPLC` — huge and DLS-internal; edit surgically, keep the anchors
 

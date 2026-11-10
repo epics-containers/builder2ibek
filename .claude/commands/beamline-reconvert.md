@@ -14,7 +14,9 @@ tempdir; parallelisation is out of scope for this command.
 
 If `xml2yaml` fails, fix the converter in `src/builder2ibek/converters/`
 and re-run `reconvert`. If `generate2` fails, do NOT re-run `xml2yaml` —
-invoke `/support-fix`.
+invoke `/support-fix`. If a reconverted IOC uses a module with no folder in
+either submodule, ask the user before creating one, following
+[new-module-folder.md](../skills/shared/new-module-folder.md).
 
 ---
 

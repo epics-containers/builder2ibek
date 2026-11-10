@@ -76,6 +76,10 @@ Each concept should live in exactly one place:
 - `shared/find-*.md` — filesystem search patterns (module path, boot script, IOC XMLs)
 - `shared/builder-py-analysis.md` — how to read a builder.py systematically
 - `shared/vxworks-to-rtems-differences.md` — VxWorks vs RTEMS API differences
+- `shared/module-special-cases.md` — per-module rulings (won't convert,
+  replaced, moved, fixed location or casing)
+- `shared/new-module-folder.md` — the checks and the user question before any
+  new module folder is created
 - `shared/module-rename-map.md` — old DLS → epics-containers module/verb renames
   for raw-IOC conversion (`/ioc-convert-raw`)
 - `vdct-conversion/SKILL.md` — VDCT → msi conversion and `auto_*` derivation

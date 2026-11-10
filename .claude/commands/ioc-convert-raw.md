@@ -283,7 +283,9 @@ Write the reconstructed entities to `$INSTANCE_DIR/config/ioc.yaml` (header,
 `ioc_name`, `description`, `entities:` — mirror the format of an existing
 converted IOC). Then, exactly as `/ioc-convert` Phase 1e, enumerate every
 `module.Entity` and collect those missing a support YAML or entity model,
-checking **both** submodules. Tell the user: "Reconstructed N entities; M
+checking **both** submodules. A module with no folder in either needs the
+user's answer first, as in Phase 1e step 5: follow
+[new-module-folder.md](../skills/shared/new-module-folder.md). Tell the user: "Reconstructed N entities; M
 modules need support YAMLs: [list]."
 
 ---
