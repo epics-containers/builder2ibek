@@ -2,7 +2,7 @@
 Dataclasses for representing XML and YAML in memory
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +55,15 @@ class Entity(dict[str, Any]):
         return self.__command__ == "delete"
 
 
+@dataclass
+class WontConvert:
+    """The entities of one type that an IOC drops, and why"""
+
+    reason: str
+    count: int = 0
+    notes: list[str] = field(default_factory=list)
+
+
 class Generic_IOC(BaseModel):
     model_config = ConfigDict(
         extra="allow",
@@ -71,6 +80,37 @@ class Generic_IOC(BaseModel):
     # IOCs whose binary includes the BLGui module
     blgui: bool = Field(default=False, exclude=True)
     already_converted: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
+    # entity types left out of the ioc.yaml on purpose, keyed by entity type
+    wont_convert_types: dict[str, WontConvert] = Field(
+        default_factory=dict, exclude=True
+    )
+
+    def wont_convert(self, entity: Entity, reason: str, note: str = ""):
+        """
+        Leave an entity out of the ioc.yaml because builder2ibek won't convert
+        it, and record a warning for the user. Warnings are grouped by entity
+        type: one per type per IOC, carrying a count and any per-entity notes.
+        """
+        entity.delete_me()
+        record = self.wont_convert_types.setdefault(
+            str(entity.type), WontConvert(reason)
+        )
+        record.count += 1
+        if note:
+            record.notes.append(note)
+
+    def warnings(self) -> list[str]:
+        """One warning per entity type this IOC drops"""
+        ioc = Path(self.source_file).stem
+        lines = []
+        for entity_type, record in self.wont_convert_types.items():
+            plural = "entity" if record.count == 1 else "entities"
+            text = (
+                f"{ioc}: won't convert {record.count} {entity_type} {plural}, "
+                f"left out of the ioc.yaml: {record.reason}"
+            )
+            lines.append("\n".join([text] + [f"  - {n}" for n in record.notes]))
+        return lines
 
 
 # Generic XML classes ##########################################################

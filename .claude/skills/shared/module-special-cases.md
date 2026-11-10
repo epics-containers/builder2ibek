@@ -111,7 +111,46 @@ XMLbuilder asserted and `converters/positioner.py` now checks. If you see
 `motor ... prefix does not match multipositioner ... prefix`, the XML is
 referencing a motor on another device, and `$(P)$(motor)` cannot express it.
 
+## `adPython` — deprecated; use ADExternal
+
+adPython is deprecated in favour of ADExternal. b2i won't convert it,
+whatever `ibek-support-dls` contains: `converters/adPython.py` leaves every
+adPython entity out of the ioc.yaml, and `xml2yaml` and `reconvert` print a
+won't-convert warning naming the IOC, the entity type and the reason. Its
+`ibek-support-dls/adPython` folder is being removed. Don't add a support YAML
+for it, and don't restore its entities by hand in a converted ioc.yaml. Flag
+the IOC to the user as needing ADExternal.
+ADExternal has no support YAML yet. Whether an automatic adPython to ADExternal
+translation is possible is tracked in
+https://github.com/epics-containers/builder2ibek/issues/173.
+
+adPython plugins sit in an areaDetector plugin chain. When another plugin takes
+its input from the dropped plugin (its `NDARRAY_PORT` is the adPython `PORT`),
+the warning lists those entities, and the ioc.yaml fails validation with
+`object <port> not found` until they are rewired or the IOC is ported.
+
+## `procServControl` — not used in containers
+
+procServControl is deprecated for containers: Kubernetes and argocd-monitor
+replace it. b2i won't convert it, whatever `ibek-support-dls` contains:
+`converters/procServControl.py` leaves every procServControl entity
+(`procServControl`, `procServControlGui`) out of the ioc.yaml, and `xml2yaml`
+and `reconvert` print a won't-convert warning naming the IOC, the entity type
+and the reason. Its `ibek-support-dls/procServControl` folder is being
+removed. Don't add a support YAML for it, and don't restore its entities by
+hand in a converted ioc.yaml.
+
+To drop another module the same way, call `ioc.wont_convert(entity, reason)`
+from its converter (`Generic_IOC.wont_convert` in `types.py`).
+
 ## `dlsPLC` — huge and DLS-internal; edit surgically, keep the anchors
+
+dlsPLC is a core DLS support module and stays in `ibek-support-dls` for good.
+It defines how IOCs talk to every type of PLC at DLS, using the DLS standards
+for register assignment. It isn't secret, and a public copy is fine, but it is of no
+use outside DLS, so it doesn't belong in `ibek-support`. When sweeping
+ibek-support-dls for upstreams or open-source candidates, classify it as
+DLS-only and keep it, even if a public mirror turns up.
 
 `ibek-support-dls/dlsPLC/dlsPLC.ibek.support.yaml` is ~6100 lines and 74 entity
 models. Treat it as an existing file to patch, never as a file to (re)generate.

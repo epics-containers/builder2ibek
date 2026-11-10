@@ -16,7 +16,7 @@ from builder2ibek.types import Entity, Generic_IOC
 
 def convert_file(
     xml: Path, yaml: Path, schema: str, description: str = "", blgui: bool = False
-):
+) -> list[str]:
     def tidy_up(yaml):
         # add blank lines between major fields
         for field in [
@@ -28,12 +28,19 @@ def convert_file(
             yaml = re.sub(rf"(\n{field})", "\n\\g<1>", yaml)
         return yaml
 
-    """Convert a single builder XML file into a single ibek YAML"""
+    """
+    Convert a single builder XML file into a single ibek YAML
+
+    Returns the IOC's won't-convert warnings, one per dropped entity type;
+    the caller reports them to the user.
+    """
     yaml.parent.mkdir(parents=True, exist_ok=True)
 
     builder = Builder()
     builder.load(xml)
     ioc = dispatch(builder, xml, yaml.parent, description=description, blgui=blgui)
+
+    warnings = ioc.warnings()
 
     ruamel = YAML()
 
@@ -49,6 +56,8 @@ def convert_file(
 
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
+
+    return warnings
 
 
 def dispatch(
