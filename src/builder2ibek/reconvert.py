@@ -22,7 +22,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 from builder2ibek.convert import convert_file
-from builder2ibek.fastcs_panda import CONTROLLER_YAML, FASTCS_PANDABLOCKS_IMAGE
+from builder2ibek.fastcs_panda import CONTROLLER_YAML
 
 BUILDER_WORK = Path("/dls_sw/work/R3.14.12.7/support")
 BUILDER_PROD = Path("/dls_sw/prod/R3.14.12.7/support")
@@ -110,15 +110,6 @@ def _existing_has_blgui(ioc_yaml: Path) -> bool:
     )
 
 
-def _is_fastcs_panda(folder: Path) -> bool:
-    """True when folder is a fastcs-pandablocks instance (see fastcs_panda)."""
-    values = folder / "values.yaml"
-    return (folder / "config" / CONTROLLER_YAML).is_file() and (
-        values.is_file()
-        and FASTCS_PANDABLOCKS_IMAGE.split(":")[0] in values.read_text()
-    )
-
-
 @dataclass
 class ReconvertResult:
     beamline: str
@@ -133,6 +124,7 @@ class ReconvertResult:
     conversion_errors: list[dict] = field(default_factory=list)
     warnings: list[dict] = field(default_factory=list)
     fastcs: list[dict] = field(default_factory=list)
+    notes: list[dict] = field(default_factory=list)
     validation: list[dict] = field(default_factory=list)
 
 
@@ -181,7 +173,8 @@ def run_reconvert(
         services_folder = services_dir / ioc_name
         ioc_yaml = services_folder / "config" / "ioc.yaml"
         # a dedicated PandA IOC is a fastcs-pandablocks instance once converted
-        if not ioc_yaml.is_file() and not _is_fastcs_panda(services_folder):
+        controller = services_folder / "config" / CONTROLLER_YAML
+        if not ioc_yaml.is_file() and not controller.is_file():
             result.skipped.append({"xml": str(xml), "reason": "no-services-folder"})
             continue
         if only_set and ioc_name not in only_set:
@@ -212,6 +205,9 @@ def run_reconvert(
             result.warnings.extend(
                 {"ioc_name": ioc_name, "warning": w} for w in converted.warnings
             )
+            result.notes.extend(
+                {"ioc_name": ioc_name, "note": n} for n in converted.notes
+            )
             result.fastcs.extend(
                 {"ioc_name": ioc_name, "instance": str(f)}
                 for f in converted.fastcs_instances
@@ -220,7 +216,7 @@ def run_reconvert(
             # is (or would be) a fastcs-pandablocks instance
             if converted.ioc_yaml_written:
                 status = "ok"
-            elif converted.fastcs_instances:
+            elif converted.fastcs_instances and not converted.refused:
                 status = "fastcs"
             else:
                 # another instance already serves its PandA(s); see warnings
@@ -337,6 +333,12 @@ def _render_human(result: ReconvertResult) -> str:
         lines.append("Warnings:")
         for w in result.warnings:
             lines.append("  - " + w["warning"].replace("\n", "\n    "))
+
+    if result.notes:
+        lines.append("")
+        lines.append("Notes:")
+        for n in result.notes:
+            lines.append("  - " + n["note"].replace("\n", "\n    "))
 
     if result.fastcs:
         lines.append("")

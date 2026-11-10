@@ -148,8 +148,9 @@ dispatch, and `xml2yaml` and `reconvert` write fastcs instances instead:
   (`config/ioc.yaml`, `ioc.schema.json` at the folder root or in `config/`,
   the pvlogging blacklist, `runtime-lock.yaml` and the pattern files it lists)
   and names any other file it leaves in `config/`. The new `values.yaml`
-  carries over the ibek one's `securityContext` and `dataVolume.hostPath`; if
-  the ibek one set anything else, it is kept as `values.yaml.ibek`. A real
+  carries over the ibek one's `securityContext` and `dataVolume` (`pvc: true`,
+  or its `hostPath`); if the ibek one set anything else, it is kept as
+  `values.yaml.ibek` (or `.ibek.1`, ... when taken) with a warning. A real
   `Chart.yaml` or `templates/` where the template has a symlink is kept, with
   a warning. Outside a services repo the instance is a folder next to the
   `--yaml` path, and that file is left alone.
@@ -162,20 +163,26 @@ dispatch, and `xml2yaml` and `reconvert` write fastcs instances instead:
 
 Before writing anything, b2i reads every `services/*/config/controller.yaml`,
 in the 0.2.x shape (`controllers[].id` / `address`) or the 0.1.0 one
-(`controller.address` / `pv_prefix`). A PandA whose prefix or address another
-instance already serves is refused, with a warning naming that folder.
-Addresses compare by short hostname, case-insensitive (`panda-01` matches
+(`controller.address` / `pv_prefix`). A folder with `config/controller.yaml`
+is an instance. A PandA is refused, with a warning, when an instance already
+serves its prefix or box, or when its own target folder is an instance serving
+different controllers (the warning has a diff; merge by hand). Boxes compare
+by short hostname, case-insensitive (`panda-01` matches
 `panda-01.diamond.ac.uk`); IP addresses compare whole. For a dedicated IOC
-nothing is written, and a warning lists all its PandAs; for a mixed one that
-PandA's instance is skipped. A target folder that holds anything else (an
-ibek IOC, a hand-made folder) stops the conversion before any file is
-written. An existing instance is never overwritten. When its controllers
-match the XML's (same ids and addresses), a re-run leaves `values.yaml` alone
-and reports any difference in `controller.yaml` as a diff. When they differ
-(a hand-edited id or address) but its `values.yaml` runs fastcs-pandablocks,
-the instance is left alone and a note asks for a manual merge; a mixed IOC's
-ioc.yaml is still written. `reconvert` gives such IOCs status `fastcs`, or
-`refused`.
+nothing is written, and a warning lists all its PandAs; for a mixed one only
+that PandA's instance is skipped. An instance serving exactly the XML's
+controllers is kept as it is, hand edits included. A mixed IOC whose own
+folder is an instance gets no ioc.yaml, with a warning: it was dedicated and
+needs merging by hand.
+
+A target folder that is not an instance and not empty (an ibek IOC other than
+a dedicated IOC's own, a hand-made folder) stops the conversion before any
+file is written, and so does a symlinked folder, `config/`, `values.yaml` or
+`controller.yaml`. xml2yaml prints the error and exits 1.
+
+`dataVolume.hostPath` comes from the IOC's own beamline, not the PandA's
+prefix. `reconvert` gives a dedicated IOC status `fastcs`, or `refused`, and
+passes the notes through in its JSON and summary.
 
 The elements that belong to a PandA: `ADPandABlocks.ADPandABlocks`,
 `ADPandABlocks.MotorSync` (no fastcs equivalent, so it is reported), the

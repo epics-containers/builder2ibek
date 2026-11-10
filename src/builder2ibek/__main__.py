@@ -34,9 +34,7 @@ def main(
 @cli.command()
 def xml2yaml(
     xml: Path = typer.Argument(..., help="Filename of the builder XML file"),
-    yaml: Path | None = typer.Option(
-        None, help="Output file (default: the XML's path with a .yaml suffix)"
-    ),
+    yaml: Path = typer.Option(..., help="Output file"),
     schema: str = typer.Option(
         "/epics/ibek-defs/ioc.schema.json",
         help="Generic IOC schema (added to top of the yaml output)",
@@ -62,13 +60,14 @@ def xml2yaml(
     services/<ioc>/values.yaml and config/controller.yaml. Otherwise each PandA
     gets its own instance, named from its PV prefix, as a sibling of the IOC's
     folder (services/<prefix>/), and the ioc.yaml keeps the other devices.
-    A PandA another instance already serves (same prefix or address) is
-    refused, and an existing instance is never overwritten.
+    A PandA another instance already serves (same prefix or box) is refused
+    with a warning, and an existing instance is never overwritten.
     """
-    if not yaml:
-        yaml = xml.absolute().with_suffix(".yaml")
-
-    result = convert_file(xml, yaml, schema, description=description, blgui=blgui)
+    try:
+        result = convert_file(xml, yaml, schema, description=description, blgui=blgui)
+    except FileExistsError as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(1) from e
     for note in result.notes:
         typer.echo(note)
     for warning in result.warnings:

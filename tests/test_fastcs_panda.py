@@ -228,7 +228,7 @@ def test_dedicated_warns_about_what_is_lost(tmp_path: Path):
     yaml = services / IOC.lower() / "config" / "ioc.yaml"
     result = convert_file(_xml(tmp_path), yaml, SCHEMA)
 
-    motor, plugins, settings = result.warnings
+    motor, plugins, settings = [w for w in result.warnings if "won't convert" in w]
     assert "1 ADPandABlocks.MotorSync" in motor
     assert "does its own data capture" in plugins
     for dropped in (
@@ -387,14 +387,11 @@ def test_rerun_keeps_hand_edits(tmp_path: Path):
 
     result = convert_file(xml, yaml, SCHEMA)
 
+    # same controllers: kept quietly, hand edits and all
     assert (values.read_text(), controller.read_text()) == edited
     assert result.fastcs_instances == [instance, services / "bl01c-mo-panda-02"]
-    (diff,) = [n for n in result.notes if "differs from what builder2ibek" in n]
-    assert str(controller) in diff
-    assert '-      output_dir: "/tmp/opi"' in diff
-    assert '+      output_dir: "/epics/opi"' in diff
-    # the untouched instance gives no diff note
-    assert len([n for n in result.notes if "differs" in n]) == 1
+    assert result.refused == []
+    assert not [w for w in result.warnings if "refused" in w]
 
 
 def test_legacy_folder_is_recreated(tmp_path: Path):
@@ -575,7 +572,7 @@ def test_ibek_values_security_context_and_hostpath_carry_over(tmp_path: Path):
     # nothing else was set, so no backup
     assert not (instance / "values.yaml.ibek").exists()
     (note,) = [n for n in result.notes if "replaced the ibek" in n]
-    assert "carrying over securityContext and dataVolume.hostPath" in note
+    assert "carrying over securityContext, dataVolume.hostPath" in note
 
 
 def test_ibek_values_with_other_keys_are_kept_as_backup(tmp_path: Path):
@@ -588,9 +585,9 @@ def test_ibek_values_with_other_keys_are_kept_as_backup(tmp_path: Path):
 
     assert (instance / "values.yaml.ibek").read_text() == original
     assert "hostNetwork" not in (instance / "values.yaml").read_text()
-    (note,) = [n for n in result.notes if "replaced the ibek" in n]
-    assert str(instance / "values.yaml.ibek") in note
-    assert "hostNetwork, nodeName" in note
+    # the user must merge it: a warning, not a note
+    (warning,) = [w for w in result.warnings if "values.yaml.ibek" in w]
+    assert "hostNetwork, nodeName" in warning
 
 
 def test_ibek_schema_at_the_folder_root_is_removed(tmp_path: Path):
@@ -619,7 +616,7 @@ def test_dedicated_refusal_names_every_panda_left_unwritten(tmp_path: Path):
 
 
 @pytest.mark.parametrize("edit", [("127.0.0.1", "127.0.0.2"), ("PANDA-01", "PANDA-9")])
-def test_hand_edited_controllers_are_left_for_a_manual_merge(
+def test_hand_edited_controllers_refuse_that_panda(
     tmp_path: Path, edit: tuple[str, str]
 ):
     services = _services_repo(tmp_path)
@@ -637,8 +634,9 @@ def test_hand_edited_controllers_are_left_for_a_manual_merge(
     # the mixed IOC's ioc.yaml is still regenerated
     assert result.ioc_yaml_written and yaml.is_file()
     assert controller.read_text() == edited
-    (note,) = [n for n in result.notes if "merge by hand" in n]
-    assert str(controller) in note
+    assert result.refused == ["BL01C-MO-PANDA-01"]
+    (warning,) = [w for w in result.warnings if "serves different controllers" in w]
+    assert str(controller) in warning and "+++ generated" in warning
 
 
 def test_panda_named_like_the_mixed_ioc_gets_its_own_folder(tmp_path: Path):
@@ -691,3 +689,197 @@ def test_ip_addresses_are_not_shortened(tmp_path: Path):
     yaml = services / IOC.lower() / "config" / "ioc.yaml"
     result = convert_file(_xml(tmp_path), yaml, SCHEMA)
     assert result.refused == []
+
+
+# Regressions from review: one per blocking scenario ##########################
+
+MIXED_ONLY = '  <EPICS_BASE.dbpf pv="BL01C-MO-MOTOR-01:VAL" value="1"/>\n'
+
+
+def _other_ioc(tmp_path: Path, name: str, host: str, prefix="BL01C-MO-PANDA-01"):
+    xml = tmp_path / f"{name}.xml"
+    xml.write_text(
+        DEDICATED.format(extra=MIXED_ONLY)
+        .replace("127.0.0.1", host)
+        .replace("BL01C-MO-PANDA-01", prefix)
+    )
+    return xml
+
+
+def test_two_mixed_iocs_same_prefix_different_hosts(tmp_path: Path):
+    # rF: the second IOC's PandA lands on the first's instance folder
+    services = _services_repo(tmp_path)
+    first = _other_ioc(tmp_path, "BL01C-EA-IOC-11", "panda-01.invalid")
+    second = _other_ioc(tmp_path, "BL01C-EA-IOC-12", "panda-77.invalid")
+    convert_file(first, services / "bl01c-ea-ioc-11" / "config" / "ioc.yaml", SCHEMA)
+    controller = services / "bl01c-mo-panda-01" / "config" / "controller.yaml"
+    before = controller.read_text()
+
+    result = convert_file(
+        second, services / "bl01c-ea-ioc-12" / "config" / "ioc.yaml", SCHEMA
+    )
+
+    assert result.refused == ["BL01C-MO-PANDA-01"]
+    assert result.fastcs_instances == []
+    assert controller.read_text() == before
+    (refusal,) = [w for w in result.warnings if "refused" in w]
+    assert "panda-77.invalid" in refusal and "panda-01.invalid" in refusal
+
+
+def test_dedicated_folder_serving_a_different_panda(tmp_path: Path):
+    # rA: the IOC's own folder is an instance for another box
+    services = _services_repo(tmp_path)
+    own = services / IOC.lower() / "config"
+    own.mkdir(parents=True)
+    (own / "controller.yaml").write_text(
+        "controllers:\n  - id: BL01C-EA-PANDA-07\n    address: panda-07.invalid\n"
+    )
+    before = (own / "controller.yaml").read_text()
+
+    result = convert_file(_xml(tmp_path), own / "ioc.yaml", SCHEMA)
+
+    assert result.fastcs_instances == []
+    assert result.refused == ["BL01C-MO-PANDA-01"]
+    assert (own / "controller.yaml").read_text() == before
+    assert not (own / "ioc.yaml").exists()
+    assert [w for w in result.warnings if "serves different controllers" in w]
+
+
+def test_dedicated_ioc_that_becomes_mixed_is_rerun(tmp_path: Path):
+    # rE: the IOC's own folder is its fastcs instance; now it has a motor too
+    services = _services_repo(tmp_path)
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    convert_file(_xml(tmp_path), yaml, SCHEMA)
+    controller = services / IOC.lower() / "config" / "controller.yaml"
+    before = controller.read_text()
+
+    result = convert_file(_xml(tmp_path, MIXED_ONLY), yaml, SCHEMA)
+
+    assert not result.ioc_yaml_written
+    assert not yaml.exists()
+    assert controller.read_text() == before
+    assert result.refused == ["BL01C-MO-PANDA-01"]
+    assert not (services / "bl01c-mo-panda-01").exists()
+    assert [w for w in result.warnings if "not writing an ibek ioc.yaml" in w]
+
+
+@pytest.mark.parametrize("taken", ["file", "symlink"])
+def test_existing_values_ibek_is_never_overwritten(tmp_path: Path, taken: str):
+    # rC
+    services = _services_repo(tmp_path)
+    instance = _ibek_instance(services, "ioc-instance:\n  image: x\n  extraVar: 1\n")
+    outside = tmp_path / "outside.txt"
+    outside.write_text("keep me\n")
+    if taken == "file":
+        (instance / "values.yaml.ibek").write_text("an older backup\n")
+    else:
+        os.symlink(outside, instance / "values.yaml.ibek")
+
+    result = convert_file(_xml(tmp_path), instance / "config" / "ioc.yaml", SCHEMA)
+
+    assert outside.read_text() == "keep me\n"
+    if taken == "file":
+        assert (instance / "values.yaml.ibek").read_text() == "an older backup\n"
+    assert "extraVar" in (instance / "values.yaml.ibek.1").read_text()
+    assert [w for w in result.warnings if "values.yaml.ibek.1" in w]
+
+
+@pytest.mark.parametrize("kind", ["fastcs", "legacy"])
+def test_symlinked_sibling_folder_is_a_conflict(tmp_path: Path, kind: str):
+    # rG, rG2: the sibling instance folder is a symlink out of the repo
+    services = _services_repo(tmp_path)
+    outside = tmp_path / "outside"
+    (outside / "config").mkdir(parents=True)
+    (outside / "user.txt").write_text("mine\n")
+    if kind == "legacy":
+        (outside / "values.yaml").write_text("dev-c7:\n")
+    os.symlink(outside, services / "bl01c-mo-panda-01")
+
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    with pytest.raises(FileExistsError, match="symlinks"):
+        convert_file(_xml(tmp_path, MIXED_DEVICES), yaml, SCHEMA)
+    assert (outside / "user.txt").read_text() == "mine\n"
+    assert sorted(p.name for p in outside.iterdir()) == sorted(
+        ["config", "user.txt"] + (["values.yaml"] if kind == "legacy" else [])
+    )
+    assert not yaml.exists()
+
+
+def test_symlinked_values_yaml_is_a_conflict(tmp_path: Path):
+    # rG3
+    services = _services_repo(tmp_path)
+    shared = tmp_path / "shared-values.yaml"
+    shared.write_text("shared: true\n")
+    own = services / IOC.lower()
+    (own / "config").mkdir(parents=True)
+    (own / "config" / "ioc.yaml").write_text("entities: []\n")
+    os.symlink(shared, own / "values.yaml")
+
+    with pytest.raises(FileExistsError):
+        convert_file(_xml(tmp_path), own / "config" / "ioc.yaml", SCHEMA)
+    assert shared.read_text() == "shared: true\n"
+    assert (own / "config" / "ioc.yaml").exists()
+
+
+def test_half_written_siblings_stop_before_any_write(tmp_path: Path):
+    # r22: two siblings with values.yaml but no controller.yaml
+    services = _services_repo(tmp_path)
+    for n in ("02",):
+        (services / f"bl01c-mo-panda-{n}").mkdir()
+        (services / f"bl01c-mo-panda-{n}" / "values.yaml").write_text("x: 1\n")
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    cmd = [
+        sys.executable,
+        "-m",
+        "builder2ibek",
+        "xml2yaml",
+        str(_xml(tmp_path, SECOND_PANDA + MIXED_DEVICES)),
+        "--yaml",
+        str(yaml),
+    ]
+    run = subprocess.run(cmd, capture_output=True, text=True)
+    assert run.returncode == 1
+    assert run.stderr.startswith("error: ") and "Traceback" not in run.stderr
+    assert not (services / "bl01c-mo-panda-01").exists()
+    assert not yaml.exists()
+
+
+def test_ibek_pvc_volume_is_carried_over(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    instance = _ibek_instance(
+        services, "ioc-instance:\n  image: x\n  dataVolume:\n    pvc: true\n"
+    )
+    result = convert_file(_xml(tmp_path), instance / "config" / "ioc.yaml", SCHEMA)
+    values = _load(instance / "values.yaml")["ioc-instance"]
+    assert values["dataVolume"] == {"pvc": True}
+    assert not (instance / "values.yaml.ibek").exists()
+    assert [n for n in result.notes if "dataVolume.pvc" in n]
+
+
+def test_data_volume_follows_the_iocs_beamline(tmp_path: Path):
+    # a PandA from another beamline's prefix still writes to this IOC's data
+    xml = _other_ioc(tmp_path, IOC, "127.0.0.1", prefix="BL22I-MO-PANDA-09")
+    services = _services_repo(tmp_path)
+    result = convert_file(xml, services / IOC.lower() / "config" / "ioc.yaml", SCHEMA)
+    values = _load(result.fastcs_instances[0] / "values.yaml")["ioc-instance"]
+    assert values["dataVolume"]["hostPath"] == "/dls/b01-1/data"
+
+
+def test_reconvert_surfaces_notes_and_finds_instances_by_controller(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    xml = _xml(tmp_path)
+    monkeypatch.setattr(rc, "discover_xmls", lambda _b: ([xml], xml.parent, "work"))
+    services = _services_repo(tmp_path / "services-repo")
+    cfg = services / IOC.lower() / "config"
+    cfg.mkdir(parents=True)
+    (cfg / "ioc.yaml").write_text("ioc_name: x\ndescription: d\nentities: []\n")
+    rc.run_reconvert("BL01C", services.parent, validate=False)
+
+    # a hand-written values.yaml with another image is still an instance
+    (cfg.parent / "values.yaml").write_text("ioc-instance:\n  image: mine\n")
+    result, code = rc.run_reconvert("BL01C", services.parent, validate=False)
+    assert code == 0
+    assert result.reconverted == [{"ioc_name": IOC.lower(), "status": "fastcs"}]
+    assert [n for n in result.notes if "kept the existing" in n["note"]]
+    assert "Notes:" in rc._render_human(result)

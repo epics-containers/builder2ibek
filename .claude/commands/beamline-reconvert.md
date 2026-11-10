@@ -57,11 +57,14 @@ entity type and reason), each entry in `fastcs` (fastcs-pandablocks
 instances written for ADPandABlocks PandAs; a dedicated PandA IOC has
 `status: fastcs` and no ioc.yaml to validate, see the `ADPandABlocks` section
 of [module-special-cases.md](../skills/shared/module-special-cases.md)). A
-dedicated PandA IOC with `status: refused` wrote nothing because another
-instance already serves one of its PandAs: its old ioc.yaml is kept as it
+PandA IOC with `status: refused` wrote nothing for its PandAs (another
+instance serves them, or its folder serves different controllers), or is a
+mixed IOC whose own folder is a fastcs instance: its old ioc.yaml is kept as it
 was, it is not validated, and it must be resolved by hand using the refusal
 warning, which names the folder that serves the PandA,
-validation pass/fail counts with stderr tails for any failure. Then run
+each entry in `notes` (what was written, kept or removed; anything needing
+action is in `warnings`), validation pass/fail counts with stderr tails for
+any failure. Then run
 `git -C <services-repo> diff --stat` to show the file delta.
 
 Do not commit anything. Suggest:

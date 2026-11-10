@@ -70,7 +70,7 @@ def convert_file(
         if not split.dedicated:
             record_wont_convert(ioc, split, fastcs.outcome())
         result.warnings = ioc.warnings() + fastcs.warnings
-        if split.dedicated:
+        if split.dedicated or fastcs.ioc_yaml_refused:
             result.ioc_yaml_written = False
             return result
     else:
