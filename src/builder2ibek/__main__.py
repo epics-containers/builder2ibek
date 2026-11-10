@@ -54,7 +54,9 @@ def xml2yaml(
     if not yaml:
         yaml = xml.absolute().with_suffix("yaml")
 
-    convert_file(xml, yaml, schema, description=description, blgui=blgui)
+    warnings = convert_file(xml, yaml, schema, description=description, blgui=blgui)
+    for warning in warnings:
+        typer.echo(f"warning: {warning}", err=True)
 
 
 @cli.command()

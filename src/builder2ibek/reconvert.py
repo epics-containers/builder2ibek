@@ -121,6 +121,7 @@ class ReconvertResult:
     skipped: list[dict] = field(default_factory=list)
     reconverted: list[dict] = field(default_factory=list)
     conversion_errors: list[dict] = field(default_factory=list)
+    warnings: list[dict] = field(default_factory=list)
     validation: list[dict] = field(default_factory=list)
 
 
@@ -193,9 +194,12 @@ def run_reconvert(
             # Route any stray converter prints to stderr so `--json` on
             # stdout stays parseable.
             with contextlib.redirect_stdout(sys.stderr):
-                convert_file(
+                warnings = convert_file(
                     xml, ioc_yaml, IOC_SCHEMA, description=description, blgui=blgui
                 )
+            result.warnings.extend(
+                {"ioc_name": ioc_name, "warning": w} for w in warnings
+            )
             result.reconverted.append({"ioc_name": ioc_name, "status": "ok"})
         except Exception as e:  # noqa: BLE001 — report any converter error
             result.conversion_errors.append(
@@ -287,6 +291,7 @@ def _render_human(result: ReconvertResult) -> str:
     lines.append(f"Reconverted:   {len(result.reconverted)}")
     lines.append(f"Skipped:       {len(result.skipped)}")
     lines.append(f"Conversion errors: {len(result.conversion_errors)}")
+    lines.append(f"Warnings:      {len(result.warnings)}")
     if not result.validate:
         lines.append("Validation:    skipped (--no-validate)")
     else:
@@ -299,6 +304,12 @@ def _render_human(result: ReconvertResult) -> str:
         lines.append("Conversion errors:")
         for err in result.conversion_errors:
             lines.append(f"  - {err['ioc_name']}: {err['error']}")
+
+    if result.warnings:
+        lines.append("")
+        lines.append("Warnings:")
+        for w in result.warnings:
+            lines.append("  - " + w["warning"].replace("\n", "\n    "))
 
     failed = [v for v in result.validation if v["status"] == "fail"]
     if failed:
