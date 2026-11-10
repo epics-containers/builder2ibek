@@ -236,13 +236,6 @@ def dev_c7(
     json_out: bool = typer.Option(
         False, "--json", help="Emit the plan as JSON on stdout"
     ),
-    enable: bool = typer.Option(
-        False,
-        "--enable",
-        help="Write new folders with global.enabled: true (default false, so "
-        "each IOC is deployed only after it is stopped on its IOC server). "
-        "manualstart IOCs are always written disabled.",
-    ),
     init_dir: Path | None = typer.Option(
         None,
         help="DLS init configuration: <server>/soft-iocs and real-iocs "
@@ -264,15 +257,14 @@ def dev_c7(
     Live IOCs are those in the init launch lists; each one's version comes
     from the redirect table. Live IOCs with no redirect entry, Windows,
     vxWorks and RTEMS IOCs, IOCs that already have a services folder, and
-    retired IOCs are reported and left out. New folders are written with
-    global.enabled: false unless --enable is given.
+    retired IOCs are reported and left out. The IOCs keep running on their
+    servers: never deploy a folder while its IOC runs there.
     """
     code = devc7_cli(
         beamline,
         services_repo,
         apply=apply,
         json_out=json_out,
-        enable=enable,
         init_dir=init_dir,
         redirect_table=redirect_table,
         dls_sw=dls_sw,

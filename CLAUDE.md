@@ -51,8 +51,8 @@ grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -m
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 #   --blgui  emit BLGui.status/device; only when the generic IOC binary has BLGui
 
-# Add a beamline's live Linux IOCs as dev-c7 legacy IOCs, written disabled
-# (dry run; --apply writes; --enable writes them enabled):
+# Add a beamline's live Linux IOCs as dev-c7 legacy IOCs (dry run; --apply writes).
+# Services-repo files only: never deploy one while its IOC runs on its server.
 uv run builder2ibek dev-c7 <BL08J> --services-repo <path/to/services-repo>
 
 # Testing:

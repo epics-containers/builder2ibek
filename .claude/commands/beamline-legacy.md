@@ -14,22 +14,24 @@ boots today, unchanged, inside a RHEL7 container.
 1. **dev-c7 for everything** (this command). Every live Linux IOC gets a
    `services/<ioc-name>/` folder made from `services/.legacy_ioc_template`.
    Its `values.yaml` holds a `dev-c7:` key that points at the IOC's existing
-   build, so there is no conversion risk. Each folder is written with
-   `global.enabled: false`. The cutover is **per IOC**: stop the IOC on its
-   IOC server, or remove it from that server's `soft-iocs`, and only then set
-   `enabled: true` and deploy its cluster copy. With hostNetwork, two running
-   copies would serve the same PVs.
+   build, so there is no conversion risk. Phase 1 **adds folders only**: the
+   IOCs keep running on their IOC servers. Deploying is a separate, per-IOC
+   cutover (Step 5) done outside builder2ibek.
 2. **ibek per IOC, when ready** (`/ioc-convert`). Converting an IOC finds the
    `dev-c7:` folder, deletes it and recreates it from `.ioc_template`
    ([CLAUDE.md](../../CLAUDE.md), `/ioc-convert` step 1a). Each conversion
    is one commit that replaces one legacy folder.
 
-**Rollback** is a revert plus a restart. Reverting the phase 2 commit brings
-back the IOC's dev-c7 folder. Reverting the phase 1 change (or setting
-`enabled: false`) removes the cluster copy; then restart the IOC on its IOC
-server (and restore its `soft-iocs` entry if it was removed).
+> **Never deploy a legacy services folder while its IOC is running on its
+> IOC server.** With hostNetwork, both copies would serve the same PVs.
+> Either don't deploy the service yet, or deploy it and stop it at once
+> (e.g. `ec stop <service>`). The plan output and the top of each written
+> `values.yaml` repeat this warning.
 
-This command only writes services-repo files. It never starts an IOC.
+This command only writes services-repo files. It never deploys or starts an
+IOC, and it does not touch the deployment repo: under ArgoCD the deployment
+repo alone decides what runs (it sets `global.enabled` for every service), so
+a values-file flag in the services repo could not stop anything.
 
 ---
 
@@ -78,10 +80,10 @@ The dev-c7 chart (2025.11.1) calls the location key `epicsDomain` and
 upper-cases it. No per-IOC `securityContext` is written: `services/values.yaml`
 shares one with every dev-c7 IOC.
 
-Every new folder gets a top-level `global: {enabled: false}` with a comment
-saying why, which renders `replicas: 0`. `--enable` writes enabled folders
-instead, except for `manualstart` IOCs: procServ keeps those stopped until
-someone starts them, so their cluster copy is always written disabled.
+Each written `values.yaml` starts with a comment naming the IOC's server and
+warning not to deploy while it runs there. `manualstart` IOCs (procServ
+`-w --noautorestart`, normally stopped) are marked "manualstart: keep stopped
+after deploying" in the plan and in that comment.
 
 Skipped and reported: Windows, vxWorks and RTEMS IOCs, other non-x86_64
 targets, Malcolm YAML entries, non-IOC services (EtherCAT scanners, Odin
@@ -95,7 +97,8 @@ Show the plan. Call out:
 
 - `work` rows: the IOC runs an unreleased build from `/dls_sw/work`. It keeps
   `iocPath`, and needs a release before its ibek conversion.
-- `no (manualstart)` rows: normally stopped, so they stay disabled.
+- `[manualstart: keep stopped after deploying]` rows: normally stopped on
+  their server, so keep the cluster copy stopped too.
 - duplicate redirect entries: fix the table; a duplicate breaks the boot on
   Linux.
 - launch arguments: check the IOC doesn't need them in the cluster.
@@ -107,14 +110,34 @@ Show the plan. Call out:
 uv run builder2ibek dev-c7 $1 --services-repo <services-repo> --apply
 ```
 
-This writes the `add` rows. It checks every target first and writes nothing
-if any of them exists, so it never overwrites a folder or half-applies; a
-re-run skips everything it wrote before. Chart symlinks are copied as
-symlinks. Hand-edit any value the user changed in Step 3, then leave the
-commit to the user.
+This writes the `add` rows. The plan is rebuilt from live NFS, so compare
+the `--apply` output with the dry-run plan the user reviewed and raise any
+difference. Every target is checked for existence (including a dangling
+link) before any write, and nothing is written if one exists, so a folder is
+never overwritten. An I/O error part way through can leave the folders
+written so far; a re-run skips them. Chart symlinks are copied as symlinks.
+Hand-edit any value the user changed in Step 3, then leave the commit to the
+user.
 
-## Step 5 — Cut over one IOC at a time
+## Step 5 — Cut over one IOC at a time (outside builder2ibek)
 
-For each IOC: stop it on its IOC server (or remove it from `soft-iocs`), set
-`enabled: true` in its `values.yaml`, and deploy. Never enable a cluster copy
-while the server copy can still run.
+For each IOC, once the services commit is merged:
+
+1. Stop the IOC on its IOC server (or remove it from that server's
+   `soft-iocs`).
+2. Deploy and start its cluster copy: `ec deploy` / `ec start`, or enable it
+   in the deployment repo.
+
+Never start a cluster copy while the server copy can still run.
+
+## Rollback
+
+1. Stop the cluster copy: `ec stop <service>`, or `enabled: false` for it in
+   the deployment repo. Reverting the services commit alone does not stop a
+   running Application.
+2. Wait for the pod to go.
+3. Restart the IOC on its IOC server (and restore its `soft-iocs` entry if
+   it was removed).
+
+For an IOC already converted in phase 2, reverting that commit brings back
+its dev-c7 folder.

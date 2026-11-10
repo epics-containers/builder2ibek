@@ -18,10 +18,10 @@ from:
 An IOC that is live but has no redirect entry cannot boot, so it is skipped;
 the report shows its newest build under ``/dls_sw/prod/<epics>/ioc/<PREFIX>/``.
 
-Every new folder is written with ``global.enabled: false`` unless asked
-otherwise: the IOC must be stopped on its IOC server before its cluster copy
-is deployed, because with hostNetwork both copies would serve the same PVs.
-A ``manualstart`` IOC is always written disabled.
+The IOCs keep running on their IOC servers. A folder written here must not
+be deployed while its IOC runs there: with hostNetwork both copies would
+serve the same PVs. The plan output and each values.yaml say so. Deploying
+is done outside builder2ibek (``ec`` or the deployment repo).
 
 Nothing here writes outside the services repo.
 """
@@ -47,7 +47,6 @@ REDIRECT_TABLE = DLS_SW / "prod/etc/redirector/redirect_table"
 DEFAULT_EPICS = "R3.14.12.7"
 TEMPLATE = ".legacy_ioc_template"
 PLACEHOLDER_RE = re.compile(r"^([ \t]*)iocVersion:.*REPLACE.*$", re.MULTILINE)
-DEVC7_KEY_RE = re.compile(r"^dev-c7:", re.MULTILINE)
 
 # Launch-list entries that start a service rather than an IOC (from the
 # DLS-wide server sweep).
@@ -55,6 +54,16 @@ NON_IOC_SCRIPT_RE = re.compile(
     r"(scanner|stOdinServer|stFrameReceiver\d+|stFrameProcessor\d+|stMetaWriter"
     r"|stEigerFan|stControlServer|stLiveViewMerge)\.sh"
 )
+MANUALSTART_NOTE = "manualstart: keep stopped after deploying"
+WARNING = """\
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+WARNING: these IOCs still run on their IOC servers.
+Do NOT deploy a legacy services folder while its IOC is running on its
+server: both would serve the same PVs (hostNetwork). Either don't deploy the
+service yet, or deploy it and stop it at once (e.g. ec stop <service>).
+Cut over one IOC at a time: stop it on its server, then start the cluster
+copy. IOCs marked manualstart: keep stopped after deploying.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
 PROD_RE = re.compile(
     r"^/dls_sw/prod/(?P<epics>[^/]+)/ioc/(?P<domain>[^/]+)/(?P<name>[^/]+)"
     r"/(?P<version>[^/]+)/(?P<rest>.+)$"
@@ -86,8 +95,8 @@ class PlanEntry:
     boot: str = ""
     servers: list[str] = field(default_factory=list)
     values: dict[str, object] = field(default_factory=dict)
-    enabled: bool = False
-    enabled_comment: str = ""  # why the folder is written disabled
+    manualstart: bool = False  # normally stopped on its server
+    header: str = ""  # warning comment for the top of values.yaml
     notes: list[str] = field(default_factory=list)
 
 
@@ -270,7 +279,6 @@ def build_plan(
     init_dir: Path | None = None,
     redirect_table: Path | None = None,
     dls_sw: Path = DLS_SW,
-    enable: bool = False,
 ) -> Plan:
     """Plan the folders. ``init_dir`` and ``redirect_table`` default to their
     place under ``dls_sw``."""
@@ -355,19 +363,15 @@ def build_plan(
                 else "no prod build yet"
             )
         servers = ", ".join(e.server for e in launches[ioc])
-        manual = [e.server for e in launches[ioc] if e.manualstart]
-        if manual:
-            entry.enabled_comment = (
-                f"manualstart on {', '.join(manual)}: procServ keeps it stopped"
-                " until someone starts it, so the cluster copy is not started either"
-            )
-        elif not enable:
-            entry.enabled_comment = (
-                f"Not deployed until the IOC is stopped on {servers} (or removed"
-                " from its soft-iocs): with hostNetwork both copies would serve the"
-                " same PVs. Set enabled: true to deploy."
-            )
-        entry.enabled = not entry.enabled_comment
+        entry.manualstart = any(e.manualstart for e in launches[ioc])
+        entry.header = (
+            f"WARNING: this IOC still runs on {servers}. Do not deploy this"
+            " service while it runs there: both would serve the same PVs"
+            " (hostNetwork). Stop it on its server first."
+        )
+        if entry.manualstart:
+            entry.notes.append(MANUALSTART_NOTE)
+            entry.header += f" {MANUALSTART_NOTE[0].upper()}{MANUALSTART_NOTE[1:]}."
         entry.action = "add"
     return plan
 
@@ -379,19 +383,17 @@ def _scalar(value: object) -> str:
     return text if loaded == text and ":" not in text else json.dumps(text)
 
 
-def render_values(
-    template: str, values: dict[str, object], disabled_because: str = ""
-) -> str:
+def render_values(template: str, values: dict[str, object], header: str = "") -> str:
     """Replace the template's iocVersion placeholder with ``values``,
-    keeping every comment. ``disabled_because`` adds ``global.enabled:
-    false`` with that comment."""
-    if disabled_because:
-        match = DEVC7_KEY_RE.search(template)
-        if not match:
-            raise ValueError(f"no dev-c7: key in {TEMPLATE}/values.yaml")
-        comment = "".join(f"# {line}\n" for line in textwrap.wrap(disabled_because, 76))
-        block = f"{comment}global:\n  enabled: false\n\n"
-        template = template[: match.start()] + block + template[match.start() :]
+    keeping every comment. ``header`` becomes a comment at the top, after
+    any yaml-language-server modeline."""
+    if header:
+        comment = "".join(f"# {line}\n" for line in textwrap.wrap(header, 76))
+        first, nl, rest = template.partition("\n")
+        if first.startswith("# yaml-language-server"):
+            template = f"{first}{nl}{comment}{rest}"
+        else:
+            template = comment + template
     lines: list[str] = []
     for key, value in values.items():
         if isinstance(value, list):
@@ -412,8 +414,10 @@ def render_values(
 
 
 def apply_plan(plan: Plan) -> list[Path]:
-    """Write the planned folders. Every target is checked first, and nothing
-    is written if any of them exists (as a file, folder or dangling link)."""
+    """Write the planned folders. Every target is checked for existence (as a
+    file, folder or dangling link) before any write, and nothing is written
+    if one exists. An I/O error part way through leaves the folders written
+    so far; a re-run skips them."""
     services = Path(plan.services_repo) / "services"
     template = services / TEMPLATE
     if not (template / "values.yaml").is_file():
@@ -421,8 +425,7 @@ def apply_plan(plan: Plan) -> list[Path]:
     template_text = (template / "values.yaml").read_text()
     adds = [e for e in plan.entries if e.action == "add"]
     rendered = {
-        e.folder: render_values(template_text, e.values, e.enabled_comment)
-        for e in adds
+        e.folder: render_values(template_text, e.values, e.header) for e in adds
     }
     clashes = [e.folder for e in adds if os.path.lexists(services / e.folder)]
     if clashes:
@@ -445,25 +448,21 @@ def render_plan(plan: Plan, applied: bool) -> str:
         "sources: " + ", ".join(plan.sources),
         "",
     ]
-    rows = [("IOC", "ACTION", "VERSION", "SOURCE", "ENABLED", "DETAIL")]
+    rows = [("IOC", "ACTION", "VERSION", "SOURCE", "DETAIL")]
     for e in plan.entries:
         if e.action == "add":
             detail = ", ".join(f"{k}={v}" for k, v in e.values.items())
-            if e.enabled:
-                enabled = "yes"
-            elif e.enabled_comment.startswith("manualstart"):
-                enabled = "no (manualstart)"
-            else:
-                enabled = "no"
+            if e.manualstart:
+                detail = f"[{MANUALSTART_NOTE}] {detail}"
         else:
-            detail, enabled = e.reason, "-"
-        rows.append((e.ioc, e.action, e.version or "-", e.source, enabled, detail))
-    widths = [max(len(r[i]) for r in rows) for i in range(5)]
+            detail = e.reason
+        rows.append((e.ioc, e.action, e.version or "-", e.source, detail))
+    widths = [max(len(r[i]) for r in rows) for i in range(4)]
     for row in rows:
         out.append(
-            "  ".join(c.ljust(w) for c, w in zip(row[:5], widths, strict=True))
+            "  ".join(c.ljust(w) for c, w in zip(row[:4], widths, strict=True))
             + "  "
-            + row[5]
+            + row[4]
         )
     notes = [(e.ioc, n) for e in plan.entries for n in e.notes]
     if notes:
@@ -474,14 +473,8 @@ def render_plan(plan: Plan, applied: bool) -> str:
         out += ["", "retired (in the redirect table, in no launch list), left out:"]
         out += [f"  {r['ioc']}: {r['boot']}" for r in plan.retired]
     adds = sum(e.action == "add" for e in plan.entries)
-    disabled = sum(e.action == "add" and not e.enabled for e in plan.entries)
     verb = "added" if applied else "to add (dry run; --apply writes them)"
-    out += [
-        "",
-        f"{adds} folder(s) {verb}; {disabled} with global.enabled: false.",
-        "Deploy each IOC only after stopping it on its IOC server: with"
-        " hostNetwork both copies would serve the same PVs.",
-    ]
+    out += ["", f"{adds} folder(s) {verb}", "", WARNING]
     return "\n".join(out)
 
 
@@ -491,7 +484,6 @@ def devc7_cli(
     *,
     apply: bool = False,
     json_out: bool = False,
-    enable: bool = False,
     init_dir: Path | None = None,
     redirect_table: Path | None = None,
     dls_sw: Path = DLS_SW,
@@ -506,7 +498,6 @@ def devc7_cli(
             init_dir=init_dir,
             redirect_table=redirect_table,
             dls_sw=dls_sw,
-            enable=enable,
         )
         if apply:
             apply_plan(plan)

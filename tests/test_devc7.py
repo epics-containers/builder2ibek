@@ -137,10 +137,8 @@ def services_repo(tmp_path: Path) -> Path:
     return repo
 
 
-def _plan(
-    services_repo: Path, dls_sw: Path, prefix: str = "BL99J", enable: bool = False
-) -> devc7.Plan:
-    return devc7.build_plan(prefix, services_repo, dls_sw=dls_sw, enable=enable)
+def _plan(services_repo: Path, dls_sw: Path, prefix: str = "BL99J") -> devc7.Plan:
+    return devc7.build_plan(prefix, services_repo, dls_sw=dls_sw)
 
 
 def _by_ioc(plan: devc7.Plan) -> dict[str, devc7.PlanEntry]:
@@ -173,19 +171,20 @@ def test_launch_arguments_noted(services_repo, dls_sw):
     assert "launch arguments on bl99j-ea-serv-01: 5066" in entry.notes
 
 
-def test_new_folders_disabled_unless_enabled(services_repo, dls_sw):
+def test_header_warns_against_double_running(services_repo, dls_sw):
     entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-MO-IOC-01"]
-    assert not entry.enabled
-    assert "stopped on bl99j-mo-serv-01" in entry.enabled_comment
-    entry = _by_ioc(_plan(services_repo, dls_sw, enable=True))["BL99J-MO-IOC-01"]
-    assert entry.enabled
-    assert entry.enabled_comment == ""
+    assert not entry.manualstart
+    assert entry.header.startswith(
+        "WARNING: this IOC still runs on bl99j-mo-serv-01. Do not deploy"
+    )
+    assert "same PVs" in entry.header
 
 
-def test_manualstart_always_disabled(services_repo, dls_sw):
-    entry = _by_ioc(_plan(services_repo, dls_sw, enable=True))["BL99J-MO-IOC-06"]
-    assert not entry.enabled
-    assert entry.enabled_comment.startswith("manualstart on bl99j-mo-serv-01")
+def test_manualstart_marked(services_repo, dls_sw):
+    entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-MO-IOC-06"]
+    assert entry.manualstart
+    assert devc7.MANUALSTART_NOTE in entry.notes
+    assert entry.header.endswith("Manualstart: keep stopped after deploying.")
 
 
 def test_same_domain_as_location_needs_no_domain(services_repo, dls_sw):
@@ -303,12 +302,9 @@ def test_apply_writes_folders(services_repo, dls_sw):
     assert "REPLACE" not in text
     assert "# work ####" in text  # comments kept
     assert "securityContext" not in text
-    assert "# Not deployed until the IOC is stopped on bl99j-mo-serv-01" in text
+    assert "enabled" not in text
     values = YAML(typ="safe").load(text)
-    assert values == {
-        "global": {"enabled": False},
-        "dev-c7": {"iocVersion": "2-3", "epicsDomain": "BL99J"},
-    }
+    assert values == {"dev-c7": {"iocVersion": "2-3", "epicsDomain": "BL99J"}}
 
     bl = YAML(typ="safe").load(
         (services_repo / "services/bl99j-bl-ioc-07/values.yaml").read_text()
@@ -318,14 +314,34 @@ def test_apply_writes_folders(services_repo, dls_sw):
     ]
 
 
-def test_apply_enabled(services_repo, dls_sw):
-    devc7.apply_plan(_plan(services_repo, dls_sw, enable=True))
-    text = (services_repo / "services/bl99j-mo-ioc-01/values.yaml").read_text()
-    assert "global:" not in text
-    manual = YAML(typ="safe").load(
-        (services_repo / "services/bl99j-mo-ioc-06/values.yaml").read_text()
-    )
-    assert manual["global"] == {"enabled": False}
+@pytest.mark.parametrize(
+    "folder, keys",
+    [
+        ("bl99j-mo-ioc-01", {"iocVersion": "2-3", "epicsDomain": "BL99J"}),
+        (
+            "bl99j-mo-ioc-06",
+            {"iocPath": "/dls_sw/work/R3.14.12.7/support/BL99J-BUILDER/iocs"},
+        ),
+        (
+            "bl99j-bl-ioc-07",
+            {
+                "workingDir": f"{PROD}/BL/1-0",
+                "args": ["stdio-expose ./bin/linux-x86_64/stBL99J-BL-IOC-07.boot"],
+            },
+        ),
+    ],
+)
+def test_written_values_parse_back(services_repo, dls_sw, folder, keys):
+    devc7.apply_plan(_plan(services_repo, dls_sw))
+    text = (services_repo / "services" / folder / "values.yaml").read_text()
+    assert YAML(typ="safe").load(text) == {"dev-c7": keys}
+    lines = text.splitlines()
+    assert lines[0].startswith("# yaml-language-server")
+    assert lines[1].startswith("# WARNING: this IOC still runs on")
+    comment = " ".join(line[2:] for line in lines[1:5] if line.startswith("# "))
+    assert "Do not deploy this service while it runs there" in comment
+    if folder == "bl99j-mo-ioc-06":
+        assert "Manualstart: keep stopped after deploying." in comment
 
 
 @pytest.mark.parametrize("kind", ["folder", "dangling-link"])
@@ -364,11 +380,12 @@ def test_apply_twice_adds_nothing(services_repo, dls_sw):
     )
 
 
-def test_render_values_disabled():
-    text = devc7.render_values("# head\n\ndev-c7:\n", {"iocVersion": "1-0"}, "why")
-    assert text == (
-        "# head\n\n# why\nglobal:\n  enabled: false\n\ndev-c7:\n  iocVersion: 1-0\n"
-    )
+def test_render_values_header():
+    template = "# yaml-language-server: x\n\ndev-c7:\n"
+    text = devc7.render_values(template, {"iocVersion": "1-0"}, "why")
+    assert text == "# yaml-language-server: x\n# why\n\ndev-c7:\n  iocVersion: 1-0\n"
+    text = devc7.render_values("dev-c7:\n", {"iocVersion": "1-0"}, "why")
+    assert text == "# why\ndev-c7:\n  iocVersion: 1-0\n"
 
 
 def test_render_values_tab_indent():
@@ -418,6 +435,8 @@ def test_cli_dry_run_and_json(services_repo, dls_sw):
     assert result.exit_code == 0, result.output
     assert "BL99J-MO-IOC-01" in result.output
     assert "dry run" in result.output
+    assert devc7.WARNING in result.output
+    assert f"[{devc7.MANUALSTART_NOTE}]" in result.output
     assert not (services_repo / "services/bl99j-mo-ioc-01").exists()
 
     result = runner.invoke(cli, [*_cli_args(services_repo, dls_sw), "--json"])
@@ -432,6 +451,7 @@ def test_cli_apply(services_repo, dls_sw):
     result = CliRunner().invoke(cli, [*_cli_args(services_repo, dls_sw), "--apply"])
     assert result.exit_code == 0, result.output
     assert (services_repo / "services/bl99j-mo-ioc-01/values.yaml").is_file()
+    assert devc7.WARNING in result.output
 
 
 def test_cli_explicit_sources(services_repo, dls_sw, tmp_path):
