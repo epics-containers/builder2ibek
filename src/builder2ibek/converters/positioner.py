@@ -19,13 +19,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type == "motorpositioner":
         entity.remove("name")
 
-        # Find the dls_pmac_asyn_motor whose name = original motorpositioner.motor.
-        # There is also dls_pmac_cs_asyn_motor but I don't need it for B21 IOCs,
-        # so leave it out of the search for now.
-        # Get the motor's PV and EGU, the motor's PV is calculated by concatenating
-        # its P and M params.
-        # Set motorpositioner.motor = motor's PV.
-        # Set motorpositioner.EGU = motor's EGU.
+        # motorpositioner.template links to the motor as $(P)$(motor), with P
+        # taken from the parent multipositioner. So motor is the motor record's
+        # suffix, not its full PV: M for pmac and basic motors, Q for
+        # softMotorForPiezo. As in XMLbuilder, the motor's P must match the
+        # parent's, or the links would point at another device.
+        # EGU is copied from the motor.
         motor_types = (
             "dls_pmac_asyn_motor",
             "dls_pmac_asyn_motor_no_coord",
@@ -45,16 +44,26 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             )
 
         motor = motors[0]
-        # softMotorForPiezo uses P+Q; pmac/basic motors use P+M
-        if motor.get("type", "").endswith("softMotorForPiezo"):
-            motor_pv = motor.get("P", "") + motor.get("Q", "")
-        else:
-            try:
-                motor_pv = motor["P"] + motor["M"]
-            except KeyError as ex:
-                raise ValueError(
-                    f"Motor '{motor['name']}' missing required attribute {ex!s}"
-                ) from ex
+        parents = [
+            e
+            for e in ioc.raw_entities
+            if e.get("type", "").endswith("multipositioner")
+            and e.get("name") == entity.MP
+        ]
+        if len(parents) != 1:
+            raise ValueError(
+                f"Expected one multipositioner with name '{entity.MP}', "
+                f"found {len(parents)}"
+            )
+        if motor.get("P") != parents[0].get("P"):
+            raise ValueError(
+                f"Motor '{motor['name']}' prefix '{motor.get('P')}' does not match "
+                f"multipositioner '{entity.MP}' prefix '{parents[0].get('P')}'"
+            )
+
+        motor_pv = motor.get("M", motor.get("Q"))
+        if motor_pv is None:
+            raise ValueError(f"Motor '{motor['name']}' has neither M nor Q")
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
 
