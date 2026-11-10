@@ -86,7 +86,7 @@ fi
 # until the duplicate is resolved. Keep this list short and give every entry a
 # reason; it is not a way to add new duplicates.
 # Each entry is "folderA folderB", the two folders relative to the repo root
-# and sorted, e.g. "ibek-support-dls/foo ibek-support/foo".
+# and sorted in C (byte) order, e.g. "ibek-support-dls/foo ibek-support/foo".
 module_clash_allowlist=(
 )
 
@@ -111,7 +111,7 @@ for def in "${defs[@]}"; do
         continue
     fi
     pair=$(printf '%s\n' "${first_folder#"$THISDIR"/}" "${folder#"$THISDIR"/}" \
-        | sort | tr '\n' ' ')
+        | LC_ALL=C sort | tr '\n' ' ')
     allowed=false
     for entry in "${module_clash_allowlist[@]}"; do
         [ "${entry} " = "${pair}" ] && allowed=true
