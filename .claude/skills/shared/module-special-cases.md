@@ -219,12 +219,12 @@ hand in a converted ioc.yaml.
 To drop another module the same way, call `ioc.wont_convert(entity, reason)`
 from its converter (`Generic_IOC.wont_convert` in `types.py`).
 
-## `gdaPlugins` — use the `detectorPlugins` runtime pattern
+## `gdaPlugins` — expanded by the converter; no support folder
 
-The `detectorPlugins` pattern in `ibek-runtime-support` (entity models
-`gdaPlugins` and `detectorPlugins`) replaces a gdaPlugins support module.
-`converters/gdaPlugins.py` expands the XML element into `ADCore` entities.
-Don't create a gdaPlugins folder in either support repo.
+`converters/gdaPlugins.py` expands the gdaPlugins element into `ADCore`
+entities from `gdaPlugins.yaml`. The `detectorPlugins` runtime pattern in
+`ibek-runtime-support` also provides a `gdaPlugins` entity model. Don't create
+a gdaPlugins folder in either support repo.
 
 ## `OXCryo` — use `ibek-support/oxCryo`
 
