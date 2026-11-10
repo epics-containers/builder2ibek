@@ -883,3 +883,70 @@ def test_reconvert_surfaces_notes_and_finds_instances_by_controller(
     assert result.reconverted == [{"ioc_name": IOC.lower(), "status": "fastcs"}]
     assert [n for n in result.notes if "kept the existing" in n["note"]]
     assert "Notes:" in rc._render_human(result)
+
+
+def test_blacklist_is_not_written_when_the_ioc_yaml_is_not(tmp_path: Path):
+    # the pvlogging blacklist must not land in a fastcs instance whose IOC
+    # refuses its ioc.yaml, nor anywhere when a conflict stops the run
+    services = _services_repo(tmp_path)
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    convert_file(_xml(tmp_path), yaml, SCHEMA)  # dedicated: an instance
+    blacklist = yaml.parent / f"{IOC.lower()}_blacklist.txt"
+    camera_pv = '<pvlogging.BlacklistPv name="BL01C-DI-CAM-01:STAT:Foo"/>'
+
+    result = convert_file(_xml(tmp_path, MIXED_DEVICES + camera_pv), yaml, SCHEMA)
+    assert not result.ioc_yaml_written
+    assert not blacklist.exists()
+
+    other = tmp_path / "other"
+    services = _services_repo(other)
+    (services / "bl01c-mo-panda-01").mkdir()
+    (services / "bl01c-mo-panda-01" / "notes.txt").write_text("not ours\n")
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    with pytest.raises(FileExistsError):
+        convert_file(_xml(other, MIXED_DEVICES + camera_pv), yaml, SCHEMA)
+    assert not (yaml.parent / f"{IOC.lower()}_blacklist.txt").exists()
+
+    # and it is still written beside an ioc.yaml that is
+    third = tmp_path / "third"
+    services = _services_repo(third)
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    convert_file(_xml(third, MIXED_DEVICES + camera_pv), yaml, SCHEMA)
+    assert (
+        "BL01C-DI-CAM-01:STAT:Foo"
+        in (yaml.parent / f"{IOC.lower()}_blacklist.txt").read_text()
+    )
+
+
+def test_unreadable_controller_yaml_refuses_every_panda(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    broken = services / "someone" / "config" / "controller.yaml"
+    broken.parent.mkdir(parents=True)
+    broken.write_text("controllers:\n  - id: BL01C-MO-PANDA-01\n  bad: [\n")
+
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    result = convert_file(_xml(tmp_path, SECOND_PANDA + MIXED_DEVICES), yaml, SCHEMA)
+
+    assert result.refused == ["BL01C-MO-PANDA-01", "BL01C-MO-PANDA-02"]
+    assert result.fastcs_instances == []
+    assert not (services / "bl01c-mo-panda-01").exists()
+    refusals = [w for w in result.warnings if "refused" in w]
+    assert len(refusals) == 2
+    assert all(f"cannot read {broken}" in w for w in refusals)
+
+
+def test_stale_removal_never_follows_a_symlink_out(tmp_path: Path):
+    services = _services_repo(tmp_path)
+    instance = _ibek_instance(services, "ioc-instance:\n  image: x\n")
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "precious.txt").write_text("keep me\n")
+    os.symlink(outside, instance / "config" / "sub")
+    (instance / "runtime-lock.yaml").write_text(
+        "patterns:\n  p:\n    files:\n      config/sub/precious.txt: sha256:0\n"
+    )
+
+    convert_file(_xml(tmp_path), instance / "config" / "ioc.yaml", SCHEMA)
+
+    assert (outside / "precious.txt").read_text() == "keep me\n"
+    assert not (instance / "runtime-lock.yaml").exists()

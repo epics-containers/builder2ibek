@@ -33,8 +33,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "BlacklistPv":
         entity.type = "pvlogging.BlacklistPvs"
-        # write the blacklist alongside the converted YAML, not into the cwd
-        out_file = ioc.out_dir / (ioc.source_file.stem.lower() + "_blacklist.txt")
+        # the blacklist goes alongside the converted YAML, not into the cwd;
+        # convert_file writes it only when it writes the ioc.yaml
+        out_name = ioc.source_file.stem.lower() + "_blacklist.txt"
         global current_ioc
         if ioc is not current_ioc:
             # first BlacklistPv of this conversion: start a new list
@@ -44,7 +45,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
                 "# Rename to 'pvlogging_excl.txt' and move to IOC config directory.\n"
             )
             blacklist.append("# The following PVs will be excluded from pvlogging")
-            print(f"writing pvlogging blacklist {out_file}")
         else:
             # remove previous blacklist entity, we only need one with all PVs
             for ent in ioc.entities:
@@ -52,12 +52,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
                     ioc.entities.remove(ent)
                     break
 
-        # add new BlacklistPv entity to the list and write the list to file
+        # add new BlacklistPv entity to the list; the file is a side file
         blacklist.append(entity.name)
         entity.blacklist = "\n".join(blacklist) + "\n"
-        out_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(out_file, "w") as blacklist_file:
-            blacklist_file.write(entity.blacklist)
+        ioc.side_files[out_name] = entity.blacklist
 
         # the BlacklistPv entity declaration only require a pointer to the file
         entity.remove("name")

@@ -89,6 +89,9 @@ def convert_file(
     ruamel.indent(mapping=2, sequence=4, offset=2)
 
     yaml.parent.mkdir(parents=True, exist_ok=True)
+    for name, text in ioc.side_files.items():
+        print(f"writing {yaml.parent / name}")
+        (yaml.parent / name).write_text(text)
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 
@@ -107,7 +110,8 @@ def dispatch(
     and build a generic IOC from the converted Entities
 
     out_dir is the folder the converted YAML is written to; convertors that
-    generate additional files write them there.
+    generate additional files put them in ioc.side_files, which convert_file
+    writes there only when it writes the ioc.yaml.
     """
     if not description:
         description = (

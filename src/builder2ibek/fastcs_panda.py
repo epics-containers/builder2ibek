@@ -395,18 +395,18 @@ class Served:
     address: str
 
 
-def read_controllers(controller: Path) -> list[tuple[str, str]]:
+def read_controllers(controller: Path) -> list[tuple[str, str]] | None:
     """
     (prefix, address) of each PandA in a controller.yaml, in the 0.2.x shape
     (controllers[].id / address) or the 0.1.0 one (controller.address and a
-    transport's pv_prefix). Unreadable files give an empty list.
+    transport's pv_prefix). None when the file cannot be read as a mapping.
     """
     try:
         doc = YAML(typ="safe").load(controller.read_text())
     except (YAMLError, OSError, UnicodeDecodeError):
-        return []
+        return None
     if not isinstance(doc, dict):
-        return []
+        return None
     found = []
     if isinstance(doc.get("controllers"), list):
         for entry in doc["controllers"]:
@@ -423,17 +423,25 @@ def read_controllers(controller: Path) -> list[tuple[str, str]]:
     return found
 
 
-def served_controllers(services: Path) -> list[Served]:
-    """Every PandA controller served by an instance folder in services"""
+def served_controllers(services: Path) -> tuple[list[Served], list[Path]]:
+    """
+    Every PandA controller served by an instance folder in services, and the
+    controller.yaml files that cannot be read (they may hide a duplicate)
+    """
+    served: list[Served] = []
+    unreadable: list[Path] = []
     if not services.is_dir():
-        return []
-    served = []
+        return served, unreadable
     for controller in sorted(services.glob(f"*/config/{CONTROLLER_YAML}")):
         folder = controller.parent.parent
         if folder.name.startswith("."):
             continue  # .fastcs_ioc_template and friends
-        served += [Served(folder, p, a) for p, a in read_controllers(controller)]
-    return served
+        found = read_controllers(controller)
+        if found is None:
+            unreadable.append(controller)
+        else:
+            served += [Served(folder, p, a) for p, a in found]
+    return served, unreadable
 
 
 def short_address(address: str) -> str:
@@ -501,7 +509,11 @@ def _ibek_stale_files(folder: Path, ioc_name: str) -> list[Path]:
             for path in (pattern or {}).get("files") or {}:
                 if str(path).startswith("config/") and "/.." not in str(path):
                     stale.append(folder / str(path))
-    return [p for p in stale if os.path.lexists(p)]
+    # never act through a symlink out of the folder (a symlinked config/sub)
+    inside = folder.resolve()
+    return [
+        p for p in stale if os.path.lexists(p) and p.resolve().is_relative_to(inside)
+    ]
 
 
 def _classify(folder: Path, ibek_ok: bool) -> str:
@@ -581,7 +593,7 @@ def plan_fastcs(ioc_name: str, split: PandaSplit, yaml: Path) -> FastcsPlan:
     parent = yaml.absolute().parent
     own = parent.parent if in_services else parent / ioc_name.lower()
     siblings = own.parent if in_services else parent
-    served = served_controllers(siblings)
+    served, unreadable = served_controllers(siblings)
     plan = FastcsPlan([], [], [], False, in_services)
 
     if split.dedicated:
@@ -607,22 +619,33 @@ def plan_fastcs(ioc_name: str, split: PandaSplit, yaml: Path) -> FastcsPlan:
                 "now has other devices too, so merge by hand"
             )
 
+    # an unreadable controller.yaml may serve any of this run's PandAs
+    unreadable_reason = (
+        [
+            "cannot read "
+            + ", ".join(map(str, unreadable))
+            + ", which may already serve it; fix or remove it"
+        ]
+        if unreadable
+        else []
+    )
+
     conflicts = []
     for folder, pandas, title in groups:
         state = _classify(folder, ibek_ok=split.dedicated and in_services)
         if state == "conflict":
             conflicts.append(folder)
             continue
-        reasons = [
+        reasons = unreadable_reason + [
             f"{s.folder} already serves {s.prefix or '?'} at {s.address}"
             for p in pandas
             if (s := _duplicate(p, served, folder))
         ]
         controller = folder / "config" / CONTROLLER_YAML
-        if state == "existing":
+        if state == "existing" and controller not in unreadable:
             wanted = sorted((p.prefix, short_address(p.address)) for p in pandas)
             held = sorted(
-                (i, short_address(a)) for i, a in read_controllers(controller)
+                (i, short_address(a)) for i, a in read_controllers(controller) or []
             )
             if held != wanted:
                 reasons.append(
