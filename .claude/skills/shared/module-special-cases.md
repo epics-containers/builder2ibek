@@ -144,11 +144,26 @@ dispatch, and `xml2yaml` and `reconvert` write fastcs instances instead:
   folder becomes one fastcs instance, with one controller per PandA, and gets
   no ioc.yaml. Given `services/<ioc>/config/ioc.yaml`, xml2yaml writes
   `services/<ioc>/values.yaml` and `config/controller.yaml` from
-  `.fastcs_ioc_template`, and deletes the ioc.yaml.
+  `.fastcs_ioc_template`. It removes the ibek-only files from that folder
+  (`config/ioc.yaml`, `config/ioc.schema.json`, the pvlogging blacklist,
+  `runtime-lock.yaml` and the pattern files it lists) and names any other file
+  it leaves in `config/`. Outside a services repo the instance is a folder next
+  to the `--yaml` path, and that file is left alone.
 - **Mixed IOC**: the ioc.yaml keeps the other devices, and each PandA gets its
   own instance, a sibling folder named from its PV prefix in lowercase
   (`services/bl22i-mo-panda-01`). The dropped elements are reported as won't
   convert, naming those instances.
+
+Before writing anything, b2i reads every `services/*/config/controller.yaml`,
+in the 0.2.x shape (`controllers[].id` / `address`) or the 0.1.0 one
+(`controller.address` / `pv_prefix`). A PandA whose prefix or address another
+instance already serves is refused, with a warning naming that folder: for a
+dedicated IOC nothing is written, for a mixed one that PandA's instance is
+skipped. A target folder that holds anything else (an ibek IOC, a hand-made
+folder) stops the conversion before any file is written. A folder b2i wrote
+for the same PandAs (same ids and addresses) is never overwritten: a re-run
+leaves `values.yaml` alone and reports any difference in `controller.yaml` as
+a diff. `reconvert` gives such IOCs status `fastcs`, or `refused`.
 
 The elements that belong to a PandA: `ADPandABlocks.ADPandABlocks`,
 `ADPandABlocks.MotorSync` (no fastcs equivalent, so it is reported), the
@@ -166,7 +181,7 @@ PandA PV. The image tag is the single constant `FASTCS_PANDABLOCKS_IMAGE` in
 into `tests/samples/fastcs-pandablocks/`.
 
 Don't add ADPandABlocks support YAML to `ibek-support`. The
-`ibek-support-dls/ADPandABlocks` folder is to be removed.
+`ibek-support-dls/ADPandABlocks` folder is removed in a separate MR.
 
 ## `procServControl` — not used in containers
 

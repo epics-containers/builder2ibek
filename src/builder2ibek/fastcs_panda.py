@@ -23,12 +23,17 @@ capture, so none of them has a counterpart.
 
 from __future__ import annotations
 
+import difflib
+import json
 import os
 import re
 import shutil
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from ruamel.yaml import YAML
+from ruamel.yaml.error import YAMLError
 
 from builder2ibek.builder import Builder
 from builder2ibek.types import Element, Entity, Generic_IOC
@@ -88,10 +93,8 @@ class PandaSplit:
 
     pandas: list[PandA]
     dedicated: bool
-    # the fastcs instance names the PandAs go to
-    instances: list[str]
-    # XML type -> count of the elements split out with the PandAs
-    dropped: Counter[str] = field(default_factory=Counter)
+    # the XML elements split out with the PandAs
+    dropped: list[Element] = field(default_factory=list)
 
 
 def _type(element: Element) -> str:
@@ -141,9 +144,10 @@ def split_pandas(builder: Builder, ioc: Generic_IOC) -> PandaSplit | None:
     Take the PandAs, and the elements that belong to them, out of builder's
     elements before dispatch. Returns None when the IOC has no PandA.
 
-    For a mixed IOC each element taken out is recorded as won't convert,
-    naming the fastcs instances written, and any remaining element that still
-    names a PandA PV gets a warning: fastcs-pandablocks PV names differ.
+    For a mixed IOC, any remaining element that still names a PandA PV gets a
+    warning: fastcs-pandablocks PV names differ. The dropped elements are
+    recorded as won't convert by record_wont_convert, once the instances have
+    been written.
     """
     pandas = [
         PandA(
@@ -160,29 +164,14 @@ def split_pandas(builder: Builder, ioc: Generic_IOC) -> PandaSplit | None:
     owned = _owned(builder.elements, pandas)
     kept = [e for e, o in zip(builder.elements, owned, strict=True) if not o]
     dropped = [e for e, o in zip(builder.elements, owned, strict=True) if o]
-    dedicated = all(_is_boilerplate(e) for e in kept)
-
-    ioc_name = Path(ioc.source_file).stem.lower()
-    instances = [ioc_name] if dedicated else [p.instance for p in pandas]
     split = PandaSplit(
         pandas=pandas,
-        dedicated=dedicated,
-        instances=instances,
-        dropped=Counter(_type(e) for e in dropped),
+        dedicated=all(_is_boilerplate(e) for e in kept),
+        dropped=dropped,
     )
-
     builder.elements = kept
-    if dedicated:
+    if split.dedicated:
         return split
-
-    reason = (
-        "ADPandABlocks is replaced by fastcs-pandablocks, written as the "
-        f"fastcs instance(s) {', '.join(instances)}"
-    )
-    for element in dropped:
-        entity = Entity(element.attributes)
-        entity.type = _type(element)
-        ioc.wont_convert(entity, reason, note=_note(element))
 
     prefixes = [p.prefix for p in pandas]
     for element in kept:
@@ -206,28 +195,50 @@ def _note(element: Element) -> str:
     return ""
 
 
+def record_wont_convert(ioc: Generic_IOC, split: PandaSplit, outcome: str) -> None:
+    """Record a mixed IOC's dropped elements as won't convert"""
+    reason = f"ADPandABlocks is replaced by fastcs-pandablocks: {outcome}"
+    for element in split.dropped:
+        entity = Entity(element.attributes)
+        entity.type = _type(element)
+        ioc.wont_convert(entity, reason, note=_note(element))
+
+
 PV_NAMES_DIFFER = (
     "fastcs-pandablocks serves PVA only, and its PV names below the prefix "
     "differ from ADPandABlocks': update GDA, ophyd-async and screens"
 )
 
 
+def _counts(elements: list[Element]) -> str:
+    return ", ".join(f"{n} {t}" for t, n in Counter(map(_type, elements)).items())
+
+
 def dedicated_warnings(ioc_name: str, split: PandaSplit) -> list[str]:
     """What a dedicated IOC loses on becoming a fastcs instance"""
+    motor_syncs = [e for e in split.dropped if _type(e) == "ADPandABlocks.MotorSync"]
+    settings = [e for e in split.dropped if _type(e) in _PV_SETTING_TYPES]
+    plugins = [
+        e
+        for e in split.dropped
+        if e.module != ADPANDABLOCKS and _type(e) not in _PV_SETTING_TYPES
+    ]
     warnings = []
-    motor_syncs = split.dropped.get(f"{ADPANDABLOCKS}.MotorSync", 0)
     if motor_syncs:
         warnings.append(
-            f"{ioc_name}: won't convert {motor_syncs} ADPandABlocks.MotorSync: "
+            f"{ioc_name}: won't convert {_counts(motor_syncs)}: "
             "fastcs-pandablocks has no equivalent"
         )
-    plugins = ", ".join(
-        f"{n} {t}" for t, n in split.dropped.items() if not t.startswith(ADPANDABLOCKS)
-    )
     if plugins:
         warnings.append(
-            f"{ioc_name}: won't convert {plugins}: fastcs-pandablocks does its "
-            "own data capture"
+            f"{ioc_name}: won't convert {_counts(plugins)}: areaDetector plugins "
+            "fed by the PandA; fastcs-pandablocks does its own data capture"
+        )
+    if settings:
+        warnings.append(
+            f"{ioc_name}: won't convert {_counts(settings)}: they act on PVs of "
+            "the PandA's ADPandABlocks driver and plugins, which "
+            "fastcs-pandablocks does not have"
         )
     return warnings
 
@@ -246,6 +257,11 @@ def beamline_data_dir(prefix: str) -> str | None:
     return f"/dls/{_BEAMLINE_LETTERS[m.group(2)].format(m.group(1))}/data"
 
 
+def _q(value: str) -> str:
+    """A YAML double-quoted scalar (JSON strings are valid YAML)"""
+    return json.dumps(value)
+
+
 def controller_yaml(pandas: list[PandA], title: str) -> str:
     """config/controller.yaml: one controller per PandA, served over PVA"""
     version = FASTCS_PANDABLOCKS_IMAGE.rsplit(":", 1)[1]
@@ -254,7 +270,9 @@ def controller_yaml(pandas: list[PandA], title: str) -> str:
         f"{version}/src/fastcs_pandablocks/panda/schema.json"
     )
     controllers = "".join(
-        f"  - id: {p.prefix}\n    type: {CONTROLLER_TYPE}\n    address: {p.address}\n"
+        f"  - id: {_q(p.prefix)}\n"
+        f"    type: {_q(CONTROLLER_TYPE)}\n"
+        f"    address: {_q(p.address)}\n"
         for p in pandas
     )
     return f"""\
@@ -266,27 +284,28 @@ controllers:
 transport:
   - epicspva: {{}}
     gui:
-      title: {title}
-      output_dir: /epics/opi
+      title: {_q(title)}
+      output_dir: "/epics/opi"
 """
 
 
 def values_yaml(data_dir: str) -> str:
     """values.yaml for a fastcs-pandablocks instance"""
     run = f"fastcs-pandablocks run /epics/ioc/config/{CONTROLLER_YAML}"
+    args = f"stdio-expose --ptty --stdin --ctrl-d '{run}'"
     return f"""\
 # yaml-language-server: $schema=../../.helm-shared/values.schema.json
 
 ioc-instance:
-  image: {FASTCS_PANDABLOCKS_IMAGE}
+  image: {_q(FASTCS_PANDABLOCKS_IMAGE)}
   args:
-    - stdio-expose --ptty --stdin --ctrl-d '{run}'
+    - {_q(args)}
 
   # fastcs-pandablocks writes its captured data here; writing as the beamline
   # user needs a securityContext with that user's runAsUser and runAsGroup
   dataVolume:
     pvc: false
-    hostPath: {data_dir}
+    hostPath: {_q(data_dir)}
 
   # DO NOT use the default livenessProbe and preStop from ioc-instance.
   # Leave blank or provide a path to an executable inside the container image.
@@ -306,6 +325,11 @@ ioc-instance:
 def _is_legacy(folder: Path) -> bool:
     values = folder / "values.yaml"
     return values.is_file() and bool(_DEV_C7_RE.search(values.read_text()))
+
+
+def _is_empty(folder: Path) -> bool:
+    """True when folder holds no files, only (possibly) empty folders"""
+    return all(p.is_dir() and not p.is_symlink() for p in folder.rglob("*"))
 
 
 def _copy_scaffold(template: Path, target: Path) -> None:
@@ -331,89 +355,303 @@ def _copy_scaffold(template: Path, target: Path) -> None:
             shutil.copyfile(entry, dest)
 
 
-def write_instance(
-    folder: Path, pandas: list[PandA], title: str, own_ioc_yaml: Path | None = None
-) -> list[str]:
-    """
-    Write a fastcs-pandablocks instance into folder, scaffolded from the
-    sibling .fastcs_ioc_template when there is one.
+# Reading the controllers other instances already serve ######################
 
-    own_ioc_yaml is the ioc.yaml this conversion would otherwise have written
-    (a dedicated IOC's own folder): it is removed. Any other folder that holds
-    an ibek ioc.yaml belongs to a different IOC and is refused, unless it is a
-    legacy dev-c7 folder, which is recreated.
 
-    Returns warnings for things a human must still fill in.
+@dataclass(frozen=True)
+class Served:
+    """A PandA controller some instance's controller.yaml already serves"""
+
+    folder: Path
+    prefix: str
+    address: str
+
+
+def read_controllers(controller: Path) -> list[tuple[str, str]]:
     """
-    warnings = []
-    ioc_yaml = folder / "config" / "ioc.yaml"
+    (prefix, address) of each PandA in a controller.yaml, in the 0.2.x shape
+    (controllers[].id / address) or the 0.1.0 one (controller.address and a
+    transport's pv_prefix). Unreadable files give an empty list.
+    """
+    try:
+        doc = YAML(typ="safe").load(controller.read_text())
+    except (YAMLError, OSError, UnicodeDecodeError):
+        return []
+    if not isinstance(doc, dict):
+        return []
+    found = []
+    if isinstance(doc.get("controllers"), list):
+        for entry in doc["controllers"]:
+            if isinstance(entry, dict) and "address" in entry:
+                found.append((str(entry.get("id", "")), str(entry["address"])))
+    single = doc.get("controller")
+    if isinstance(single, dict) and "address" in single:
+        prefix = ""
+        for transport in doc.get("transport") or []:
+            for options in (transport or {}).values():
+                if isinstance(options, dict) and options.get("pv_prefix"):
+                    prefix = str(options["pv_prefix"])
+        found.append((prefix, str(single["address"])))
+    return found
+
+
+def served_controllers(services: Path) -> list[Served]:
+    """Every PandA controller served by an instance folder in services"""
+    if not services.is_dir():
+        return []
+    served = []
+    for controller in sorted(services.glob(f"*/config/{CONTROLLER_YAML}")):
+        folder = controller.parent.parent
+        if folder.name.startswith("."):
+            continue  # .fastcs_ioc_template and friends
+        served += [Served(folder, p, a) for p, a in read_controllers(controller)]
+    return served
+
+
+def _duplicate(panda: PandA, served: list[Served], target: Path) -> Served | None:
+    for s in served:
+        if s.folder == target:
+            continue
+        if s.prefix == panda.prefix or s.address.lower() == panda.address.lower():
+            return s
+    return None
+
+
+# Planning, then writing #####################################################
+
+
+@dataclass
+class Target:
+    """One fastcs instance folder to write"""
+
+    folder: Path
+    pandas: list[PandA]
+    title: str
+    # new: write it; rerun: an instance this tool wrote for the same PandAs,
+    # left alone; legacy: a dev-c7 folder, recreated; ibek: the IOC's own ibek
+    # folder, which becomes the fastcs instance
+    state: str
+
+
+def _ibek_stale_files(folder: Path, ioc_name: str) -> list[Path]:
+    """
+    The files builder2ibek's ibek flow puts in an instance folder, which a
+    fastcs instance does not use: the ioc.yaml and its schema, the pvlogging
+    blacklist, and runtime-lock.yaml with the pattern files it vendored.
+    """
+    config = folder / "config"
+    names = ["ioc.yaml", "ioc.schema.json", f"{ioc_name.lower()}_blacklist.txt"]
+    names.append("pvlogging_excl.txt")
+    stale = [config / n for n in names]
+    lock = folder / "runtime-lock.yaml"
+    if lock.is_file():
+        stale.append(lock)
+        try:
+            doc = YAML(typ="safe").load(lock.read_text()) or {}
+        except (YAMLError, OSError, UnicodeDecodeError):
+            doc = {}
+        for pattern in (doc.get("patterns") or {}).values():
+            for path in (pattern or {}).get("files") or {}:
+                if str(path).startswith("config/") and "/.." not in str(path):
+                    stale.append(folder / str(path))
+    return [p for p in stale if p.is_file() or p.is_symlink()]
+
+
+def _classify(folder: Path, pandas: list[PandA], ibek_ok: bool) -> str | None:
+    """The Target state for folder, or None when it belongs to something else"""
+    if not folder.exists() or _is_empty(folder):
+        return "new"
     if _is_legacy(folder):
-        shutil.rmtree(folder)
-    elif ioc_yaml.exists() and ioc_yaml != own_ioc_yaml:
+        return "legacy"
+    controller = folder / "config" / CONTROLLER_YAML
+    if controller.is_file():
+        wanted = sorted((p.prefix, p.address.lower()) for p in pandas)
+        held = sorted((p, a.lower()) for p, a in read_controllers(controller))
+        return "rerun" if held == wanted else None
+    if ibek_ok and (folder / "config" / "ioc.yaml").is_file():
+        return "ibek"
+    return None
+
+
+@dataclass
+class FastcsPlan:
+    """What write_fastcs will do, decided before anything is written"""
+
+    targets: list[Target]
+    # PandAs refused because another instance already serves them
+    refused: list[tuple[PandA, Served]]
+    # the ioc.yaml path is a services-repo instance folder's own ioc.yaml
+    in_services: bool
+
+
+def is_services_ioc_yaml(yaml: Path) -> bool:
+    """True for services/<name>/config/ioc.yaml"""
+    yaml = yaml.absolute()
+    return (
+        yaml.name == "ioc.yaml"
+        and yaml.parent.name == "config"
+        and yaml.parent.parent.parent.name == "services"
+    )
+
+
+def plan_fastcs(ioc_name: str, split: PandaSplit, yaml: Path) -> FastcsPlan:
+    """
+    Decide every instance folder before writing any. In a services repo the
+    IOC's own folder is services/<ioc>/ and siblings go in services/; anywhere
+    else every instance is a folder next to the ioc.yaml.
+
+    A PandA that another instance already serves (same prefix or address) is
+    refused. A target folder that holds anything other than a fresh, legacy or
+    re-run instance (or, for a dedicated IOC, its own ibek folder) raises
+    FileExistsError, so nothing is written.
+    """
+    in_services = is_services_ioc_yaml(yaml)
+    parent = yaml.absolute().parent
+    own = parent.parent if in_services else parent / ioc_name.lower()
+    siblings = own.parent if in_services else parent
+    served = served_controllers(siblings)
+
+    if split.dedicated:
+        groups = [(own, split.pandas, ioc_name)]
+    else:
+        groups = [(siblings / p.instance, [p], p.prefix) for p in split.pandas]
+
+    targets, refused, conflicts = [], [], []
+    for folder, pandas, title in groups:
+        dupes = [(p, d) for p in pandas if (d := _duplicate(p, served, folder))]
+        if dupes:
+            # a dedicated IOC's instance is written whole or not at all
+            refused += dupes
+            continue
+        state = _classify(folder, pandas, ibek_ok=split.dedicated and in_services)
+        if state is None:
+            conflicts.append(folder)
+        else:
+            targets.append(Target(folder, pandas, title, state))
+
+    if conflicts:
         raise FileExistsError(
-            f"{folder} holds an ibek ioc.yaml, not writing a fastcs-pandablocks "
-            "instance over it"
+            f"{ioc_name}: not writing fastcs-pandablocks instances, these folders "
+            "already hold something else: " + ", ".join(map(str, conflicts))
+        )
+    return FastcsPlan(targets, refused, in_services)
+
+
+def _write_target(target: Target, ioc_name: str) -> tuple[list[str], list[str]]:
+    """Write one planned instance. Returns (notes, warnings)."""
+    folder = target.folder
+    generated = controller_yaml(target.pandas, target.title)
+    controller = folder / "config" / CONTROLLER_YAML
+
+    if target.state == "rerun":
+        existing = controller.read_text()
+        if existing == generated:
+            return [], []
+        diff = "".join(
+            difflib.unified_diff(
+                existing.splitlines(keepends=True),
+                generated.splitlines(keepends=True),
+                str(controller),
+                "generated",
+            )
+        )
+        note = (
+            f"{ioc_name}: {controller} differs from what builder2ibek generates "
+            f"and was left alone:\n{diff}"
+        )
+        return [note], []
+
+    notes, warnings = [], []
+    if target.state == "legacy":
+        shutil.rmtree(folder)
+    elif target.state == "ibek":
+        removed = _ibek_stale_files(folder, ioc_name)
+        for path in removed:
+            path.unlink()
+        names = ", ".join(str(p.relative_to(folder)) for p in removed)
+        left = sorted(
+            p.name for p in (folder / "config").iterdir() if p.name != CONTROLLER_YAML
+        )
+        notes.append(
+            f"{ioc_name}: removed the ibek files {names} from {folder}"
+            + (f"; left in config/: {', '.join(left)}" if left else "")
         )
 
-    template = folder.parent / FASTCS_IOC_TEMPLATE
-    if template.is_dir():
-        _copy_scaffold(template, folder)
-    (folder / "config").mkdir(parents=True, exist_ok=True)
-    if own_ioc_yaml is not None:
-        own_ioc_yaml.unlink(missing_ok=True)
-
-    data_dir = beamline_data_dir(pandas[0].prefix)
+    data_dir = beamline_data_dir(target.pandas[0].prefix)
     if data_dir is None:
         data_dir = "REPLACE_WITH_DATA_PATH"
         warnings.append(
-            f"{folder.name}: no beamline data folder known for {pandas[0].prefix}, "
-            f"set dataVolume.hostPath in {folder / 'values.yaml'}"
+            f"{ioc_name}: no beamline data folder known for "
+            f"{target.pandas[0].prefix}, set dataVolume.hostPath in "
+            f"{folder / 'values.yaml'}"
         )
+    (folder / "config").mkdir(parents=True, exist_ok=True)
     (folder / "values.yaml").write_text(values_yaml(data_dir))
-    (folder / "config" / CONTROLLER_YAML).write_text(controller_yaml(pandas, title))
-    return warnings
+    controller.write_text(generated)
+    template = folder.parent / FASTCS_IOC_TEMPLATE
+    if template.is_dir():
+        # after writing ours, so only the scaffold's links and extras are added
+        _copy_scaffold(template, folder)
+    return notes, warnings
 
 
-def instance_dirs(yaml: Path, ioc_name: str) -> tuple[Path, Path]:
-    """
-    (the IOC's own instance folder, the folder sibling instances go in) for the
-    ioc.yaml path xml2yaml was given. In a services repo the path is
-    services/<ioc>/config/ioc.yaml, so siblings go in services/. Anywhere else
-    every instance, the IOC's own included, is a folder next to the ioc.yaml.
-    """
-    parent = yaml.parent.absolute()
-    if parent.name == "config":
-        return parent.parent, parent.parent.parent
-    return parent / ioc_name, parent
+@dataclass
+class FastcsResult:
+    """What write_fastcs did"""
+
+    # instance folders written, or re-run and left alone
+    folders: list[Path] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    # PandAs not written because another instance already serves them
+    refused: list[PandA] = field(default_factory=list)
+
+    def outcome(self) -> str:
+        """The won't-convert reason for a mixed IOC's dropped elements"""
+        parts = []
+        if self.folders:
+            names = ", ".join(f.name for f in self.folders)
+            parts.append(f"written as the fastcs instance(s) {names}")
+        if self.refused:
+            names = ", ".join(p.prefix for p in self.refused)
+            parts.append(f"not written for {names}, already served elsewhere")
+        return "; ".join(parts)
 
 
-def write_fastcs(
-    ioc_name: str, split: PandaSplit, yaml: Path
-) -> tuple[list[Path], list[str], list[str]]:
+def write_fastcs(ioc_name: str, split: PandaSplit, yaml: Path) -> FastcsResult:
     """
     Write the fastcs instances for split next to the ioc.yaml path given.
-    ioc_name is the XML file's stem, e.g. BL08J-MO-IOC-11.
-    Returns the instance folders written, notes saying so, and warnings.
+    ioc_name is the XML file's stem, e.g. BL08J-MO-IOC-11. Every folder is
+    checked (plan_fastcs) before any is written.
     """
-    instance, siblings = instance_dirs(yaml, ioc_name.lower())
-    if split.dedicated:
-        warnings = write_instance(
-            instance, split.pandas, ioc_name, own_ioc_yaml=yaml.absolute()
-        )
-        notes = [
-            f"{ioc_name}: dedicated PandA IOC, wrote the fastcs-pandablocks "
-            f"instance {instance} for {len(split.pandas)} PandA(s) instead of an "
-            f"ioc.yaml. {PV_NAMES_DIFFER}"
-        ]
-        return [instance], notes, dedicated_warnings(ioc_name, split) + warnings
+    plan = plan_fastcs(ioc_name, split, yaml)
+    result = FastcsResult(refused=[p for p, _ in plan.refused])
+    result.warnings = [
+        f"{ioc_name}: refused to write a fastcs-pandablocks instance for "
+        f"{panda.prefix} ({panda.address}): {served.folder} already serves "
+        f"{served.prefix or '?'} at {served.address}"
+        for panda, served in plan.refused
+    ]
 
-    folders, notes, warnings = [], [], []
-    for panda in split.pandas:
-        folder = siblings / panda.instance
-        warnings += write_instance(folder, [panda], panda.prefix)
-        folders.append(folder)
-        notes.append(
-            f"{ioc_name}: wrote the fastcs-pandablocks instance {folder} for the "
-            f"PandA {panda.prefix}. {PV_NAMES_DIFFER}"
+    for target in plan.targets:
+        target_notes, target_warnings = _write_target(target, ioc_name)
+        result.folders.append(target.folder)
+        result.warnings += target_warnings
+        what = "kept" if target.state == "rerun" else "wrote"
+        prefixes = ", ".join(p.prefix for p in target.pandas)
+        result.notes.append(
+            f"{ioc_name}: {what} the fastcs-pandablocks instance {target.folder} "
+            f"for {prefixes}. {PV_NAMES_DIFFER}"
         )
-    return folders, notes, warnings
+        result.notes += target_notes
+
+    if split.dedicated and result.folders:
+        result.warnings += dedicated_warnings(ioc_name, split)
+        if plan.in_services:
+            result.notes.append(f"{ioc_name}: dedicated PandA IOC, no ioc.yaml written")
+        else:
+            result.notes.append(
+                f"{ioc_name}: dedicated PandA IOC, no ioc.yaml written; {yaml} is "
+                "outside a services repo instance folder, so it was left alone"
+            )
+    return result

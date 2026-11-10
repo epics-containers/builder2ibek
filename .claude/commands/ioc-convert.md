@@ -83,7 +83,8 @@ for an IOC with ADPandABlocks PandAs and says so on stdout; see the
 - **Dedicated** (PandAs plus boilerplate): xml2yaml turns `$INSTANCE_DIR` into
   a fastcs instance, from `.fastcs_ioc_template`, and writes no `ioc.yaml`.
   Stop here: the remaining phases are for ibek IOCs. Report the instance and
-  xml2yaml's warnings.
+  xml2yaml's warnings. If xml2yaml refused because another instance already
+  serves the PandA, it wrote nothing: report the folder it names and stop.
 - **Mixed** (other devices too): xml2yaml writes the `ioc.yaml` and one sibling
   instance per PandA, `services/<pv-prefix-lowercase>/`. Carry on with the
   `ioc.yaml` as usual, and list the sibling instances in the report.

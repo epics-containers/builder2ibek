@@ -11,7 +11,7 @@ from typing import Any
 from ruamel.yaml import YAML, CommentedMap
 
 from builder2ibek.builder import Builder, Element
-from builder2ibek.fastcs_panda import split_pandas, write_fastcs
+from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_fastcs
 from builder2ibek.moduleinfos import finalizers, module_infos
 from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
@@ -26,8 +26,10 @@ class ConvertResult:
     notes: list[str] = dc_field(default_factory=list)
     # False for a dedicated PandA IOC, which becomes a fastcs instance instead
     ioc_yaml_written: bool = True
-    # fastcs-pandablocks instance folders written
+    # fastcs-pandablocks instance folders written, or re-run and left alone
     fastcs_instances: list[Path] = dc_field(default_factory=list)
+    # PandA prefixes refused because another instance already serves them
+    refused: list[str] = dc_field(default_factory=list)
 
 
 def convert_file(
@@ -54,21 +56,25 @@ def convert_file(
     Returns what was written and the IOC's warnings, one per dropped entity
     type plus any others; the caller reports them to the user.
     """
-    yaml.parent.mkdir(parents=True, exist_ok=True)
-
     builder = Builder()
     builder.load(xml)
     ioc = dispatch(builder, xml, yaml.parent, description=description, blgui=blgui)
 
-    result = ConvertResult(warnings=ioc.warnings())
-    if ioc.panda_split is not None:
-        folders, notes, warnings = write_fastcs(xml.stem, ioc.panda_split, yaml)
-        result.fastcs_instances = folders
-        result.notes = notes
-        result.warnings += warnings
-        if ioc.panda_split.dedicated:
+    result = ConvertResult()
+    split = ioc.panda_split
+    if split is not None:
+        fastcs = write_fastcs(xml.stem, split, yaml)
+        result.fastcs_instances = fastcs.folders
+        result.refused = [p.prefix for p in fastcs.refused]
+        result.notes = fastcs.notes
+        if not split.dedicated:
+            record_wont_convert(ioc, split, fastcs.outcome())
+        result.warnings = ioc.warnings() + fastcs.warnings
+        if split.dedicated:
             result.ioc_yaml_written = False
             return result
+    else:
+        result.warnings = ioc.warnings()
 
     ruamel = YAML()
 
@@ -82,6 +88,7 @@ def convert_file(
 
     ruamel.indent(mapping=2, sequence=4, offset=2)
 
+    yaml.parent.mkdir(parents=True, exist_ok=True)
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 

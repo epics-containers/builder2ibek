@@ -55,6 +55,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # add new BlacklistPv entity to the list and write the list to file
         blacklist.append(entity.name)
         entity.blacklist = "\n".join(blacklist) + "\n"
+        out_file.parent.mkdir(parents=True, exist_ok=True)
         with open(out_file, "w") as blacklist_file:
             blacklist_file.write(entity.blacklist)
 

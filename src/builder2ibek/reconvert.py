@@ -216,16 +216,22 @@ def run_reconvert(
                 {"ioc_name": ioc_name, "instance": str(f)}
                 for f in converted.fastcs_instances
             )
-            # status "fastcs": no ioc.yaml to validate, the IOC became a
-            # fastcs-pandablocks instance
-            status = "ok" if converted.ioc_yaml_written else "fastcs"
+            # status "fastcs" or "refused": no ioc.yaml to validate, the IOC
+            # is (or would be) a fastcs-pandablocks instance
+            if converted.ioc_yaml_written:
+                status = "ok"
+            elif converted.fastcs_instances:
+                status = "fastcs"
+            else:
+                # another instance already serves its PandA(s); see warnings
+                status = "refused"
             result.reconverted.append({"ioc_name": ioc_name, "status": status})
         except Exception as e:  # noqa: BLE001 — report any converter error
             result.conversion_errors.append(
                 {"ioc_name": ioc_name, "error": f"{type(e).__name__}: {e}"}
             )
 
-    if validate and result.reconverted:
+    if validate and any(r["status"] == "ok" for r in result.reconverted):
         _run_validation(result)
 
     if result.conversion_errors:
