@@ -51,11 +51,23 @@ def xml2yaml(
         "otherwise BLGui entities are dropped.",
     ),
 ):
+    """
+    Convert a builder XML IOC to an ibek ioc.yaml.
+
+    ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
+    that holds only PandAs and boilerplate becomes one fastcs instance in place
+    of the ioc.yaml: given services/<ioc>/config/ioc.yaml, it writes
+    services/<ioc>/values.yaml and config/controller.yaml. Otherwise each PandA
+    gets its own instance, named from its PV prefix, as a sibling of the IOC's
+    folder (services/<prefix>/), and the ioc.yaml keeps the other devices.
+    """
     if not yaml:
         yaml = xml.absolute().with_suffix("yaml")
 
-    warnings = convert_file(xml, yaml, schema, description=description, blgui=blgui)
-    for warning in warnings:
+    result = convert_file(xml, yaml, schema, description=description, blgui=blgui)
+    for note in result.notes:
+        typer.echo(note)
+    for warning in result.warnings:
         typer.echo(f"warning: {warning}", err=True)
 
 
@@ -206,7 +218,8 @@ def reconvert(
     optionally schema-validate each result with ibek generate2. Sequential
     inside one EPICS_ROOT tempdir. An IOC whose existing ioc.yaml has
     BLGui.* entities is reconverted with --blgui, which
-    regenerates them from the XML.
+    regenerates them from the XML. ADPandABlocks PandAs are written as
+    fastcs-pandablocks instances, as xml2yaml does; those are not validated.
     """
     reconvert_cli(
         beamline,

@@ -1,0 +1,192 @@
+{
+  "$defs": {
+    "EpicsDocsOptions": {
+      "description": "Docs options for EPICS.",
+      "properties": {
+        "output_dir": {
+          "default": ".",
+          "format": "path",
+          "title": "Output Dir",
+          "type": "string"
+        },
+        "title": {
+          "default": "FastCS Devices",
+          "title": "Title",
+          "type": "string"
+        },
+        "depth": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Depth"
+        }
+      },
+      "title": "EpicsDocsOptions",
+      "type": "object"
+    },
+    "EpicsGUIFormat": {
+      "description": "The format of an EPICS GUI.",
+      "enum": [
+        ".bob",
+        ".edl"
+      ],
+      "title": "EpicsGUIFormat",
+      "type": "string"
+    },
+    "EpicsGUIOptions": {
+      "description": "Epics GUI options for use in both CA and PVA transports.",
+      "properties": {
+        "output_dir": {
+          "default": ".",
+          "format": "path",
+          "title": "Output Dir",
+          "type": "string"
+        },
+        "file_format": {
+          "$ref": "#/$defs/EpicsGUIFormat",
+          "default": ".bob"
+        },
+        "title": {
+          "default": "FastCS Devices",
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "title": "EpicsGUIOptions",
+      "type": "object"
+    },
+    "EpicsPVAOptions": {
+      "additionalProperties": false,
+      "description": "PVAccess-specific options.\n\nCurrently empty: present so ``epicspva:`` survives in fastcs.yaml as the\ntransport discriminator key. Reserved for future PVA-specific knobs.",
+      "properties": {},
+      "title": "EpicsPVAOptions",
+      "type": "object"
+    },
+    "EpicsPVATransport": {
+      "additionalProperties": false,
+      "description": "PV access transport.",
+      "properties": {
+        "epicspva": {
+          "$ref": "#/$defs/EpicsPVAOptions"
+        },
+        "docs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EpicsDocsOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "gui": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EpicsGUIOptions"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "EpicsPVATransport",
+      "type": "object"
+    },
+    "PandaControllerEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "fastcs_pandablocks.PandaController",
+          "title": "Type",
+          "type": "string"
+        },
+        "address": {
+          "title": "Address",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "address"
+      ],
+      "title": "PandaControllerEntry",
+      "type": "object"
+    },
+    "RestServerOptions": {
+      "properties": {
+        "host": {
+          "default": "localhost",
+          "title": "Host",
+          "type": "string"
+        },
+        "port": {
+          "default": 8080,
+          "title": "Port",
+          "type": "integer"
+        },
+        "log_level": {
+          "default": "info",
+          "title": "Log Level",
+          "type": "string"
+        }
+      },
+      "title": "RestServerOptions",
+      "type": "object"
+    },
+    "RestTransport": {
+      "additionalProperties": false,
+      "description": "Rest Transport Adapter.",
+      "properties": {
+        "rest": {
+          "$ref": "#/$defs/RestServerOptions"
+        }
+      },
+      "title": "RestTransport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "controllers": {
+      "items": {
+        "$ref": "#/$defs/PandaControllerEntry"
+      },
+      "title": "Controllers",
+      "type": "array"
+    },
+    "transport": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/EpicsPVATransport"
+          },
+          {
+            "$ref": "#/$defs/RestTransport"
+          }
+        ]
+      },
+      "title": "Transport",
+      "type": "array"
+    }
+  },
+  "required": [
+    "controllers",
+    "transport"
+  ],
+  "title": "PandaController",
+  "type": "object"
+}

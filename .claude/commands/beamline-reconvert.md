@@ -53,8 +53,11 @@ emits no JSON, fall back to Appendix A. Do not silently skip validation.
 Parse the JSON on stdout and summarise: reconverted count, skipped
 (grouped by `reason`), each conversion error's message, each entry in
 `warnings` (won't-convert entities left out of an ioc.yaml, with the IOC,
-entity type and reason), validation pass/fail counts with stderr tails for
-any failure. Then run
+entity type and reason), each entry in `fastcs` (fastcs-pandablocks
+instances written for ADPandABlocks PandAs; a dedicated PandA IOC has
+`status: fastcs` and no ioc.yaml to validate, see the `ADPandABlocks` section
+of [module-special-cases.md](../skills/shared/module-special-cases.md)),
+validation pass/fail counts with stderr tails for any failure. Then run
 `git -C <services-repo> diff --stat` to show the file delta.
 
 Do not commit anything. Suggest:

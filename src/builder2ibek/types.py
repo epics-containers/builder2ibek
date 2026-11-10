@@ -84,6 +84,10 @@ class Generic_IOC(BaseModel):
     wont_convert_types: dict[str, WontConvert] = Field(
         default_factory=dict, exclude=True
     )
+    # warnings that are not about a dropped entity type
+    extra_warnings: list[str] = Field(default_factory=list, exclude=True)
+    # the PandAs split out for fastcs-pandablocks (a fastcs_panda.PandaSplit)
+    panda_split: Any = Field(default=None, exclude=True)
 
     def wont_convert(self, entity: Entity, reason: str, note: str = ""):
         """
@@ -110,7 +114,7 @@ class Generic_IOC(BaseModel):
                 f"left out of the ioc.yaml: {record.reason}"
             )
             lines.append("\n".join([text] + [f"  - {n}" for n in record.notes]))
-        return lines
+        return lines + self.extra_warnings
 
 
 # Generic XML classes ##########################################################

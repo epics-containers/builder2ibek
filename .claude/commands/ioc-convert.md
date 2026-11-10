@@ -75,6 +75,19 @@ module (e.g. RTEMS / DLS-build hybrids): it emits `BLGui.status` and
 `BLGui.device` for the XML's `auto_BLGui_*` entities. Without it they are
 dropped.
 
+**PandA IOCs (ADPandABlocks).** xml2yaml writes fastcs-pandablocks instances
+for an IOC with ADPandABlocks PandAs and says so on stdout; see the
+`ADPandABlocks` section of
+[module-special-cases.md](../skills/shared/module-special-cases.md).
+
+- **Dedicated** (PandAs plus boilerplate): xml2yaml turns `$INSTANCE_DIR` into
+  a fastcs instance, from `.fastcs_ioc_template`, and writes no `ioc.yaml`.
+  Stop here: the remaining phases are for ibek IOCs. Report the instance and
+  xml2yaml's warnings.
+- **Mixed** (other devices too): xml2yaml writes the `ioc.yaml` and one sibling
+  instance per PandA, `services/<pv-prefix-lowercase>/`. Carry on with the
+  `ioc.yaml` as usual, and list the sibling instances in the report.
+
 ### 1d. Review ioc.yaml and fix converters
 
 Read the generated `ioc.yaml`. **Do not read large referenced files yet** —

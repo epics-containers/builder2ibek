@@ -22,6 +22,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 from builder2ibek.convert import convert_file
+from builder2ibek.fastcs_panda import CONTROLLER_YAML, FASTCS_PANDABLOCKS_IMAGE
 
 BUILDER_WORK = Path("/dls_sw/work/R3.14.12.7/support")
 BUILDER_PROD = Path("/dls_sw/prod/R3.14.12.7/support")
@@ -109,6 +110,15 @@ def _existing_has_blgui(ioc_yaml: Path) -> bool:
     )
 
 
+def _is_fastcs_panda(folder: Path) -> bool:
+    """True when folder is a fastcs-pandablocks instance (see fastcs_panda)."""
+    values = folder / "values.yaml"
+    return (folder / "config" / CONTROLLER_YAML).is_file() and (
+        values.is_file()
+        and FASTCS_PANDABLOCKS_IMAGE.split(":")[0] in values.read_text()
+    )
+
+
 @dataclass
 class ReconvertResult:
     beamline: str
@@ -122,6 +132,7 @@ class ReconvertResult:
     reconverted: list[dict] = field(default_factory=list)
     conversion_errors: list[dict] = field(default_factory=list)
     warnings: list[dict] = field(default_factory=list)
+    fastcs: list[dict] = field(default_factory=list)
     validation: list[dict] = field(default_factory=list)
 
 
@@ -169,7 +180,8 @@ def run_reconvert(
         ioc_name = xml.stem.lower()
         services_folder = services_dir / ioc_name
         ioc_yaml = services_folder / "config" / "ioc.yaml"
-        if not ioc_yaml.is_file():
+        # a dedicated PandA IOC is a fastcs-pandablocks instance once converted
+        if not ioc_yaml.is_file() and not _is_fastcs_panda(services_folder):
             result.skipped.append({"xml": str(xml), "reason": "no-services-folder"})
             continue
         if only_set and ioc_name not in only_set:
@@ -194,13 +206,20 @@ def run_reconvert(
             # Route any stray converter prints to stderr so `--json` on
             # stdout stays parseable.
             with contextlib.redirect_stdout(sys.stderr):
-                warnings = convert_file(
+                converted = convert_file(
                     xml, ioc_yaml, IOC_SCHEMA, description=description, blgui=blgui
                 )
             result.warnings.extend(
-                {"ioc_name": ioc_name, "warning": w} for w in warnings
+                {"ioc_name": ioc_name, "warning": w} for w in converted.warnings
             )
-            result.reconverted.append({"ioc_name": ioc_name, "status": "ok"})
+            result.fastcs.extend(
+                {"ioc_name": ioc_name, "instance": str(f)}
+                for f in converted.fastcs_instances
+            )
+            # status "fastcs": no ioc.yaml to validate, the IOC became a
+            # fastcs-pandablocks instance
+            status = "ok" if converted.ioc_yaml_written else "fastcs"
+            result.reconverted.append({"ioc_name": ioc_name, "status": status})
         except Exception as e:  # noqa: BLE001 — report any converter error
             result.conversion_errors.append(
                 {"ioc_name": ioc_name, "error": f"{type(e).__name__}: {e}"}
@@ -257,7 +276,7 @@ def _run_validation(result: ReconvertResult) -> None:
         for item in result.reconverted:
             ioc_name = item["ioc_name"]
             cand = by_name.get(ioc_name)
-            if cand is None:
+            if cand is None or item["status"] != "ok":
                 continue
             shutil.copy(cand["ioc_yaml"], cfg_ioc)
             proc = subprocess.run(
@@ -292,6 +311,8 @@ def _render_human(result: ReconvertResult) -> str:
     lines.append(f"Skipped:       {len(result.skipped)}")
     lines.append(f"Conversion errors: {len(result.conversion_errors)}")
     lines.append(f"Warnings:      {len(result.warnings)}")
+    if result.fastcs:
+        lines.append(f"FastCS instances: {len(result.fastcs)}")
     if not result.validate:
         lines.append("Validation:    skipped (--no-validate)")
     else:
@@ -310,6 +331,12 @@ def _render_human(result: ReconvertResult) -> str:
         lines.append("Warnings:")
         for w in result.warnings:
             lines.append("  - " + w["warning"].replace("\n", "\n    "))
+
+    if result.fastcs:
+        lines.append("")
+        lines.append("fastcs-pandablocks instances written (not validated):")
+        for f in result.fastcs:
+            lines.append(f"  - {f['ioc_name']}: {f['instance']}")
 
     failed = [v for v in result.validation if v["status"] == "fail"]
     if failed:

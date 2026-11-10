@@ -3,20 +3,36 @@ Generic XML to YAML conversion functions
 """
 
 import re
+from dataclasses import dataclass
+from dataclasses import field as dc_field
 from pathlib import Path
 from typing import Any
 
 from ruamel.yaml import YAML, CommentedMap
 
 from builder2ibek.builder import Builder, Element
+from builder2ibek.fastcs_panda import split_pandas, write_fastcs
 from builder2ibek.moduleinfos import finalizers, module_infos
 from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
 
 
+@dataclass
+class ConvertResult:
+    """What convert_file wrote, and the warnings for the user"""
+
+    warnings: list[str] = dc_field(default_factory=list)
+    # what else was written, e.g. fastcs instances
+    notes: list[str] = dc_field(default_factory=list)
+    # False for a dedicated PandA IOC, which becomes a fastcs instance instead
+    ioc_yaml_written: bool = True
+    # fastcs-pandablocks instance folders written
+    fastcs_instances: list[Path] = dc_field(default_factory=list)
+
+
 def convert_file(
     xml: Path, yaml: Path, schema: str, description: str = "", blgui: bool = False
-) -> list[str]:
+) -> ConvertResult:
     def tidy_up(yaml):
         # add blank lines between major fields
         for field in [
@@ -31,8 +47,12 @@ def convert_file(
     """
     Convert a single builder XML file into a single ibek YAML
 
-    Returns the IOC's won't-convert warnings, one per dropped entity type;
-    the caller reports them to the user.
+    An IOC with ADPandABlocks PandAs also gets fastcs-pandablocks instances,
+    written next to the ioc.yaml (see builder2ibek.fastcs_panda); a dedicated
+    PandA IOC gets only that, and no ioc.yaml.
+
+    Returns what was written and the IOC's warnings, one per dropped entity
+    type plus any others; the caller reports them to the user.
     """
     yaml.parent.mkdir(parents=True, exist_ok=True)
 
@@ -40,7 +60,15 @@ def convert_file(
     builder.load(xml)
     ioc = dispatch(builder, xml, yaml.parent, description=description, blgui=blgui)
 
-    warnings = ioc.warnings()
+    result = ConvertResult(warnings=ioc.warnings())
+    if ioc.panda_split is not None:
+        folders, notes, warnings = write_fastcs(xml.stem, ioc.panda_split, yaml)
+        result.fastcs_instances = folders
+        result.notes = notes
+        result.warnings += warnings
+        if ioc.panda_split.dedicated:
+            result.ioc_yaml_written = False
+            return result
 
     ruamel = YAML()
 
@@ -57,7 +85,7 @@ def convert_file(
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 
-    return warnings
+    return result
 
 
 def dispatch(
@@ -99,6 +127,9 @@ def dispatch(
         out_dir=out_dir or Path(),
         blgui=blgui,
     )
+
+    # PandAs become fastcs-pandablocks instances, not ioc.yaml entities
+    ioc.panda_split = split_pandas(builder, ioc)
 
     do_dispatch(builder, ioc)
 
