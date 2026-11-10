@@ -113,11 +113,13 @@ referencing a motor on another device, and `$(P)$(motor)` cannot express it.
 
 ## `adPython` — deprecated; use ADExternal
 
-adPython is deprecated in favour of ADExternal. Don't create an `adPython`
-folder in `ibek-support` or `ibek-support-dls`. b2i won't convert it:
-`converters/adPython.py` leaves every adPython entity out of the ioc.yaml, and
-`xml2yaml` and `reconvert` print a won't-convert warning naming the IOC, the
-entity type and the reason. Flag the IOC to the user as needing ADExternal.
+adPython is deprecated in favour of ADExternal. b2i won't convert it,
+whatever `ibek-support-dls` contains: `converters/adPython.py` leaves every
+adPython entity out of the ioc.yaml, and `xml2yaml` and `reconvert` print a
+won't-convert warning naming the IOC, the entity type and the reason. Its
+`ibek-support-dls/adPython` folder is being removed. Don't add a support YAML
+for it, and don't restore its entities by hand in a converted ioc.yaml. Flag
+the IOC to the user as needing ADExternal.
 ADExternal has no support YAML yet. Whether an automatic adPython to ADExternal
 translation is possible is tracked in
 https://github.com/epics-containers/builder2ibek/issues/173.
@@ -130,12 +132,13 @@ the warning lists those entities, and the ioc.yaml fails validation with
 ## `procServControl` — not used in containers
 
 procServControl is deprecated for containers: Kubernetes and argocd-monitor
-replace it. There is no support YAML for it in `ibek-support` or
-`ibek-support-dls`; don't create one. b2i won't convert it:
+replace it. b2i won't convert it, whatever `ibek-support-dls` contains:
 `converters/procServControl.py` leaves every procServControl entity
 (`procServControl`, `procServControlGui`) out of the ioc.yaml, and `xml2yaml`
 and `reconvert` print a won't-convert warning naming the IOC, the entity type
-and the reason.
+and the reason. Its `ibek-support-dls/procServControl` folder is being
+removed. Don't add a support YAML for it, and don't restore its entities by
+hand in a converted ioc.yaml.
 
 To drop another module the same way, call `ioc.wont_convert(entity, reason)`
 from its converter (`Generic_IOC.wont_convert` in `types.py`).

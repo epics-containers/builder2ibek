@@ -51,8 +51,10 @@ emits no JSON, fall back to Appendix A. Do not silently skip validation.
 ## Step 3 — Report
 
 Parse the JSON on stdout and summarise: reconverted count, skipped
-(grouped by `reason`), each conversion error's message, validation
-pass/fail counts with stderr tails for any failure. Then run
+(grouped by `reason`), each conversion error's message, each entry in
+`warnings` (won't-convert entities left out of an ioc.yaml, with the IOC,
+entity type and reason), validation pass/fail counts with stderr tails for
+any failure. Then run
 `git -C <services-repo> diff --stat` to show the file delta.
 
 Do not commit anything. Suggest:
