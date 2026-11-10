@@ -202,8 +202,8 @@ PandA PV. The image tag is the single constant `FASTCS_PANDABLOCKS_IMAGE` in
 `fastcs_panda.py`; bumping it means vendoring that release's `schema.json`
 into `tests/samples/fastcs-pandablocks/`.
 
-Don't add ADPandABlocks support YAML to `ibek-support`. The `ibek-support-dls`
-ADPandABlocks folder is removed in a separate MR.
+`ibek-support-dls` has no ADPandABlocks folder. Don't add ADPandABlocks
+support YAML to `ibek-support` or `ibek-support-dls`.
 
 ## `procServControl` — not used in containers
 
