@@ -16,10 +16,15 @@ from pathlib import Path
 
 import pytest
 
+from builder2ibek.patterns import LIBRARIES
 from tests.conftest import COMMUNITY_SUPPORT, DLS_SUPPORT
 
 REPO_ROOT = Path(__file__).parent.parent
-SUBMODULES = (COMMUNITY_SUPPORT, DLS_SUPPORT)
+SUBMODULES = (
+    COMMUNITY_SUPPORT,
+    DLS_SUPPORT,
+    *(REPO_ROOT / library for library in LIBRARIES),
+)
 
 
 def _committed_pin(submodule: Path) -> str:

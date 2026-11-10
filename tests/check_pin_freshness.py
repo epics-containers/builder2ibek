@@ -14,6 +14,9 @@ weekly from periodic.yml, and by hand whenever you like:
 
     python3 tests/check_pin_freshness.py
 
+The runtime pattern libraries are pinned at release tags rather than main, so
+those pins are compared with the newest release tag instead.
+
 ibek-support-dls is on Diamond's internal GitLab, so this can only reach it from
 inside the network. From a GitHub runner that submodule is reported unreachable
 and skipped rather than treated as a problem.
@@ -27,6 +30,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SUBMODULES = ("ibek-support", "ibek-support-dls")
+# Pinned at release tags; kept in step with builder2ibek.patterns.LIBRARIES, which
+# this script does not import so that it runs without the package installed.
+TAGGED_SUBMODULES = ("ibek-runtime-streamdevice", "ibek-runtime-support")
 LS_REMOTE_TIMEOUT = 30
 
 IN_ACTIONS = os.environ.get("GITHUB_ACTIONS") == "true"
@@ -79,6 +85,44 @@ def _remote_main(url: str) -> str | None:
     return result.stdout.split()[0]
 
 
+def _version_key(tag: str) -> tuple[int, ...]:
+    """Sort key for a release tag such as 0.7.3 or v0.2.0; others sort first."""
+    try:
+        return tuple(int(part) for part in tag.removeprefix("v").split("."))
+    except ValueError:
+        return ()
+
+
+def _remote_latest_tag(url: str) -> tuple[str, str] | None:
+    """(tag, commit) of the newest release tag upstream, or None if unreachable."""
+    try:
+        result = subprocess.run(
+            ["git", "ls-remote", "--tags", url],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=LS_REMOTE_TIMEOUT,
+        )
+    except subprocess.TimeoutExpired:
+        return None
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    commits: dict[str, str] = {}
+    for line in result.stdout.splitlines():
+        sha, ref = line.split()
+        tag = ref.removeprefix("refs/tags/")
+        # an annotated tag is listed twice; the ^{} line names its commit
+        if tag.endswith("^{}"):
+            commits[tag.removesuffix("^{}")] = sha
+        else:
+            commits.setdefault(tag, sha)
+    tags = [tag for tag in commits if _version_key(tag)]
+    if not tags:
+        return None
+    latest = max(tags, key=_version_key)
+    return latest, commits[latest]
+
+
 def main() -> int:
     stale = 0
     for submodule in SUBMODULES:
@@ -98,7 +142,24 @@ def main() -> int:
                 f"python3 tests/vendor_support_dls.py --update"
             )
 
-    print(f"\n{stale} of {len(SUBMODULES)} submodule pins behind main")
+    for submodule in TAGGED_SUBMODULES:
+        pinned = _committed_pin(submodule)
+        latest = _remote_latest_tag(_submodule_url(submodule))
+
+        if latest is None:
+            print(f"{submodule}: remote unreachable, skipped")
+        elif latest[1] == pinned:
+            print(f"{submodule}: at the newest release {latest[0]}")
+        else:
+            stale += 1
+            _warn(
+                f"{submodule} pin {pinned[:8]} is not the newest release "
+                f"{latest[0]}. To take it: git -C {submodule} checkout {latest[0]}, "
+                f"then commit the pin and ./tests/samples/make_samples.sh"
+            )
+
+    total = len(SUBMODULES) + len(TAGGED_SUBMODULES)
+    print(f"\n{stale} of {total} submodule pins behind main or the newest release")
     # Always 0: this reports, it does not gate.
     return 0
 

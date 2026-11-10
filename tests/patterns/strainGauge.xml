@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<strainGauge.strainGauge P="BL11I-OP-VFM-01:SG" bus="ty_71_6" name="M1.strainGauge"/>
+</components>

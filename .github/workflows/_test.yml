@@ -26,8 +26,10 @@ jobs:
           # Need this to get version number from last tag
           fetch-depth: 0
 
-      - name: Init ibek-support submodule
-        run: git submodule update --init ibek-support
+      - name: Init ibek-support and runtime pattern library submodules
+        run: >-
+          git submodule update --init
+          ibek-support ibek-runtime-streamdevice ibek-runtime-support
 
       # ibek-support-dls is on Diamond's internal GitLab, so the runner cannot
       # clone it. Drop in the vendored entity models instead, or 9 of the 14

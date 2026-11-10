@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<GR150.gr150 DISABLE="1" P="BL13I-OP-MIRR-01:CHILLER" bus="ty_60_1" name="MIRR1"/>
+</components>

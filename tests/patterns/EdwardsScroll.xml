@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EdwardsScroll.EdwardsScroll P="BL08J-VA-SCROL-01" name="SCROLL1" port="VA_TSERV1_8"/>
+	<EdwardsScroll.EdwardsScroll P="BL08J-VA-SCROL-02" name="SCROLL2" port="VA_TSERV1_11"/>
+</components>
