@@ -18,9 +18,9 @@ from:
 An IOC that is live but has no redirect entry cannot boot, so it is skipped;
 the report shows its newest build under ``/dls_sw/prod/<epics>/ioc/<PREFIX>/``.
 
-The IOCs keep running on their IOC servers. A folder written here must not
-be deployed while its IOC runs there: with hostNetwork both copies would
-serve the same PVs. The plan output and each values.yaml say so. Deploying
+The IOCs keep running on their IOC servers. Stop an IOC on its server first,
+then deploy and start its folder's cluster copy: with hostNetwork two running
+copies would serve the same PVs. The plan output and each values.yaml say so. Deploying
 is done outside builder2ibek (``ec`` or the deployment repo).
 
 Nothing here writes outside the services repo.
@@ -58,11 +58,12 @@ MANUALSTART_NOTE = "manualstart: keep stopped after deploying"
 WARNING = """\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 WARNING: these IOCs still run on their IOC servers.
-Do NOT deploy a legacy services folder while its IOC is running on its
-server: both would serve the same PVs (hostNetwork). Either don't deploy the
-service yet, or deploy it and stop it at once (e.g. ec stop <service>).
-Cut over one IOC at a time: stop it on its server, then start the cluster
-copy. IOCs marked manualstart: keep stopped after deploying.
+Cut over one IOC at a time: stop the IOC on its server first, then deploy
+and start its cluster copy (ec start --commit <service>). With hostNetwork,
+two running copies would serve the same PVs. If a service has to be deployed
+before that, deploy it stopped (ec stop --commit <service> immediately),
+knowing that both copies serve the same PVs for that short window.
+IOCs marked manualstart: keep stopped after deploying.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
 PROD_RE = re.compile(
     r"^/dls_sw/prod/(?P<epics>[^/]+)/ioc/(?P<domain>[^/]+)/(?P<name>[^/]+)"
@@ -365,9 +366,11 @@ def build_plan(
         servers = ", ".join(e.server for e in launches[ioc])
         entry.manualstart = any(e.manualstart for e in launches[ioc])
         entry.header = (
-            f"WARNING: this IOC still runs on {servers}. Do not deploy this"
-            " service while it runs there: both would serve the same PVs"
-            " (hostNetwork). Stop it on its server first."
+            f"WARNING: this IOC still runs on {servers}. Stop it there first,"
+            " then deploy and start this service: with hostNetwork both would"
+            " serve the same PVs. If it has to be deployed before that, deploy"
+            f" it stopped (ec stop --commit {entry.folder} immediately); both"
+            " serve the same PVs for that short window."
         )
         if entry.manualstart:
             entry.notes.append(MANUALSTART_NOTE)

@@ -5,6 +5,7 @@ All names are fictional: beamline BL99J lives in the bl99i services repo.
 
 from __future__ import annotations
 
+import itertools
 import json
 import os
 from pathlib import Path
@@ -175,7 +176,7 @@ def test_header_warns_against_double_running(services_repo, dls_sw):
     entry = _by_ioc(_plan(services_repo, dls_sw))["BL99J-MO-IOC-01"]
     assert not entry.manualstart
     assert entry.header.startswith(
-        "WARNING: this IOC still runs on bl99j-mo-serv-01. Do not deploy"
+        "WARNING: this IOC still runs on bl99j-mo-serv-01. Stop it there first"
     )
     assert "same PVs" in entry.header
 
@@ -338,8 +339,10 @@ def test_written_values_parse_back(services_repo, dls_sw, folder, keys):
     lines = text.splitlines()
     assert lines[0].startswith("# yaml-language-server")
     assert lines[1].startswith("# WARNING: this IOC still runs on")
-    comment = " ".join(line[2:] for line in lines[1:5] if line.startswith("# "))
-    assert "Do not deploy this service while it runs there" in comment
+    block = list(itertools.takewhile(lambda line: line.startswith("# "), lines[1:]))
+    comment = " ".join(line[2:] for line in block)
+    assert "Stop it there first, then deploy and start this service" in comment
+    assert f"ec stop --commit {folder} immediately" in comment
     if folder == "bl99j-mo-ioc-06":
         assert "Manualstart: keep stopped after deploying." in comment
 

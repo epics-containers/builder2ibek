@@ -22,11 +22,12 @@ boots today, unchanged, inside a RHEL7 container.
    ([CLAUDE.md](../../CLAUDE.md), `/ioc-convert` step 1a). Each conversion
    is one commit that replaces one legacy folder.
 
-> **Never deploy a legacy services folder while its IOC is running on its
-> IOC server.** With hostNetwork, both copies would serve the same PVs.
-> Either don't deploy the service yet, or deploy it and stop it at once
-> (e.g. `ec stop <service>`). The plan output and the top of each written
-> `values.yaml` repeat this warning.
+> **Stop the IOC on its IOC server first, then deploy and start its cluster
+> copy.** With hostNetwork, two running copies would serve the same PVs. If a
+> service has to be deployed before that, deploy it stopped
+> (`ec stop --commit <service>` immediately), knowing that both copies serve
+> the same PVs for that short window. The plan output and the top of each
+> written `values.yaml` repeat this warning.
 
 This command only writes services-repo files. It never deploys or starts an
 IOC, and it does not touch the deployment repo: under ArgoCD the deployment
@@ -125,15 +126,17 @@ For each IOC, once the services commit is merged:
 
 1. Stop the IOC on its IOC server (or remove it from that server's
    `soft-iocs`).
-2. Deploy and start its cluster copy: `ec deploy` / `ec start`, or enable it
-   in the deployment repo.
+2. Deploy and start its cluster copy: `ec deploy`, then
+   `ec start --commit <service>`, or enable it in the deployment repo.
+   Without `--commit`, ec only patches the live Argo Application, and a later
+   sync from the deployment repo can undo it.
 
 Never start a cluster copy while the server copy can still run.
 
 ## Rollback
 
-1. Stop the cluster copy: `ec stop <service>`, or `enabled: false` for it in
-   the deployment repo. Reverting the services commit alone does not stop a
+1. Stop the cluster copy: `ec stop --commit <service>`, or `enabled: false`
+   for it in the deployment repo. Reverting the services commit alone does not stop a
    running Application.
 2. Wait for the pod to go.
 3. Restart the IOC on its IOC server (and restore its `soft-iocs` entry if
