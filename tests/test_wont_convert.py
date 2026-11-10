@@ -50,7 +50,7 @@ def _write_xml(folder: Path) -> Path:
 def _convert(tmp_path: Path) -> tuple[list[dict], list[str]]:
     xml = _write_xml(tmp_path)
     yaml = tmp_path / "ioc.yaml"
-    warnings = convert_file(xml, yaml, "/epics/ibek-defs/ioc.schema.json")
+    warnings = convert_file(xml, yaml, "/epics/ibek-defs/ioc.schema.json").warnings
     return YAML(typ="safe").load(yaml.read_text())["entities"], warnings
 
 

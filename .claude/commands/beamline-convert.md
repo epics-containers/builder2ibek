@@ -37,7 +37,10 @@ To avoid parallel write conflicts (two IOC subagents trying to create the same
 support YAML), do a quick pre-pass:
 
 1. Run `uv run builder2ibek xml2yaml` for each IOC to generate ioc.yaml files
-2. Scan all generated ioc.yaml files for entity types
+2. Scan all generated ioc.yaml files for entity types. A dedicated PandA IOC
+   (ADPandABlocks) has none: xml2yaml writes a fastcs-pandablocks instance in
+   its place and says so; see the `ADPandABlocks` section of
+   [module-special-cases.md](../skills/shared/module-special-cases.md)
 3. Deduplicate the list of modules needing support YAMLs across all IOCs
 4. Read [module-special-cases.md](../skills/shared/module-special-cases.md) — skip
    modules that don't need support YAMLs and use correct folder names
@@ -68,6 +71,9 @@ For each IOC XML, spawn a `general-purpose` subagent:
 >
 > Report your results when complete.
 
+Skip Step 4 for a dedicated PandA IOC: the pre-pass already wrote its fastcs
+instance, and there is no ioc.yaml to validate. List it in the report.
+
 **Parallelism**: each subagent creates its own `EPICS_ROOT` (Phase 0), so file
 conflicts are avoided. Launch up to **10 IOCs in parallel** per batch for best
 throughput — wait for each batch to complete before launching the next.
@@ -90,7 +96,8 @@ Parallel subagents can inadvertently revert each other's edits to shared files
 
 After all IOC conversions complete:
 
-1. List which IOCs succeeded and which had issues
+1. List which IOCs succeeded and which had issues, and the fastcs-pandablocks
+   instances written for PandA IOCs
 2. Run a final `./update-schema` and `uv run pytest` in the main repo
 3. Report files changed across all repos
 4. Suggest git commands for the user to review and commit:

@@ -116,8 +116,8 @@ referencing a motor on another device, and `$(P)$(motor)` cannot express it.
 adPython is deprecated in favour of ADExternal. b2i won't convert it,
 whatever `ibek-support-dls` contains: `converters/adPython.py` leaves every
 adPython entity out of the ioc.yaml, and `xml2yaml` and `reconvert` print a
-won't-convert warning naming the IOC, the entity type and the reason. Its
-`ibek-support-dls/adPython` folder is being removed. Don't add a support YAML
+won't-convert warning naming the IOC, the entity type and the reason.
+`ibek-support-dls` has no adPython folder. Don't add a support YAML
 for it, and don't restore its entities by hand in a converted ioc.yaml. Flag
 the IOC to the user as needing ADExternal.
 ADExternal has no support YAML yet. Whether an automatic adPython to ADExternal
@@ -129,6 +129,79 @@ its input from the dropped plugin (its `NDARRAY_PORT` is the adPython `PORT`),
 the warning lists those entities, and the ioc.yaml fails validation with
 `object <port> not found` until they are rewired or the IOC is ported.
 
+## `ADPandABlocks` — replaced by fastcs-pandablocks
+
+ADPandABlocks is replaced by
+[fastcs-pandablocks](https://github.com/PandABlocks/fastcs-PandABlocks), which
+introspects the PandA itself: an instance needs only each PandA's PV prefix and
+box address. b2i never writes ADPandABlocks entities to an ioc.yaml.
+`src/builder2ibek/fastcs_panda.py` splits the PandAs out of the XML before
+dispatch, and `xml2yaml` and `reconvert` write fastcs instances instead:
+
+- **Dedicated IOC**: PandAs, the elements that belong to them, and boilerplate
+  only (`devIocStats`, `autosave`, `EpicsEnvSet` such as
+  `EPICS_CA_MAX_ARRAY_BYTES`, `pvlogging.PvLogging`). The IOC's own service
+  folder becomes one fastcs instance, with one controller per PandA, and gets
+  no ioc.yaml. Given `services/<ioc>/config/ioc.yaml`, xml2yaml writes
+  `services/<ioc>/values.yaml` and `config/controller.yaml` from
+  `.fastcs_ioc_template`. It removes the ibek-only files from that folder
+  (`config/ioc.yaml`, `ioc.schema.json` at the folder root or in `config/`,
+  the pvlogging blacklist, `runtime-lock.yaml` and the pattern files it lists)
+  and names any other file it leaves in `config/`. The new `values.yaml`
+  carries over the ibek one's `securityContext` and `dataVolume` (`pvc: true`,
+  or its `hostPath`); if the ibek one set anything else, it is kept as
+  `values.yaml.ibek` (or `.ibek.1`, ... when taken) with a warning. A real
+  `Chart.yaml` or `templates/` where the template has a symlink is kept, with
+  a warning. Outside a services repo the instance is a folder next to the
+  `--yaml` path, and that file is left alone.
+- **Mixed IOC**: the ioc.yaml keeps the other devices, and each PandA gets its
+  own instance, a sibling folder named from its PV prefix in lowercase
+  (`services/bl22i-mo-panda-01`). A PandA whose prefix in lowercase is the
+  IOC's own name gets `<prefix>-panda` instead, so the two never share a
+  folder. The dropped elements are reported as won't convert, naming those
+  instances.
+
+Before writing anything, b2i reads every `services/*/config/controller.yaml`,
+in the 0.2.x shape (`controllers[].id` / `address`) or the 0.1.0 one
+(`controller.address` / `pv_prefix`). A folder with `config/controller.yaml`
+is an instance. A PandA is refused, with a warning, when an instance already
+serves its prefix or box, or when its own target folder is an instance serving
+different controllers (the warning has a diff; merge by hand). Boxes compare
+by short hostname, case-insensitive (`panda-01` matches
+`panda-01.diamond.ac.uk`); IP addresses compare whole. For a dedicated IOC
+nothing is written, and a warning lists all its PandAs; for a mixed one only
+that PandA's instance is skipped. An instance serving exactly the XML's
+controllers is kept as it is, hand edits included. A mixed IOC whose own
+folder is an instance gets no ioc.yaml, with a warning: it was dedicated and
+needs merging by hand.
+
+A target folder that is not an instance and not empty (an ibek IOC other than
+a dedicated IOC's own, a hand-made folder) stops the conversion before any
+file is written, and so does a symlinked folder, `config/`, `values.yaml` or
+`controller.yaml`. xml2yaml prints the error and exits 1.
+
+`dataVolume.hostPath` comes from the IOC's own beamline, not the PandA's
+prefix. `reconvert` gives a dedicated IOC status `fastcs`, or `refused`, and
+passes the notes through in its JSON and summary.
+
+The elements that belong to a PandA: `ADPandABlocks.ADPandABlocks`,
+`ADPandABlocks.MotorSync` (no fastcs equivalent, so it is reported), the
+areaDetector plugins fed from a PandA port down the `NDARRAY_PORT` chain
+(fastcs-pandablocks does its own data capture), and `dbpf`, `StartupCommand`
+and `pvlogging.BlacklistPv` elements that name a PV under a PandA's prefix.
+
+The mapping is `P` → controller `id` (the PV prefix) and `HOST` → `address`.
+`R` (always `:DRV:`) was the areaDetector driver's suffix and has no
+counterpart. fastcs-pandablocks serves PVA only, and its PV names below the
+prefix differ from ADPandABlocks', so GDA, ophyd-async and screens need
+updating; xml2yaml warns about any other ioc.yaml entity that still names a
+PandA PV. The image tag is the single constant `FASTCS_PANDABLOCKS_IMAGE` in
+`fastcs_panda.py`; bumping it means vendoring that release's `schema.json`
+into `tests/samples/fastcs-pandablocks/`.
+
+Don't add ADPandABlocks support YAML to `ibek-support`. The `ibek-support-dls`
+ADPandABlocks folder is removed in a separate MR.
+
 ## `procServControl` — not used in containers
 
 procServControl is deprecated for containers: Kubernetes and argocd-monitor
@@ -136,8 +209,8 @@ replace it. b2i won't convert it, whatever `ibek-support-dls` contains:
 `converters/procServControl.py` leaves every procServControl entity
 (`procServControl`, `procServControlGui`) out of the ioc.yaml, and `xml2yaml`
 and `reconvert` print a won't-convert warning naming the IOC, the entity type
-and the reason. Its `ibek-support-dls/procServControl` folder is being
-removed. Don't add a support YAML for it, and don't restore its entities by
+and the reason. `ibek-support-dls` has no procServControl folder. Don't add a
+support YAML for it, and don't restore its entities by
 hand in a converted ioc.yaml.
 
 To drop another module the same way, call `ioc.wont_convert(entity, reason)`

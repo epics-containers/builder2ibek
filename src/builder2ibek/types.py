@@ -73,8 +73,8 @@ class Generic_IOC(BaseModel):
     entities: list[dict[str, Any]]
     raw_entities: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
     source_file: Path
-    # where the converted YAML is being written - any extra files a convertor
-    # generates belong next to it, not in the current working directory
+    # where the converted YAML is being written; extra files a convertor
+    # generates go in side_files, which convert_file writes next to it
     out_dir: Path = Field(default=Path(), exclude=True)
     # emit BLGui.status / BLGui.device (xml2yaml --blgui); only for generic
     # IOCs whose binary includes the BLGui module
@@ -84,6 +84,12 @@ class Generic_IOC(BaseModel):
     wont_convert_types: dict[str, WontConvert] = Field(
         default_factory=dict, exclude=True
     )
+    # files that go next to the ioc.yaml, by name; written only with it
+    side_files: dict[str, str] = Field(default_factory=dict, exclude=True)
+    # warnings that are not about a dropped entity type
+    extra_warnings: list[str] = Field(default_factory=list, exclude=True)
+    # the PandAs split out for fastcs-pandablocks (a fastcs_panda.PandaSplit)
+    panda_split: Any = Field(default=None, exclude=True)
 
     def wont_convert(self, entity: Entity, reason: str, note: str = ""):
         """
@@ -110,7 +116,7 @@ class Generic_IOC(BaseModel):
                 f"left out of the ioc.yaml: {record.reason}"
             )
             lines.append("\n".join([text] + [f"  - {n}" for n in record.notes]))
-        return lines
+        return lines + self.extra_warnings
 
 
 # Generic XML classes ##########################################################
