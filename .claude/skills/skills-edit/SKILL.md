@@ -16,7 +16,7 @@ AI-assisted IOC conversion. It splits into two parts:
 - **Commands** (`.claude/commands/<name>.md`) — explicit user workflows
   invoked via `/<name>` with arguments. Currently: `ioc-convert`,
   `ioc-convert-raw`, `ioc-check`, `ioc-inspect`, `beamline-convert`,
-  `beamline-check`, `beamline-reconvert`, `support-create`, `support-fix`,
+  `beamline-check`, `beamline-reconvert`, `beamline-legacy`, `support-create`, `support-fix`,
   `support-inspect`, `memo`.
 
 Editing either well is as important as editing code.
