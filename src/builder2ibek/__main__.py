@@ -6,6 +6,7 @@ from builder2ibek import __version__
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
+from builder2ibek.devc7 import DLS_SW, devc7_cli
 from builder2ibek.migrate_autosave import migrate_folder
 from builder2ibek.reconvert import reconvert_cli
 
@@ -216,6 +217,60 @@ def reconvert(
         only=list(only) or None,
         json_out=json_out,
     )
+
+
+@cli.command("dev-c7")
+def dev_c7(
+    beamline: str = typer.Argument(
+        ..., help="Beamline prefix of the IOCs to add (e.g. 'BL08J' or 'i08')"
+    ),
+    services_repo: Path = typer.Option(
+        ..., "--services-repo", help="Path to the beamline services repo"
+    ),
+    apply: bool = typer.Option(
+        False,
+        "--apply",
+        help="Write the planned folders (default: print the plan only). "
+        "An existing folder is never overwritten.",
+    ),
+    json_out: bool = typer.Option(
+        False, "--json", help="Emit the plan as JSON on stdout"
+    ),
+    init_dir: Path | None = typer.Option(
+        None,
+        help="DLS init configuration: <server>/soft-iocs and real-iocs "
+        "[default: <dls-sw>/prod/etc/init]",
+    ),
+    redirect_table: Path | None = typer.Option(
+        None,
+        help="DLS IOC redirector table: IOC name -> boot script "
+        "[default: <dls-sw>/prod/etc/redirector/redirect_table]",
+    ),
+    dls_sw: Path = typer.Option(
+        DLS_SW, help="Root that /dls_sw paths resolve under (for tests)"
+    ),
+):
+    """
+    Add every live Linux IOC with a beamline prefix to a services repo as a
+    dev-c7 legacy IOC, running the build it boots from today.
+
+    Live IOCs are those in the init launch lists; each one's version comes
+    from the redirect table. Live IOCs with no redirect entry, Windows,
+    vxWorks and RTEMS IOCs, IOCs that already have a services folder, and
+    retired IOCs are reported and left out. The IOCs keep running on their
+    servers: never deploy a folder while its IOC runs there.
+    """
+    code = devc7_cli(
+        beamline,
+        services_repo,
+        apply=apply,
+        json_out=json_out,
+        init_dir=init_dir,
+        redirect_table=redirect_table,
+        dls_sw=dls_sw,
+    )
+    if code:
+        raise typer.Exit(code)
 
 
 if __name__ == "__main__":

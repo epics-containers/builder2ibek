@@ -51,6 +51,10 @@ grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -m
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 #   --blgui  emit BLGui.status/device; only when the generic IOC binary has BLGui
 
+# Add a beamline's live Linux IOCs as dev-c7 legacy IOCs (dry run; --apply writes).
+# Services-repo files only: never deploy one while its IOC runs on its server.
+uv run builder2ibek dev-c7 <BL08J> --services-repo <path/to/services-repo>
+
 # Testing:
 uv run pytest
 env -u EPICS_ROOT uv run pytest      # as CI runs it -- local /epics hides failures
@@ -84,6 +88,8 @@ bumping a submodule.
 - `/beamline-convert <beamline> [services-repo]` — convert all builder XML IOCs for a beamline
 - `/beamline-reconvert <beamline> [services-repo]` — re-run xml2yaml on all IOCs and validate schema
 - `/beamline-check <beamline> [services-repo]` — run ioc-check on all IOCs in a beamline
+- `/beamline-legacy <beamline> [services-repo]` — phase 1 of a beamline migration: add every
+  live Linux IOC as a dev-c7 legacy IOC; phase 2 is `/ioc-convert` per IOC, which replaces it
 - `/compose2helm <compose-repo>[/services/<name>] [helm-services-repo]` — port IOC
   instances from a docker-compose services repo to a helm `ioc-instance` services
   repo, bumping generic IOC images to their latest releases
