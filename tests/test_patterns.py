@@ -205,7 +205,7 @@ def test_alignment_matches_the_models(index: PatternIndex, module: str):
     if module in ALIGNED:
         assert not problems, f"{module} is in ALIGNED but: {problems}"
     else:
-        assert problems, f"{module} now matches its generic model; move it to ALIGNED"
+        assert problems, f"{module} matches its generic model; move it to ALIGNED"
 
 
 def _convert(xml: Path) -> list[dict]:

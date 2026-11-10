@@ -45,7 +45,8 @@ models. CI clones both (they are on GitHub).
 To take a new release: `git -C ibek-runtime-streamdevice checkout <tag>`, commit
 the pin, then run `tests/test_patterns.py`. A release that aligns a pattern with
 its generic model fails `test_alignment_matches_the_models` until the module moves
-from `GENERIC_DIFFERS` to `ALIGNED` in `patterns.py`. `check_pin_freshness.py` warns when
+from `GENERIC_DIFFERS` to `ALIGNED` in `patterns.py`. That holds only with the real
+ibek-support-dls checked out: with the vendored subset, most of those tests skip. `check_pin_freshness.py` warns when
 a newer release tag exists.
 
 ## After bumping a submodule pin

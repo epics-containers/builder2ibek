@@ -86,7 +86,10 @@ def _remote_main(url: str) -> str | None:
 
 
 def _version_key(tag: str) -> tuple[int, ...]:
-    """Sort key for a release tag such as 0.7.3 or v0.2.0; others sort first."""
+    """Sort key for a release tag such as 0.7.3 or v0.2.0.
+
+    Any other tag gives an empty key, and the caller filters those out.
+    """
     try:
         return tuple(int(part) for part in tag.removeprefix("v").split("."))
     except ValueError:
@@ -155,7 +158,7 @@ def main() -> int:
             _warn(
                 f"{submodule} pin {pinned[:8]} is not the newest release "
                 f"{latest[0]}. To take it: git -C {submodule} checkout {latest[0]}, "
-                f"then commit the pin and ./tests/samples/make_samples.sh"
+                f"then commit the pin and run tests/test_patterns.py"
             )
 
     total = len(SUBMODULES) + len(TAGGED_SUBMODULES)
