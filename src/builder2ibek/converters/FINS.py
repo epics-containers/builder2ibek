@@ -11,3 +11,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     # simulation attribute is a VxWorks builder concept, not needed in ibek
     entity.remove("simulation")
+    # FINSTemplate is a leaf: nothing refers to it by name
+    if entity_type == "FINSTemplate":
+        entity.remove("name")

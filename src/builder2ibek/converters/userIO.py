@@ -15,7 +15,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     # Some str-typed params in support YAML get parsed as int/float by XML.
     # Only coerce fields that are actually type: str (not float/int).
     str_fields = ["LINR", "OUT", "INP", "EGU"]
+    if entity_type == "auto_calcout12input":
+        # every field of this template is str, e.g. OCAL="1"
+        str_fields += ["CALC", "OCAL", "PREC", "OOPT", "DOPT", "FLNK"]
+        str_fields += [f"INP{c}" for c in "ABCDEFGHIJKL"]
+    xml = entity.xml_attributes()
     for field in str_fields:
         val = entity.get(field)
         if val is not None and not isinstance(val, str):
-            entity[field] = str(val)
+            entity[field] = xml.get(field, str(val))

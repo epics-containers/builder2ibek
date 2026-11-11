@@ -21,5 +21,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         "digitelMpcIonpGroup",
         "dummyIonp",
         "digitelMpcTsp",
+        "digitelMpcqTsp",
+        "digitelMpcTspGroup",
     ]:
         entity.remove("name")
