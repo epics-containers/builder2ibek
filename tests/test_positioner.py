@@ -159,11 +159,35 @@ def test_explicit_pos_is_kept(tmp_path: Path):
   <positioner.multipositioner DESC="one" MP=":MP" P="BL01C-MO-STAGE-01"
     STRA="Out" STRB="In" name="ONE"/>
   <positioner.motorpositioner DESC="y" MP="ONE" PREC="3" Q=":Y:P"
-    motor="STAGE.Y" pos="D"/>
+    motor="STAGE.Y" pos="B"/>
+  <positioner.motorpositioner DESC="pz" MP="ONE" PREC="3" Q=":PZ:P"
+    motor="STAGE.PZ"/>
+  <positioner.motorpositioner DESC="pz" MP="ONE" PREC="3" Q=":PZ:P1"
+    motor="STAGE.PZ"/>
 """,
     )
 
-    assert [e["pos"] for e in entities if "Q" in e] == ["D"]
+    # later positioners skip the slot the XML gives
+    assert [e.get("pos", "A") for e in entities if "Q" in e] == ["B", "A", "C"]
+
+
+def test_more_than_eight_positioners_is_an_error(tmp_path: Path):
+    positioners = "".join(
+        f"""
+  <positioner.motorpositioner DESC="y" MP="ONE" PREC="3" Q=":Y:P{i}"
+    motor="STAGE.Y"/>"""
+        for i in range(9)
+    )
+    with pytest.raises(ValueError, match="'ONE' has more than 8 positioners"):
+        _convert(
+            tmp_path,
+            """
+  <positioner.multipositioner DESC="one" MP=":MP" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="ONE"/>
+"""
+            + positioners
+            + "\n",
+        )
 
 
 def test_multipositioner_drops_gui_macros(tmp_path: Path):

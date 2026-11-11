@@ -15,8 +15,9 @@ SLOT_TYPES = ("positioner.positioner", "positioner.motorpositioner")
 # the multipositioner's dfanout records have outputs OUTA..OUTH
 MAX_SLOTS = 8
 
-# GUI macros that XMLbuilder's multipositioner computes from its positioners
-GUI_MACROS = ("NPOS", *(f"P{i}" for i in range(1, MAX_SLOTS + 1)))
+# screen macros that XMLbuilder's multipositioner computes from its
+# positioners: their count and the suffixes of up to eight of them
+GUI_MACROS = ("NPOS", *(f"P{i}" for i in range(1, 9)))
 
 
 def assign_slot(entity: Entity, ioc: Generic_IOC):
@@ -24,20 +25,23 @@ def assign_slot(entity: Entity, ioc: Generic_IOC):
     Set pos, the positioner's slot in its multipositioner, unless the XML
     gives one. As in XMLbuilder's multipositioner.addPositioner, positioners
     and motorpositioners take the slots A, B, C ... in the order they appear
-    in the XML.
+    in the XML, skipping any slot an earlier positioner's XML gives.
     """
     if entity.get("pos"):
         return
-    taken = [
-        e
+    taken = {
+        e.get("pos") or "A"
         for e in ioc.already_converted
         if e.get("type") in SLOT_TYPES and e.get("MP") == entity.MP
+    }
+    free = [
+        chr(ord("A") + i) for i in range(MAX_SLOTS) if chr(ord("A") + i) not in taken
     ]
-    if len(taken) >= MAX_SLOTS:
+    if not free:
         raise ValueError(
             f"Multipositioner '{entity.MP}' has more than {MAX_SLOTS} positioners"
         )
-    entity.pos = chr(ord("A") + len(taken))
+    entity.pos = free[0]
 
 
 @globalHandler
