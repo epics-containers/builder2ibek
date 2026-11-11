@@ -42,6 +42,18 @@ class Entity(dict[str, Any]):
             self[new] = self[attr]
             del self[attr]
 
+    def xml_attributes(self) -> dict[str, str]:
+        """
+        The attributes of the builder XML element this entity was made from,
+        as written in the XML. An XML attribute named "type" is only here,
+        because the entity's own type replaces it.
+        """
+        return self.__dict__.get("_xml_attributes", {})
+
+    def set_xml_attributes(self, attributes: dict[str, str]):
+        # kept off the dict, so that it never reaches the YAML
+        self.__dict__["_xml_attributes"] = dict(attributes)
+
     def add_entity(self, entity: "Entity | dict[str, Any]"):
         self._extra_entities.append(entity)
 
@@ -86,6 +98,12 @@ class Generic_IOC(BaseModel):
     )
     # files that go next to the ioc.yaml, by name; written only with it
     side_files: dict[str, str] = Field(default_factory=dict, exclude=True)
+    # ADCore.NDAttributes elements by the port they attach to, each an
+    # Attribute element's XML attributes; ADCore's finalize turns them into
+    # the NDAttributes XML of that port's driver or plugin
+    nd_attributes: dict[str, list[dict[str, str]]] = Field(
+        default_factory=dict, exclude=True
+    )
     # warnings that are not about a dropped entity type
     extra_warnings: list[str] = Field(default_factory=list, exclude=True)
     # the PandAs split out for fastcs-pandablocks (a fastcs_panda.PandaSplit)

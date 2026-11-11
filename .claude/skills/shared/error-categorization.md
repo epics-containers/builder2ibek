@@ -29,7 +29,7 @@ Patterns seen across multiple beamline conversions:
 | `when: last` not in ibek | `pingWait` entities fail generate2 | Known gap — ibek 3.3.3 hasn't implemented `When.last` |
 | gdaPlugins incomplete expansion | Only primary ROI+Stat chain generated; missing roi1-6, stat1-6, ffmpeg, PVA | Major gap in gdaPlugins converter — deliberate simplification |
 | Dropped `records.*` entities | calcout/calc/bi/mbbi records silently omitted | Converter TODO — raw EPICS records not yet supported |
-| NDAttributes `%s` format strings | `dbpf %s%s` in post_init outputs unresolved format strings | ADCore support YAML bug — PV names not resolved |
+| NDAttributes XML in a file | Warning "`<type>` has no ATTRIBUTES_FILE": the port's XML goes in `<port>.xml` next to the ioc.yaml, set by `ADCore.NDAttributesConfig` | Add `ATTRIBUTES_FILE` and `XMLSIZE` to that entity model, as ibek-support's ADCore drivers have; the converter then puts the XML inline |
 | vacValveGroup column misalignment | Rows have wrong number of values for multi-column pattern | dlsPLC support YAML — check column count matches template |
 | Moxa16 fixed channel count | NCHANS<16 devices still get 16 channels | terminalServer support YAML — handle NCHANS param |
 | `when: last` not implemented | All `utility.pingWait` uses fail | Known ibek gap |

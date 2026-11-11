@@ -31,7 +31,7 @@ def test_blacklist_written_next_to_yaml(samples: Path, tmp_path: Path, monkeypat
 
     blacklist = _convert(samples / f"{SAMPLE}.xml", tmp_path / "out")
 
-    expected = samples / f"{SAMPLE.lower()}_blacklist.txt"
+    expected = samples / "config" / SAMPLE.lower() / f"{SAMPLE.lower()}_blacklist.txt"
     assert blacklist.read_text() == expected.read_text()
     assert list(cwd.iterdir()) == []
 

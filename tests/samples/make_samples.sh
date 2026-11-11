@@ -24,13 +24,21 @@ for x in ${XMLS}; do
 
   echo "=== $x ==="
 
-  # step 1: XML → YAML
+  # step 1: XML → YAML, in a folder of its own so that the files a converter
+  # writes next to the ioc.yaml go to config/<stem>/, not among the samples
+  tmpdir=$(mktemp -d)
   echo "  xml2yaml → $y"
-  builder2ibek xml2yaml "$x" --yaml "$y"
+  builder2ibek xml2yaml "$x" --yaml "$tmpdir/ioc.yaml"
+  cp "$tmpdir/ioc.yaml" "$y"
+  rm -rf "config/${stem}"
+  for side in "$tmpdir"/*; do
+    [ "$side" = "$tmpdir/ioc.yaml" ] && continue
+    mkdir -p "config/${stem}"
+    echo "  side file → config/${stem}/$(basename "$side")"
+    cp "$side" "config/${stem}/"
+  done
 
   # step 2: YAML → st.cmd + ioc.subst
-  tmpdir=$(mktemp -d)
-  cp "$y" "$tmpdir/ioc.yaml"
 
   if ibek runtime generate2 "$tmpdir" --output "$tmpdir" --no-pvi 2>/dev/null; then
     echo "  generate2 → ${stem}.st.cmd, ${stem}.ioc.subst"

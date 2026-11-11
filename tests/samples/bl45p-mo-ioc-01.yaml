@@ -116,7 +116,6 @@ entities:
     DESC: Sample X
     DHLM: 19
     DIR: Pos
-    DLLM: 0
     EGU: mm
     M: :X
     MRES: 0.0001

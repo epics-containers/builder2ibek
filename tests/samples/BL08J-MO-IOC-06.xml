@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<devIocStats.devIocStatsHelper ioc="BL08J-MO-IOC-06" name="IOC-STATS"/>
+	<autosave.Autosave bl="True" iocName="BL08J-MO-IOC-06" ip="127.0.0.1" name="autosave" path="/dls_sw/i08-1/epics/autosave"/>
+	<utility.pingWait ip="127.0.0.1"/>
+	<EPICS_BASE.EpicsEnvSet key="IOCSH_PS1" value="BL08J-MO-IOC-06 &gt; "/>
+	<pmac.pmacAsynIPPort IP="127.0.0.1" name="STEP06_PORT"/>
+	<pmac.GeoBrick MovingPoll="50" P="BL08J-MO-STEP-06" Port="STEP06_PORT" name="STEP06"/>
+	<pmac.dls_pmac_asyn_motor ADDR="1" DESC="D7 Positioner Motor" DHLM="1.2" DLLM="-47" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":Y" MRES="0.0000079375" P="BL08J-DI-PHDGN-07" PORT="STEP06" PREC="4" SPORT="STEP06_PORT" TWV="1" VELO="0.7" name="D7J.Y"/>
+	<pmac.dls_pmac_asyn_motor ADDR="2" DESC="X1 (Upstream)" DHLM="13.8" DLLM="-14.0" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":X1" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="STEP06" PREC="3" SPORT="STEP06_PORT" TWV="1" VELO="0.3" name="M6.X1"/>
+	<pmac.dls_pmac_asyn_motor ADDR="3" DESC="X2 (Downstream)" DHLM="17.9" DLLM="-8.9" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":X2" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="STEP06" PREC="3" SPORT="STEP06_PORT" TWV="1" VELO="0.3" name="M6.X2"/>
+	<pmac.dls_pmac_asyn_motor ACCL="1.0" ADDR="4" DESC="Y1 (Upstream)" DHLM="12.8" DLLM="-15.0" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":Y1" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="STEP06" PREC="3" SPORT="STEP06_PORT" TWV="1" VELO="0.4" name="M6.Y1"/>
+	<pmac.dls_pmac_asyn_motor ACCL="1.0" ADDR="5" DESC="Y2 (Downstream ring side)" DHLM="14.0" DLLM="-13.7" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":Y2" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="STEP06" PREC="3" SPORT="STEP06_PORT" TWV="1" VELO="0.4" name="M6.Y2"/>
+	<pmac.dls_pmac_asyn_motor ACCL="1.0" ADDR="6" DESC="Y3 (Downstream road side)" DHLM="14.4" DLLM="-13.4" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":Y3" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="STEP06" PREC="3" SPORT="STEP06_PORT" TWV="1" VELO="0.4" name="M6.Y3"/>
+	<!--Have not yet set the soft limits properly.
+These are rough values
+AW 2018-12-14-->
+	<pmac.dls_pmac_asyn_motor ADDR="7" DESC="Bender 1" DHLM="4" DLLM="0" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":BEND1" MRES="0.000011607" P="BL08J-OP-HFM-06" PORT="STEP06" PREC="5" SPORT="STEP06_PORT" TWV="1" VELO="0.28" name="M6.BEND1"/>
+	<pmac.dls_pmac_asyn_motor ADDR="8" DESC="Bender 2" DHLM="4" DLLM="0" EGU="mm" HOMEVIS="0" HOMEVISSTR="Use homing screen" M=":BEND2" MRES="0.000011607" P="BL08J-OP-HFM-06" PORT="STEP06" PREC="5" SPORT="STEP06_PORT" TWV="1" VELO="0.28" name="M6.BEND2"/>
+	<positioner.multipositioner DESC="D7 positioner" MP=":MP" P="BL08J-DI-PHDGN-07" STRA="Out" STRB="In" name="D7J.multipositioner"/>
+	<positioner.motorpositioner DESC="D7 positioner" MP="D7J.multipositioner" PREC="4" Q=":P" VALB="-1" motor="D7J.Y" name="D7J.MP"/>
+	<pmac.CS CS="2" Controller="STEP06" IdlePoll="200" PARENTPORT="STEP06" PLCNum="17" Program="10" name="M6.CSX.Control"/>
+	<pmac.CS CS="3" Controller="STEP06" IdlePoll="200" PARENTPORT="STEP06" PLCNum="18" Program="10" name="M6.CSY.Control"/>
+	<pmac.CS CS="4" Controller="STEP06" IdlePoll="200" PARENTPORT="STEP06" PLCNum="19" Program="10" name="M6.CSBEND.Control"/>
+	<pmac.dls_pmac_cs_asyn_motor ADDR="7" DESC="X virtual motor" DHLM="13" DLLM="-8" EGU="mm" HOMEVIS="0" HOMEVISSTR="Home individual motors" M=":X" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="M6.CSX.Control" PREC="4" TWV="0.1" VELO="0.3" name="M6.X"/>
+	<pmac.dls_pmac_cs_asyn_motor ADDR="8" DESC="Pitch virtual motor" EGU="deg" HOMEVIS="0" HOMEVISSTR="Home individual motors" M=":PITCH" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="M6.CSX.Control" PREC="4" TWV="0.1" VELO="0.1" name="M6.PITCH"/>
+	<pmac.dls_pmac_cs_asyn_motor ACCL="1.0" ADDR="7" DESC="Yaw virtual motor" EGU="deg" HOMEVIS="0" HOMEVISSTR="Home individual motors" M=":YAW" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="M6.CSY.Control" PREC="4" TWV="0.1" VELO="0.1" name="M6.YAW"/>
+	<pmac.dls_pmac_cs_asyn_motor ACCL="1.0" ADDR="8" DESC="Roll virtual motor" EGU="deg" HOMEVIS="0" HOMEVISSTR="Home individual motors" M=":ROLL" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="M6.CSY.Control" PREC="4" TWV="0.1" VELO="0.1" name="M6.YROLL"/>
+	<pmac.dls_pmac_cs_asyn_motor ACCL="1.0" ADDR="9" DESC="Y virtaul motor" DHLM="12" DLLM="-13" EGU="mm" HOMEVIS="0" HOMEVISSTR="Home individual motors" M=":Y" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="M6.CSY.Control" PREC="4" TWV="0.1" VELO="0.4" name="M6.Y"/>
+	<pmac.dls_pmac_cs_asyn_motor ADDR="7" DESC="Bender curvature virtual" DHLM="1000" DLLM="-1000" EGU="kct" HOMEVIS="0" HOMEVISSTR="Home individual motors" M=":CURVE" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="M6.CSBEND.Control" PREC="4" TWV="0.1" VELO="0.1" name="M6.CURVE"/>
+	<pmac.dls_pmac_cs_asyn_motor ADDR="8" DESC="Bender ellipsticity virtual" DHLM="1000" DLLM="-1000" EGU="kct" HOMEVIS="0" HOMEVISSTR="Home individual motors" M=":ELIP" MRES="0.0001" P="BL08J-OP-HFM-06" PORT="M6.CSBEND.Control" PREC="4" TWV="0.1" VELO="0.1" name="M6.ELIP"/>
+	<pmac.autohome DESC="M6 motor homing" GRP2="X jacks" GRP3="Y jacks (watch bellows)" GRP4="Bender axes" P="BL08J-OP-HFM-06" PLC="11" PORT="STEP06" name="M6.Home"/>
+	<pmac.autohome GRP2="Y axis" P="BL08J-DI-PHDGN-07" PLC="12" PORT="STEP06" name="D7J.Home"/>
+	<pmac.pmacCreateCsGroup AxisCount="7" Controller="STEP06" GroupName="Default" GroupNumber="1" name="CS.GROUP.DEFAULT"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="2" Controller="STEP06" CoordSysNumber="2" GroupNumber="1" name="M6.X1.CS2"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="3" Controller="STEP06" CoordSysNumber="2" GroupNumber="1" name="M6.X2.CS2"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="4" Controller="STEP06" CoordSysNumber="3" GroupNumber="1" name="M6.Y1.CS3"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="5" Controller="STEP06" CoordSysNumber="3" GroupNumber="1" name="M6.Y2.CS3"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="6" Controller="STEP06" CoordSysNumber="3" GroupNumber="1" name="M6.Y3.CS3"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="7" Controller="STEP06" CoordSysNumber="4" GroupNumber="1" name="M6.BEND1.CS4"/>
+	<pmac.pmacCsGroupAddAxis AxisDef="I" AxisNumber="8" Controller="STEP06" CoordSysNumber="4" GroupNumber="1" name="M6.BEND2.CS4"/>
+</components>

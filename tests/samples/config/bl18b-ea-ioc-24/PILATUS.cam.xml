@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<Attributes>
+  <Attribute addr="0" datatype="DOUBLE" description="Acquisition period between images" name="AcqPeriod" source="ACQ_PERIOD" type="PARAM"/>
+  <Attribute addr="0" datatype="INT" description="Number of exposures per image" name="NumExposures" source="NEXPOSURES" type="PARAM"/>
+  <Attribute addr="0" datatype="INT" description="Number of images" name="NumImages" source="NIMAGES" type="PARAM"/>
+  <Attribute addr="0" datatype="INT" description="Image mode" name="ImageMode" source="IMAGE_MODE" type="PARAM"/>
+  <Attribute addr="0" datatype="INT" description="Trigger mode" name="TriggerMode" source="TRIGGER_MODE" type="PARAM"/>
+  <Attribute addr="0" datatype="INT" description="Image counter" name="ImageCounter" source="ARRAY_COUNTER" type="PARAM"/>
+  <Attribute addr="0" datatype="INT" description="Detector X size" name="MaxSizeX" source="MAX_SIZE_X" type="PARAM"/>
+  <Attribute addr="0" datatype="INT" description="Detector Y size" name="MaxSizeY" source="MAX_SIZE_Y" type="PARAM"/>
+  <Attribute addr="0" datatype="STRING" description="Camera model" name="CameraModel" source="MODEL" type="PARAM"/>
+  <Attribute addr="0" datatype="STRING" description="Camera manufacturer" name="CameraManufacturer" source="MANUFACTURER" type="PARAM"/>
+  <Attribute addr="0" datatype="STRING" description="Driver file name" name="DriverFileName" source="FULL_FILE_NAME" type="PARAM"/>
+</Attributes>

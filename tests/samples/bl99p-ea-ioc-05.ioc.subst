@@ -34,6 +34,6 @@ pattern
 
 file "$(FFMPEGSERVER)/db/ffmpegStream.template" {
 pattern 
-	{ "PORT",      "P",               "R",      "NDARRAY_PORT", "MAXW", "MAXH", "QUALITY", "SETW", "SETH" }
-	{ "DET3.MJPG", "BL99P-EA-DET-03", ":MJPG:", "DET3.cam",     "1600", "1200", "100",     "0",    "0"    }
+	{ "XMLSIZE", "PORT",      "P",               "R",      "NDARRAY_PORT", "MAXW", "MAXH", "QUALITY", "SETW", "SETH" }
+	{ "256",     "DET3.MJPG", "BL99P-EA-DET-03", ":MJPG:", "DET3.cam",     "1600", "1200", "100",     "0",    "0"    }
 }

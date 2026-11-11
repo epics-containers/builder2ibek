@@ -269,6 +269,7 @@ def make_entity(element: Element) -> Entity:
 
     entity = Entity()
     entity.type = f"{element.module}.{element.name}"
+    entity.set_xml_attributes(element.attributes)
 
     for attribute_name, attribute_val in element.attributes.items():
         # detect cross-references like $(MRES) and convert to Jinja2 templates

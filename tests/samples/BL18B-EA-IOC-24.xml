@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<devIocStats.devIocStatsHelper ioc="BL18B-EA-IOC-24" name="BL18B-EA-IOC-24.DEVIOCSTATS"/>
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_MAX_ARRAY_BYTES" name="EPICS_CA_MAX_ARRAY_BYTES" value="10000000"/>
+	<autosave.Autosave bl="True" iocName="BL18B-EA-IOC-24" name="BL18B-EA-IOC-24.AUTOSAVE" path="/dls_sw/b18/epics/autosave" skip_1="True"/>
+	<ADPilatus.pilatusDetector ADDR="0" BUFFERS="20000" CAMSERVER="127.0.0.1:41234" CAMSERVER_HOST="127.0.0.1" P="BL18B-EA-PILAT-01" PORT="PILATUS.cam" R=":CAM:" TIMEOUT="1" XSIZE="1475" YSIZE="195" name="PILATUS.cam"/>
+	<ADCore.NDAttributes attrname="AcqPeriod" datatype="DOUBLE" description="Acquisition period between images" port="PILATUS.cam" source="ACQ_PERIOD" type="PARAM"/>
+	<ADCore.NDAttributes attrname="NumExposures" description="Number of exposures per image" port="PILATUS.cam" source="NEXPOSURES" type="PARAM"/>
+	<ADCore.NDAttributes attrname="NumImages" description="Number of images" port="PILATUS.cam" source="NIMAGES" type="PARAM"/>
+	<ADCore.NDAttributes attrname="ImageMode" description="Image mode" port="PILATUS.cam" source="IMAGE_MODE" type="PARAM"/>
+	<ADCore.NDAttributes attrname="TriggerMode" description="Trigger mode" port="PILATUS.cam" source="TRIGGER_MODE" type="PARAM"/>
+	<ADCore.NDAttributes attrname="ImageCounter" description="Image counter" port="PILATUS.cam" source="ARRAY_COUNTER" type="PARAM"/>
+	<ADCore.NDAttributes attrname="MaxSizeX" description="Detector X size" port="PILATUS.cam" source="MAX_SIZE_X" type="PARAM"/>
+	<ADCore.NDAttributes attrname="MaxSizeY" description="Detector Y size" port="PILATUS.cam" source="MAX_SIZE_Y" type="PARAM"/>
+	<ADCore.NDAttributes attrname="CameraModel" datatype="STRING" description="Camera model" port="PILATUS.cam" source="MODEL" type="PARAM"/>
+	<ADCore.NDAttributes attrname="CameraManufacturer" datatype="STRING" description="Camera manufacturer" port="PILATUS.cam" source="MANUFACTURER" type="PARAM"/>
+	<ADCore.NDAttributes attrname="DriverFileName" datatype="STRING" description="Driver file name" port="PILATUS.cam" source="FULL_FILE_NAME" type="PARAM"/>
+	<ADCore.NDFileNull ENABLED="1" NDARRAY_PORT="PILATUS.cam" P="BL18B-EA-PILAT-01" PORT="PILATUS.null.null" QUEUE="1000" R=":NULL:"/>
+	<adUtil.gdaPlugins ARRFTVL="LONG" ARRTYPE="Int32" CAM="PILATUS.cam" DISPLAYQUEUE="1000" HTTP_PORT="8081" NELEMENTS="287625" P="BL18B-EA-PILAT-01" PLUGINQUEUE="15000" PORTPREFIX="PILATUS" XSIZE="1475" YSIZE="195" name="gdaT" threads="4"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:FilePath" value="/ramdisk"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:FileName" value="frame"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:FileTemplate" value="%s%s_%05d.tif"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:ImageMode" value="Multiple"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:TriggerMode" value="Ext. Enable"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:CamserverAsyn.AUCT" value="noAutoConnect"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:AutoIncrement" value="Yes"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:ThresholdApply" value="Apply"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:AcquireTime" value="0.025"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:AcquirePeriod" value="0.03"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:TriggerMode" value="Internal"/>
+	<EPICS_BASE.dbpf pv="BL18B-EA-PILAT-01:CAM:NumImages" value="100"/>
+	<EPICS_BASE.dbpf name="PILATUS.HUMID.HIGH_VALUE" pv="BL18B-EA-PILAT-01:CAM:Humid0_RBV.HIGH" value="20.0"/>
+	<EPICS_BASE.dbpf name="PILATUS.HUMID.HIGH_ALARM" pv="BL18B-EA-PILAT-01:CAM:Humid0_RBV.HSV" value="MINOR"/>
+	<EPICS_BASE.dbpf name="PILATUS.HUMID.HIHI_VALUE" pv="BL18B-EA-PILAT-01:CAM:Humid0_RBV.HIHI" value="25.0"/>
+	<EPICS_BASE.dbpf name="PILATUS.HUMID.HIHI_ALARM" pv="BL18B-EA-PILAT-01:CAM:Humid0_RBV.HHSV" value="MAJOR"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.HIGH_VALUE" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.HIGH" value="31"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.HIGH_ALARM" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.HSV" value="MINOR"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.HIHI_VALUE" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.HIHI" value="33"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.HIHI_ALARM" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.HHSV" value="MAJOR"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.LOW_VALUE" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.LOW" value="19"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.LOW_ALARM" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.LSV" value="MINOR"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.LOLO_VALUE" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.LOLO" value="17"/>
+	<EPICS_BASE.dbpf name="PILATUS.TEMP0.LOLO_ALARM" pv="BL18B-EA-PILAT-01:CAM:Temp0_RBV.LLSV" value="MAJOR"/>
+	<EPICS_BASE.dbpf name="PILATUS.ARR.CALLBACKS" pv="BL18B-EA-PILAT-01:ARR:EnableCallbacks" value="Enable"/>
+	<!--We only want the NULL plugin deleting our driver files-->
+	<EPICS_BASE.dbpf name="HDF5_PLUGIN.DELETE_FILE" pv="BL18B-EA-PILAT-01:HDF5:DeleteDriverFile" value="No"/>
+	<!--We only want the NULL plugin deleting our driver files-->
+	<EPICS_BASE.dbpf name="TIFF_PLUGIN.DELETE_FILE" pv="BL18B-EA-PILAT-01:TIFF:DeleteDriverFile" value="No"/>
+	<!--Use Null plugin to delete files on PPU RAM disk-->
+	<EPICS_BASE.dbpf name="NULL_PLUGIN.DELETE_FILE" pv="BL18B-EA-PILAT-01:NULL:DeleteDriverFile" value="Yes"/>
+	<EPICS_BASE.dbpf name="NULL_PLUGIN.CAPTURE" pv="BL18B-EA-PILAT-01:NULL:Capture" value="Capture"/>
+	<EPICS_BASE.dbpf name="NULL_PLUGIN.LAZY_OPEN" pv="BL18B-EA-PILAT-01:NULL:LazyOpen" value="Yes"/>
+	<EPICS_BASE.dbpf name="NULL_PLUGIN.WRITE_MODE" pv="BL18B-EA-PILAT-01:NULL:FileWriteMode" value="Stream"/>
+</components>

@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=https://github.com/epics-containers/ibek/releases/download/3.0.1/ibek.support.schema.json
+
+module: ADPilatus
+
+entity_models:
+  - name: pilatusDetector
+    description: |-
+      Creates a Pilatus areaDetector driver and its associated camserver
+      asyn IP port
+    parameters:
+      P:
+        type: str
+        description: Device Prefix
+      R:
+        type: str
+        description: Device Suffix
+      PORT:
+        type: id
+        description: Port name for the detector
+      CAMSERVER:
+        type: str
+        description: |-
+          Machine:port that pilatus camserver is running on
+        default: localhost:41234
+      XSIZE:
+        type: int
+        description: Maximum X dimension of the image
+        default: 1024
+      YSIZE:
+        type: int
+        description: Maximum Y dimension of the image
+        default: 768
+      BUFFERS:
+        type: int
+        description: |-
+          Maximum number of NDArray buffers to be created for plugin callbacks
+        default: 50
+      MEMORY:
+        type: int
+        description: |-
+          Max memory to allocate, should be maxw*maxh*nbuffer for driver
+          and all attached plugins
+        default: 0
+      PRIORITY:
+        type: int
+        description: |-
+          Thread priority for the asyn port driver used for epicsThreadCreate
+          call, 0 for epicsThreadPriorityMedium
+        default: 0
+      STACK_SIZE:
+        type: int
+        description: |-
+          The stack size for the asyn port driver thread, 0 for
+          epicsThreadGetStackSize(epicsThreadStackMedium)
+        default: 0
+      CBF_TRANSFER:
+        type: int
+        description: |-
+          Disable/Enable cbf transfer to camserver host
+          (0 to disable, otherwise enabled)
+        default: 0
+      CAMSERVER_HOST:
+        type: str
+        description: |-
+          Machine where camserver is running on, for cbf transfer
+        default: 10.10.10.100
+      CBF_TEMPLATE_LOCATION:
+        type: str
+        description: |-
+          Directory path in CAMSERVER_HOST where cbf templates are copied to
+        default: /tmp/cbf_templates
+      TIMEOUT:
+        type: int
+        description: Timeout
+        default: 1
+      ADDR:
+        type: int
+        description: Asyn Port address
+        default: 0
+
+    pre_init:
+      - type: text
+        value: |
+          # drvAsynIPPortConfigure(name, port, priority, noAutoConnect, noProcessEos)
+          drvAsynIPPortConfigure("{{PORT}}ip", "{{CAMSERVER}}", 100, 0, 0)
+          asynOctetSetInputEos("{{PORT}}ip", 0, "\030")
+          asynOctetSetOutputEos("{{PORT}}ip", 0, "\n")
+      - type: text
+        value: |
+          # pilatusDetectorConfig(portName, serverPort, maxSizeX, maxSizeY, maxBuffers, maxMemory, priority, stack_size, cbf_transfer [0,1], camserver_host, cbfTemplateLocation)
+          pilatusDetectorConfig("{{PORT}}", "{{PORT}}ip", {{XSIZE}}, {{YSIZE}}, {{BUFFERS}}, {{MEMORY}}, {{PRIORITY}}, {{STACK_SIZE}}, {{CBF_TRANSFER}}, "{{CAMSERVER_HOST}}", "{{CBF_TEMPLATE_LOCATION}}")
+
+    databases:
+      - file: $(ADPILATUS)/db/pilatus.template
+        args:
+          P:
+          R:
+          PORT:
+          TIMEOUT:
+          ADDR:
+          CAMSERVER_PORT: "{{PORT}}ip"
+
+    pvi:
+      yaml_path: pilatus.pvi.device.yaml
+      ui_macros:
+        P:
+        R:
+      pv_prefix: "$(P)$(R)"

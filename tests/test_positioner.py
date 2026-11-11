@@ -8,6 +8,7 @@ XMLbuilder, the motor is found by name whatever its type, and positioners
 take their multipositioner's slots A, B, C ... in XML order.
 """
 
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -231,6 +232,37 @@ def test_external_motor_drops_name(tmp_path: Path):
             "pos": "B",
         }
     ]
+
+
+def test_external_motor_generates(tmp_path: Path, ibek_defs):
+    # the converted entity validates against the positioner entity model and
+    # loads motorpositioner.template with the prefix and motor it was given;
+    # no HEADER, whose motors are not complete enough to generate
+    xml = tmp_path / "ioc.xml"
+    xml.write_text(
+        """<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+  <positioner.multipositioner DESC="light" MP=":MP" P="BL01C-EA-OAV-01:FZOOM"
+    STRA="Off" STRB="On" name="ONE"/>
+  <positioner.motorpositioner_external_motor DESC="light" EGU="%" MP=":MP"
+    P="BL01C-EA-OAV-01:FZOOM" PREC="1" Q=":PI" VALB="10" motor=":I"
+    name="BLIT" pos="B"/>
+</components>
+"""
+    )
+    convert_file(xml, tmp_path / "ioc.yaml", "/epics/ibek-defs/ioc.schema.json")
+    result = subprocess.run(
+        ["ibek", "runtime", "generate2", str(tmp_path), "--output", str(tmp_path)]
+        + ["--no-pvi"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+    subst = (tmp_path / "ioc.subst").read_text()
+    row = next(line for line in subst.splitlines() if ":PI" in line)
+    assert '"BL01C-EA-OAV-01:FZOOM"' in row
+    assert '":I"' in row
 
 
 def test_empty_m_gives_an_empty_motor_suffix(tmp_path: Path):
