@@ -23,10 +23,13 @@ XML = """<?xml version="1.0" ?>
     name="FVALVE1" port="VLVCC2" vlvcc="BL01C-VA-VLVCC-02"/>
   <userIO.auto_calcout12input CALC="A" DOPT="" EGU="" FLNK="" INPA="1"
     INPB="BL01C-VA-VALVE-10:STA" OCAL="1" OOPT="" OUT="" P="BL01C-VA-SPACE-12:"
-    PREC="3" R="STA" SCAN=".5 second" name="BL01C-VA-SPACE-12:"/>
+    PREC="3" R="1" SCAN=".5 second" name="BL01C-VA-SPACE-12:"/>
   <alarmMonitor.alarmMonitor ALARMSTAT="LOW LEVEL" CONDITION="A&lt;B"
     INPA="BL01C-VA-PIRG-81:PRESSURE3_RBV" INPB="1e-03"
     P="BL01C-VA-PIRG-81:PRESSURE3" R=":LOWLEVEL" name="PIRG81ALH.LOW"/>
+  <alarmMonitor.alarmNoAck ALARMSTAT="maintenance required" CONDITION="A=1"
+    DISABLELINK="0" DISABLEVAL="0" INPA="BL01C-VA-O2-01:SENS:MAINTAIN" INPB="2"
+    P="BL01C-VA-O2-01" R="1" name="AL1"/>
   <FINS.FINSTemplate device="BL01C-VA-VLVCC-03" name="VLVCC3.INFO"
     port="fins_VLVCC3"/>
   <digitelMpc.digitelMpcqTsp ctlsrc="1" device="BL01C-VA-TSP-01" name="TSP1"
@@ -93,6 +96,7 @@ def test_userio_calcout12input_fields_are_str(tmp_path: Path):
     assert calc["OCAL"] == "1"
     assert calc["INPA"] == "1"
     assert calc["PREC"] == "3"
+    assert calc["R"] == "1"
     assert "name" not in calc
 
 
@@ -100,6 +104,16 @@ def test_alarm_monitor(tmp_path: Path):
     entities, _ = _convert(tmp_path, XML)
     (alarm,) = _by_type(entities, "alarmMonitor.alarmMonitor")
     assert alarm["INPB"] == "1e-03"
+    assert "name" not in alarm
+
+
+def test_alarm_no_ack(tmp_path: Path):
+    entities, _ = _convert(tmp_path, XML)
+    (alarm,) = _by_type(entities, "alarmMonitor.alarmNoAck")
+    assert alarm["R"] == "1"
+    assert alarm["INPB"] == "2"
+    assert alarm["DISABLELINK"] == "0"
+    assert alarm["DISABLEVAL"] == 0
     assert "name" not in alarm
 
 
@@ -131,6 +145,7 @@ def test_raw_records_dropped_with_warning(tmp_path: Path):
         w.startswith(f"{IOC}: won't convert 2 records.calcout entities")
         for w in record_warnings
     )
+    assert all("config folder" in w for w in record_warnings)
     assert any(
         w.startswith(f"{IOC}: won't convert 1 records.ai entity")
         for w in record_warnings

@@ -5,7 +5,8 @@ xml_component = "records"
 
 REASON = (
     "raw records have no entity model: recreate any that are still needed "
-    "as a template in a support module"
+    "as a template in the IOC instance's config folder or in a support "
+    "module (docs/how-to/after-beamline-convert.md, Custom templates)"
 )
 
 
