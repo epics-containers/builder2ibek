@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<aravisGigE.aravisCamera ADDR="0" BUFFERS="100" CLASS="AVT_Manta_1_44" ID="127.0.0.1" P="BL99P-EA-DET-01" PORT="DET1.cam" R=":CAM:" TIMEOUT="1"/>
+	<ADCore.NDProcess ADDR="0" NDARRAY_ADDR="0" NDARRAY_PORT="DET1.cam" P="BL99P-EA-DET-01" PORT="DET1.proc" QUEUE="20" R=":PROC:" TIMEOUT="1"/>
+	<ADCore.NDStats ADDR="0" HIST_SIZE="256" NDARRAY_ADDR="0" NDARRAY_PORT="DET1.proc" P="BL99P-EA-DET-01" PORT="DET1.stat" QUEUE="20" R=":STAT:" TIMEOUT="1" XSIZE="1296" YSIZE="966"/>
+	<ADCore.NDFileHDF5 ADDR="0" NDARRAY_ADDR="0" NDARRAY_PORT="DET1.cam" P="BL99P-EA-DET-01" PORT="DET1.hdf" QUEUE="90" R=":HDF5:" TIMEOUT="1"/>
+	<ADCore.NDAttributes attrname="Manufacturer" datatype="STRING" description="Camera manufacturer" port="DET1.cam" source="MANUFACTURER" type="PARAM"/>
+	<ADCore.NDAttributes attrname="ImageCounter" description="Image counter" port="DET1.cam" source="ARRAY_COUNTER" type="PARAM"/>
+	<ADCore.NDAttributes attrname="RingCurrent" description="Ring current &amp; &quot;beam&quot; &lt;mA&gt;" port="DET1.cam" source="SR-DI-DCCT-01:SIGNAL"/>
+	<ADCore.NDAttributes attrname="Gap" dbrtype="DBR_DOUBLE" description="Undulator gap, the 'ID' gap" port="DET1.cam" source="BL99P-MO-SERVC-01:CURRGAPD" type="EPICS_PV"/>
+	<ADCore.NDAttributes port="DET1.cam" source="BL99P-EA-DET-01:CAM:Temperature_RBV"/>
+	<ADCore.NDAttributes addr="1" attrname="procFrameCount" datatype="INT" description="Process plugin input frame counter" port="DET1.proc" source="ARRAY_COUNTER" type="PARAM"/>
+	<ADCore.NDAttributes attrname="statFrameDrop" description="Statistics plugin dropped frames" port="DET1.stat" source="DROPPED_ARRAYS" type="PARAM"/>
+	<ADCore.NDAttributes attrname="hdfFrameCount" description="HDF5 plugin input frame counter" port="DET1.hdf" source="ARRAY_COUNTER" type="PARAM"/>
+</components>

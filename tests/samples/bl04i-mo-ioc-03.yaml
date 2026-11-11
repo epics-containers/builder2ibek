@@ -457,9 +457,7 @@ entities:
     BVEL: 30
     Controller: GeoBrick_3
     DESC: Phi
-    DHLM: 0
     DIR: Pos
-    DLLM: 0
     EGU: deg
     ERES: 0.00219727
     HLSV: NO_ALARM
@@ -529,7 +527,6 @@ entities:
     BACC: 0.1
     Controller: GeoBrick_2
     DESC: Scintillator Z
-    DHLM: 0
     DIR: Neg
     DLLM: -103.5
     EGU: mm

@@ -205,6 +205,17 @@ into `tests/samples/fastcs-pandablocks/`.
 `ibek-support-dls` has no ADPandABlocks folder. Don't add ADPandABlocks
 support YAML to `ibek-support` or `ibek-support-dls`.
 
+## `ADCore.NDAttributes` — folded into the port's `ATTRIBUTES_FILE`
+
+There is no `ADCore.NDAttributes` entity. The ADCore converter collects the
+builder elements by `port` and writes the NDAttributes XML, as XMLbuilder wrote
+it, inline into the `ATTRIBUTES_FILE` of the driver or plugin with that `PORT`.
+A model without `ATTRIBUTES_FILE` (ADPilatus, ADAndor_dls and the other
+ibek-support-dls areaDetector drivers) gets `<port>.xml` next to the ioc.yaml
+instead, set by an `ADCore.NDAttributesConfig` entity. Give such a model
+`ATTRIBUTES_FILE` and `XMLSIZE` as ibek-support's ADCore drivers have them, and
+its IOCs get the XML inline.
+
 ## `procServControl` — not used in containers
 
 procServControl is deprecated for containers: Kubernetes and argocd-monitor

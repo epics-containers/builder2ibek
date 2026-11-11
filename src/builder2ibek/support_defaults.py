@@ -12,6 +12,8 @@ _project_root = Path(__file__).parent.parent.parent
 
 # {entity_type: {param_name: default_value}}
 _defaults: dict[str, dict[str, Any]] = {}
+# {entity_type: {param_name, ...}}
+_params: dict[str, set[str]] = {}
 
 
 def _load_all_support_yamls():
@@ -34,6 +36,7 @@ def _load_all_support_yamls():
                     continue
                 entity_type = f"{module_name}.{entity_name}"
                 params = model.get("parameters", {})
+                _params[entity_type] = set(params)
                 defaults = {}
                 for param_name, param_spec in params.items():
                     if isinstance(param_spec, dict) and "default" in param_spec:
@@ -44,6 +47,11 @@ def _load_all_support_yamls():
                         defaults[param_name] = default_val
                 if defaults:
                     _defaults[entity_type] = defaults
+
+
+def entity_params(entity_type: str) -> set[str] | None:
+    """The parameter names of an entity model, or None if no model is found."""
+    return _params.get(entity_type)
 
 
 def _values_match(entity_val: Any, default_val: Any) -> bool:
