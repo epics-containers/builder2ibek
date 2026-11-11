@@ -232,6 +232,39 @@ def test_another_tag_of_the_runtime_image(tmp_path: Path, monkeypatch):
     assert result.warnings == []
 
 
+def test_new_image_tag_refreshes_the_schema(tmp_path: Path, monkeypatch):
+    """Converting again after values.yaml moves to another tag of the runtime
+    image rebuilds ioc.schema.json from that tag's base schema."""
+    cache = tmp_path / "cache"
+    write_schema_cache(cache)
+    monkeypatch.setenv("IBEK_SCHEMA_CACHE", str(cache))
+    ec8 = _cache_path(DEFAULT_RUNTIME_IMAGE)
+    ec7 = json.loads(ec8.read_text())
+    ec7["properties"]["entities"]["items"]["discriminator"]["mapping"].pop(
+        "pvlogging.BlacklistPvs"
+    )
+    ec8.with_name("2.8.26ec7.json").write_text(json.dumps(ec7))
+    validators = ec8.with_suffix(".validators.json").read_text()
+    ec8.with_name("2.8.26ec7.validators.json").write_text(
+        validators.replace("2.8.26ec8", "2.8.26ec7")
+    )
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    schema = instance / "ioc.schema.json"
+
+    def mapping() -> dict:
+        items = json.loads(schema.read_text())["properties"]["entities"]["items"]
+        return items["discriminator"]["mapping"]
+
+    assert "pvlogging.BlacklistPvs" in mapping()
+    (instance / "values.yaml").write_text(
+        f"ioc-instance:\n  image: {RUNTIME_REPO}:2.8.26ec7\n"
+    )
+    result = _vendor(instance)
+    assert result.vendored and result.warnings == []
+    assert "pvlogging.BlacklistPvs" not in mapping()
+
+
 def test_schema_not_found(tmp_path: Path, monkeypatch):
     """A tag whose base schema is neither packaged nor cached, offline."""
     monkeypatch.setenv("IBEK_SCHEMA_CACHE", str(tmp_path / "empty"))
@@ -343,7 +376,7 @@ def test_library_with_local_changes_is_not_vendored(tmp_path: Path, monkeypatch)
     result = _vendor(instance)
     assert not result.vendored and not result.decided
     assert "has local changes" in result.warnings[0]
-    assert "checkout -- . && git -C" in result.warnings[0]
+    assert "reset -q HEAD -- attocubeInterf" in result.warnings[0]
     assert not (instance / "runtime-lock.yaml").exists()
 
 

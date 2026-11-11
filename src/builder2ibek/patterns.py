@@ -161,9 +161,12 @@ GIT_TIMEOUT = 120
 
 
 def _git(library: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["git", "-C", str(library), *args], capture_output=True, text=True
-    )
+    try:
+        return subprocess.run(
+            ["git", "-C", str(library), *args], capture_output=True, text=True
+        )
+    except OSError as e:  # no git on PATH
+        raise PatternIndexError(f"cannot run git for {library}: {e}") from e
 
 
 def _library_version(library: Path) -> str:
@@ -179,21 +182,41 @@ def _library_version(library: Path) -> str:
     return tag
 
 
+def _at_tag(library: Path, version: str) -> bool:
+    """True if the library's checkout is at the commit tag ``version`` names."""
+    result = _git(library, "tag", "--points-at", "HEAD")
+    return result.returncode == 0 and version in result.stdout.split()
+
+
+def _committed_folders(library: Path) -> set[str]:
+    """The pattern folders of the library's commit."""
+    tracked = _git(library, "ls-tree", "-r", "--name-only", "HEAD").stdout.split("\n")
+    return {
+        folder
+        for folder, _, name in (path.partition("/") for path in tracked)
+        if name == f"{folder}.ibek.support.yaml"
+    }
+
+
 def _local_changes(library: Path) -> list[str]:
-    """The files of the library's pattern folders that differ from its commit.
+    """The files of the library's pattern folders that differ from its commit:
+    edited, staged, deleted or untracked.
 
     Files outside the pattern folders are never vendored, so they do not count.
     """
     result = _git(library, "status", "--porcelain", "--untracked-files=all")
     if result.returncode != 0:
         return [f"git status failed: {result.stderr.strip()}"]
+    folders = _committed_folders(library) | {
+        p.parent.name for p in library.glob("*/*.ibek.support.yaml")
+    }
     changed = []
     for line in result.stdout.splitlines():
-        path = line[3:].split(" -> ")[-1].strip('"')
-        folder = path.split("/")[0]
-        if "/" in path and _has_patterns(library, folder):
-            changed.append(path)
-    return changed
+        for path in line[3:].split(" -> "):
+            path = path.strip('"')
+            if "/" in path and path.split("/")[0] in folders:
+                changed.append(path)
+    return sorted(set(changed))
 
 
 def library_cache() -> Path:
@@ -270,6 +293,8 @@ class PatternIndex:
         self.patterns: dict[str, Pattern] = {}
         # library -> its pattern files that differ from the pinned tag
         self.local_changes: dict[str, list[str]] = {}
+        # library -> the local copy it is read from
+        self.library_paths: dict[str, Path] = {}
         self._ioc_models: dict[str, Any] = {}
         yml = YAML(typ="safe", pure=True)
 
@@ -280,7 +305,7 @@ class PatternIndex:
             elif cache_dir is not None:
                 version = LIBRARY_VERSIONS[name]
                 library = fetch_library(name, version, cache_dir, urls[name])
-                if _library_version(library) != version:
+                if not _at_tag(library, version):
                     raise PatternIndexError(
                         f"{library} is not at {version}; delete it to fetch again"
                     )
@@ -289,6 +314,7 @@ class PatternIndex:
                     f"no patterns found in {library}; in a builder2ibek checkout, "
                     f"initialise the submodule:\n    git submodule update --init {name}"
                 )
+            self.library_paths[name] = library
             changed = _local_changes(library)
             if changed:
                 self.local_changes[name] = changed
@@ -323,17 +349,20 @@ class PatternIndex:
         changed = self.local_changes.get(library)
         if not changed:
             return ""
-        path = self.patterns_root(library)
+        path = self.library_paths[library]
+        folders = sorted({c.split("/")[0] for c in changed})
+        committed = sorted(set(folders) & _committed_folders(path))
+        git = f"git -C {path}"
+        commands = [
+            f"{git} reset -q HEAD -- {' '.join(folders)}",
+            f"{git} clean -fdq -- {' '.join(folders)}",
+        ]
+        if committed:
+            commands.append(f"{git} checkout -q HEAD -- {' '.join(committed)}")
         return (
             f"{path} has local changes in its pattern folders ({', '.join(changed)}), "
-            f"so its patterns are not those of the pinned tag. To restore it:\n"
-            f"    git -C {path} checkout -- . && git -C {path} clean -fd"
-        )
-
-    def patterns_root(self, library: str) -> Path:
-        """The local copy the library's patterns are read from."""
-        return next(
-            p.library_path for p in self.patterns.values() if p.library == library
+            f"so its patterns are not those of the pinned tag. To restore those "
+            f"folders, losing the changes:\n    " + " && ".join(commands)
         )
 
     def pattern_for_module(self, module: str) -> Pattern | None:

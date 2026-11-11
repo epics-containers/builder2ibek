@@ -174,7 +174,10 @@ pins another image are not vendored; xml2yaml says why.
 The pattern libraries are read from builder2ibek's submodules in a checkout.
 An installed builder2ibek (`uvx builder2ibek`) clones each library once, at the
 tag it pins, into `${XDG_CACHE_HOME:-~/.cache}/builder2ibek/patterns/`; with no
-network and no clone there, it converts without patterns and says so. ibek's
+network and no clone there, it converts without patterns and says so. The
+clone ignores your git configuration (so `url.insteadOf` rules cannot turn it
+into SSH); behind a proxy, set `https_proxy` in the environment rather than
+`http.proxy` in git. ibek's
 `IBEK_SCHEMA_CACHE` holds the base schemas it uses when the network cannot be
 reached.
 

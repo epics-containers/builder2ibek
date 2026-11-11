@@ -64,7 +64,10 @@ A library whose pattern folders differ from its tag (edited or untracked files)
 is still indexed, so tests and pattern development work on it, but xml2yaml
 vendors nothing from it and prints how to restore it. The cache clone runs git
 with no prompts, a timeout and no user configuration (`url.insteadOf` rules
-would turn it into an SSH clone).
+would turn it into an SSH clone). That also drops global settings such as
+`http.proxy` and `http.sslCAInfo`: behind a proxy, set `https_proxy` /
+`HTTPS_PROXY` in the environment, which git honours. A clone counts only if
+`git tag --points-at HEAD` lists its tag.
 
 ### Vendoring offline in the tests
 

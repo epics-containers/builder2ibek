@@ -31,6 +31,7 @@ builder2ibek, so deciding whether an IOC is pattern-only for it needs no network
 from __future__ import annotations
 
 import contextlib
+import copy
 import io
 import json
 import re
@@ -49,6 +50,7 @@ from ibek.pattern_cmds.schema import (
     SchemaNotFoundError,
     fetch_base_schema,
     find_image,
+    merge_entities,
     parse_image_ref,
     published_schema_url,
 )
@@ -242,6 +244,31 @@ def _add(pattern: Pattern, instance: Path) -> None:
     lock.save()
 
 
+def _schema_is_current(instance: Path) -> bool:
+    """True if the instance's ioc.yaml header and ioc.schema.json are what
+    ``ibek pattern schema`` would write now: the schema merges the base schema
+    of the image values.yaml pins with the vendored support YAMLs.
+
+    False when that cannot be told, for example with an image whose base schema
+    cannot be had.
+    """
+    ioc_yaml = instance / "config" / "ioc.yaml"
+    schema = instance / "ioc.schema.json"
+    if not schema.is_file() or not ioc_yaml.is_file():
+        return False
+    if ioc_yaml.read_text().partition("\n")[0] != SCHEMA_HEADER:
+        return False
+    image = find_image(instance)
+    if image is None:
+        return False
+    try:
+        base = copy.deepcopy(_base_schema(image))
+    except SchemaNotFoundError:
+        return False
+    support_yamls = sorted((instance / "config").glob("*.ibek.support.yaml"))
+    return merge_entities(base, support_yamls) == json.loads(schema.read_text())
+
+
 def _vendor(patterns: list[Pattern], instance: Path, result: PatternResult) -> None:
     locked = _lock(instance).patterns
     added = False
@@ -267,12 +294,8 @@ def _vendor(patterns: list[Pattern], instance: Path, result: PatternResult) -> N
             result.warnings.append(
                 f"ibek pattern check {instance} failed:\n{_output(check)}"
             )
-    ioc_yaml = instance / "config" / "ioc.yaml"
-    has_schema = (instance / "ioc.schema.json").is_file() and (
-        ioc_yaml.read_text().partition("\n")[0] == SCHEMA_HEADER
-    )
-    if not added and not has_schema:
-        # ibek sets the header and writes the schema the instance lacks
+    if not added and not _schema_is_current(instance):
+        # ibek sets the header and writes the schema afresh
         schema = _ibek("pattern", "schema", str(instance))
         if schema.returncode != 0:
             result.warnings.append(

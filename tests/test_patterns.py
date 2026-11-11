@@ -147,18 +147,57 @@ def test_library_that_cannot_be_fetched(tmp_path: Path):
     assert not any((tmp_path / "cache").glob("*@*"))
 
 
+def _restore(message: str):
+    """Run the restore command a changes_message gives."""
+    command = message.rpartition("\n")[2].strip()
+    subprocess.run(["bash", "-c", command], check=True)
+
+
 def test_library_with_local_changes(tmp_path: Path):
-    """Indexed, so development on a library still works, but reported."""
+    """Indexed, so development on a library still works, but reported, with a
+    command that restores the pattern folders and nothing else."""
     for library in LIBRARIES:
         _tagged_library(tmp_path / library, "1.0.0", f"m_{library}")
     edited = tmp_path / LIBRARIES[0]
-    (edited / f"m_{LIBRARIES[0]}" / "new.proto").write_text("x\n")
+    folder = edited / f"m_{LIBRARIES[0]}"
+    (folder / "new.proto").write_text("x\n")
     (edited / "notes.txt").write_text("not in a pattern folder\n")
     index = PatternIndex(tmp_path)
     assert index.local_changes == {LIBRARIES[0]: [f"m_{LIBRARIES[0]}/new.proto"]}
-    message = index.changes_message(LIBRARIES[0])
-    assert f"git -C {edited} checkout -- . && git -C {edited} clean -fd" in message
     assert index.changes_message(LIBRARIES[1]) == ""
+    _restore(index.changes_message(LIBRARIES[0]))
+    assert not (folder / "new.proto").exists()
+    assert (edited / "notes.txt").exists()
+    assert PatternIndex(tmp_path).local_changes == {}
+
+
+def test_staged_and_deleted_files_are_changes(tmp_path: Path):
+    keep = tmp_path / LIBRARIES[0] / "keep"
+    keep.mkdir(parents=True)
+    (keep / "keep.ibek.support.yaml").write_text("module: keep\nentity_models: []\n")
+    for library in LIBRARIES:
+        _tagged_library(tmp_path / library, "1.0.0", f"m_{library}")
+    edited = tmp_path / LIBRARIES[0]
+    module = f"m_{LIBRARIES[0]}"
+    support_yaml = edited / module / f"{module}.ibek.support.yaml"
+    text = support_yaml.read_text()
+    (edited / module / "staged.proto").write_text("x\n")
+    subprocess.run(["git", "-C", str(edited), "add", "."], check=True)
+    support_yaml.unlink()
+    index = PatternIndex(tmp_path)
+    assert index.local_changes == {
+        LIBRARIES[0]: [f"{module}/{module}.ibek.support.yaml", f"{module}/staged.proto"]
+    }
+    _restore(index.changes_message(LIBRARIES[0]))
+    assert support_yaml.read_text() == text
+    assert not (edited / module / "staged.proto").exists()
+    assert PatternIndex(tmp_path).local_changes == {}
+
+
+def test_no_git_on_path(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("PATH", str(tmp_path))
+    with pytest.raises(PatternIndexError, match="cannot run git"):
+        PatternIndex(REPO_ROOT)
 
 
 def test_fetch_into_an_unwritable_cache(tmp_path: Path):
