@@ -20,7 +20,7 @@ schema_cache=$(mktemp -d)
 python3 -c "import sys; from pathlib import Path; from builder2ibek.vendor_patterns import write_schema_cache; write_schema_cache(Path(sys.argv[1]))" "$schema_cache"
 export IBEK_SCHEMA_CACHE=$schema_cache
 export HTTPS_PROXY=http://127.0.0.1:9 https_proxy=http://127.0.0.1:9
-unset NO_PROXY no_proxy IBEK_PATTERN_LIBRARIES
+unset NO_PROXY no_proxy IBEK_PATTERN_LIBRARIES IBEK_SCHEMA_URL
 image=$(python3 -c "from builder2ibek.vendor_patterns import DEFAULT_RUNTIME_IMAGE; print(DEFAULT_RUNTIME_IMAGE)")
 
 # pass a list of XML files as args or use all xml files in the samples dir

@@ -34,7 +34,7 @@ def offline_patterns(tmp_path_factory):
     os.environ["XDG_CACHE_HOME"] = str(tmp_path_factory.mktemp("xdg-cache"))
     for name in ("HTTPS_PROXY", "https_proxy"):
         os.environ[name] = DEAD_PROXY
-    for name in ("NO_PROXY", "no_proxy", "IBEK_PATTERN_LIBRARIES"):
+    for name in ("NO_PROXY", "no_proxy", "IBEK_PATTERN_LIBRARIES", "IBEK_SCHEMA_URL"):
         os.environ.pop(name, None)
 
 

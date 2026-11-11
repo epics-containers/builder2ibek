@@ -315,6 +315,49 @@ def test_schema_url_override_is_honoured(tmp_path: Path, monkeypatch):
     assert "example.com" in result.warnings[0]
 
 
+def test_tests_ignore_an_exported_schema_url():
+    """offline_patterns removes IBEK_SCHEMA_URL, which would replace every
+    base schema the tests use."""
+    import os
+
+    assert "IBEK_SCHEMA_URL" not in os.environ
+
+
+@pytest.mark.parametrize(
+    "url", ["http://example.com/schema.json", "https://example.com/{nope}.json"]
+)
+def test_bad_schema_url_is_a_warning(tmp_path: Path, monkeypatch, url: str):
+    """A schema URL ibek refuses is reported for the IOC, not raised."""
+    monkeypatch.setenv("IBEK_SCHEMA_URL", url)
+    instance = _instance(tmp_path)
+    result = _vendor(instance)
+    assert not result.vendored
+    assert "cannot tell which modules" in result.warnings[0]
+
+
+def test_base_schema_with_a_bad_shape(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(vp, "fetch_base_schema", lambda *_: {"not": "a schema"})
+    monkeypatch.setenv("IBEK_SCHEMA_URL", "https://example.com/{tag}.json")
+    result = _vendor(_instance(tmp_path))
+    assert "cannot tell which modules" in result.warnings[0]
+
+
+def test_base_schema_is_fetched_once(tmp_path: Path, monkeypatch):
+    fetched = []
+    schema = vp._packaged_schema(vp._schema_file(DEFAULT_RUNTIME_IMAGE))
+
+    def fetch(image, url):
+        fetched.append(image)
+        return schema
+
+    monkeypatch.setattr(vp, "fetch_base_schema", fetch)
+    monkeypatch.setenv("IBEK_SCHEMA_URL", "https://example.com/{tag}/once.json")
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    _vendor(instance)
+    assert fetched == [DEFAULT_RUNTIME_IMAGE]
+
+
 def test_lock_schema_url_is_honoured(tmp_path: Path, monkeypatch):
     """So is a schema_url the instance's runtime-lock.yaml records."""
     from ibek.pattern_cmds.lock import RuntimeLock

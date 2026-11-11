@@ -55,6 +55,7 @@ from ibek.pattern_cmds.schema import (
     merge_entities,
     parse_image_ref,
     published_schema_url,
+    schema_shape_problem,
 )
 from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES, PatternError, source_label
 
@@ -172,15 +173,35 @@ def _base_schema(image: str, recorded_url: str | None = None) -> dict:
     builder2ibek's copy serves the default image, unless ``IBEK_SCHEMA_URL`` or
     the lock's ``schema_url`` (``recorded_url``) names another source.
 
-    Raises SchemaNotFoundError when it cannot be had.
+    Raises SchemaNotFoundError when it cannot be had: not found, a schema URL
+    ibek refuses, or a document without the shape of an ibek IOC schema.
     """
     packaged = _schema_file(image)
-    overridden = recorded_url or os.getenv(SCHEMA_URL_ENV, "").strip()
-    if not overridden and (image == DEFAULT_RUNTIME_IMAGE or packaged.is_file()):
+    override = os.getenv(SCHEMA_URL_ENV, "").strip()
+    if not (recorded_url or override) and (
+        image == DEFAULT_RUNTIME_IMAGE or packaged.is_file()
+    ):
         return _packaged_schema(packaged)
-    # ibek reports a fallback to its cache on stdout, which is xml2yaml's output
-    with contextlib.redirect_stdout(io.StringIO()):
-        return fetch_base_schema(image, recorded_url)
+    return _fetched_schema(
+        image, recorded_url, override, os.getenv("IBEK_SCHEMA_CACHE", "")
+    )
+
+
+@cache
+def _fetched_schema(
+    image: str, recorded_url: str | None, _override: str, _cache_dir: str
+) -> dict:
+    """ibek's fetch of a base schema, once for each source it can come from."""
+    try:
+        # ibek reports a fallback to its cache on stdout, xml2yaml's output
+        with contextlib.redirect_stdout(io.StringIO()):
+            schema = fetch_base_schema(image, recorded_url)
+    except PatternError as e:  # a schema URL ibek refuses
+        raise SchemaNotFoundError(str(e)) from e
+    problem = schema_shape_problem(schema)
+    if problem:
+        raise SchemaNotFoundError(f"the base schema of {image} {problem}")
+    return schema
 
 
 def _entity_types(schema: Mapping[str, Any]) -> set[str]:
