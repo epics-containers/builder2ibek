@@ -115,6 +115,44 @@ def test_unknown_port_is_dropped_with_a_warning(tmp_path: Path):
 
 
 @requires_support
+def test_numeric_port_is_found(tmp_path: Path):
+    # make_entity turns PORT="5" into the number 5
+    entities, warnings = _convert(
+        tmp_path,
+        """
+  <ADCore.NDProcess NDARRAY_PORT="DET1.stat" P="BL99P-EA-DET-01" PORT="5"
+    R=":PROC:"/>
+  <ADCore.NDAttributes attrname="N" port="5" source="ARRAY_COUNTER" type="PARAM"/>
+""",
+    )
+
+    assert warnings == []
+    (proc,) = [e for e in entities if e["type"] == "ADCore.NDProcess"]
+    assert 'name="N"' in proc["ATTRIBUTES_FILE"]
+
+
+@requires_support
+def test_type_without_a_model_gets_a_config_file(tmp_path: Path):
+    entities, warnings = _convert(
+        tmp_path,
+        """
+  <dtacq_adc.dtacq_adc P="BL99P-EA-ADC-01" PORT="ADC" R=":ADC:"/>
+  <ADCore.NDAttributes attrname="N" port="ADC" source="ARRAY_COUNTER" type="PARAM"/>
+""",
+    )
+
+    assert (tmp_path / "ADC.xml").exists()
+    assert {
+        "type": "ADCore.NDAttributesConfig",
+        "ATTRIBUTES_FILE": "ADC.xml",
+        "P": "BL99P-EA-ADC-01",
+        "R": ":ADC:",
+    } in entities
+    assert len(warnings) == 1
+    assert "dtacq_adc.dtacq_adc has no entity model" in warnings[0]
+
+
+@requires_support
 def test_model_without_attributes_file_gets_a_config_file(tmp_path: Path):
     # ADPilatus.pilatusDetector has no ATTRIBUTES_FILE: the XML goes in a
     # file next to the ioc.yaml, which an ADCore.NDAttributesConfig sets
@@ -132,9 +170,9 @@ def test_model_without_attributes_file_gets_a_config_file(tmp_path: Path):
     entities = YAML(typ="safe").load(yaml.read_text())["entities"]
     types = [e["type"] for e in entities]
     config = entities[types.index("ADPilatus.pilatusDetector") + 1]
-    assert config == {
-        "type": "ADCore.NDAttributesConfig",
-        "P": "BL18B-EA-PILAT-01",
-        "R": ":CAM:",
-        "ATTRIBUTES_FILE": "PILATUS.cam.xml",
-    }
+    assert list(config.items()) == [
+        ("type", "ADCore.NDAttributesConfig"),
+        ("ATTRIBUTES_FILE", "PILATUS.cam.xml"),
+        ("P", "BL18B-EA-PILAT-01"),
+        ("R", ":CAM:"),
+    ]

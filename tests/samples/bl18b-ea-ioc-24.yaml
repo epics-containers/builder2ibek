@@ -34,9 +34,9 @@ entities:
     YSIZE: 195
 
   - type: ADCore.NDAttributesConfig
+    ATTRIBUTES_FILE: PILATUS.cam.xml
     P: BL18B-EA-PILAT-01
     R: ':CAM:'
-    ATTRIBUTES_FILE: PILATUS.cam.xml
 
   - type: ADCore.NDFileNull
     ENABLED: 1

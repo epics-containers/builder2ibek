@@ -64,19 +64,6 @@ def attributes_xml(attributes: list[dict[str, str]]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def _sort_keys(entity: dict):
-    """
-    Put type first and the remaining keys in name order, as do_dispatch does:
-    finalize runs after that sort, so an entity it adds a key to is put back
-    in order here.
-    """
-    sorted_items = dict(sorted(entity.items()))
-    entity_type = sorted_items.pop("type")
-    entity.clear()
-    entity["type"] = entity_type
-    entity.update(sorted_items)
-
-
 def finalize(ioc: Generic_IOC):
     """
     Give each port that ADCore.NDAttributes elements attach to its
@@ -89,6 +76,9 @@ def finalize(ioc: Generic_IOC):
     ADCore.NDAttributesConfig entity: inline XML would not fit the
     NDAttributesFile record, whose size only those models can grow.
     """
+    # convert imports every converter, this one included
+    from builder2ibek.convert import ordered_params
+
     entities: list[Entity] = ioc.entities  # type: ignore
     ioc_name = ioc.source_file.stem if ioc.source_file else ""
 
@@ -96,7 +86,8 @@ def finalize(ioc: Generic_IOC):
         xml = attributes_xml(attributes)
         count = f"{len(attributes)} ADCore.NDAttributes"
 
-        target = next((e for e in entities if e.get("PORT") == port), None)
+        # make_entity turns a numeric-looking PORT into a number
+        target = next((e for e in entities if str(e.get("PORT")) == port), None)
         if target is None:
             ioc.extra_warnings.append(
                 f"{ioc_name}: dropped {count} for port {port}: no converted "
@@ -104,10 +95,10 @@ def finalize(ioc: Generic_IOC):
             )
             continue
 
-        params = entity_params(str(target["type"])) or set()
-        if "ATTRIBUTES_FILE" in params:
+        params = entity_params(str(target["type"]))
+        if params is not None and "ATTRIBUTES_FILE" in params:
             target["ATTRIBUTES_FILE"] = LiteralScalarString(xml)
-            _sort_keys(target)
+            _reorder(target, ordered_params(target))
             continue
 
         if "P" not in target or "R" not in target:
@@ -119,15 +110,28 @@ def finalize(ioc: Generic_IOC):
 
         file_name = f"{port}.xml"
         ioc.side_files[file_name] = '<?xml version="1.0" ?>\n' + xml
-        config = {
-            "type": "ADCore.NDAttributesConfig",
-            "P": target["P"],
-            "R": target["R"],
-            "ATTRIBUTES_FILE": file_name,
-        }
-        entities.insert(entities.index(target) + 1, config)  # type: ignore
-        ioc.extra_warnings.append(
-            f"{ioc_name}: {target['type']} has no ATTRIBUTES_FILE, so the "
-            f"NDAttributes XML for port {port} goes in {file_name} next to the "
-            "ioc.yaml, set by an ADCore.NDAttributesConfig entity"
+        config = ordered_params(
+            {
+                "type": "ADCore.NDAttributesConfig",
+                "P": target["P"],
+                "R": target["R"],
+                "ATTRIBUTES_FILE": file_name,
+            }
         )
+        entities.insert(entities.index(target) + 1, config)  # type: ignore
+        reason = (
+            "has no ATTRIBUTES_FILE"
+            if params is not None
+            else "has no entity model in ibek-support or ibek-support-dls"
+        )
+        ioc.extra_warnings.append(
+            f"{ioc_name}: {target['type']} {reason}, so the NDAttributes XML "
+            f"for port {port} goes in {file_name} next to the ioc.yaml, set by "
+            "an ADCore.NDAttributesConfig entity"
+        )
+
+
+def _reorder(entity: dict, ordered: dict):
+    """Put an entity's keys in place in the given order"""
+    entity.clear()
+    entity.update(ordered)
