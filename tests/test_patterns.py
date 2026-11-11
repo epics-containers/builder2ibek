@@ -194,9 +194,28 @@ def test_staged_and_deleted_files_are_changes(tmp_path: Path):
     assert PatternIndex(tmp_path).local_changes == {}
 
 
+def test_restore_command_quotes_paths(tmp_path: Path):
+    root = tmp_path / "with space"
+    for library in LIBRARIES:
+        _tagged_library(root / library, "1.0.0", f"m {library}")
+    folder = root / LIBRARIES[0] / f"m {LIBRARIES[0]}"
+    (folder / "new.proto").write_text("x\n")
+    index = PatternIndex(root)
+    assert index.local_changes
+    _restore(index.changes_message(LIBRARIES[0]))
+    assert not (folder / "new.proto").exists()
+    assert PatternIndex(root).local_changes == {}
+
+
+def test_fetch_without_git(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("PATH", str(tmp_path))
+    with pytest.raises(PatternIndexError, match="git is not installed"):
+        fetch_library("lib", "1.0.0", tmp_path / "cache", str(tmp_path))
+
+
 def test_no_git_on_path(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PATH", str(tmp_path))
-    with pytest.raises(PatternIndexError, match="cannot run git"):
+    with pytest.raises(PatternIndexError, match="git is not installed"):
         PatternIndex(REPO_ROOT)
 
 

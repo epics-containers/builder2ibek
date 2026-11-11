@@ -265,6 +265,70 @@ def test_new_image_tag_refreshes_the_schema(tmp_path: Path, monkeypatch):
     assert "pvlogging.BlacklistPvs" not in mapping()
 
 
+def _ibek_calls(monkeypatch) -> list[tuple[str, ...]]:
+    """Record each ibek command vendoring runs."""
+    calls: list[tuple[str, ...]] = []
+    run = vp._ibek
+
+    def spy(*args: str):
+        calls.append(args)
+        return run(*args)
+
+    monkeypatch.setattr(vp, "_ibek", spy)
+    return calls
+
+
+def test_unchanged_instance_is_not_asked_for_a_schema(tmp_path: Path, monkeypatch):
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    calls = _ibek_calls(monkeypatch)
+    _vendor(instance)
+    assert [c[:2] for c in calls] == [("pattern", "check")]
+
+
+def test_schema_written_by_other_tooling_is_kept(tmp_path: Path, monkeypatch):
+    """A schema that differs only in what the services repo's own ibek writes,
+    such as descriptions and layout, is left as it is."""
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    schema = instance / "ioc.schema.json"
+    data = json.loads(schema.read_text())
+    for definition in data["$defs"].values():
+        definition["description"] = "written by another ibek"
+    schema.write_text(json.dumps(data, indent=4, sort_keys=True))
+    text = schema.read_text()
+    calls = _ibek_calls(monkeypatch)
+    _vendor(instance)
+    assert ("pattern", "schema", str(instance)) not in calls
+    assert schema.read_text() == text
+
+
+def test_schema_url_override_is_honoured(tmp_path: Path, monkeypatch):
+    """IBEK_SCHEMA_URL replaces builder2ibek's copy of the base schema, as it
+    does ibek's own; offline and uncached, the IOC cannot be classified."""
+    monkeypatch.setenv("IBEK_SCHEMA_CACHE", str(tmp_path / "empty"))
+    monkeypatch.setenv("IBEK_SCHEMA_URL", "https://example.com/{tag}/schema.json")
+    instance = _instance(tmp_path)
+    result = _vendor(instance)
+    assert not result.vendored
+    assert "cannot tell which modules" in result.warnings[0]
+    assert "example.com" in result.warnings[0]
+
+
+def test_lock_schema_url_is_honoured(tmp_path: Path, monkeypatch):
+    """So is a schema_url the instance's runtime-lock.yaml records."""
+    from ibek.pattern_cmds.lock import RuntimeLock
+
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    lock = RuntimeLock(instance / "runtime-lock.yaml")
+    lock.schema_url = "https://example.com/{tag}/schema.json"
+    lock.save()
+    monkeypatch.setenv("IBEK_SCHEMA_CACHE", str(tmp_path / "empty"))
+    result = _vendor(instance)
+    assert "example.com" in result.warnings[0]
+
+
 def test_schema_not_found(tmp_path: Path, monkeypatch):
     """A tag whose base schema is neither packaged nor cached, offline."""
     monkeypatch.setenv("IBEK_SCHEMA_CACHE", str(tmp_path / "empty"))

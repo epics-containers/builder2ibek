@@ -29,6 +29,7 @@ here, so a plan says what could come from a pattern, not what must.
 from __future__ import annotations
 
 import os
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -165,7 +166,11 @@ def _git(library: Path, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             ["git", "-C", str(library), *args], capture_output=True, text=True
         )
-    except OSError as e:  # no git on PATH
+    except FileNotFoundError as e:
+        raise PatternIndexError(
+            f"cannot run git for {library}: git is not installed (not on PATH)"
+        ) from e
+    except OSError as e:
         raise PatternIndexError(f"cannot run git for {library}: {e}") from e
 
 
@@ -267,6 +272,14 @@ def fetch_library(name: str, version: str, cache_dir: Path, url: str) -> Path:
         raise PatternIndexError(
             f"cannot fetch {name} {version} from {url}: no answer in {GIT_TIMEOUT}s"
         ) from e
+    except FileNotFoundError as e:
+        if e.filename != "git":
+            raise PatternIndexError(
+                f"cannot fetch {name} {version} into {cache_dir}: {e}"
+            ) from e
+        raise PatternIndexError(
+            f"cannot fetch {name} {version}: git is not installed (not on PATH)"
+        ) from e
     except OSError as e:
         raise PatternIndexError(
             f"cannot fetch {name} {version} into {cache_dir}: {e}"
@@ -352,13 +365,17 @@ class PatternIndex:
         path = self.library_paths[library]
         folders = sorted({c.split("/")[0] for c in changed})
         committed = sorted(set(folders) & _committed_folders(path))
-        git = f"git -C {path}"
+
+        def quoted(paths: list[str]) -> str:
+            return " ".join(shlex.quote(p) for p in paths)
+
+        git = f"git -C {shlex.quote(str(path))}"
         commands = [
-            f"{git} reset -q HEAD -- {' '.join(folders)}",
-            f"{git} clean -fdq -- {' '.join(folders)}",
+            f"{git} reset -q HEAD -- {quoted(folders)}",
+            f"{git} clean -fdq -- {quoted(folders)}",
         ]
         if committed:
-            commands.append(f"{git} checkout -q HEAD -- {' '.join(committed)}")
+            commands.append(f"{git} checkout -q HEAD -- {quoted(committed)}")
         return (
             f"{path} has local changes in its pattern folders ({', '.join(changed)}), "
             f"so its patterns are not those of the pinned tag. To restore those "

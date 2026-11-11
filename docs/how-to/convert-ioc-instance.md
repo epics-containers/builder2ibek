@@ -160,6 +160,14 @@ already in `runtime-lock.yaml` is left at the version and file selection the
 lock records: xml2yaml runs `ibek pattern check` on it, and reports a locked
 version that differs from builder2ibek's. The `../ioc.schema.json` header of an
 instance with a `runtime-lock.yaml` is kept whatever the conversion decides.
+An existing `ioc.schema.json` is left alone unless the entity types or their
+parameter names it describes differ from those of the image's base schema plus
+the vendored models, as after a change of image tag; only then does xml2yaml
+run `ibek pattern schema`. Differences that come from the ibek version that
+wrote the file, such as descriptions or layout, do not count, so the services
+repo's own tooling and builder2ibek do not rewrite the file in turn. The base
+schema is found as ibek finds it: `IBEK_SCHEMA_URL` or the lock's `schema_url`
+take precedence over builder2ibek's copy for the default image.
 
 Options:
 

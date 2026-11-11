@@ -34,6 +34,7 @@ import contextlib
 import copy
 import io
 import json
+import os
 import re
 import subprocess
 import sys
@@ -47,6 +48,7 @@ from ibek.globals import RUNTIME_LOCK_NAME
 from ibek.pattern_cmds.lock import RuntimeLock
 from ibek.pattern_cmds.schema import (
     SCHEMA_HEADER,
+    SCHEMA_URL_ENV,
     SchemaNotFoundError,
     fetch_base_schema,
     find_image,
@@ -153,17 +155,32 @@ def write_schema_cache(root: Path) -> None:
 
 
 @cache
-def _base_schema(image: str) -> dict:
-    """The published base schema of ``image``.
+def _packaged_schema(path: Path) -> dict:
+    return json.loads(path.read_text())
+
+
+def _recorded_schema_url(instance: Path | None) -> str | None:
+    """The base schema URL the instance's runtime-lock.yaml records, if any."""
+    if instance is None or not (instance / RUNTIME_LOCK_NAME).is_file():
+        return None
+    return _lock(instance).schema_url
+
+
+def _base_schema(image: str, recorded_url: str | None = None) -> dict:
+    """The published base schema of ``image``, found as ibek finds it.
+
+    builder2ibek's copy serves the default image, unless ``IBEK_SCHEMA_URL`` or
+    the lock's ``schema_url`` (``recorded_url``) names another source.
 
     Raises SchemaNotFoundError when it cannot be had.
     """
     packaged = _schema_file(image)
-    if image == DEFAULT_RUNTIME_IMAGE or packaged.is_file():
-        return json.loads(packaged.read_text())
+    overridden = recorded_url or os.getenv(SCHEMA_URL_ENV, "").strip()
+    if not overridden and (image == DEFAULT_RUNTIME_IMAGE or packaged.is_file()):
+        return _packaged_schema(packaged)
     # ibek reports a fallback to its cache on stdout, which is xml2yaml's output
     with contextlib.redirect_stdout(io.StringIO()):
-        return fetch_base_schema(image)
+        return fetch_base_schema(image, recorded_url)
 
 
 def _entity_types(schema: Mapping[str, Any]) -> set[str]:
@@ -181,13 +198,16 @@ def _same_repository(image: str, other: str) -> bool:
 
 
 def _not_built(
-    entities: Iterable[Mapping[str, Any]], plan: PatternPlan, image: str
+    entities: Iterable[Mapping[str, Any]],
+    plan: PatternPlan,
+    image: str,
+    recorded_url: str | None = None,
 ) -> list[str]:
     """The modules an IOC needs that are neither patterns nor built into ``image``.
 
     Raises SchemaNotFoundError when ``image``'s base schema cannot be had.
     """
-    built = _entity_types(_base_schema(image))
+    built = _entity_types(_base_schema(image, recorded_url))
     patterns = {p.module for p in plan.patterns}
     missing: dict[str, None] = {}
     for entity in entities:
@@ -244,13 +264,28 @@ def _add(pattern: Pattern, instance: Path) -> None:
     lock.save()
 
 
-def _schema_is_current(instance: Path) -> bool:
-    """True if the instance's ioc.yaml header and ioc.schema.json are what
-    ``ibek pattern schema`` would write now: the schema merges the base schema
-    of the image values.yaml pins with the vendored support YAMLs.
+def _signature(schema: Mapping[str, Any]) -> dict[str, frozenset[str]]:
+    """Each entity type an IOC schema accepts, with its parameter names."""
+    items = schema["properties"]["entities"]["items"]
+    if "$ref" in items:
+        items = schema["$defs"][items["$ref"].split("/")[-1]]
+    defs = schema.get("$defs", {})
+    return {
+        entity_type: frozenset(defs.get(ref.split("/")[-1], {}).get("properties", {}))
+        for entity_type, ref in items["discriminator"]["mapping"].items()
+    }
 
-    False when that cannot be told, for example with an image whose base schema
-    cannot be had.
+
+def _schema_is_current(instance: Path) -> bool:
+    """True if the instance's ioc.yaml header and ioc.schema.json still describe
+    the entities ``ibek pattern schema`` would give it now: the base schema of
+    the image values.yaml pins, merged with the vendored support YAMLs.
+
+    Only entity types and their parameter names are compared, not the whole
+    schema, which depends on the ibek and pydantic versions that wrote it: a
+    services repo whose own tooling writes the schema keeps its file unless the
+    image or the vendored models changed what the IOC may hold. False when that
+    cannot be told, for example with an image whose base schema cannot be had.
     """
     ioc_yaml = instance / "config" / "ioc.yaml"
     schema = instance / "ioc.schema.json"
@@ -262,11 +297,12 @@ def _schema_is_current(instance: Path) -> bool:
     if image is None:
         return False
     try:
-        base = copy.deepcopy(_base_schema(image))
-    except SchemaNotFoundError:
+        base = copy.deepcopy(_base_schema(image, _recorded_schema_url(instance)))
+        existing = _signature(json.loads(schema.read_text()))
+    except (SchemaNotFoundError, ValueError, KeyError, TypeError):
         return False
     support_yamls = sorted((instance / "config").glob("*.ibek.support.yaml"))
-    return merge_entities(base, support_yamls) == json.loads(schema.read_text())
+    return _signature(merge_entities(base, support_yamls)) == existing
 
 
 def _vendor(patterns: list[Pattern], instance: Path, result: PatternResult) -> None:
@@ -382,7 +418,7 @@ def _plan_and_vendor(
         image = pinned
 
     try:
-        missing = _not_built(entities, plan, image)
+        missing = _not_built(entities, plan, image, _recorded_schema_url(instance))
     except SchemaNotFoundError as e:
         result.decided = False
         result.warnings.append(
