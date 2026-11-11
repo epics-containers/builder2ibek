@@ -171,7 +171,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ibek" }]
+requires-dist = [{ name = "ibek", specifier = ">=4.9.0" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -564,7 +564,7 @@ wheels = [
 
 [[package]]
 name = "ibek"
-version = "4.8.3"
+version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "gitpython" },
@@ -576,9 +576,9 @@ dependencies = [
     { name = "truststore" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7f/0e/9fff94996fb90386a5011b192aa7a97a61dc5e1734f04a8994ec8ca8c295/ibek-4.8.3.tar.gz", hash = "sha256:648586c0b42bf4dce0bf6dcc33b260b8555537ab8bb481b81c20a9d7ac2c449e", size = 354732, upload-time = "2026-11-09T11:00:31.683Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/33/7e/2abe749fab54934bd9fa23887c04606b8d40ca32e8b34b57495476cb6836/ibek-4.9.0.tar.gz", hash = "sha256:ba657f2e304c6b557d71d5313ab7dda2ed16d2652717503e2e2460d906f8105d", size = 375406, upload-time = "2026-11-10T14:20:07.998Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/42/3f5dc2fbd3332fa4b7f8cd8c236a06e48cffcfc9d00f0bed51cf66636c7d/ibek-4.8.3-py3-none-any.whl", hash = "sha256:00f94b9bb39ea4e9748cf4fb8adc2630515ae5381d469fa804cbc3a0f9871a51", size = 79847, upload-time = "2026-11-09T11:00:30.193Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/a9/2898a1888f3e86304dacdf96432491c5954ef32521c8492cf11758432ad8/ibek-4.9.0-py3-none-any.whl", hash = "sha256:9160d7049bc531bf678cafb301349634624b04c223132ef3f4e920275d7cf42b", size = 87750, upload-time = "2026-11-10T14:20:06.826Z" },
 ]
 
 [[package]]
