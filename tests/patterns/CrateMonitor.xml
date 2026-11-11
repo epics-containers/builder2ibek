@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<CrateMonitor.CrateMonitor device="BL05I-DI-CMON-01" name="CS1.DI1_Monitor"/>
+</components>

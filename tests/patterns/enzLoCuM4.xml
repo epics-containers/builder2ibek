@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<enzLoCuM4.enzLoCuM4 adr="01" device="BL05I-DI-IAMP-01" gda_desc="Current Amplifier 1 (S2)" gda_name="CA1.CTRL" name="DI3.LOCUM1" port="enz.LOCUM1"/>
+</components>

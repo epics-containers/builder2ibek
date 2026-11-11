@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EdwardsNextTurbo.EdwardsNextTurbo P="BL08J-VA-TURBO-01" name="TURBO1" port="VA_TSERV1_12"/>
+</components>

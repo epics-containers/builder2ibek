@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<attocubeInterf.ids3010 P="BL08J-MO-INTRF-" PORT="ATT1Port" Q="01" name="T1.ATTO_01"/>
+	<attocubeInterf.ids3010 P="BL08J-MO-INTRF-" PORT="ATT2Port" Q="02" name="T1.ATTO_02"/>
+</components>

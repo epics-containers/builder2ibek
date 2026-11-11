@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<cognexDataMan100.dataman100 P="BL11I-EA-BARCR-01" PORT="barcodereader" R=":DATA"/>
+</components>

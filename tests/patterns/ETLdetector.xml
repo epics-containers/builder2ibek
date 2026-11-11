@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<ETLdetector.ETLdetector P="BL11I-DI-IMON-01" Q=":E1" addr="43" gda_desc="I Monitor (OH)" gda_name="IO.E1" name="IO.E1" port="ty_70_5"/>
+</components>
