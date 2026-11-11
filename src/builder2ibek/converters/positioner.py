@@ -9,56 +9,105 @@ schema = ""
 
 GDA_PLUGINS = Path(__file__).parent / "gdaPlugins.yaml"
 
+# the types XMLbuilder registers with their multipositioner via addPositioner
+SLOT_TYPES = ("positioner.positioner", "positioner.motorpositioner")
+
+# the multipositioner's dfanout records have outputs OUTA..OUTH
+MAX_SLOTS = 8
+
+# screen macros that XMLbuilder's multipositioner computes from its
+# positioners: their count and the suffixes of up to eight of them
+GUI_MACROS = ("NPOS", *(f"P{i}" for i in range(1, 9)))
+
+
+def assign_slot(entity: Entity, ioc: Generic_IOC):
+    """
+    Set pos, the positioner's slot in its multipositioner, unless the XML
+    gives one. As in XMLbuilder's multipositioner.addPositioner, positioners
+    and motorpositioners take the slots A, B, C ... in the order they appear
+    in the XML, skipping any slot an earlier positioner's XML gives.
+    """
+    if entity.get("pos"):
+        return
+    taken = {
+        e.get("pos") or "A"
+        for e in ioc.already_converted
+        if e.get("type") in SLOT_TYPES and e.get("MP") == entity.MP
+    }
+    free = [
+        chr(ord("A") + i) for i in range(MAX_SLOTS) if chr(ord("A") + i) not in taken
+    ]
+    if not free:
+        raise ValueError(
+            f"Multipositioner '{entity.MP}' has more than {MAX_SLOTS} positioners"
+        )
+    entity.pos = free[0]
+
 
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "positioner":
         entity.DEADBAND = str(entity.DEADBAND)
         entity.remove("name")
+        assign_slot(entity, ioc)
 
     elif entity_type == "motorpositioner":
+        name = entity.get("name") or entity.get("Q")
         entity.remove("name")
+        assign_slot(entity, ioc)
 
-        # Find the dls_pmac_asyn_motor whose name = original motorpositioner.motor.
-        # There is also dls_pmac_cs_asyn_motor but I don't need it for B21 IOCs,
-        # so leave it out of the search for now.
-        # Get the motor's PV and EGU, the motor's PV is calculated by concatenating
-        # its P and M params.
-        # Set motorpositioner.motor = motor's PV.
-        # Set motorpositioner.EGU = motor's EGU.
-        motor_types = (
-            "dls_pmac_asyn_motor",
-            "dls_pmac_asyn_motor_no_coord",
-            "basic_asyn_motor",
-            "softMotorForPiezo",
-        )
-        motors = [
-            e
-            for e in ioc.raw_entities
-            if any(e.get("type", "").endswith(t) for t in motor_types)
-            and e.get("name") == entity.motor
-        ]
+        # motorpositioner.template links to the motor as $(P)$(motor), with P
+        # taken from the parent multipositioner. So motor is the motor record's
+        # suffix, not its full PV. The motor is any motor record type, found
+        # by name; its record is $(P)$(M), or $(P)$(Q) for softMotorForPiezo.
+        # The motor's P must match the parent's, or the links would point at
+        # another device. EGU is copied from the motor.
+        motors = [e for e in ioc.raw_entities if e.get("name") == entity.motor]
 
         if len(motors) != 1:
             raise ValueError(
-                f"Expected one motor with name '{entity.motor}', found {len(motors)}"
+                f"Expected one entity named '{entity.motor}' as the motor of "
+                f"motorpositioner '{name}', found {len(motors)}"
             )
 
         motor = motors[0]
-        # softMotorForPiezo uses P+Q; pmac/basic motors use P+M
-        if motor.get("type", "").endswith("softMotorForPiezo"):
-            motor_pv = motor.get("P", "") + motor.get("Q", "")
-        else:
-            try:
-                motor_pv = motor["P"] + motor["M"]
-            except KeyError as ex:
-                raise ValueError(
-                    f"Motor '{motor['name']}' missing required attribute {ex!s}"
-                ) from ex
+        motor_type = motor.get("type", "")
+        motor_pv = motor.get("M", motor.get("Q"))
+        if motor.get("P") is None or motor_pv is None:
+            raise ValueError(
+                f"Motor '{motor['name']}' of type '{motor_type}' has no P with M "
+                f"or Q, so its motor record PV is unknown"
+            )
+
+        parents = [
+            e
+            for e in ioc.raw_entities
+            if e.get("type", "").endswith("multipositioner")
+            and e.get("name") == entity.MP
+        ]
+        if len(parents) != 1:
+            raise ValueError(
+                f"Expected one multipositioner with name '{entity.MP}', "
+                f"found {len(parents)}"
+            )
+        if motor.get("P") != parents[0].get("P"):
+            raise ValueError(
+                f"Motor '{motor['name']}' prefix '{motor.get('P')}' does not match "
+                f"multipositioner '{entity.MP}' prefix '{parents[0].get('P')}'"
+            )
+
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
 
+    elif entity_type == "motorpositioner_external_motor":
+        # takes P, MP, motor and pos as given, and nothing refers to its name
+        entity.remove("name")
+
     elif entity_type == "multipositioner":
+        # XMLbuilder recomputes these from the positioners, for its screens
+        for macro in GUI_MACROS:
+            entity.remove(macro)
+
         # First we need to check if there is a corresponding motorpositioner that
         # already has a Q (and therefore a PS) macro defined
         motor_ps = [
