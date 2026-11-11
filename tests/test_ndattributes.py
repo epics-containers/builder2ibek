@@ -115,6 +115,23 @@ def test_unknown_port_is_dropped_with_a_warning(tmp_path: Path):
 
 
 @requires_support
+def test_no_model_and_no_prefix_is_dropped_with_a_warning(tmp_path: Path):
+    # without ATTRIBUTES_FILE, P and R there is nowhere to set the XML
+    entities, warnings = _convert(
+        tmp_path,
+        """
+  <dtacq_adc.dtacq_adc P="" PORT="ADC" R=":ADC:"/>
+  <ADCore.NDAttributes attrname="N" port="ADC" source="ARRAY_COUNTER" type="PARAM"/>
+""",
+    )
+
+    assert not [e for e in entities if e["type"] == "ADCore.NDAttributesConfig"]
+    assert not (tmp_path / "ADC.xml").exists()
+    assert len(warnings) == 1
+    assert "dropped 1 ADCore.NDAttributes for port ADC" in warnings[0]
+
+
+@requires_support
 def test_numeric_port_is_found(tmp_path: Path):
     # make_entity turns PORT="5" into the number 5
     entities, warnings = _convert(

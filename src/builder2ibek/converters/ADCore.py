@@ -101,7 +101,7 @@ def finalize(ioc: Generic_IOC):
             _reorder(target, ordered_params(target))
             continue
 
-        if "P" not in target or "R" not in target:
+        if target.get("P") is None or target.get("R") is None:
             ioc.extra_warnings.append(
                 f"{ioc_name}: dropped {count} for port {port}: its entity "
                 f"{target['type']} has no ATTRIBUTES_FILE, P or R"
