@@ -9,24 +9,55 @@ schema = ""
 
 GDA_PLUGINS = Path(__file__).parent / "gdaPlugins.yaml"
 
+# the types XMLbuilder registers with their multipositioner via addPositioner
+SLOT_TYPES = ("positioner.positioner", "positioner.motorpositioner")
+
+# the multipositioner's dfanout records have outputs OUTA..OUTH
+MAX_SLOTS = 8
+
+# GUI macros that XMLbuilder's multipositioner computes from its positioners
+GUI_MACROS = ("NPOS", *(f"P{i}" for i in range(1, MAX_SLOTS + 1)))
+
+
+def assign_slot(entity: Entity, ioc: Generic_IOC):
+    """
+    Set pos, the positioner's slot in its multipositioner, unless the XML
+    gives one. As in XMLbuilder's multipositioner.addPositioner, positioners
+    and motorpositioners take the slots A, B, C ... in the order they appear
+    in the XML.
+    """
+    if entity.get("pos"):
+        return
+    taken = [
+        e
+        for e in ioc.already_converted
+        if e.get("type") in SLOT_TYPES and e.get("MP") == entity.MP
+    ]
+    if len(taken) >= MAX_SLOTS:
+        raise ValueError(
+            f"Multipositioner '{entity.MP}' has more than {MAX_SLOTS} positioners"
+        )
+    entity.pos = chr(ord("A") + len(taken))
+
 
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "positioner":
         entity.DEADBAND = str(entity.DEADBAND)
         entity.remove("name")
+        assign_slot(entity, ioc)
 
     elif entity_type == "motorpositioner":
-        name = entity.get("name")
+        name = entity.get("name") or entity.get("Q")
         entity.remove("name")
+        assign_slot(entity, ioc)
 
         # motorpositioner.template links to the motor as $(P)$(motor), with P
         # taken from the parent multipositioner. So motor is the motor record's
-        # suffix, not its full PV. As in XMLbuilder, the motor is any entity
-        # with the referenced name, whatever its type, and its record is
-        # $(P)$(M), or $(P)$(Q) for softMotorForPiezo. The motor's P must match
-        # the parent's, or the links would point at another device.
-        # EGU is copied from the motor.
+        # suffix, not its full PV. The motor is any motor record type, found
+        # by name; its record is $(P)$(M), or $(P)$(Q) for softMotorForPiezo.
+        # The motor's P must match the parent's, or the links would point at
+        # another device. EGU is copied from the motor.
         motors = [e for e in ioc.raw_entities if e.get("name") == entity.motor]
 
         if len(motors) != 1:
@@ -64,7 +95,15 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.motor = motor_pv
         entity.EGU = motor.get("EGU", "")
 
+    elif entity_type == "motorpositioner_external_motor":
+        # takes P, MP, motor and pos as given, and nothing refers to its name
+        entity.remove("name")
+
     elif entity_type == "multipositioner":
+        # XMLbuilder recomputes these from the positioners, for its screens
+        for macro in GUI_MACROS:
+            entity.remove(macro)
+
         # First we need to check if there is a corresponding motorpositioner that
         # already has a Q (and therefore a PS) macro defined
         motor_ps = [

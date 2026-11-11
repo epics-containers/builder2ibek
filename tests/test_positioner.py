@@ -1,10 +1,11 @@
 """
-Tests for the positioner converter's motorpositioner handling.
+Tests for the positioner converter.
 
 motorpositioner.template links to its motor as $(P)$(motor), with P taken
 from the parent multipositioner, so the converter must set motor to the motor
 record's suffix and refuse a motor whose prefix differs (issue #103). As in
-XMLbuilder, the motor is found by name whatever its type.
+XMLbuilder, the motor is found by name whatever its type, and positioners
+take their multipositioner's slots A, B, C ... in XML order.
 """
 
 from pathlib import Path
@@ -24,14 +25,19 @@ HEADER = """<?xml version="1.0" ?>
 """
 
 
-def _motorpositioners(tmp_path: Path, body: str) -> list[dict]:
+def _convert(tmp_path: Path, body: str) -> list[dict]:
     xml = tmp_path / "ioc.xml"
     xml.write_text(HEADER + body + "</components>\n")
     yaml = tmp_path / "ioc.yaml"
     convert_file(xml, yaml, "/epics/ibek-defs/ioc.schema.json")
-
     ioc = YAML(typ="safe").load(yaml.read_text())
-    return [e for e in ioc["entities"] if e["type"] == "positioner.motorpositioner"]
+    return [e for e in ioc["entities"] if e["type"].startswith("positioner.")]
+
+
+def _motorpositioners(tmp_path: Path, body: str) -> list[dict]:
+    return [
+        e for e in _convert(tmp_path, body) if e["type"] == "positioner.motorpositioner"
+    ]
 
 
 def test_motor_is_the_suffix_not_the_pv(tmp_path: Path):
@@ -112,5 +118,122 @@ def test_missing_motor_names_the_motorpositioner(tmp_path: Path):
     STRA="Out" STRB="In" name="STAGE.MP"/>
   <positioner.motorpositioner DESC="y" MP="STAGE.MP" PREC="3" Q=":Y:P"
     VALB="1" motor="NOSUCH" name="STAGE.YP"/>
+""",
+        )
+
+
+def test_positioners_take_slots_in_xml_order(tmp_path: Path):
+    # as XMLbuilder's multipositioner.addPositioner: positioners and
+    # motorpositioners share one sequence of slots per multipositioner
+    entities = _convert(
+        tmp_path,
+        """
+  <positioner.multipositioner DESC="one" MP=":MP" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="ONE"/>
+  <positioner.multipositioner DESC="two" MP=":MP2" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="TWO"/>
+  <positioner.motorpositioner DESC="y" MP="ONE" PREC="3" Q=":Y:P"
+    motor="STAGE.Y"/>
+  <positioner.positioner DEADBAND="0.1" DESC="pv" MP="ONE" Q=":PV:P"
+    READBACK="RBV" SET="SET" STOP="STOP"/>
+  <positioner.motorpositioner DESC="pz" MP="TWO" PREC="3" Q=":PZ:P"
+    motor="STAGE.PZ"/>
+  <positioner.motorpositioner DESC="pz" MP="ONE" PREC="3" Q=":PZ:P1"
+    motor="STAGE.PZ"/>
+""",
+    )
+
+    # pos A is the model's default, so it is left out of the YAML
+    assert [(e["Q"], e.get("pos", "A")) for e in entities if "Q" in e] == [
+        (":Y:P", "A"),
+        (":PV:P", "B"),
+        (":PZ:P", "A"),
+        (":PZ:P1", "C"),
+    ]
+
+
+def test_explicit_pos_is_kept(tmp_path: Path):
+    entities = _convert(
+        tmp_path,
+        """
+  <positioner.multipositioner DESC="one" MP=":MP" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="ONE"/>
+  <positioner.motorpositioner DESC="y" MP="ONE" PREC="3" Q=":Y:P"
+    motor="STAGE.Y" pos="D"/>
+""",
+    )
+
+    assert [e["pos"] for e in entities if "Q" in e] == ["D"]
+
+
+def test_multipositioner_drops_gui_macros(tmp_path: Path):
+    # NPOS and P1..P8 are screen macros XMLbuilder computes itself
+    entities = _convert(
+        tmp_path,
+        """
+  <positioner.multipositioner DESC="one" MP=":MP" NPOS="2" P="BL01C-MO-STAGE-01"
+    P1="P1" P2="P2" P1_VALS="Y" STRA="Out" STRB="In" name="ONE"/>
+  <positioner.motorpositioner DESC="y" MP="ONE" PREC="3" Q=":Y:P"
+    motor="STAGE.Y"/>
+""",
+    )
+
+    mp = entities[0]
+    assert "NPOS" not in mp and "P1" not in mp and "P2" not in mp
+    assert mp["P1_VALS"] == "Y"
+
+
+def test_external_motor_drops_name(tmp_path: Path):
+    entities = _convert(
+        tmp_path,
+        """
+  <positioner.motorpositioner_external_motor DESC="light" EGU="%" MP=":MP"
+    P="BL01C-EA-OAV-01:FZOOM" PREC="1" Q=":PI" VALB="10" motor=":I"
+    name="BLIT" pos="B"/>
+""",
+    )
+
+    assert entities == [
+        {
+            "type": "positioner.motorpositioner_external_motor",
+            "DESC": "light",
+            "EGU": "%",
+            "MP": ":MP",
+            "P": "BL01C-EA-OAV-01:FZOOM",
+            "PREC": 1,
+            "Q": ":PI",
+            "VALB": 10,
+            "motor": ":I",
+            "pos": "B",
+        }
+    ]
+
+
+def test_empty_m_gives_an_empty_motor_suffix(tmp_path: Path):
+    # a motor whose record is $(P) alone, as on the LI SLED
+    entities = _convert(
+        tmp_path,
+        """
+  <motor.basic_asyn_motor ADDR="0" DESC="sled" EGU="mm" M="" MRES="0.001"
+    P="BL01C-MO-SLED-01" PORT="SLED" PREC="3" name="SLED.M"/>
+  <positioner.multipositioner DESC="sled" MP=":MP" P="BL01C-MO-SLED-01"
+    STRA="Out" STRB="In" name="SLED.MP"/>
+  <positioner.motorpositioner DESC="sled" MP="SLED.MP" PREC="3" Q=":P"
+    motor="SLED.M"/>
+""",
+    )
+
+    assert [e["motor"] for e in entities if "Q" in e] == [""]
+
+
+def test_unnamed_motorpositioner_is_reported_by_q(tmp_path: Path):
+    with pytest.raises(ValueError, match="motorpositioner ':Y:P', found 0"):
+        _convert(
+            tmp_path,
+            """
+  <positioner.multipositioner DESC="stage" MP=":MP" P="BL01C-MO-STAGE-01"
+    STRA="Out" STRB="In" name="STAGE.MP"/>
+  <positioner.motorpositioner DESC="y" MP="STAGE.MP" PREC="3" Q=":Y:P"
+    motor="NOSUCH"/>
 """,
         )
