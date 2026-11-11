@@ -121,6 +121,52 @@ Notice that `asyn.AsynIP` and `hidenRGA.hidenRGA_qga` remain as separate entitie
 in the output, reflecting the original XML structure.  The ibek entity models
 for both must be present in the `ibek-support*` submodules used by the Generic IOC.
 
+### IOCs that run on runtime patterns
+
+Some devices need no compiled support module: their StreamDevice protocol,
+database template and entity model come from a runtime pattern in
+[ibek-runtime-streamdevice](https://github.com/epics-containers/ibek-runtime-streamdevice)
+or [ibek-runtime-support](https://github.com/epics-containers/ibek-runtime-support),
+which builder2ibek pins as submodules. An IOC is **pattern-only** when each of its
+entities either validates against such a pattern or is built into the runtime
+image, `ghcr.io/epics-containers/ioc-streamdevice-runtime` at the tag pinned in
+`src/builder2ibek/vendor_patterns.py`. That image ships asyn, devIocStats,
+autosave and pvlogging.
+
+For a pattern-only IOC written into an instance folder,
+`--yaml <instance>/config/ioc.yaml`, xml2yaml runs
+`ibek pattern add <library>:<pattern>@<tag>` for each pattern into
+`<instance>`. ibek writes:
+
+- the pattern's files (`*.ibek.support.yaml`, protocol, template) in `config/`;
+- `runtime-lock.yaml`, recording each pattern's version, source and file hashes;
+- `ioc.schema.json`, the image's published schema plus the pattern models;
+- the `ioc.yaml` header `# yaml-language-server: $schema=../ioc.schema.json`.
+
+ibek takes the image from the instance's `values.yaml`. xml2yaml does not
+write `values.yaml`: it prints the image, and if the instance pins none it
+warns that no `ioc.schema.json` was written. Set the image and run xml2yaml
+again; adding a pattern at the version it is locked at rewrites the same files.
+For example, for BL08J-MO-IOC-13:
+
+```text
+vendored ibek-runtime-streamdevice:attocubeInterf@0.7.3 into services/bl08j-mo-ioc-13
+image: ghcr.io/epics-containers/ioc-streamdevice-runtime:2.8.26ec8
+```
+
+The entities themselves are the same as for a generic IOC. Options:
+
+- `--no-vendor` writes the `ioc.yaml` and only lists the patterns and image.
+- `--patterns-out <file>` writes the `ibek pattern add` references, one per
+  line, for tooling. The file is empty when the IOC uses no pattern.
+
+An IOC whose `ioc.yaml` is not in a `config/` folder, an IOC that also needs
+modules the runtime image does not build, and an instance whose `values.yaml`
+pins another image are not vendored; xml2yaml says why. ibek's own environment
+variables apply: `IBEK_PATTERN_LIBRARIES` points a library at a local
+checkout, and `IBEK_SCHEMA_CACHE` holds the base schemas ibek uses when the
+network cannot be reached.
+
 ---
 
 ## 3. Review and adjust
@@ -156,6 +202,9 @@ For schema validation to work your `ioc.yaml` should have the following header:
 ```yaml
 # yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json
 ```
+
+A pattern-only IOC has `$schema=../ioc.schema.json` instead, written by ibek
+when it vendors the patterns.
 
 ---
 

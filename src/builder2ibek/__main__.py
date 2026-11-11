@@ -9,6 +9,7 @@ from builder2ibek.dbcompare import compare_dbs
 from builder2ibek.devc7 import DLS_SW, devc7_cli
 from builder2ibek.migrate_autosave import migrate_folder
 from builder2ibek.reconvert import reconvert_cli
+from builder2ibek.vendor_patterns import VendorError
 
 cli = typer.Typer()
 
@@ -51,9 +52,30 @@ def xml2yaml(
         "Only for generic IOCs whose binary includes the BLGui module; "
         "otherwise BLGui entities are dropped.",
     ),
+    vendor: bool = typer.Option(
+        True,
+        "--vendor/--no-vendor",
+        help="Vendor the runtime patterns of a pattern-only IOC into its instance "
+        "folder with `ibek pattern add`. --no-vendor writes the ioc.yaml and only "
+        "lists the patterns.",
+    ),
+    patterns_out: Path | None = typer.Option(
+        None,
+        "--patterns-out",
+        help="Write the IOC's `ibek pattern add` references to this file, one per "
+        "line (empty when the IOC uses none)",
+    ),
 ):
     """
     Convert a builder XML IOC to an ibek ioc.yaml.
+
+    An IOC whose devices all come from runtime patterns and the runtime image
+    (ioc-streamdevice-runtime) is pattern-only. Given
+    services/<ioc>/config/ioc.yaml, xml2yaml runs `ibek pattern add` for each
+    pattern into services/<ioc>/, which writes the pattern files under config/,
+    runtime-lock.yaml, ioc.schema.json and the ioc.yaml schema header. The
+    schema needs the image set in values.yaml; xml2yaml prints the image and
+    does not write values.yaml.
 
     ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
     that holds only PandAs and boilerplate becomes one fastcs instance in place
@@ -65,10 +87,14 @@ def xml2yaml(
     with a warning, and an existing instance is never overwritten.
     """
     try:
-        result = convert_file(xml, yaml, schema, description=description, blgui=blgui)
-    except FileExistsError as e:
+        result = convert_file(
+            xml, yaml, schema, description=description, blgui=blgui, vendor=vendor
+        )
+    except (FileExistsError, VendorError) as e:
         typer.echo(f"error: {e}", err=True)
         raise typer.Exit(1) from e
+    if patterns_out is not None:
+        patterns_out.write_text("".join(f"{ref}\n" for ref in result.patterns))
     for note in result.notes:
         typer.echo(note)
     for warning in result.warnings:

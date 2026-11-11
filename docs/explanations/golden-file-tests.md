@@ -24,9 +24,17 @@ with those files.
   `SR03C-VA-IOC-01_expanded.db` (XMLbuilder's output) with `sr03c-va-ioc-01.db`
   and expects the report to equal the committed `compare.diff`.
 
+Both conversion tests convert into an instance folder, `instance/config/ioc.yaml`
+with a `values.yaml` pinning the runtime image, so a pattern-only sample has its
+runtime patterns vendored as xml2yaml does for a real instance. For such a
+sample the tests also compare the pattern list with `<ioc>.patterns` and the
+vendored `runtime-lock.yaml` with `<ioc>.runtime-lock.yaml`, and generate2 reads
+the vendored support YAML from `config/`. Vendoring runs offline, from the
+pattern library submodules and the base schemas in `tests/schema-cache/`.
+
 All of these are in `tests/test_file_conversion.py` and `tests/test_compare.py`.
-The golden files are the committed `*.yaml`, `*.st.cmd`, `*.ioc.subst` and
-`compare.diff`.
+The golden files are the committed `*.yaml`, `*.st.cmd`, `*.ioc.subst`,
+`*.patterns`, `*.runtime-lock.yaml` and `compare.diff`.
 
 ## The model in one paragraph
 

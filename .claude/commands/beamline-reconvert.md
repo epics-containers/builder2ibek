@@ -39,7 +39,13 @@ XML stems to `<services-repo>/services/<ioc-name>/config/ioc.yaml`,
 re-runs `xml2yaml` for each match (preserving the existing `description`
 field, and `--blgui` when the existing ioc.yaml has `BLGui.*` entities),
 then schema-validates every reconverted ioc.yaml with
-`ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir.
+`ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir, together
+with the support YAMLs of any patterns vendored in its `config/`.
+
+A pattern-only IOC (see the pattern-only paragraph of
+[ioc-convert.md](ioc-convert.md), phase 1c) has its runtime patterns
+vendored again by each run, which rewrites the same files and keeps the
+`../ioc.schema.json` header ibek wrote.
 
 Flags: `--no-validate` skips the generate2 pass; `--only <ioc-name>`
 (repeatable) limits the run.
@@ -64,10 +70,20 @@ instance serves them, or its folder serves different controllers), or is a
 mixed IOC whose own folder is a fastcs instance: its old ioc.yaml is kept as it
 was, it is not validated, and it must be resolved by hand using the refusal
 warning, which names the folder that serves the PandA,
+each entry in `patterns` (pattern-only IOCs: the `ibek pattern add`
+references, the image and whether they were vendored),
 each entry in `notes` (what was written, kept or removed; anything needing
 action is in `warnings`), validation pass/fail counts with stderr tails for
 any failure. Then run
 `git -C <services-repo> diff --stat` to show the file delta.
+
+For each `patterns` entry whose `values.yaml` does not pin its `image`, or
+whose warnings say the instance pins no image or another one: set
+`ioc-instance.image` in `<services-repo>/services/<ioc-name>/values.yaml` to
+that image and re-run with `--only <ioc-name>`, so that the patterns are
+vendored and `ioc.schema.json` is built for that image. A warning that
+`runtime-lock.yaml` holds patterns the IOC no longer uses needs those entries
+and their `config/` files removed by hand; report it.
 
 Do not commit anything. Suggest:
 
@@ -85,7 +101,8 @@ git -C <services-repo> commit -m "Reconvert IOCs with latest ibek-support"
 ls /dls_sw/work/R3.14.12.7/support/<BLXXY>-BUILDER/etc/makeIocs/*.xml \
   || ls /dls_sw/prod/R3.14.12.7/support/<BLXXY>-BUILDER/*/etc/makeIocs/*.xml
 
-# 2. For each XML whose lowercased stem matches a services folder:
+# 2. For each XML whose lowercased stem matches a services folder
+#    (vendors the patterns of a pattern-only IOC, as reconvert does):
 uv run builder2ibek xml2yaml <xml> --yaml <services-repo>/services/<ioc-name>/config/ioc.yaml
 
 # 3. Schema-validate each one:
@@ -93,7 +110,8 @@ export EPICS_ROOT=$(mktemp -d /tmp/epics-reconvert-XXXXXX)
 ./update-schema
 TMPCONFIG=$(mktemp -d /tmp/reconvert-config-XXXXXX)
 for ioc_yaml in <services-repo>/services/*/config/ioc.yaml; do
-  cp "$ioc_yaml" "$TMPCONFIG/ioc.yaml"
+  rm -f "$TMPCONFIG"/*
+  cp "$ioc_yaml" "$(dirname "$ioc_yaml")"/*.ibek.support.yaml "$TMPCONFIG/" 2>/dev/null
   ibek runtime generate2 --no-pvi "$TMPCONFIG" 2>&1 || true
 done
 rm -rf "$TMPCONFIG" "$EPICS_ROOT"

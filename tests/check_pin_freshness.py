@@ -15,7 +15,8 @@ weekly from periodic.yml, and by hand whenever you like:
     python3 tests/check_pin_freshness.py
 
 The runtime pattern libraries are pinned at release tags rather than main, so
-those pins are compared with the newest release tag instead.
+those pins are compared with the newest release tag instead. So is the image
+pattern-only IOCs run on, builder2ibek.vendor_patterns.DEFAULT_RUNTIME_IMAGE.
 
 ibek-support-dls is on Diamond's internal GitLab, so this can only reach it from
 inside the network. From a GitHub runner that submodule is reported unreachable
@@ -25,6 +26,7 @@ and skipped rather than treated as a problem.
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -34,6 +36,10 @@ SUBMODULES = ("ibek-support", "ibek-support-dls")
 # this script does not import so that it runs without the package installed.
 TAGGED_SUBMODULES = ("ibek-runtime-streamdevice", "ibek-runtime-support")
 LS_REMOTE_TIMEOUT = 30
+# Read rather than imported, for the same reason
+VENDOR_PATTERNS = REPO_ROOT / "src" / "builder2ibek" / "vendor_patterns.py"
+# ioc-streamdevice releases: the StreamDevice version, then ec<n>
+IMAGE_TAG = re.compile(r"(\d+)\.(\d+)\.(\d+)ec(\d+)")
 
 IN_ACTIONS = os.environ.get("GITHUB_ACTIONS") == "true"
 
@@ -126,6 +132,59 @@ def _remote_latest_tag(url: str) -> tuple[str, str] | None:
     return latest, commits[latest]
 
 
+def _remote_tags(url: str) -> list[str] | None:
+    """The tags upstream, or None if the remote cannot be reached."""
+    try:
+        result = subprocess.run(
+            ["git", "ls-remote", "--tags", "--refs", url],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=LS_REMOTE_TIMEOUT,
+        )
+    except subprocess.TimeoutExpired:
+        return None
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    return [
+        line.split()[1].removeprefix("refs/tags/")
+        for line in result.stdout.splitlines()
+    ]
+
+
+def _check_runtime_image() -> int:
+    """Warn if the default runtime image is not the newest release; 1 if so."""
+    match = re.search(r'DEFAULT_RUNTIME_IMAGE = "(.*)"', VENDOR_PATTERNS.read_text())
+    assert match, f"no DEFAULT_RUNTIME_IMAGE in {VENDOR_PATTERNS}"
+    image = match[1]
+    pinned = image.rpartition(":")[2]
+    # ghcr.io/epics-containers/ioc-streamdevice-runtime -> its GitHub repo
+    repo = image.rpartition(":")[0].removeprefix("ghcr.io/").removesuffix("-runtime")
+    tags = _remote_tags(f"https://github.com/{repo}")
+    if tags is None:
+        print(f"{image}: remote unreachable, skipped")
+        return 0
+    releases = {
+        tuple(int(n) for n in m.groups()): tag
+        for tag in tags
+        if (m := IMAGE_TAG.fullmatch(tag))
+    }
+    if not releases:
+        print(f"{image}: no releases found upstream, skipped")
+        return 0
+    latest = releases[max(releases)]
+    if latest == pinned:
+        print(f"{image}: the newest release")
+        return 0
+    _warn(
+        f"DEFAULT_RUNTIME_IMAGE {image} is not the newest release {latest}. To "
+        f"take it: set the tag in {VENDOR_PATTERNS.relative_to(REPO_ROOT)}, add "
+        f"its ibek.ioc.schema.json release asset to tests/schema-cache, and run "
+        f"./tests/samples/make_samples.sh"
+    )
+    return 1
+
+
 def main() -> int:
     stale = 0
     for submodule in SUBMODULES:
@@ -161,8 +220,10 @@ def main() -> int:
                 f"then commit the pin and run tests/test_patterns.py"
             )
 
-    total = len(SUBMODULES) + len(TAGGED_SUBMODULES)
-    print(f"\n{stale} of {total} submodule pins behind main or the newest release")
+    stale += _check_runtime_image()
+
+    total = len(SUBMODULES) + len(TAGGED_SUBMODULES) + 1
+    print(f"\n{stale} of {total} pins behind main or the newest release")
     # Always 0: this reports, it does not gate.
     return 0
 

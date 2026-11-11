@@ -8,8 +8,10 @@ import sys
 from pathlib import Path
 
 import pytest
+from ibek.pattern_cmds.schema import SCHEMA_HEADER
 
 from builder2ibek import reconvert as rc
+from builder2ibek.vendor_patterns import DEFAULT_RUNTIME_IMAGE
 
 SAMPLES = Path(__file__).parent / "samples"
 
@@ -112,6 +114,35 @@ def test_run_reconvert_happy_path_no_validate(
     assert "Old description" in text
     # And the file should look like a real converted IOC, not the placeholder.
     assert "EPICS_TZ" in text
+
+
+def test_run_reconvert_vendors_a_pattern_only_ioc(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Each reconversion vendors the patterns again and keeps the schema
+    header ibek wrote; validation reads the vendored support YAML."""
+    xml = SAMPLES / "BL08J-MO-IOC-13.xml"
+    monkeypatch.setattr(rc, "discover_xmls", lambda _b: ([xml], xml.parent, "work"))
+    ioc_name = xml.stem.lower()
+    repo = _fake_services_repo(tmp_path, ioc_name)
+    instance = repo / "services" / ioc_name
+    (instance / "values.yaml").write_text(
+        f"ioc-instance:\n  image: {DEFAULT_RUNTIME_IMAGE}\n"
+    )
+
+    for _ in range(2):
+        result, code = rc.run_reconvert("BL08J", repo)
+        assert code == 0, result
+        assert result.validation == [{"ioc_name": ioc_name, "status": "ok"}]
+        [patterns] = result.patterns
+        assert patterns["vendored"] and patterns["image"] == DEFAULT_RUNTIME_IMAGE
+        assert (
+            patterns["patterns"]
+            == (SAMPLES / f"{ioc_name}.patterns").read_text().splitlines()
+        )
+        header = (instance / "config" / "ioc.yaml").read_text().partition("\n")[0]
+        assert header == SCHEMA_HEADER
+        assert (instance / "ioc.schema.json").is_file()
 
 
 def test_run_reconvert_only_filter(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

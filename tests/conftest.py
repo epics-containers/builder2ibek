@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -10,6 +11,51 @@ COMMUNITY_SUPPORT = REPO_ROOT / "ibek-support"
 DLS_SUPPORT = REPO_ROOT / "ibek-support-dls"
 
 HAS_COMMUNITY_SUPPORT = any(COMMUNITY_SUPPORT.glob("*/*.ibek.support.yaml"))
+
+# Published base schemas of the images the tests vendor patterns for, laid out as
+# ibek caches them under $IBEK_SCHEMA_CACHE
+SCHEMA_CACHE = Path(__file__).parent / "schema-cache"
+# a proxy nothing listens on, so that a schema fetch fails and ibek uses its cache
+DEAD_PROXY = "http://127.0.0.1:9"
+# kept in step with builder2ibek.patterns.LIBRARIES; test_patterns checks it
+PATTERN_LIBRARIES = ("ibek-runtime-streamdevice", "ibek-runtime-support")
+
+
+def canonical_lock(text: str) -> str:
+    """A runtime-lock.yaml as vendoring from GitHub writes it.
+
+    The tests vendor from the library submodules, and ibek records the source it
+    vendored from, which is then a path in this checkout.
+    """
+    for library in PATTERN_LIBRARIES:
+        text = text.replace(
+            f"source: {REPO_ROOT / library}",
+            f"source: github.com/epics-containers/{library}",
+        )
+    return text
+
+
+@pytest.fixture(scope="session", autouse=True)
+def offline_patterns(tmp_path_factory):
+    """Vendor runtime patterns and read base schemas without the network.
+
+    `ibek pattern add` clones each library from GitHub and fetches the image's
+    published base schema. Here IBEK_PATTERN_LIBRARIES points each library at
+    its pinned submodule, and the schema fetch goes to a dead proxy, so ibek
+    falls back to a copy of the committed cache. The copy keeps ibek from
+    writing into the repo. Exported to os.environ so that the subprocesses
+    the tests start see it too.
+    """
+    cache = tmp_path_factory.mktemp("schema-cache")
+    shutil.copytree(SCHEMA_CACHE, cache, dirs_exist_ok=True)
+    os.environ["IBEK_SCHEMA_CACHE"] = str(cache)
+    os.environ["IBEK_PATTERN_LIBRARIES"] = ",".join(
+        f"{library}={REPO_ROOT / library}" for library in PATTERN_LIBRARIES
+    )
+    for name in ("HTTPS_PROXY", "https_proxy"):
+        os.environ[name] = DEAD_PROXY
+    for name in ("NO_PROXY", "no_proxy"):
+        os.environ.pop(name, None)
 
 
 def _epics_root(tmp_path_factory) -> Path:

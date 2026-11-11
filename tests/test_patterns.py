@@ -294,3 +294,9 @@ def test_plan_ignores_modules_without_patterns(index: PatternIndex):
         [{"type": "epics.EpicsEnvSet"}, {"type": "devIocStats.iocAdminSoft"}]
     )
     assert plan.patterns == [] and plan.build_time == {}
+
+
+def test_conftest_vendors_from_every_library():
+    from tests.conftest import PATTERN_LIBRARIES
+
+    assert PATTERN_LIBRARIES == LIBRARIES

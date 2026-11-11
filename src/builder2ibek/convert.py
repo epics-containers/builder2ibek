@@ -15,6 +15,7 @@ from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_f
 from builder2ibek.moduleinfos import finalizers, module_infos
 from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.vendor_patterns import vendor_patterns
 
 
 @dataclass
@@ -30,10 +31,20 @@ class ConvertResult:
     fastcs_instances: list[Path] = dc_field(default_factory=list)
     # PandA prefixes refused because another instance already serves them
     refused: list[str] = dc_field(default_factory=list)
+    # `ibek pattern add` references of a pattern-only IOC, and its image
+    patterns: list[str] = dc_field(default_factory=list)
+    image: str | None = None
+    # True when the patterns were vendored into the IOC's instance folder
+    vendored: bool = False
 
 
 def convert_file(
-    xml: Path, yaml: Path, schema: str, description: str = "", blgui: bool = False
+    xml: Path,
+    yaml: Path,
+    schema: str,
+    description: str = "",
+    blgui: bool = False,
+    vendor: bool = True,
 ) -> ConvertResult:
     def tidy_up(yaml):
         # add blank lines between major fields
@@ -52,6 +63,10 @@ def convert_file(
     An IOC with ADPandABlocks PandAs also gets fastcs-pandablocks instances,
     written next to the ioc.yaml (see builder2ibek.fastcs_panda); a dedicated
     PandA IOC gets only that, and no ioc.yaml.
+
+    A pattern-only IOC written to <instance>/config/ioc.yaml has its runtime
+    patterns vendored into <instance> (see builder2ibek.vendor_patterns), unless
+    vendor is False.
 
     Returns what was written and the IOC's warnings, one per dropped entity
     type plus any others; the caller reports them to the user.
@@ -94,6 +109,13 @@ def convert_file(
         (yaml.parent / name).write_text(text)
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
+
+    patterns = vendor_patterns([dict(e) for e in ioc.entities], yaml, vendor=vendor)
+    result.patterns = patterns.refs
+    result.image = patterns.image
+    result.vendored = patterns.vendored
+    result.notes += patterns.notes
+    result.warnings += patterns.warnings
 
     return result
 

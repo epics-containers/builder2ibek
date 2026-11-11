@@ -75,6 +75,26 @@ module (e.g. RTEMS / DLS-build hybrids): it emits `BLGui.status` and
 `BLGui.device` for the XML's `auto_BLGui_*` entities. Without it they are
 dropped.
 
+**Pattern-only IOCs (runtime patterns).** When every device in the IOC comes
+from a runtime pattern (`ibek-runtime-streamdevice`, `ibek-runtime-support`)
+or from the runtime image, xml2yaml vendors the patterns into `$INSTANCE_DIR`
+itself with `ibek pattern add`, and prints one `vendored <ref>` line per
+pattern and an `image: <image>` line. It writes the pattern files under
+`config/`, `runtime-lock.yaml`, `ioc.schema.json` and the
+`$schema=../ioc.schema.json` header of `ioc.yaml`. Don't run `ibek pattern add`
+by hand, and don't edit the vendored files or the header.
+
+- Set `ioc-instance.image` in `$INSTANCE_DIR/values.yaml` to the printed image.
+  If xml2yaml warned that the instance pins no image or pins another one, set
+  it and run the same xml2yaml command again: ibek builds `ioc.schema.json`
+  from the image in `values.yaml`, and re-vendoring at the same version
+  rewrites the same files.
+- The modules the patterns supply need no support YAML: skip them in 1e.
+- A warning `patterns not vendored: the IOC also needs ...` means a mixed IOC
+  (patterns plus compiled modules). Carry on as a normal IOC: those modules
+  stay build-time on a generic IOC. The warning names each pattern that
+  rejected its entities and why.
+
 **PandA IOCs (ADPandABlocks).** xml2yaml writes fastcs-pandablocks instances
 for an IOC with ADPandABlocks PandAs and says so on stdout; see the
 `ADPandABlocks` section of
@@ -168,7 +188,8 @@ is clean of converter-fixable issues.
 Parse the final ioc.yaml. For each entity type `<module>.<Entity>`:
 
 1. Read [module-special-cases.md](../skills/shared/module-special-cases.md) — skip
-   modules that don't need support YAMLs (e.g. `epics`) and use the correct
+   modules that don't need support YAMLs (e.g. `epics`, and modules xml2yaml
+   vendored as runtime patterns into `config/`) and use the correct
    folder name for case-sensitive modules (e.g. `IOCInfo` not `IOCinfo`).
 2. Check whether the support YAML already exists — **always check BOTH
    submodules** (`ibek-support-dls/<module>/` and `ibek-support/<module>/`)
@@ -372,6 +393,8 @@ Once clean, **do not commit anything**. Report to the user:
 
 ```bash
 # In /workspaces/<beamline>-services — new IOC instance:
+# (for a pattern-only IOC this includes the vendored config/ files,
+#  runtime-lock.yaml and ioc.schema.json)
 git -C /workspaces/<beamline>-services add services/<ioc-name>/
 git -C /workspaces/<beamline>-services commit -m "Add <ioc-name> (converted from builder XML)"
 

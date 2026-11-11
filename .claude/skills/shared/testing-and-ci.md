@@ -47,7 +47,29 @@ the pin, then run `tests/test_patterns.py`. A release that aligns a pattern with
 its generic model fails `test_alignment_matches_the_models` until the module moves
 from `GENERIC_DIFFERS` to `ALIGNED` in `patterns.py`. That holds only with the real
 ibek-support-dls checked out: with the vendored subset, most of those tests skip. `check_pin_freshness.py` warns when
-a newer release tag exists.
+a newer release tag exists. A pin bump changes the `@<tag>` in every
+`tests/samples/*.patterns` and `*.runtime-lock.yaml`: run `make_samples.sh`.
+
+### Vendoring offline in the tests
+
+`xml2yaml` vendors a pattern-only IOC with `ibek pattern add`, which clones the
+library and fetches the image's published base schema. The tests never touch the
+network: the session fixture `offline_patterns` in `tests/conftest.py` (and
+`make_samples.sh` likewise) sets `IBEK_PATTERN_LIBRARIES` to the two submodules,
+`IBEK_SCHEMA_CACHE` to a copy of `tests/schema-cache/`, and `HTTPS_PROXY` to a
+dead port, so ibek falls back to the cached schema. `tests/schema-cache/` holds
+the base schema of `DEFAULT_RUNTIME_IMAGE` (`src/builder2ibek/vendor_patterns.py`)
+at `ghcr.io/epics-containers/ioc-streamdevice/<tag>.json`, the release asset
+`ibek.ioc.schema.json` as ibek caches it. Moving the image to a new tag needs that
+tag's schema added there (`gh release download <tag> -R
+epics-containers/ioc-streamdevice -p ibek.ioc.schema.json`);
+`test_default_image_has_a_cached_schema` fails until it is, and
+`check_pin_freshness.py` warns when a newer image release exists.
+
+A pattern sample (`BL08J-MO-IOC-13`) has two more golden files:
+`<stem>.patterns`, the `--patterns-out` list, and `<stem>.runtime-lock.yaml`,
+whose hashes pin every vendored file. Its lock records the GitHub source, not
+the submodule path the test vendored from (`canonical_lock`).
 
 ## After bumping a submodule pin
 

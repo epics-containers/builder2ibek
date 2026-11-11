@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<EPICS_BASE.EpicsEnvSet key="EPICS_CA_MAX_ARRAY_BYTES" value="6000000"/>
+	<devIocStats.devIocStatsHelper ioc="BL08J-MO-IOC-13" name="IOC-STATS"/>
+
+	<!--for SYNC CS
+for SYNC CS
+NB velo reduced temporarily from 3 to 2 because Malcolm doesnt currenly account for accl correctly when calculating PVT moves.
+NB velo reduced temporarily from 3 to 2 because Malcolm doesnt currenly account for accl correctly when calculating PVT moves.
+Sometimes this motor doesnt quit manage the 0.05 acceleration rate (on larger moves) in which case 0.25 works well.
+Attocube interferometer-->
+	<utility.pingWait ip="127.0.0.1" name="PING_INTRF1"/>
+	<utility.pingWait ip="127.0.0.1" name="PING_INTRF2"/>
+
+	<asyn.AsynIP name="ATT1Port" port="127.0.0.1:9090"/>
+	<!--Attocube interferometer-->
+	<asyn.AsynIP name="ATT2Port" port="127.0.0.1:9091"/>
+	<attocubeInterf.ids3010 P="BL08J-MO-INTRF-" PORT="ATT1Port" Q="01" name="T1.ATTO_01"/>
+	<attocubeInterf.ids3010 P="BL08J-MO-INTRF-" PORT="ATT2Port" Q="02" name="T1.ATTO_02"/>
+	<!-- <records.asyn DESC="Home X Fine to 0" DTYP="asynRecordDevice" PINI="NO" PORT="BRICK1port" name="XF.HMZ" record="BL08J-EA-TABLE-01:XF:HMZ"/> -->
+	<!-- <records.asyn DESC="Home Y Fine to 0" DTYP="asynRecordDevice" PINI="NO" PORT="BRICK1port" name="YF.HMZ" record="BL08J-EA-TABLE-01:YF:HMZ"/> -->
+	<!-- <records.asyn DESC="Home Z Fine to 0" DTYP="asynRecordDevice" PINI="NO" PORT="BRICK1port" name="ZF.HMZ" record="BL08J-EA-TABLE-01:ZF:HMZ"/> -->
+</components>

@@ -124,6 +124,7 @@ class ReconvertResult:
     conversion_errors: list[dict] = field(default_factory=list)
     warnings: list[dict] = field(default_factory=list)
     fastcs: list[dict] = field(default_factory=list)
+    patterns: list[dict] = field(default_factory=list)
     notes: list[dict] = field(default_factory=list)
     validation: list[dict] = field(default_factory=list)
 
@@ -212,6 +213,15 @@ def run_reconvert(
                 {"ioc_name": ioc_name, "instance": str(f)}
                 for f in converted.fastcs_instances
             )
+            if converted.patterns:
+                result.patterns.append(
+                    {
+                        "ioc_name": ioc_name,
+                        "patterns": converted.patterns,
+                        "image": converted.image,
+                        "vendored": converted.vendored,
+                    }
+                )
             # status "fastcs" or "refused": no ioc.yaml to validate, the IOC
             # is (or would be) a fastcs-pandablocks instance
             if converted.ioc_yaml_written:
@@ -273,16 +283,22 @@ def _run_validation(result: ReconvertResult) -> None:
                 )
             return
 
-        cfg_ioc = Path(tmp_config) / "ioc.yaml"
         by_name = {c["ioc_name"]: c for c in result.ioc_candidates}
         for item in result.reconverted:
             ioc_name = item["ioc_name"]
             cand = by_name.get(ioc_name)
             if cand is None or item["status"] != "ok":
                 continue
-            shutil.copy(cand["ioc_yaml"], cfg_ioc)
+            # the ioc.yaml, and the support YAMLs of any patterns vendored next
+            # to it, which generate2 reads from the config folder
+            config = Path(cand["ioc_yaml"]).parent
+            cfg = Path(tmp_config) / ioc_name
+            cfg.mkdir()
+            shutil.copy(config / "ioc.yaml", cfg / "ioc.yaml")
+            for support_yaml in config.glob("*.ibek.support.yaml"):
+                shutil.copy(support_yaml, cfg / support_yaml.name)
             proc = subprocess.run(
-                ["ibek", "runtime", "generate2", "--no-pvi", str(tmp_config)],
+                ["ibek", "runtime", "generate2", "--no-pvi", str(cfg)],
                 env=env,
                 capture_output=True,
                 text=True,
@@ -315,6 +331,8 @@ def _render_human(result: ReconvertResult) -> str:
     lines.append(f"Warnings:      {len(result.warnings)}")
     if result.fastcs:
         lines.append(f"FastCS instances: {len(result.fastcs)}")
+    if result.patterns:
+        lines.append(f"Pattern-only IOCs: {len(result.patterns)}")
     if not result.validate:
         lines.append("Validation:    skipped (--no-validate)")
     else:
@@ -345,6 +363,14 @@ def _render_human(result: ReconvertResult) -> str:
         lines.append("fastcs-pandablocks instances written (not validated):")
         for f in result.fastcs:
             lines.append(f"  - {f['ioc_name']}: {f['instance']}")
+
+    if result.patterns:
+        lines.append("")
+        lines.append("Runtime patterns (pattern-only IOCs):")
+        for p in result.patterns:
+            state = "vendored" if p["vendored"] else "not vendored"
+            lines.append(f"  - {p['ioc_name']} ({state}, image {p['image']}):")
+            lines.extend(f"      {ref}" for ref in p["patterns"])
 
     failed = [v for v in result.validation if v["status"] == "fail"]
     if failed:
