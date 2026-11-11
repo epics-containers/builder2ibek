@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import os
 import shlex
-import shutil
 import subprocess
 import tempfile
 import warnings
@@ -260,14 +259,16 @@ def fetch_library(name: str, version: str, cache_dir: Path, url: str) -> Path:
                 raise PatternIndexError(
                     f"cannot fetch {name} {version} from {url}: {result.stderr.strip()}"
                 )
-            # another run may have filled the cache meanwhile: keep its clone
-            if not _has_patterns(dest):
-                shutil.rmtree(dest, ignore_errors=True)
-                try:
-                    clone.rename(dest)
-                except OSError:
-                    if not _has_patterns(dest):
-                        raise
+            # Published by one atomic rename. The rename fails when another run
+            # has published its clone meanwhile, which is kept; a dest left by
+            # something else is never deleted here.
+            try:
+                clone.rename(dest)
+            except OSError as e:
+                if not _has_patterns(dest):
+                    raise PatternIndexError(
+                        f"{dest} exists without patterns; delete it to fetch again"
+                    ) from e
     except subprocess.TimeoutExpired as e:
         raise PatternIndexError(
             f"cannot fetch {name} {version} from {url}: no answer in {GIT_TIMEOUT}s"
@@ -308,7 +309,7 @@ class PatternIndex:
         self.local_changes: dict[str, list[str]] = {}
         # library -> the local copy it is read from
         self.library_paths: dict[str, Path] = {}
-        self._ioc_models: dict[str, Any] = {}
+        self._ioc_models: dict[tuple[str, int, int], Any] = {}
         yml = YAML(typ="safe", pure=True)
 
         for name in LIBRARIES:
@@ -335,7 +336,12 @@ class PatternIndex:
                 support_yaml = folder / f"{folder.name}.ibek.support.yaml"
                 if not support_yaml.is_file():
                     continue
-                data = yml.load(support_yaml.read_text())
+                try:
+                    data = yml.load(support_yaml.read_text())
+                except Exception as e:  # unreadable, or not YAML
+                    raise PatternIndexError(f"cannot read {support_yaml}: {e}") from e
+                if not isinstance(data, dict):
+                    raise PatternIndexError(f"{support_yaml} is not a support YAML")
                 module = data.get("module")
                 if module != folder.name:
                     raise PatternIndexError(
@@ -393,11 +399,14 @@ class PatternIndex:
         return self.patterns.get(module)
 
     def _ioc_model(self, pattern: Pattern) -> Any:
-        model = self._ioc_models.get(pattern.module)
+        stat = pattern.support_yaml.stat()
+        # a vendored copy may change between calls, a library file does not
+        key = (str(pattern.support_yaml), stat.st_mtime_ns, stat.st_size)
+        model = self._ioc_models.get(key)
         if model is None:
             entity_models = EntityFactory().make_entity_models([pattern.support_yaml])
             model = IocFactory().make_ioc_model(entity_models)
-            self._ioc_models[pattern.module] = model
+            self._ioc_models[key] = model
         return model
 
     def rejects(self, pattern: Pattern, entities: list[Mapping[str, Any]]) -> str:

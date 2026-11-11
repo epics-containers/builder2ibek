@@ -213,6 +213,26 @@ def test_fetch_without_git(tmp_path: Path, monkeypatch):
         fetch_library("lib", "1.0.0", tmp_path / "cache", str(tmp_path))
 
 
+def test_support_yaml_that_cannot_be_read(tmp_path: Path):
+    for library in LIBRARIES:
+        _tagged_library(tmp_path / library, "1.0.0", f"m_{library}")
+    support = tmp_path / LIBRARIES[0] / f"m_{LIBRARIES[0]}"
+    (support / f"m_{LIBRARIES[0]}.ibek.support.yaml").write_text("module: [x\n")
+    with pytest.raises(PatternIndexError, match="cannot read"):
+        PatternIndex(tmp_path)
+
+
+def test_fetch_never_deletes_what_is_in_the_way(tmp_path: Path):
+    remote = _tagged_library(tmp_path / "remote", "1.0.0")
+    cache = tmp_path / "cache"
+    dest = cache / "lib@1.0.0"
+    dest.mkdir(parents=True)
+    (dest / "something").write_text("")
+    with pytest.raises(PatternIndexError, match="exists without patterns"):
+        fetch_library("lib", "1.0.0", cache, str(remote))
+    assert (dest / "something").exists()
+
+
 def test_no_git_on_path(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PATH", str(tmp_path))
     with pytest.raises(PatternIndexError, match="git is not installed"):

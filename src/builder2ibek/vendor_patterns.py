@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import contextlib
 import copy
+import dataclasses
 import io
 import json
 import os
@@ -58,8 +59,15 @@ from ibek.pattern_cmds.schema import (
     schema_shape_problem,
 )
 from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES, PatternError, source_label
+from ruamel.yaml import YAML
 
-from builder2ibek.patterns import Pattern, PatternIndexError, PatternPlan, pattern_index
+from builder2ibek.patterns import (
+    Pattern,
+    PatternIndex,
+    PatternIndexError,
+    PatternPlan,
+    pattern_index,
+)
 
 # The image a pattern-only IOC runs on. It ships asyn, devIocStats, autosave and
 # pvlogging, and ibek >= 4.6.1, which vendored patterns need. Its base schema is
@@ -274,15 +282,55 @@ def _add(pattern: Pattern, instance: Path) -> None:
         "pattern", "add", pattern.ref, str(instance),
         "--source", str(pattern.library_path),
     )  # fmt: skip
+    # ibek may have written the lock before failing, for example on the schema
+    _record_github_source(pattern, instance)
     if proc.returncode != 0:
         raise VendorError(
             f"ibek pattern add {pattern.ref} {instance} failed:\n{_output(proc)}"
         )
+
+
+def _record_github_source(pattern: Pattern, instance: Path) -> None:
+    """Record the library's GitHub URL, not the local copy, as the source of
+    the pattern's lock entry, if the lock has one."""
+    if not (instance / RUNTIME_LOCK_NAME).is_file():
+        return
     lock = _lock(instance)
-    entry = lock.patterns[pattern.module]
+    entry = lock.patterns.get(pattern.module)
     source = source_label(DEFAULT_LIBRARIES[pattern.library])
+    if entry is None or entry.source == source:
+        return
     lock.set_pattern(pattern.module, entry.version, source, entry.files, entry.select)
     lock.save()
+
+
+def _locked_rejects(
+    index: PatternIndex,
+    pattern: Pattern,
+    version: str,
+    instance: Path,
+    entities: Sequence[Mapping[str, Any]],
+) -> str:
+    """Why the pattern the instance has vendored rejects the IOC's entities,
+    or "" if it accepts them."""
+    support_yaml = instance / "config" / pattern.support_yaml.name
+    if not support_yaml.is_file():
+        return f"{support_yaml} is missing"
+    try:
+        data = YAML(typ="safe", pure=True).load(support_yaml.read_text())
+        models = frozenset(m["name"] for m in data.get("entity_models") or [])
+    except Exception as e:  # not a support YAML builder2ibek can read
+        return f"cannot read {support_yaml}: {e}"
+    vendored = dataclasses.replace(
+        pattern, version=version, models=models, support_yaml=support_yaml
+    )
+    module_entities = [
+        e for e in entities if str(e["type"]).partition(".")[0] == pattern.module
+    ]
+    try:
+        return index.rejects(vendored, module_entities)
+    except Exception as e:  # a model ibek cannot build
+        return f"cannot load {support_yaml}: {e}"
 
 
 def _signature(schema: Mapping[str, Any]) -> dict[str, frozenset[str]]:
@@ -323,28 +371,48 @@ def _schema_is_current(instance: Path) -> bool:
     except (SchemaNotFoundError, ValueError, KeyError, TypeError):
         return False
     support_yamls = sorted((instance / "config").glob("*.ibek.support.yaml"))
-    return _signature(merge_entities(base, support_yamls)) == existing
+    try:
+        merged = merge_entities(base, support_yamls)
+    except Exception:  # a vendored support YAML ibek cannot load
+        return False
+    return _signature(merged) == existing
 
 
-def _vendor(patterns: list[Pattern], instance: Path, result: PatternResult) -> None:
+def _vendor(
+    index: PatternIndex,
+    patterns: list[Pattern],
+    instance: Path,
+    entities: Sequence[Mapping[str, Any]],
+    result: PatternResult,
+) -> None:
     locked = _lock(instance).patterns
     added = False
+    refs = []
     for pattern in patterns:
         entry = locked.get(pattern.module)
         if entry is None:
             _add(pattern, instance)
             added = True
+            refs.append(pattern.ref)
             result.notes.append(f"vendored {pattern.ref} into {instance}")
             continue
-        result.notes.append(
-            f"kept {pattern.module} {entry.version} from {instance / RUNTIME_LOCK_NAME}"
-        )
+        refs.append(f"{pattern.library}:{pattern.module}@{entry.version}")
+        lock = instance / RUNTIME_LOCK_NAME
+        result.notes.append(f"kept {pattern.module} {entry.version} from {lock}")
         if entry.version != pattern.version:
             result.warnings.append(
-                f"{instance / RUNTIME_LOCK_NAME} pins {pattern.module} "
-                f"{entry.version}, and builder2ibek's pin is {pattern.version}; "
-                "the lock is left as it is"
+                f"{lock} pins {pattern.module} {entry.version}, and builder2ibek's "
+                f"pin is {pattern.version}; the lock is left as it is"
             )
+        rejected = _locked_rejects(index, pattern, entry.version, instance, entities)
+        if rejected:
+            result.warnings.append(
+                f"the {pattern.module} the instance has vendored does not take this "
+                f"IOC's entities, so generate2 will fail: {rejected}. Update the "
+                f"pattern in {lock}, or remove its entry and files and convert again"
+            )
+    # the versions the instance holds, which the lock may pin apart from ours
+    result.refs = refs
     if any(p.module in locked for p in patterns):
         check = _ibek("pattern", "check", str(instance))
         if check.returncode != 0:
@@ -491,7 +559,7 @@ def _plan_and_vendor(
                 f"{values} holds {IMAGE_PLACEHOLDER} in a form xml2yaml does not "
                 f"replace: set ioc-instance.image to {image} by hand"
             )
-    _vendor(plan.patterns, instance, result)
+    _vendor(index, plan.patterns, instance, entities, result)
     result.notes.append(f"image: {image}")
 
     if ioc_yaml.read_text().partition("\n")[0] != SCHEMA_HEADER:

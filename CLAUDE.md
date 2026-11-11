@@ -55,7 +55,7 @@ uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 # A pattern-only IOC written to <instance>/config/ioc.yaml gets its runtime
 # patterns vendored into <instance> (`ibek pattern add`); a values.yaml image
 # placeholder gets the runtime image, and locked patterns are only checked.
-#   --no-vendor           list the patterns, write nothing else
+#   --no-vendor           skip vendoring only (ioc.yaml is still written); list the patterns
 #   --patterns-out <file> write the `ibek pattern add` references, one per line
 
 # Add a beamline's live Linux IOCs as dev-c7 legacy IOCs (dry run; --apply writes).

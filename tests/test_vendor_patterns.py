@@ -145,6 +145,48 @@ def test_locked_version_is_kept(tmp_path: Path):
         for w in result.warnings
     )
     assert _header(instance) == SCHEMA_HEADER
+    # the version the instance holds is the one reported
+    assert result.refs == [f"{_attocube().library}:attocubeInterf@0.7.9"]
+
+
+def test_locked_pattern_that_rejects_the_entities(tmp_path: Path):
+    """A retained pattern is validated against the IOC's entities."""
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    support = instance / "config" / "attocubeInterf.ibek.support.yaml"
+    support.write_text(support.read_text().replace("name: ids3010", "name: ids3011"))
+    result = _vendor(instance)
+    assert any(
+        "does not take this IOC's entities" in w and "no model" in w
+        for w in result.warnings
+    )
+
+
+def test_locked_support_yaml_that_cannot_be_read(tmp_path: Path):
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    support = instance / "config" / "attocubeInterf.ibek.support.yaml"
+    support.write_text("module: [unclosed\n")
+    result = _vendor(instance)
+    assert any("cannot read" in w for w in result.warnings)
+
+
+def test_failed_add_still_records_the_github_source(tmp_path: Path, monkeypatch):
+    """ibek may write the lock and then fail, for example on the schema."""
+    run = vp._ibek
+
+    def add_then_fail(*args: str):
+        proc = run(*args)
+        if args[:2] == ("pattern", "add"):
+            proc.returncode = 1
+        return proc
+
+    monkeypatch.setattr(vp, "_ibek", add_then_fail)
+    instance = _instance(tmp_path)
+    with pytest.raises(VendorError):
+        _vendor(instance)
+    entry = _lock(instance)["patterns"]["attocubeInterf"]
+    assert entry["source"] == "github.com/epics-containers/ibek-runtime-streamdevice"
 
 
 def test_locked_files_are_checked(tmp_path: Path):

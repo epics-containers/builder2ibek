@@ -171,7 +171,8 @@ take precedence over builder2ibek's copy for the default image.
 
 Options:
 
-- `--no-vendor` writes the `ioc.yaml` and only lists the patterns and image.
+- `--no-vendor` skips vendoring only: the `ioc.yaml` and any converter side files
+  are still written, and the patterns and image are listed.
 - `--patterns-out <file>` writes the `ibek pattern add` references, one per
   line, for tooling. The file is empty when the IOC uses no pattern.
 
