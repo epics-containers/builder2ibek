@@ -10,20 +10,18 @@
 
 THIS=$(dirname $0)
 cd $THIS
-REPO=$(cd ../.. && pwd)
 
 set -e
 
 # Vendor offline, as the tests do (see offline_patterns in tests/conftest.py):
-# patterns from the library submodules, base schemas from a copy of the
-# committed cache, with the network fetch sent to a dead proxy.
+# builder2ibek vendors from the library submodules, and ibek's base schema fetch
+# goes to a dead proxy so that it uses builder2ibek's copy of the schema.
 schema_cache=$(mktemp -d)
-cp -r ../schema-cache/. "$schema_cache"
+python3 -c "import sys; from pathlib import Path; from builder2ibek.vendor_patterns import write_schema_cache; write_schema_cache(Path(sys.argv[1]))" "$schema_cache"
 export IBEK_SCHEMA_CACHE=$schema_cache
-export IBEK_PATTERN_LIBRARIES="ibek-runtime-streamdevice=$REPO/ibek-runtime-streamdevice,ibek-runtime-support=$REPO/ibek-runtime-support"
 export HTTPS_PROXY=http://127.0.0.1:9 https_proxy=http://127.0.0.1:9
-unset NO_PROXY no_proxy
-image=$(python3 -c "import re,sys; print(re.search(r'DEFAULT_RUNTIME_IMAGE = \"(.*)\"', open(sys.argv[1]).read())[1])" "$REPO/src/builder2ibek/vendor_patterns.py")
+unset NO_PROXY no_proxy IBEK_PATTERN_LIBRARIES
+image=$(python3 -c "from builder2ibek.vendor_patterns import DEFAULT_RUNTIME_IMAGE; print(DEFAULT_RUNTIME_IMAGE)")
 
 # pass a list of XML files as args or use all xml files in the samples dir
 XMLS=${@:-$(ls *.xml)}
@@ -53,9 +51,7 @@ for x in ${XMLS}; do
   if [ -s "$tmpdir/patterns" ]; then
     echo "  patterns → ${stem}.patterns, ${stem}.runtime-lock.yaml"
     cp "$tmpdir/patterns" "${stem}.patterns"
-    # record the source as vendoring from GitHub does (canonical_lock in conftest)
-    sed -e "s#source: $REPO/#source: github.com/epics-containers/#" \
-      "$instance/runtime-lock.yaml" > "${stem}.runtime-lock.yaml"
+    cp "$instance/runtime-lock.yaml" "${stem}.runtime-lock.yaml"
   fi
   vendored=""
   [ -f "$instance/runtime-lock.yaml" ] && vendored=$(sed -n 's#^      config/##p' "$instance/runtime-lock.yaml" | cut -d: -f1)

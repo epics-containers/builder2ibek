@@ -143,18 +143,25 @@ For a pattern-only IOC written into an instance folder,
 - `ioc.schema.json`, the image's published schema plus the pattern models;
 - the `ioc.yaml` header `# yaml-language-server: $schema=../ioc.schema.json`.
 
-ibek takes the image from the instance's `values.yaml`. xml2yaml does not
-write `values.yaml`: it prints the image, and if the instance pins none it
-warns that no `ioc.schema.json` was written. Set the image and run xml2yaml
-again; adding a pattern at the version it is locked at rewrites the same files.
+The image is the one the instance's `values.yaml` pins, if it is a tag of
+`ioc-streamdevice-runtime`. A `values.yaml` that still holds the services
+template's `image: REPLACE_WITH_IMAGE_URI` gets the default runtime image, so a
+new instance is ready in one pass. An image someone has set is never changed.
 For example, for BL08J-MO-IOC-13:
 
 ```text
+set image ghcr.io/epics-containers/ioc-streamdevice-runtime:2.8.26ec8 in services/bl08j-mo-ioc-13/values.yaml
 vendored ibek-runtime-streamdevice:attocubeInterf@0.7.3 into services/bl08j-mo-ioc-13
 image: ghcr.io/epics-containers/ioc-streamdevice-runtime:2.8.26ec8
 ```
 
-The entities themselves are the same as for a generic IOC. Options:
+The entities themselves are the same as for a generic IOC. A pattern that is
+already in `runtime-lock.yaml` is left at the version and file selection the
+lock records: xml2yaml runs `ibek pattern check` on it, and reports a locked
+version that differs from builder2ibek's. The `../ioc.schema.json` header of an
+instance with a `runtime-lock.yaml` is kept whatever the conversion decides.
+
+Options:
 
 - `--no-vendor` writes the `ioc.yaml` and only lists the patterns and image.
 - `--patterns-out <file>` writes the `ibek pattern add` references, one per
@@ -162,10 +169,14 @@ The entities themselves are the same as for a generic IOC. Options:
 
 An IOC whose `ioc.yaml` is not in a `config/` folder, an IOC that also needs
 modules the runtime image does not build, and an instance whose `values.yaml`
-pins another image are not vendored; xml2yaml says why. ibek's own environment
-variables apply: `IBEK_PATTERN_LIBRARIES` points a library at a local
-checkout, and `IBEK_SCHEMA_CACHE` holds the base schemas ibek uses when the
-network cannot be reached.
+pins another image are not vendored; xml2yaml says why.
+
+The pattern libraries are read from builder2ibek's submodules in a checkout.
+An installed builder2ibek (`uvx builder2ibek`) clones each library once, at the
+tag it pins, into `${XDG_CACHE_HOME:-~/.cache}/builder2ibek/patterns/`; with no
+network and no clone there, it converts without patterns and says so. ibek's
+`IBEK_SCHEMA_CACHE` holds the base schemas it uses when the network cannot be
+reached.
 
 ---
 

@@ -179,7 +179,7 @@ def _check_runtime_image() -> int:
     _warn(
         f"DEFAULT_RUNTIME_IMAGE {image} is not the newest release {latest}. To "
         f"take it: set the tag in {VENDOR_PATTERNS.relative_to(REPO_ROOT)}, add "
-        f"its ibek.ioc.schema.json release asset to tests/schema-cache, and run "
+        f"its ibek.ioc.schema.json release asset to src/builder2ibek/schemas, and run "
         f"./tests/samples/make_samples.sh"
     )
     return 1
@@ -217,7 +217,9 @@ def main() -> int:
             _warn(
                 f"{submodule} pin {pinned[:8]} is not the newest release "
                 f"{latest[0]}. To take it: git -C {submodule} checkout {latest[0]}, "
-                f"then commit the pin and run tests/test_patterns.py"
+                f"set LIBRARY_VERSIONS in src/builder2ibek/patterns.py, commit the "
+                f"pin, "
+                f"and run tests/test_patterns.py and make_samples.sh"
             )
 
     stale += _check_runtime_image()

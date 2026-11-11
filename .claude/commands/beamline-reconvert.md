@@ -43,9 +43,9 @@ then schema-validates every reconverted ioc.yaml with
 with the support YAMLs of any patterns vendored in its `config/`.
 
 A pattern-only IOC (see the pattern-only paragraph of
-[ioc-convert.md](ioc-convert.md), phase 1c) has its runtime patterns
-vendored again by each run, which rewrites the same files and keeps the
-`../ioc.schema.json` header ibek wrote.
+[ioc-convert.md](ioc-convert.md), phase 1c) has any new runtime patterns
+vendored by each run; the ones already locked are checked, not changed, and
+the `../ioc.schema.json` header ibek wrote is kept.
 
 Flags: `--no-validate` skips the generate2 pass; `--only <ioc-name>`
 (repeatable) limits the run.
@@ -77,13 +77,11 @@ action is in `warnings`), validation pass/fail counts with stderr tails for
 any failure. Then run
 `git -C <services-repo> diff --stat` to show the file delta.
 
-For each `patterns` entry whose `values.yaml` does not pin its `image`, or
-whose warnings say the instance pins no image or another one: set
-`ioc-instance.image` in `<services-repo>/services/<ioc-name>/values.yaml` to
-that image and re-run with `--only <ioc-name>`, so that the patterns are
-vendored and `ioc.schema.json` is built for that image. A warning that
-`runtime-lock.yaml` holds patterns the IOC no longer uses needs those entries
-and their `config/` files removed by hand; report it.
+A pattern already in an instance's `runtime-lock.yaml` is kept as locked:
+report any warning that the lock pins another version than builder2ibek, or
+that `ibek pattern check` failed. A warning that `runtime-lock.yaml` holds
+patterns the IOC no longer uses needs those entries and their `config/` files
+removed by hand; report it.
 
 Do not commit anything. Suggest:
 
@@ -109,10 +107,13 @@ uv run builder2ibek xml2yaml <xml> --yaml <services-repo>/services/<ioc-name>/co
 export EPICS_ROOT=$(mktemp -d /tmp/epics-reconvert-XXXXXX)
 ./update-schema
 TMPCONFIG=$(mktemp -d /tmp/reconvert-config-XXXXXX)
-for ioc_yaml in <services-repo>/services/*/config/ioc.yaml; do
-  rm -f "$TMPCONFIG"/*
-  cp "$ioc_yaml" "$(dirname "$ioc_yaml")"/*.ibek.support.yaml "$TMPCONFIG/" 2>/dev/null
-  ibek runtime generate2 --no-pvi "$TMPCONFIG" 2>&1 || true
-done
+bash -c '
+for ioc_yaml in "$1"/services/*/config/ioc.yaml; do
+  find "$2" -mindepth 1 -delete
+  # the ioc.yaml and any vendored pattern support YAMLs
+  find "$(dirname "$ioc_yaml")" -maxdepth 1 \( -name ioc.yaml -o -name "*.ibek.support.yaml" \) \
+    -exec cp {} "$2/" \;
+  ibek runtime generate2 --no-pvi "$2" 2>&1 || true
+done' _ <services-repo> "$TMPCONFIG"
 rm -rf "$TMPCONFIG" "$EPICS_ROOT"
 ```

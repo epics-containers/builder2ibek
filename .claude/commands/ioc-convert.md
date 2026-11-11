@@ -77,23 +77,26 @@ dropped.
 
 **Pattern-only IOCs (runtime patterns).** When every device in the IOC comes
 from a runtime pattern (`ibek-runtime-streamdevice`, `ibek-runtime-support`)
-or from the runtime image, xml2yaml vendors the patterns into `$INSTANCE_DIR`
-itself with `ibek pattern add`, and prints one `vendored <ref>` line per
-pattern and an `image: <image>` line. It writes the pattern files under
+or from the runtime image `ioc-streamdevice-runtime`, xml2yaml vendors the
+patterns into `$INSTANCE_DIR` itself with `ibek pattern add`, and prints one
+`vendored <ref>` line per pattern and an `image: <image>` line. If
+`values.yaml` still holds the template's `REPLACE_WITH_IMAGE_URI`, it sets the
+default runtime image there first. ibek writes the pattern files under
 `config/`, `runtime-lock.yaml`, `ioc.schema.json` and the
 `$schema=../ioc.schema.json` header of `ioc.yaml`. Don't run `ibek pattern add`
 by hand, and don't edit the vendored files or the header.
 
-- Set `ioc-instance.image` in `$INSTANCE_DIR/values.yaml` to the printed image.
-  If xml2yaml warned that the instance pins no image or pins another one, set
-  it and run the same xml2yaml command again: ibek builds `ioc.schema.json`
-  from the image in `values.yaml`, and re-vendoring at the same version
-  rewrites the same files.
+- A pattern already in `runtime-lock.yaml` is kept at the locked version, and
+  checked with `ibek pattern check`; a lock version other than builder2ibek's
+  pin is reported, not changed. Report those warnings to the user.
 - The modules the patterns supply need no support YAML: skip them in 1e.
 - A warning `patterns not vendored: the IOC also needs ...` means a mixed IOC
   (patterns plus compiled modules). Carry on as a normal IOC: those modules
   stay build-time on a generic IOC. The warning names each pattern that
   rejected its entities and why.
+- A warning that `values.yaml` pins another image means the instance was set
+  up for a generic IOC: nothing is vendored. Ask the user whether it should
+  move to the runtime image.
 
 **PandA IOCs (ADPandABlocks).** xml2yaml writes fastcs-pandablocks instances
 for an IOC with ADPandABlocks PandAs and says so on stdout; see the

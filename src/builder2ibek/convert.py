@@ -15,7 +15,7 @@ from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_f
 from builder2ibek.moduleinfos import finalizers, module_infos
 from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.vendor_patterns import vendor_patterns
+from builder2ibek.vendor_patterns import kept_schema, vendor_patterns
 
 
 @dataclass
@@ -98,7 +98,9 @@ def convert_file(
     delattr(ioc, "source_file")
     yaml_map = CommentedMap(ioc.model_dump())
 
-    # add support yaml schema
+    # add support yaml schema; an instance with vendored patterns keeps the
+    # instance schema ibek set
+    schema = kept_schema(yaml) or schema
     yaml_map.yaml_add_eol_comment(f"yaml-language-server: $schema={schema}", column=0)
 
     ruamel.indent(mapping=2, sequence=4, offset=2)

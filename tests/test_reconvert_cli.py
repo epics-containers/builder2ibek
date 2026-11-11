@@ -11,6 +11,7 @@ import pytest
 from ibek.pattern_cmds.schema import SCHEMA_HEADER
 
 from builder2ibek import reconvert as rc
+from builder2ibek import vendor_patterns as vp
 from builder2ibek.vendor_patterns import DEFAULT_RUNTIME_IMAGE
 
 SAMPLES = Path(__file__).parent / "samples"
@@ -143,6 +144,30 @@ def test_run_reconvert_vendors_a_pattern_only_ioc(
         header = (instance / "config" / "ioc.yaml").read_text().partition("\n")[0]
         assert header == SCHEMA_HEADER
         assert (instance / "ioc.schema.json").is_file()
+
+
+def test_run_reconvert_vendor_error_keeps_the_header(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    xml = SAMPLES / "BL08J-MO-IOC-13.xml"
+    monkeypatch.setattr(rc, "discover_xmls", lambda _b: ([xml], xml.parent, "work"))
+    ioc_name = xml.stem.lower()
+    repo = _fake_services_repo(tmp_path, ioc_name)
+    instance = repo / "services" / ioc_name
+    (instance / "values.yaml").write_text(
+        f"ioc-instance:\n  image: {DEFAULT_RUNTIME_IMAGE}\n"
+    )
+    rc.run_reconvert("BL08J", repo, validate=False)
+
+    def fail(*_args):
+        raise vp.VendorError("ibek pattern add failed")
+
+    monkeypatch.setattr(vp, "_vendor", fail)
+    result, code = rc.run_reconvert("BL08J", repo, validate=False)
+    assert code == 2
+    assert "ibek pattern add failed" in result.conversion_errors[0]["error"]
+    header = (instance / "config" / "ioc.yaml").read_text().partition("\n")[0]
+    assert header == SCHEMA_HEADER
 
 
 def test_run_reconvert_only_filter(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

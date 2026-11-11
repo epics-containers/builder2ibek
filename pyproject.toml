@@ -11,7 +11,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 description = "Conversion tool for DLS XML builder IOC instances to ibek ioc.yaml"
-dependencies = ["ibek>=4.9.0"] # Add project dependencies here, e.g. ["click", "numpy"]
+dependencies = ["ibek>=4.9.0"] # pattern vendoring: lock selections, image refs
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.md"

@@ -17,7 +17,6 @@ from builder2ibek.vendor_patterns import DEFAULT_RUNTIME_IMAGE
 from tests.conftest import (
     DLS_SUPPORT,
     HAS_COMMUNITY_SUPPORT,
-    canonical_lock,
     requires_support,
 )
 
@@ -80,7 +79,7 @@ def _check_vendored(stem: str, instance: Path, patterns: list[str]):
     if not patterns:
         assert not lock.exists() and not expected_lock.exists()
         return
-    assert canonical_lock(lock.read_text()) == expected_lock.read_text()
+    assert lock.read_text() == expected_lock.read_text()
     # every file the lock lists is on disk with the hash it records
     check = subprocess.run(
         [sys.executable, "-m", "ibek", "pattern", "check", str(instance)],

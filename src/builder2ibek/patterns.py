@@ -5,7 +5,9 @@ A runtime pattern is a support module whose files (``*.ibek.support.yaml``, prot
 template) are vendored into an IOC instance with ``ibek pattern add``, so the IOC
 runs on a stock image instead of one with the module compiled in. The patterns come
 from the two libraries ibek knows by default, which this repo pins as submodules at
-release tags. The index is read from those checkouts: every library folder holding
+the release tags in :data:`LIBRARY_VERSIONS`. The index is read from those
+checkouts, or, where they are absent (an installed builder2ibek), from a shallow
+clone of each library at its tag in the user's cache. Every library folder holding
 ``<folder>/<folder>.ibek.support.yaml`` is a pattern for the module of that name, and
 the support YAML lists its entity models.
 
@@ -26,7 +28,10 @@ here, so a plan says what could come from a pattern, not what must.
 
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
+import tempfile
 import warnings
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
@@ -37,6 +42,7 @@ from typing import Any
 from ibek.entity_factory import EntityFactory
 from ibek.ioc import clear_entity_model_ids
 from ibek.ioc_factory import IocFactory
+from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES
 from pydantic import ValidationError
 from pydantic.warnings import PydanticDeprecatedSince211
 from ruamel.yaml import YAML
@@ -46,6 +52,14 @@ _project_root = Path(__file__).parent.parent.parent
 # The pattern libraries, in the order ibek probes an unqualified pattern name. Each is
 # a submodule at the repo root, named as ibek names it in its library registry.
 LIBRARIES = ("ibek-runtime-streamdevice", "ibek-runtime-support")
+
+# The release tag each library submodule is pinned at, for an installed
+# builder2ibek, which has no submodules to read it from. tests/test_patterns.py
+# checks it against the submodules, so a pin bump updates it too.
+LIBRARY_VERSIONS: dict[str, str] = {
+    "ibek-runtime-streamdevice": "0.7.3",
+    "ibek-runtime-support": "0.3.1",
+}
 
 # Modules that have both a pattern and a generic model in ibek-support* are listed
 # in exactly one of these two tables; tests/test_patterns.py checks that against the
@@ -112,6 +126,11 @@ class Pattern:
     support_yaml: Path
 
     @property
+    def library_path(self) -> Path:
+        """The local copy of the library, at ``version``, to vendor from."""
+        return self.support_yaml.parent.parent
+
+    @property
     def ref(self) -> str:
         """The reference to pass to ``ibek pattern add``."""
         return f"{self.library}:{self.module}@{self.version}"
@@ -135,9 +154,10 @@ class PatternPlan:
 
 
 def _library_version(library: Path) -> str:
-    """The release tag the library checkout is at."""
+    """The release tag the library checkout is at, which must be clean."""
+    git = ["git", "-C", str(library)]
     result = subprocess.run(
-        ["git", "-C", str(library), "describe", "--tags", "--exact-match", "HEAD"],
+        [*git, "describe", "--tags", "--exact-match", "HEAD"],
         capture_output=True,
         text=True,
     )
@@ -148,13 +168,80 @@ def _library_version(library: Path) -> str:
             f"version to vendor its patterns at. Check out the committed pin:\n"
             f"    git submodule update --init {library.name}"
         )
+    status = subprocess.run(
+        [*git, "status", "--porcelain"], capture_output=True, text=True
+    )
+    if status.returncode != 0 or status.stdout.strip():
+        raise PatternIndexError(
+            f"{library.name} has local changes, so its patterns are not those of "
+            f"{tag}. Restore the committed pin:\n"
+            f"    git submodule update --init --force {library.name}"
+        )
     return tag
+
+
+def library_cache() -> Path:
+    """Where an installed builder2ibek keeps its clones of the libraries."""
+    root = os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache"
+    return Path(root) / "builder2ibek" / "patterns"
+
+
+def _has_patterns(library: Path) -> bool:
+    return any(library.glob("*/*.ibek.support.yaml"))
+
+
+def fetch_library(name: str, version: str, cache_dir: Path, url: str) -> Path:
+    """A shallow clone of library ``name`` at tag ``version``, kept in ``cache_dir``.
+
+    Cloned once into ``<cache_dir>/<name>@<version>``; a release tag does not move, so
+    the clone is used as it is from then on.
+    """
+    dest = cache_dir / f"{name}@{version}"
+    if _has_patterns(dest):
+        return dest
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=cache_dir, prefix=f".{name}@") as tmp:
+        clone = Path(tmp) / "clone"
+        result = subprocess.run(
+            [
+                "git",
+                "clone",
+                "--quiet",
+                "--depth",
+                "1",
+                "--branch",
+                version,
+                "--",
+                url,
+                str(clone),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise PatternIndexError(
+                f"cannot fetch {name} {version} from {url}: {result.stderr.strip()}"
+            )
+        shutil.rmtree(dest, ignore_errors=True)
+        clone.rename(dest)
+    return dest
 
 
 class PatternIndex:
     """The patterns in the pinned libraries, keyed by module."""
 
-    def __init__(self, root: Path = _project_root):
+    def __init__(
+        self,
+        root: Path = _project_root,
+        cache_dir: Path | None = None,
+        urls: Mapping[str, str] = DEFAULT_LIBRARIES,
+    ):
+        """Index the libraries checked out under ``root``.
+
+        A library with no checkout there is cloned into ``cache_dir`` at its tag in
+        :data:`LIBRARY_VERSIONS`, from ``urls``; with no ``cache_dir``, it is an
+        error.
+        """
         self.root = root
         self.patterns: dict[str, Pattern] = {}
         self._ioc_models: dict[str, Any] = {}
@@ -162,12 +249,16 @@ class PatternIndex:
 
         for name in LIBRARIES:
             library = root / name
-            if not any(library.glob("*/*.ibek.support.yaml")):
+            if _has_patterns(library):
+                version = _library_version(library)
+            elif cache_dir is not None:
+                version = LIBRARY_VERSIONS[name]
+                library = fetch_library(name, version, cache_dir, urls[name])
+            else:
                 raise PatternIndexError(
-                    f"no patterns found in {library}; initialise the submodule:\n"
-                    f"    git submodule update --init {name}"
+                    f"no patterns found in {library}; in a builder2ibek checkout, "
+                    f"initialise the submodule:\n    git submodule update --init {name}"
                 )
-            version = _library_version(library)
             for folder in sorted(p for p in library.iterdir() if p.is_dir()):
                 support_yaml = folder / f"{folder.name}.ibek.support.yaml"
                 if not support_yaml.is_file():
@@ -268,6 +359,21 @@ class PatternIndex:
 
 
 @cache
+def _index_or_error() -> PatternIndex | PatternIndexError:
+    try:
+        return PatternIndex(cache_dir=library_cache())
+    except PatternIndexError as e:
+        return e
+
+
 def pattern_index() -> PatternIndex:
-    """The index of this checkout's pinned libraries, read once."""
-    return PatternIndex()
+    """The index of the pinned libraries, read once.
+
+    From the submodules of a checkout, else from the user's cache, cloning a
+    library there the first time. A failure is raised again on every call
+    without another attempt.
+    """
+    index = _index_or_error()
+    if isinstance(index, PatternIndexError):
+        raise index
+    return index

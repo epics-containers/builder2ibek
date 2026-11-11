@@ -73,9 +73,10 @@ def xml2yaml(
     (ioc-streamdevice-runtime) is pattern-only. Given
     services/<ioc>/config/ioc.yaml, xml2yaml runs `ibek pattern add` for each
     pattern into services/<ioc>/, which writes the pattern files under config/,
-    runtime-lock.yaml, ioc.schema.json and the ioc.yaml schema header. The
-    schema needs the image set in values.yaml; xml2yaml prints the image and
-    does not write values.yaml.
+    runtime-lock.yaml, ioc.schema.json and the ioc.yaml schema header. A
+    values.yaml that still holds the template's REPLACE_WITH_IMAGE_URI gets the
+    runtime image; an image someone set is never changed. Patterns already in
+    runtime-lock.yaml are checked and kept at their locked version.
 
     ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
     that holds only PandAs and boilerplate becomes one fastcs instance in place

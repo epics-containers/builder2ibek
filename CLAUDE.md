@@ -53,8 +53,8 @@ grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -m
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 #   --blgui  emit BLGui.status/device; only when the generic IOC binary has BLGui
 # A pattern-only IOC written to <instance>/config/ioc.yaml gets its runtime
-# patterns vendored into <instance> (`ibek pattern add`); the image to set in
-# values.yaml is printed.
+# patterns vendored into <instance> (`ibek pattern add`); a values.yaml image
+# placeholder gets the runtime image, and locked patterns are only checked.
 #   --no-vendor           list the patterns, write nothing else
 #   --patterns-out <file> write the `ibek pattern add` references, one per line
 

@@ -1,5 +1,6 @@
 """The runtime pattern index, and which modules builder2ibek maps to a pattern."""
 
+import shutil
 import subprocess
 from functools import cache
 from pathlib import Path
@@ -14,6 +15,7 @@ from builder2ibek.patterns import (
     ALIGNED,
     GENERIC_DIFFERS,
     LIBRARIES,
+    LIBRARY_VERSIONS,
     PatternIndex,
     PatternIndexError,
     pattern_index,
@@ -91,6 +93,66 @@ def test_patterns_pinned_at_a_release_tag(index: PatternIndex, library: str):
     ).stdout.split()
     versions = {p.version for p in index.patterns.values() if p.library == library}
     assert len(versions) == 1 and versions <= set(tags)
+
+
+def test_library_versions_are_the_submodule_pins(index: PatternIndex):
+    """An installed builder2ibek clones the libraries at LIBRARY_VERSIONS."""
+    for library in LIBRARIES:
+        versions = {p.version for p in index.patterns.values() if p.library == library}
+        assert versions == {LIBRARY_VERSIONS[library]}, (
+            f"set LIBRARY_VERSIONS[{library!r}] in patterns.py to the pin {versions}"
+        )
+
+
+def _tagged_library(path: Path, tag: str, module: str = "foo") -> Path:
+    folder = path / module
+    folder.mkdir(parents=True)
+    (folder / f"{module}.ibek.support.yaml").write_text(
+        f"module: {module}\nentity_models: []\n"
+    )
+    git = ["git", "-C", str(path)]
+    ident = ["-c", "user.name=test", "-c", "user.email=test@example.com"]
+    subprocess.run([*git, "init", "-q"], check=True)
+    subprocess.run([*git, "add", "."], check=True)
+    subprocess.run([*git, *ident, "commit", "-qm", "x"], check=True)
+    subprocess.run([*git, "tag", tag], check=True)
+    return path
+
+
+def test_libraries_without_submodules_are_fetched(tmp_path: Path):
+    """An installed builder2ibek indexes clones in its cache, at the pins."""
+    urls = {
+        name: str(
+            _tagged_library(tmp_path / "remote" / name, LIBRARY_VERSIONS[name], f"m{i}")
+        )
+        for i, name in enumerate(LIBRARIES)
+    }
+    cache = tmp_path / "cache"
+    index = PatternIndex(tmp_path / "no-checkout", cache_dir=cache, urls=urls)
+    pattern = index.patterns["m0"]
+    assert pattern.version == LIBRARY_VERSIONS[LIBRARIES[0]]
+    assert pattern.library_path == cache / f"{LIBRARIES[0]}@{pattern.version}"
+    # the clone is used again, without the remote
+    shutil.rmtree(tmp_path / "remote")
+    again = PatternIndex(tmp_path / "no-checkout", cache_dir=cache, urls=urls)
+    assert again.patterns.keys() == index.patterns.keys()
+
+
+def test_library_that_cannot_be_fetched(tmp_path: Path):
+    urls = {name: str(tmp_path / "absent") for name in LIBRARIES}
+    with pytest.raises(PatternIndexError, match="cannot fetch"):
+        PatternIndex(tmp_path, cache_dir=tmp_path / "cache", urls=urls)
+    assert not any((tmp_path / "cache").glob("*@*"))
+
+
+def test_library_with_local_changes(tmp_path: Path):
+    for library in LIBRARIES:
+        _tagged_library(tmp_path / library, "1.0.0")
+    (tmp_path / LIBRARIES[0] / "foo" / "foo.ibek.support.yaml").write_text(
+        "module: foo\nentity_models: []\n# edited\n"
+    )
+    with pytest.raises(PatternIndexError, match="has local changes"):
+        PatternIndex(tmp_path)
 
 
 def test_ref_is_what_ibek_pattern_add_takes(index: PatternIndex):
@@ -294,9 +356,3 @@ def test_plan_ignores_modules_without_patterns(index: PatternIndex):
         [{"type": "epics.EpicsEnvSet"}, {"type": "devIocStats.iocAdminSoft"}]
     )
     assert plan.patterns == [] and plan.build_time == {}
-
-
-def test_conftest_vendors_from_every_library():
-    from tests.conftest import PATTERN_LIBRARIES
-
-    assert PATTERN_LIBRARIES == LIBRARIES
