@@ -153,14 +153,22 @@ class PatternPlan:
         return [p.ref for p in self.patterns]
 
 
-def _library_version(library: Path) -> str:
-    """The release tag the library checkout is at, which must be clean."""
-    git = ["git", "-C", str(library)]
-    result = subprocess.run(
-        [*git, "describe", "--tags", "--exact-match", "HEAD"],
-        capture_output=True,
-        text=True,
+# git for the library clones: no prompts, and none of the user's configuration,
+# whose url.insteadOf rules could turn an https clone into an ssh one
+_GIT_ENV = {"GIT_TERMINAL_PROMPT": "0", "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_CONFIG_NOSYSTEM": "1"}  # fmt: skip
+GIT_TIMEOUT = 120
+
+
+def _git(library: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-C", str(library), *args], capture_output=True, text=True
     )
+
+
+def _library_version(library: Path) -> str:
+    """The release tag the library checkout is at."""
+    result = _git(library, "describe", "--tags", "--exact-match", "HEAD")
     tag = result.stdout.strip()
     if result.returncode != 0 or not tag:
         raise PatternIndexError(
@@ -168,16 +176,24 @@ def _library_version(library: Path) -> str:
             f"version to vendor its patterns at. Check out the committed pin:\n"
             f"    git submodule update --init {library.name}"
         )
-    status = subprocess.run(
-        [*git, "status", "--porcelain"], capture_output=True, text=True
-    )
-    if status.returncode != 0 or status.stdout.strip():
-        raise PatternIndexError(
-            f"{library.name} has local changes, so its patterns are not those of "
-            f"{tag}. Restore the committed pin:\n"
-            f"    git submodule update --init --force {library.name}"
-        )
     return tag
+
+
+def _local_changes(library: Path) -> list[str]:
+    """The files of the library's pattern folders that differ from its commit.
+
+    Files outside the pattern folders are never vendored, so they do not count.
+    """
+    result = _git(library, "status", "--porcelain", "--untracked-files=all")
+    if result.returncode != 0:
+        return [f"git status failed: {result.stderr.strip()}"]
+    changed = []
+    for line in result.stdout.splitlines():
+        path = line[3:].split(" -> ")[-1].strip('"')
+        folder = path.split("/")[0]
+        if "/" in path and _has_patterns(library, folder):
+            changed.append(path)
+    return changed
 
 
 def library_cache() -> Path:
@@ -186,44 +202,52 @@ def library_cache() -> Path:
     return Path(root) / "builder2ibek" / "patterns"
 
 
-def _has_patterns(library: Path) -> bool:
-    return any(library.glob("*/*.ibek.support.yaml"))
+def _has_patterns(library: Path, folder: str = "*") -> bool:
+    return any(library.glob(f"{folder}/*.ibek.support.yaml"))
 
 
 def fetch_library(name: str, version: str, cache_dir: Path, url: str) -> Path:
     """A shallow clone of library ``name`` at tag ``version``, kept in ``cache_dir``.
 
     Cloned once into ``<cache_dir>/<name>@<version>``; a release tag does not move, so
-    the clone is used as it is from then on.
+    the clone is used as it is from then on. Any failure, including a cache folder
+    that cannot be written, raises PatternIndexError.
     """
     dest = cache_dir / f"{name}@{version}"
-    if _has_patterns(dest):
-        return dest
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(dir=cache_dir, prefix=f".{name}@") as tmp:
-        clone = Path(tmp) / "clone"
-        result = subprocess.run(
-            [
-                "git",
-                "clone",
-                "--quiet",
-                "--depth",
-                "1",
-                "--branch",
-                version,
-                "--",
-                url,
-                str(clone),
-            ],
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            raise PatternIndexError(
-                f"cannot fetch {name} {version} from {url}: {result.stderr.strip()}"
-            )
-        shutil.rmtree(dest, ignore_errors=True)
-        clone.rename(dest)
+    try:
+        if _has_patterns(dest):
+            return dest
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=cache_dir, prefix=f".{name}@") as tmp:
+            clone = Path(tmp) / "clone"
+            result = subprocess.run(
+                ["git", "clone", "--quiet", "--depth", "1", "--branch", version,
+                 "--", url, str(clone)],
+                capture_output=True,
+                text=True,
+                timeout=GIT_TIMEOUT,
+                env={**os.environ, **_GIT_ENV},
+            )  # fmt: skip
+            if result.returncode != 0:
+                raise PatternIndexError(
+                    f"cannot fetch {name} {version} from {url}: {result.stderr.strip()}"
+                )
+            # another run may have filled the cache meanwhile: keep its clone
+            if not _has_patterns(dest):
+                shutil.rmtree(dest, ignore_errors=True)
+                try:
+                    clone.rename(dest)
+                except OSError:
+                    if not _has_patterns(dest):
+                        raise
+    except subprocess.TimeoutExpired as e:
+        raise PatternIndexError(
+            f"cannot fetch {name} {version} from {url}: no answer in {GIT_TIMEOUT}s"
+        ) from e
+    except OSError as e:
+        raise PatternIndexError(
+            f"cannot fetch {name} {version} into {cache_dir}: {e}"
+        ) from e
     return dest
 
 
@@ -244,6 +268,8 @@ class PatternIndex:
         """
         self.root = root
         self.patterns: dict[str, Pattern] = {}
+        # library -> its pattern files that differ from the pinned tag
+        self.local_changes: dict[str, list[str]] = {}
         self._ioc_models: dict[str, Any] = {}
         yml = YAML(typ="safe", pure=True)
 
@@ -254,11 +280,18 @@ class PatternIndex:
             elif cache_dir is not None:
                 version = LIBRARY_VERSIONS[name]
                 library = fetch_library(name, version, cache_dir, urls[name])
+                if _library_version(library) != version:
+                    raise PatternIndexError(
+                        f"{library} is not at {version}; delete it to fetch again"
+                    )
             else:
                 raise PatternIndexError(
                     f"no patterns found in {library}; in a builder2ibek checkout, "
                     f"initialise the submodule:\n    git submodule update --init {name}"
                 )
+            changed = _local_changes(library)
+            if changed:
+                self.local_changes[name] = changed
             for folder in sorted(p for p in library.iterdir() if p.is_dir()):
                 support_yaml = folder / f"{folder.name}.ibek.support.yaml"
                 if not support_yaml.is_file():
@@ -284,6 +317,24 @@ class PatternIndex:
                     ),
                     support_yaml=support_yaml,
                 )
+
+    def changes_message(self, library: str) -> str:
+        """Why the library's patterns are not vendored, or "" if they can be."""
+        changed = self.local_changes.get(library)
+        if not changed:
+            return ""
+        path = self.patterns_root(library)
+        return (
+            f"{path} has local changes in its pattern folders ({', '.join(changed)}), "
+            f"so its patterns are not those of the pinned tag. To restore it:\n"
+            f"    git -C {path} checkout -- . && git -C {path} clean -fd"
+        )
+
+    def patterns_root(self, library: str) -> Path:
+        """The local copy the library's patterns are read from."""
+        return next(
+            p.library_path for p in self.patterns.values() if p.library == library
+        )
 
     def pattern_for_module(self, module: str) -> Pattern | None:
         """The pattern builder2ibek may use for a module, or None.

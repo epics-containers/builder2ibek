@@ -60,6 +60,12 @@ and vendors from there. `test_library_versions_are_the_submodule_pins` fails
 until a pin bump updates it. ibek keeps no cache of pattern libraries, only of
 base schemas.
 
+A library whose pattern folders differ from its tag (edited or untracked files)
+is still indexed, so tests and pattern development work on it, but xml2yaml
+vendors nothing from it and prints how to restore it. The cache clone runs git
+with no prompts, a timeout and no user configuration (`url.insteadOf` rules
+would turn it into an SSH clone).
+
 ### Vendoring offline in the tests
 
 `xml2yaml` vendors a pattern-only IOC with `ibek pattern add --source <local

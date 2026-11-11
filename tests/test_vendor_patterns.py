@@ -11,7 +11,7 @@ from typer.testing import CliRunner
 
 from builder2ibek import vendor_patterns as vp
 from builder2ibek.__main__ import cli
-from builder2ibek.patterns import PatternIndexError, pattern_index
+from builder2ibek.patterns import Pattern, PatternIndexError, pattern_index
 from builder2ibek.vendor_patterns import (
     DEFAULT_RUNTIME_IMAGE,
     VendorError,
@@ -23,7 +23,12 @@ from builder2ibek.vendor_patterns import (
 SAMPLES = Path(__file__).parent / "samples"
 MO_IOC_13 = SAMPLES / "BL08J-MO-IOC-13.xml"
 
-ATTOCUBE = pattern_index().patterns["attocubeInterf"]
+
+def _attocube() -> Pattern:
+    """Read once the session's offline set-up is in place, not at collection."""
+    return pattern_index().patterns["attocubeInterf"]
+
+
 DEFAULT_HEADER = "# yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json"
 RUNTIME_REPO = DEFAULT_RUNTIME_IMAGE.rpartition(":")[0]
 
@@ -100,17 +105,17 @@ def test_instance_folder(tmp_path: Path):
 def test_pattern_only_ioc_is_vendored(tmp_path: Path):
     instance = _instance(tmp_path)
     result = _vendor(instance)
-    assert result.refs == [ATTOCUBE.ref]
+    assert result.refs == [_attocube().ref]
     assert result.image == DEFAULT_RUNTIME_IMAGE
     assert result.vendored and result.warnings == []
-    assert f"vendored {ATTOCUBE.ref} into {instance}" in result.notes
+    assert f"vendored {_attocube().ref} into {instance}" in result.notes
     assert (instance / "config" / "attocubeInterf.ibek.support.yaml").is_file()
     assert (instance / "ioc.schema.json").is_file()
     assert _header(instance) == SCHEMA_HEADER
     # vendored from the submodule, recorded as from GitHub
     entry = _lock(instance)["patterns"]["attocubeInterf"]
     assert entry["source"] == "github.com/epics-containers/ibek-runtime-streamdevice"
-    assert entry["version"] == ATTOCUBE.version
+    assert entry["version"] == _attocube().version
 
 
 def test_vendoring_again_changes_nothing(tmp_path: Path):
@@ -120,7 +125,7 @@ def test_vendoring_again_changes_nothing(tmp_path: Path):
     _reset_header(instance)
     result = _vendor(instance)
     assert result.vendored and result.warnings == []
-    assert f"vendored {ATTOCUBE.ref} into {instance}" not in result.notes
+    assert f"vendored {_attocube().ref} into {instance}" not in result.notes
     assert _files(instance) == files
 
 
@@ -130,13 +135,13 @@ def test_locked_version_is_kept(tmp_path: Path):
     _vendor(instance)
     lock = instance / "runtime-lock.yaml"
     lock.write_text(
-        lock.read_text().replace(f"version: {ATTOCUBE.version}", "version: 0.7.9")
+        lock.read_text().replace(f"version: {_attocube().version}", "version: 0.7.9")
     )
     _reset_header(instance)
     result = _vendor(instance)
     assert _lock(instance)["patterns"]["attocubeInterf"]["version"] == "0.7.9"
     assert any(
-        "pins attocubeInterf 0.7.9" in w and ATTOCUBE.version in w
+        "pins attocubeInterf 0.7.9" in w and _attocube().version in w
         for w in result.warnings
     )
     assert _header(instance) == SCHEMA_HEADER
@@ -149,6 +154,29 @@ def test_locked_files_are_checked(tmp_path: Path):
     result = _vendor(instance)
     assert any("ibek pattern check" in w for w in result.warnings)
     assert (instance / "config" / "ids3010.proto").read_text() == "edited\n"
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        '  image: "REPLACE_WITH_IMAGE_URI"  # set by xml2yaml',
+        "  image: 'REPLACE_WITH_IMAGE_URI'\r",
+    ],
+)
+def test_placeholder_forms(tmp_path: Path, line: str):
+    instance = _instance(tmp_path, f"ioc-instance:\n{line}\n  x: 1\n")
+    result = _vendor(instance)
+    assert result.vendored and result.warnings == []
+    values = (instance / "values.yaml").read_bytes().decode()
+    assert values == f"ioc-instance:\n{line}\n  x: 1\n".replace(
+        "REPLACE_WITH_IMAGE_URI", DEFAULT_RUNTIME_IMAGE
+    )
+
+
+def test_placeholder_not_replaced_is_reported(tmp_path: Path):
+    instance = _instance(tmp_path, "ioc-instance:\n  image: REPLACE_WITH_IMAGE_URI:x\n")
+    result = _vendor(instance)
+    assert "does not replace" in result.warnings[0]
 
 
 def test_placeholder_image_is_filled(tmp_path: Path):
@@ -221,7 +249,7 @@ def test_schema_not_found(tmp_path: Path, monkeypatch):
 def test_no_vendor_lists_the_patterns_only(tmp_path: Path):
     instance = _instance(tmp_path)
     result = _vendor(instance, vendor=False)
-    assert result.refs == [ATTOCUBE.ref] and not result.vendored
+    assert result.refs == [_attocube().ref] and not result.vendored
     assert not (instance / "runtime-lock.yaml").exists()
     assert _header(instance) == DEFAULT_HEADER
 
@@ -230,7 +258,7 @@ def test_ioc_yaml_outside_an_instance(tmp_path: Path):
     ioc_yaml = tmp_path / "ioc.yaml"
     ioc_yaml.write_text("entities: []\n")
     result = vendor_patterns(_entities(), ioc_yaml)
-    assert result.refs == [ATTOCUBE.ref] and not result.vendored
+    assert result.refs == [_attocube().ref] and not result.vendored
     assert "is not in the config/ folder" in result.warnings[0]
     assert sorted(p.name for p in tmp_path.iterdir()) == ["ioc.yaml"]
 
@@ -249,7 +277,7 @@ def test_mixed_ioc_is_not_vendored(tmp_path: Path):
     result = _vendor(instance, brick)
     assert result.refs == [] and not result.vendored
     assert "also needs pmac" in result.warnings[0]
-    assert ATTOCUBE.ref in result.warnings[0]
+    assert _attocube().ref in result.warnings[0]
     assert not (instance / "runtime-lock.yaml").exists()
 
 
@@ -263,7 +291,7 @@ def test_rejected_pattern_module_is_reported(tmp_path: Path):
     assert not result.vendored
     warning = result.warnings[0]
     assert "also needs attocubeInterf" in warning
-    assert f"attocubeInterf: {ATTOCUBE.ref} rejects" in warning
+    assert f"attocubeInterf: {_attocube().ref} rejects" in warning
 
 
 def test_ioc_without_patterns_is_left_alone(tmp_path: Path):
@@ -282,7 +310,41 @@ def test_stale_lock_entry_is_reported(tmp_path: Path):
     _vendor(instance, scroll)
     result = _vendor(instance)
     assert result.vendored
-    assert "also holds EdwardsScroll" in result.warnings[0]
+    assert "also holds EdwardsScroll, which this IOC does not use" in result.warnings[0]
+
+
+def test_lock_left_when_the_ioc_uses_no_pattern(tmp_path: Path):
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    result = vendor_patterns(_entities()[:3], instance / "config" / "ioc.yaml")
+    assert (
+        "holds attocubeInterf, and this IOC uses no runtime pattern"
+        in (result.warnings[0])
+    )
+
+
+def test_offline_revendoring_does_not_warn(tmp_path: Path, monkeypatch):
+    """A vendored instance converted again with no network and no schema cache:
+    the header and schema it has are kept, and ibek is not asked for another."""
+    instance = _instance(tmp_path)
+    _vendor(instance)
+    monkeypatch.setenv("IBEK_SCHEMA_CACHE", str(tmp_path / "empty"))
+    files = _files(instance)
+    result = _vendor(instance)
+    assert result.vendored and result.warnings == []
+    assert _files(instance) == files
+
+
+def test_library_with_local_changes_is_not_vendored(tmp_path: Path, monkeypatch):
+    index = pattern_index()
+    library = _attocube().library
+    monkeypatch.setitem(index.local_changes, library, ["attocubeInterf/x.proto"])
+    instance = _instance(tmp_path)
+    result = _vendor(instance)
+    assert not result.vendored and not result.decided
+    assert "has local changes" in result.warnings[0]
+    assert "checkout -- . && git -C" in result.warnings[0]
+    assert not (instance / "runtime-lock.yaml").exists()
 
 
 def test_lock_left_when_the_ioc_is_no_longer_pattern_only(tmp_path: Path):
@@ -350,8 +412,8 @@ def test_cli_patterns_out(tmp_path: Path, vendor: bool):
     args = ["--patterns-out", str(patterns_out)] + ([] if vendor else ["--no-vendor"])
     result = _xml2yaml(instance, *args)
     assert result.exit_code == 0, result.output
-    assert patterns_out.read_text() == f"{ATTOCUBE.ref}\n"
-    assert (f"vendored {ATTOCUBE.ref}" in result.output) == vendor
+    assert patterns_out.read_text() == f"{_attocube().ref}\n"
+    assert (f"vendored {_attocube().ref}" in result.output) == vendor
     assert (instance / "runtime-lock.yaml").exists() == vendor
     # ibek's own reports stay out of xml2yaml's output
     assert "Using cached schema" not in result.output

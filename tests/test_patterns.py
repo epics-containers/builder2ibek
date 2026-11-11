@@ -9,6 +9,7 @@ import pytest
 from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES
 from ruamel.yaml import YAML
 
+from builder2ibek import patterns as patterns_module
 from builder2ibek.builder import Builder
 from builder2ibek.convert import dispatch
 from builder2ibek.patterns import (
@@ -18,6 +19,7 @@ from builder2ibek.patterns import (
     LIBRARY_VERSIONS,
     PatternIndex,
     PatternIndexError,
+    fetch_library,
     pattern_index,
 )
 from tests.conftest import DLS_SUPPORT, REPO_ROOT
@@ -146,13 +148,36 @@ def test_library_that_cannot_be_fetched(tmp_path: Path):
 
 
 def test_library_with_local_changes(tmp_path: Path):
+    """Indexed, so development on a library still works, but reported."""
     for library in LIBRARIES:
-        _tagged_library(tmp_path / library, "1.0.0")
-    (tmp_path / LIBRARIES[0] / "foo" / "foo.ibek.support.yaml").write_text(
-        "module: foo\nentity_models: []\n# edited\n"
-    )
-    with pytest.raises(PatternIndexError, match="has local changes"):
-        PatternIndex(tmp_path)
+        _tagged_library(tmp_path / library, "1.0.0", f"m_{library}")
+    edited = tmp_path / LIBRARIES[0]
+    (edited / f"m_{LIBRARIES[0]}" / "new.proto").write_text("x\n")
+    (edited / "notes.txt").write_text("not in a pattern folder\n")
+    index = PatternIndex(tmp_path)
+    assert index.local_changes == {LIBRARIES[0]: [f"m_{LIBRARIES[0]}/new.proto"]}
+    message = index.changes_message(LIBRARIES[0])
+    assert f"git -C {edited} checkout -- . && git -C {edited} clean -fd" in message
+    assert index.changes_message(LIBRARIES[1]) == ""
+
+
+def test_fetch_into_an_unwritable_cache(tmp_path: Path):
+    (tmp_path / "file").write_text("")
+    with pytest.raises(PatternIndexError, match="cannot fetch"):
+        fetch_library("lib", "1.0.0", tmp_path / "file" / "cache", str(tmp_path))
+
+
+def test_fetch_keeps_a_clone_another_run_made(tmp_path: Path, monkeypatch):
+    remote = _tagged_library(tmp_path / "remote", "1.0.0")
+    cache = tmp_path / "cache"
+    first = fetch_library("lib", "1.0.0", cache, str(remote))
+    marker = first / "marker"
+    marker.write_text("")
+    # as if another run filled the cache while this one cloned
+    calls = iter([False, True])
+    monkeypatch.setattr(patterns_module, "_has_patterns", lambda *_: next(calls))
+    assert fetch_library("lib", "1.0.0", cache, str(remote)) == first
+    assert marker.exists()
 
 
 def test_ref_is_what_ibek_pattern_add_takes(index: PatternIndex):

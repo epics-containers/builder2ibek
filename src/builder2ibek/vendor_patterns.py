@@ -63,8 +63,10 @@ DEFAULT_RUNTIME_IMAGE = "ghcr.io/epics-containers/ioc-streamdevice-runtime:2.8.2
 
 # The image of a services template's values.yaml, before anyone has set one
 IMAGE_PLACEHOLDER = "REPLACE_WITH_IMAGE_URI"
-_PLACEHOLDER_LINE = re.compile(
-    rf"^([ \t]*image:[ \t]*){IMAGE_PLACEHOLDER}[ \t]*$", re.M
+# the placeholder as an image: value, maybe quoted, maybe with a trailing comment
+_PLACEHOLDER = re.compile(
+    rf"""^([ \t]*image:[ \t]*(["']?)){IMAGE_PLACEHOLDER}(?=\2[ \t]*(\#.*)?\r?$)""",
+    re.M,
 )
 
 _SCHEMAS = Path(__file__).parent / "schemas"
@@ -89,6 +91,8 @@ class PatternResult:
     """
 
     refs: list[str] = field(default_factory=list)
+    # the patterns the IOC's modules could come from, pattern-only or not
+    available: list[str] = field(default_factory=list)
     image: str | None = None
     instance: Path | None = None
     vendored: bool = False
@@ -197,10 +201,10 @@ def _fill_placeholder(instance: Path, image: str) -> bool:
     values = instance / "values.yaml"
     if not values.is_file():
         return False
-    text = values.read_text()
-    filled, count = _PLACEHOLDER_LINE.subn(rf"\g<1>{image}", text)
+    text = values.read_bytes().decode()
+    filled, count = _PLACEHOLDER.subn(rf"\g<1>{image}", text)
     if count:
-        values.write_text(filled)
+        values.write_bytes(filled.encode())
     return bool(count)
 
 
@@ -263,8 +267,12 @@ def _vendor(patterns: list[Pattern], instance: Path, result: PatternResult) -> N
             result.warnings.append(
                 f"ibek pattern check {instance} failed:\n{_output(check)}"
             )
-    if not added:
-        # the ioc.yaml was rewritten; ibek sets its header and refreshes the schema
+    ioc_yaml = instance / "config" / "ioc.yaml"
+    has_schema = (instance / "ioc.schema.json").is_file() and (
+        ioc_yaml.read_text().partition("\n")[0] == SCHEMA_HEADER
+    )
+    if not added and not has_schema:
+        # ibek sets the header and writes the schema the instance lacks
         schema = _ibek("pattern", "schema", str(instance))
         if schema.returncode != 0:
             result.warnings.append(
@@ -295,13 +303,18 @@ def vendor_patterns(
     stale = sorted(set(_lock(instance).patterns) - modules)
     if stale and result.vendored:
         result.warnings.append(
-            f"{lock} also holds {', '.join(stale)}, which this IOC no longer uses: "
+            f"{lock} also holds {', '.join(stale)}, which this IOC does not use: "
             "remove those entries and their files"
+        )
+    elif stale and not result.available:
+        result.warnings.append(
+            f"{lock} holds {', '.join(stale)}, and this IOC uses no runtime "
+            "pattern: remove those entries and their files by hand"
         )
     elif stale:
         result.warnings.append(
             f"{lock} holds {', '.join(stale)}, and this IOC is not pattern-only "
-            "(see above): remove the patterns it no longer uses by hand"
+            "(see the warning above): remove the patterns it does not use by hand"
         )
     return result
 
@@ -328,6 +341,7 @@ def _plan_and_vendor(
     if not plan.patterns:
         return
     refs = plan.refs
+    result.available = refs
     available = f"\n  patterns available: {', '.join(refs)}"
 
     instance = result.instance
@@ -382,16 +396,30 @@ def _plan_and_vendor(
         )
         return
 
-    if pinned is None and _fill_placeholder(instance, image):
-        result.notes.append(f"set image {image} in {instance / 'values.yaml'}")
+    changes = sorted({index.changes_message(p.library) for p in plan.patterns} - {""})
+    if changes:
+        result.decided = False
+        result.warnings.extend(f"patterns not vendored: {c}" for c in changes)
+        return
+
+    values = instance / "values.yaml"
+    if pinned is None:
+        if _fill_placeholder(instance, image):
+            result.notes.append(f"set image {image} in {values}")
+        elif values.is_file() and IMAGE_PLACEHOLDER in values.read_text():
+            result.warnings.append(
+                f"{values} holds {IMAGE_PLACEHOLDER} in a form xml2yaml does not "
+                f"replace: set ioc-instance.image to {image} by hand"
+            )
     _vendor(plan.patterns, instance, result)
     result.notes.append(f"image: {image}")
 
     if ioc_yaml.read_text().partition("\n")[0] != SCHEMA_HEADER:
         if find_image(instance) is None:
             result.warnings.append(
-                f"{instance.name} pins no image, so ibek wrote no ioc.schema.json: "
-                f"set ioc-instance.image to {image} in values.yaml, then run "
+                f"{instance.name} pins no image ibek can use (one with a registry "
+                f"path and a tag), so ibek wrote no ioc.schema.json: set "
+                f"ioc-instance.image to {image} in values.yaml, then run "
                 f"`ibek pattern schema {instance}`"
             )
         else:
