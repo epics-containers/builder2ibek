@@ -51,6 +51,7 @@ from ibek.pattern_cmds.schema import (
     resolve_image_ref,
 )
 from ibek.pattern_cmds.schema import fetch_base_schema as _fetch_base_schema
+from ibek.pattern_cmds.sources import PatternError
 
 from builder2ibek.patterns import (
     cache_outcome,
@@ -114,7 +115,9 @@ def image_entity_types(image: str) -> frozenset[str] | None:
         if "$ref" in items:
             items = schema["$defs"][items["$ref"].split("/")[-1]]
         return frozenset(items["discriminator"]["mapping"])
-    except Exception:  # noqa: BLE001 -- the caller warns
+    except (SchemaNotFoundError, PatternError, OSError, ValueError, KeyError):
+        # not published, unreachable, not JSON or not an ibek IOC schema; the
+        # caller warns
         return None
 
 

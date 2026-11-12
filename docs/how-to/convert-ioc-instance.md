@@ -153,6 +153,13 @@ which writes the pattern files under `config/`, `runtime-lock.yaml`,
   pattern is added with a warning: set the generic IOC image and re-run
   xml2yaml to drop the patterns that image already installs.
 
+For a mixed IOC on a generic IOC image hosted on a GitLab registry, builder2ibek
+and `ibek pattern add` can fetch the image's published schema only when that
+GitLab server is listed in `IBEK_GITLAB_HOSTS`, a comma-separated list of
+`host[:port]` entries (a bare host means HTTPS on port 443), with a token in
+`GITLAB_TOKEN` for a private project. Without it every pattern is added and the
+`ioc.yaml` keeps the default schema header.
+
 A pattern already in `runtime-lock.yaml` is left at its locked version; move it
 with `ibek pattern update`. Any other `--yaml` path only lists the patterns and
 the image. `BUILDER2IBEK_PATTERN_TAG` and `BUILDER2IBEK_RUNTIME_TAG` fix the

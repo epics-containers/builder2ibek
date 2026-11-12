@@ -98,7 +98,9 @@ def test_convert(sample_xml: Path, tmp_path: Path):
     config = _instance_config(tmp_path, stem)
     out_yaml = config / "ioc.yaml"
 
-    convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
+    result = convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
+
+    assert not [w for w in result.warnings if "runtime patterns not added" in w]
 
     assert out_yaml.read_text() == expected_yaml.read_text()
     _check_patterns(config, stem)
@@ -144,6 +146,7 @@ def test_generate(sample_xml: Path, ibek_defs):
         assert result.returncode == 0, (
             f"xml2yaml failed for {sample_xml.name}:\n{result.stderr}"
         )
+        assert "runtime patterns not added" not in result.stderr, result.stderr
         assert ioc_yaml.read_text() == expected_yaml.read_text(), (
             f"YAML mismatch for {stem}"
         )
