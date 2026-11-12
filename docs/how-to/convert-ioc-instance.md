@@ -156,7 +156,8 @@ which writes the pattern files under `config/`, `runtime-lock.yaml`,
 For a mixed IOC on a generic IOC image hosted on a GitLab registry, builder2ibek
 and `ibek pattern add` can fetch the image's published schema only when that
 GitLab server is listed in `IBEK_GITLAB_HOSTS`, a comma-separated list of
-`host[:port]` entries (a bare host means HTTPS on port 443), with a token in
+`host[:port]` entries (a bare host means HTTPS on port 443; in a GitLab CI job
+ibek also adds `CI_SERVER_HOST` itself), with a token in
 `GITLAB_TOKEN` for a private project. Without it every pattern is added and the
 `ioc.yaml` keeps the default schema header.
 

@@ -115,7 +115,14 @@ def image_entity_types(image: str) -> frozenset[str] | None:
         if "$ref" in items:
             items = schema["$defs"][items["$ref"].split("/")[-1]]
         return frozenset(items["discriminator"]["mapping"])
-    except (SchemaNotFoundError, PatternError, OSError, ValueError, KeyError):
+    except (
+        SchemaNotFoundError,
+        PatternError,
+        OSError,
+        ValueError,
+        KeyError,
+        TypeError,
+    ):
         # not published, unreachable, not JSON or not an ibek IOC schema; the
         # caller warns
         return None
