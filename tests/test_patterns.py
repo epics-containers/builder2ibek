@@ -3,22 +3,28 @@
 import subprocess
 from functools import cache
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES
 from ruamel.yaml import YAML
 
+from builder2ibek import patterns
 from builder2ibek.builder import Builder
 from builder2ibek.convert import dispatch
 from builder2ibek.patterns import (
     ALIGNED,
     GENERIC_DIFFERS,
-    LIBRARIES,
+    LIBRARY,
+    LIBRARY_TAG_ENV,
+    LIBRARY_URL,
     PatternIndex,
     PatternIndexError,
+    latest_tag,
     pattern_index,
 )
 from tests.conftest import DLS_SUPPORT, REPO_ROOT
+from tests.pattern_pins import PATTERN_LIBRARY, PATTERN_TAG
 
 FIXTURES = Path(__file__).parent / "patterns"
 
@@ -43,54 +49,91 @@ def index() -> PatternIndex:
     return pattern_index()
 
 
-# -- the libraries --------------------------------------------------------------
+# -- the library -----------------------------------------------------------------
 
 
-@pytest.mark.parametrize("library", LIBRARIES)
-def test_library_is_the_one_ibek_vendors_from(library: str):
-    """The index must read the same library `ibek pattern add` clones."""
+def test_library_is_the_one_ibek_vendors_from():
+    """The submodule the tests index is the library `ibek pattern add` clones."""
     url = subprocess.run(
-        ["git", "config", "-f", ".gitmodules", f"submodule.{library}.url"],
+        ["git", "config", "-f", ".gitmodules", f"submodule.{LIBRARY}.url"],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
         check=True,
     ).stdout.strip()
-    assert url == DEFAULT_LIBRARIES[library]
-    path = subprocess.run(
-        ["git", "config", "-f", ".gitmodules", f"submodule.{library}.path"],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
-    # a path matching ibek-support* would feed the patterns to update-schema
-    assert path == library and not path.startswith("ibek-support")
+    assert url == DEFAULT_LIBRARIES[LIBRARY] == LIBRARY_URL
 
 
-def test_libraries_in_ibek_probe_order():
-    assert list(LIBRARIES) == [n for n in DEFAULT_LIBRARIES if n in LIBRARIES]
-
-
-@pytest.mark.parametrize("library", LIBRARIES)
-def test_every_pattern_folder_is_indexed(index: PatternIndex, library: str):
-    folders = {
-        p.parent.name for p in (REPO_ROOT / library).glob("*/*.ibek.support.yaml")
-    }
-    indexed = {p.module for p in index.patterns.values() if p.library == library}
-    assert folders and indexed == folders
-
-
-@pytest.mark.parametrize("library", LIBRARIES)
-def test_patterns_pinned_at_a_release_tag(index: PatternIndex, library: str):
+def test_tests_index_the_pinned_tag(index: PatternIndex):
+    """conftest pins the tag the submodule is checked out at."""
     tags = subprocess.run(
-        ["git", "-C", str(REPO_ROOT / library), "tag", "--points-at", "HEAD"],
+        ["git", "-C", str(PATTERN_LIBRARY), "tag", "--points-at", "HEAD"],
         capture_output=True,
         text=True,
         check=True,
     ).stdout.split()
-    versions = {p.version for p in index.patterns.values() if p.library == library}
-    assert len(versions) == 1 and versions <= set(tags)
+    assert PATTERN_TAG in tags
+    assert {p.version for p in index.patterns.values()} == {PATTERN_TAG}
+
+
+def test_every_pattern_folder_is_indexed(index: PatternIndex):
+    folders = {p.parent.name for p in PATTERN_LIBRARY.glob("*/*.ibek.support.yaml")}
+    assert folders and set(index.patterns) == folders
+
+
+def _ls_remote(*tags: str) -> subprocess.CompletedProcess:
+    out = "".join(f"0123abcd\trefs/tags/{t}\n" for t in tags)
+    return subprocess.CompletedProcess([], 0, out, "")
+
+
+def test_latest_tag_is_the_highest_release():
+    tags = ("0.7.3", "0.10.0", "0.9.1", "1.0.0-beta.1", "1.0.0rc1")
+    with patch.object(patterns.subprocess, "run", return_value=_ls_remote(*tags)):
+        assert latest_tag("url") == "0.10.0"
+    tags = ("2.8.26ec8", "2.8.26ec10", "2.8.26ec11-beta.1", "0.1.0-beta.1")
+    with patch.object(patterns.subprocess, "run", return_value=_ls_remote(*tags)):
+        assert latest_tag("url") == "2.8.26ec10"
+
+
+def test_latest_tag_unreachable():
+    failed = subprocess.CompletedProcess([], 128, "", "not found")
+    with patch.object(patterns.subprocess, "run", return_value=failed):
+        with pytest.raises(PatternIndexError, match="cannot list the tags"):
+            latest_tag("url")
+
+
+@pytest.mark.parametrize("override", ["0.7.3", ""])
+def test_pattern_index_clones_the_tag(monkeypatch, override: str):
+    """The override tag, else the latest, is shallow-cloned and indexed."""
+    monkeypatch.setenv(LIBRARY_TAG_ENV, override)
+    calls = []
+
+    def run(cmd, **kwargs):
+        calls.append(cmd)
+        if cmd[1] == "ls-remote":
+            return _ls_remote("0.7.3", "0.8.1")
+        clone = Path(kwargs["cwd"]) / LIBRARY / "foo"
+        clone.mkdir(parents=True)
+        (clone / "foo.ibek.support.yaml").write_text(
+            "module: foo\nentity_models: [{name: bar}]\n"
+        )
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    pattern_index.cache_clear()
+    try:
+        with patch.object(patterns.subprocess, "run", side_effect=run):
+            index = pattern_index()
+    finally:
+        pattern_index.cache_clear()
+    tag = override or "0.8.1"
+    assert calls[-1][:2] == ["git", "clone"] and calls[-1][-3:] == [
+        "--branch",
+        tag,
+        LIBRARY_URL,
+    ]
+    assert len(calls) == (1 if override else 2)
+    assert index.patterns["foo"].ref == f"{LIBRARY}:foo@{tag}"
+    assert index.patterns["foo"].models == {"bar"}
 
 
 def test_ref_is_what_ibek_pattern_add_takes(index: PatternIndex):
@@ -107,25 +150,16 @@ def test_models_are_read_from_the_support_yaml(index: PatternIndex):
 
 
 def test_folder_must_match_module(tmp_path: Path):
-    for library in LIBRARIES:
-        folder = tmp_path / library / "foo"
-        folder.mkdir(parents=True)
-        (folder / "foo.ibek.support.yaml").write_text(
-            "module: bar\nentity_models: []\n"
-        )
-        git = ["git", "-C", str(tmp_path / library)]
-        ident = ["-c", "user.name=test", "-c", "user.email=test@example.com"]
-        subprocess.run([*git, "init", "-q"], check=True)
-        subprocess.run([*git, "add", "."], check=True)
-        subprocess.run([*git, *ident, "commit", "-qm", "x"], check=True)
-        subprocess.run([*git, "tag", "1.0.0"], check=True)
+    folder = tmp_path / "foo"
+    folder.mkdir()
+    (folder / "foo.ibek.support.yaml").write_text("module: bar\nentity_models: []\n")
     with pytest.raises(PatternIndexError, match="declares module 'bar'"):
-        PatternIndex(tmp_path)
+        PatternIndex(tmp_path, "1.0.0")
 
 
 def test_missing_library_is_an_error(tmp_path: Path):
-    with pytest.raises(PatternIndexError, match="git submodule update --init"):
-        PatternIndex(tmp_path)
+    with pytest.raises(PatternIndexError, match="no patterns found"):
+        PatternIndex(tmp_path, "1.0.0")
 
 
 # -- which modules map to a pattern --------------------------------------------

@@ -11,6 +11,10 @@ cd $THIS
 
 set -e
 
+# Pin the runtime pattern library and the ioc-streamdevice-runtime image as the
+# tests do: clones of the library read the submodule
+eval "$(python3 ../pattern_pins.py)"
+
 # pass a list of XML files as args or use all xml files in the samples dir
 XMLS=${@:-$(ls *.xml)}
 
@@ -24,28 +28,42 @@ for x in ${XMLS}; do
 
   echo "=== $x ==="
 
-  # step 1: XML → YAML, in a folder of its own so that the files a converter
-  # writes next to the ioc.yaml go to config/<stem>/, not among the samples
+  # step 1: XML → YAML, into a services-repo instance of its own, as the tests
+  # do, so that the runtime patterns it uses are added. The files a converter
+  # writes next to the ioc.yaml go to config/<stem>/, not among the samples.
   tmpdir=$(mktemp -d)
+  instance="$tmpdir/services/$stem"
+  config="$instance/config"
+  mkdir -p "$config"
+  printf 'ioc-instance:\n  image: REPLACE_WITH_IMAGE_URI\n' > "$instance/values.yaml"
   echo "  xml2yaml → $y"
-  builder2ibek xml2yaml "$x" --yaml "$tmpdir/ioc.yaml"
-  cp "$tmpdir/ioc.yaml" "$y"
+  builder2ibek xml2yaml "$x" --yaml "$config/ioc.yaml"
+  cp "$config/ioc.yaml" "$y"
+  rm -f "${stem}.runtime-lock.yaml"
+  vendored=""
+  if [ -f "$instance/runtime-lock.yaml" ]; then
+    echo "  runtime patterns → ${stem}.runtime-lock.yaml"
+    cp "$instance/runtime-lock.yaml" "${stem}.runtime-lock.yaml"
+    vendored=$(grep -o 'config/[^:]*' "$instance/runtime-lock.yaml" | sed 's|config/||')
+  fi
   rm -rf "config/${stem}"
-  for side in "$tmpdir"/*; do
-    [ "$side" = "$tmpdir/ioc.yaml" ] && continue
+  for side in "$config"/*; do
+    name=$(basename "$side")
+    [ "$name" = "ioc.yaml" ] && continue
+    echo "$vendored" | grep -qx "$name" && continue
     mkdir -p "config/${stem}"
-    echo "  side file → config/${stem}/$(basename "$side")"
+    echo "  side file → config/${stem}/$name"
     cp "$side" "config/${stem}/"
   done
 
   # step 2: YAML → st.cmd + ioc.subst
 
-  if ibek runtime generate2 "$tmpdir" --output "$tmpdir" --no-pvi 2>/dev/null; then
+  if ibek runtime generate2 "$config" --output "$config" --no-pvi 2>/dev/null; then
     echo "  generate2 → ${stem}.st.cmd, ${stem}.ioc.subst"
     # ibek leaves a trailing blank line on generated files; strip it so the
     # pre-commit end-of-file-fixer doesn't show phantom diffs.
-    printf '%s\n' "$(cat "$tmpdir/st.cmd")" > "${stem}.st.cmd"
-    printf '%s\n' "$(cat "$tmpdir/ioc.subst")" > "${stem}.ioc.subst"
+    printf '%s\n' "$(cat "$config/st.cmd")" > "${stem}.st.cmd"
+    printf '%s\n' "$(cat "$config/ioc.subst")" > "${stem}.ioc.subst"
   else
     echo " ERROR SKIPPING !!! generate2 SKIP (validation failed)"
     rm -f "${stem}.st.cmd" "${stem}.ioc.subst"

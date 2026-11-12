@@ -121,6 +121,32 @@ Notice that `asyn.AsynIP` and `hidenRGA.hidenRGA_qga` remain as separate entitie
 in the output, reflecting the original XML structure.  The ibek entity models
 for both must be present in the `ibek-support*` submodules used by the Generic IOC.
 
+### Runtime patterns
+
+A module with a runtime pattern in
+[ibek-runtime-streamdevice](https://github.com/epics-containers/ibek-runtime-streamdevice)
+needs no compiled support in the image: its files are vendored into the IOC
+instance. xml2yaml checks every IOC for such modules, against the library's
+latest release tag. When the `--yaml` path is `services/<ioc>/config/ioc.yaml`
+in a services repo, it adds each pattern with
+`ibek pattern add ibek-runtime-streamdevice:<module>@<tag> services/<ioc>`,
+which writes the pattern files under `config/`, `runtime-lock.yaml`,
+`ioc.schema.json` and the `ioc.yaml` schema header.
+
+- **Pattern-only IOC**: every other entity is one the latest
+  `ioc-streamdevice-runtime` image builds, as its published schema lists. Its
+  `values.yaml` image is set to that image, in place of the template's
+  `REPLACE_WITH_IMAGE_URI` or an older `ioc-streamdevice-runtime` tag.
+- **Any other IOC** keeps the image its `values.yaml` names. A pattern whose
+  entity types that image's published schema already has is installed by the
+  image and is not added. When the schema cannot be fetched every pattern is
+  added, with a warning.
+
+A pattern already in `runtime-lock.yaml` is left at its locked version; move it
+with `ibek pattern update`. Any other `--yaml` path only lists the patterns and
+the image. `BUILDER2IBEK_PATTERN_TAG` and `BUILDER2IBEK_RUNTIME_TAG` fix the
+library tag and the `ioc-streamdevice-runtime` tag in place of the latest.
+
 ---
 
 ## 3. Review and adjust

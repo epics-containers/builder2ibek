@@ -1,0 +1,189 @@
+"""Adding a converted IOC's runtime patterns to its instance, with ibek mocked."""
+
+import subprocess
+from pathlib import Path
+
+import pytest
+
+from builder2ibek import vendor_patterns
+from builder2ibek.patterns import Pattern, PatternIndexError, PatternPlan
+from builder2ibek.vendor_patterns import (
+    RUNTIME_IMAGE,
+    RUNTIME_TAG_ENV,
+    add_patterns,
+    runtime_image,
+)
+
+RUNTIME = f"{RUNTIME_IMAGE}:2.0ec2"
+VAC = "ghcr.io/epics-containers/ioc-dlslinuxvac:2026.8.1"
+LOCK = """\
+version: 1
+patterns:
+  attocubeInterf:
+    version: 0.1.0
+    source: github.com/epics-containers/ibek-runtime-streamdevice
+    files: {}
+"""
+
+
+def _pattern(module: str, model: str) -> Pattern:
+    return Pattern(
+        library="ibek-runtime-streamdevice",
+        module=module,
+        version="0.8.1",
+        models=frozenset({model}),
+        support_yaml=Path("unused"),
+    )
+
+
+ATTO = _pattern("attocubeInterf", "ids3010")
+SCROLL = _pattern("EdwardsScroll", "EdwardsScroll")
+ENTITIES = [
+    {"type": "asyn.AsynIP", "name": "p", "port": "localhost:1"},
+    {"type": "attocubeInterf.ids3010", "P": "X", "PORT": "p", "Q": "01"},
+    {"type": "EdwardsScroll.EdwardsScroll", "P": "Y", "port": "p"},
+]
+SCHEMAS = {
+    RUNTIME: frozenset({"asyn.AsynIP", "epics.EpicsEnvSet"}),
+    VAC: frozenset(
+        {"asyn.AsynIP", "digitelMpc.digitelMpc", "EdwardsScroll.EdwardsScroll"}
+    ),
+}
+
+
+class FakeIndex:
+    def plan(self, entities):
+        return PatternPlan(patterns=[ATTO, SCROLL])
+
+
+@pytest.fixture
+def ibek(monkeypatch) -> list[tuple[str, ...]]:
+    """Mock the index, the image schemas and ibek; return ibek's calls."""
+    calls: list[tuple[str, ...]] = []
+
+    def run(*args: str):
+        calls.append(args)
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+    monkeypatch.setattr(vendor_patterns, "pattern_index", FakeIndex)
+    monkeypatch.setattr(vendor_patterns, "image_entity_types", SCHEMAS.get)
+    monkeypatch.setattr(vendor_patterns, "runtime_image", lambda: RUNTIME)
+    monkeypatch.setattr(vendor_patterns, "_ibek", run)
+    return calls
+
+
+def _instance(root: Path, image: str) -> Path:
+    instance = root / "services" / "bl01t-ea-ioc-01"
+    (instance / "config").mkdir(parents=True)
+    (instance / "values.yaml").write_text(f"ioc-instance:\n  image: {image}\n")
+    return instance
+
+
+def _adds(calls) -> list[str]:
+    return [c[2] for c in calls if c[:2] == ("pattern", "add")]
+
+
+def test_runtime_image_override_and_latest(monkeypatch):
+    runtime_image.cache_clear()
+    monkeypatch.setenv(RUNTIME_TAG_ENV, "2.8.26ec8")
+    assert runtime_image() == f"{RUNTIME_IMAGE}:2.8.26ec8"
+
+    runtime_image.cache_clear()
+    monkeypatch.delenv(RUNTIME_TAG_ENV)
+    urls = []
+    monkeypatch.setattr(
+        vendor_patterns, "latest_tag", lambda url: urls.append(url) or "2.8.26ec9"
+    )
+    assert runtime_image() == f"{RUNTIME_IMAGE}:2.8.26ec9"
+    # the image is built from the generic IOC repo without the -runtime suffix
+    assert urls == ["https://github.com/epics-containers/ioc-streamdevice"]
+    runtime_image.cache_clear()
+
+
+@pytest.mark.parametrize("image", ["REPLACE_WITH_IMAGE_URI", f"{RUNTIME_IMAGE}:2.0ec1"])
+def test_pattern_only_gets_the_runtime_image(tmp_path: Path, ibek, image: str):
+    instance = _instance(tmp_path, image)
+    entities = ENTITIES[:2]  # asyn is built by the runtime image
+
+    report = add_patterns(entities, instance / "config" / "ioc.yaml")
+
+    assert RUNTIME in (instance / "values.yaml").read_text()
+    # every pattern the plan picked, with no --source
+    assert ibek == [
+        ("pattern", "add", ATTO.ref, str(instance)),
+        ("pattern", "add", SCROLL.ref, str(instance)),
+    ]
+    assert f"image set to {RUNTIME}" in report.notes
+    assert not report.warnings
+
+
+def test_mixed_skips_patterns_the_image_installs(tmp_path: Path, ibek):
+    instance = _instance(tmp_path, VAC)
+    entities = [*ENTITIES, {"type": "digitelMpc.digitelMpc", "name": "m"}]
+
+    report = add_patterns(entities, instance / "config" / "ioc.yaml")
+
+    assert VAC in (instance / "values.yaml").read_text()
+    assert _adds(ibek) == [ATTO.ref]
+    assert f"EdwardsScroll: {VAC} installs it" in report.notes
+
+
+def test_mixed_without_image_schema_adds_all(tmp_path: Path, ibek):
+    other = "ghcr.io/epics-containers/ioc-other:1.0"
+    instance = _instance(tmp_path, other)
+    entities = [*ENTITIES, {"type": "other.thing"}]
+
+    report = add_patterns(entities, instance / "config" / "ioc.yaml")
+
+    assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
+    assert any(other in w for w in report.warnings)
+
+
+def test_no_instance_only_reports(tmp_path: Path, ibek):
+    report = add_patterns(ENTITIES[:2], tmp_path / "ioc.yaml")
+
+    assert ibek == []
+    assert report.notes == [
+        f"would add runtime pattern {ATTO.ref}",
+        f"would add runtime pattern {SCROLL.ref}",
+        f"image: {RUNTIME}",
+    ]
+
+
+def test_locked_pattern_is_left_alone(tmp_path: Path, ibek):
+    instance = _instance(tmp_path, RUNTIME)
+    (instance / "runtime-lock.yaml").write_text(LOCK)
+
+    report = add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml")
+
+    assert _adds(ibek) == [SCROLL.ref]
+    assert (instance / "runtime-lock.yaml").read_text() == LOCK
+    assert any(
+        "attocubeInterf stays at 0.1.0" in n and "not 0.8.1" in n for n in report.notes
+    )
+
+
+def test_all_locked_regenerates_the_schema(tmp_path: Path, ibek, monkeypatch):
+    monkeypatch.setattr(FakeIndex, "plan", lambda self, e: PatternPlan([ATTO]))
+    instance = _instance(tmp_path, RUNTIME)
+    (instance / "runtime-lock.yaml").write_text(LOCK)
+
+    add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml")
+
+    # the ioc.yaml was rewritten, so ibek sets its schema header again
+    assert ibek == [("pattern", "schema", str(instance))]
+
+
+def test_offline_conversion_warns(tmp_path: Path, ibek, monkeypatch):
+    def unreachable():
+        raise PatternIndexError("cannot list the tags of url")
+
+    monkeypatch.setattr(vendor_patterns, "pattern_index", unreachable)
+    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
+
+    report = add_patterns(ENTITIES, instance / "config" / "ioc.yaml")
+
+    assert ibek == [] and report.notes == []
+    assert report.warnings == [
+        "runtime patterns not checked: cannot list the tags of url"
+    ]

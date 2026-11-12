@@ -55,6 +55,13 @@ def xml2yaml(
     """
     Convert a builder XML IOC to an ibek ioc.yaml.
 
+    Given services/<ioc>/config/ioc.yaml in a services repo, each
+    ibek-runtime-streamdevice pattern the IOC uses is added with `ibek pattern
+    add`, at the library's latest release. A pattern-only IOC gets the latest
+    ioc-streamdevice-runtime image in values.yaml; any other IOC keeps its image
+    and skips the patterns that image installs. Elsewhere the patterns are only
+    listed. BUILDER2IBEK_PATTERN_TAG and BUILDER2IBEK_RUNTIME_TAG fix the tags.
+
     ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
     that holds only PandAs and boilerplate becomes one fastcs instance in place
     of the ioc.yaml: given services/<ioc>/config/ioc.yaml, it writes

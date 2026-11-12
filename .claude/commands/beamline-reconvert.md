@@ -39,7 +39,10 @@ XML stems to `<services-repo>/services/<ioc-name>/config/ioc.yaml`,
 re-runs `xml2yaml` for each match (preserving the existing `description`
 field, and `--blgui` when the existing ioc.yaml has `BLGui.*` entities),
 then schema-validates every reconverted ioc.yaml with
-`ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir.
+`ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir, together with
+the support YAMLs of the runtime patterns in its `config/`. Each xml2yaml
+adds the IOC's runtime patterns as `/ioc-convert` describes; report the
+patterns added and any image set, from the notes.
 
 Flags: `--no-validate` skips the generate2 pass; `--only <ioc-name>`
 (repeatable) limits the run.
@@ -93,7 +96,8 @@ export EPICS_ROOT=$(mktemp -d /tmp/epics-reconvert-XXXXXX)
 ./update-schema
 TMPCONFIG=$(mktemp -d /tmp/reconvert-config-XXXXXX)
 for ioc_yaml in <services-repo>/services/*/config/ioc.yaml; do
-  cp "$ioc_yaml" "$TMPCONFIG/ioc.yaml"
+  rm -f "$TMPCONFIG"/*
+  cp "$ioc_yaml" "$(dirname "$ioc_yaml")"/*.ibek.support.yaml "$TMPCONFIG/" 2>/dev/null
   ibek runtime generate2 --no-pvi "$TMPCONFIG" 2>&1 || true
 done
 rm -rf "$TMPCONFIG" "$EPICS_ROOT"

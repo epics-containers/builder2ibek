@@ -16,6 +16,30 @@ from tests.conftest import DLS_SUPPORT, HAS_COMMUNITY_SUPPORT, requires_support
 
 SAMPLES = Path(__file__).parent / "samples"
 
+
+def _instance_config(root: Path, stem: str) -> Path:
+    """The config folder of a services-repo instance made from the template.
+
+    Samples convert into one so that the runtime patterns they use are added,
+    as for a real IOC; tests/conftest.py pins their versions.
+    """
+    instance = root / "services" / stem
+    (instance / "config").mkdir(parents=True)
+    (instance / "values.yaml").write_text(
+        "ioc-instance:\n  image: REPLACE_WITH_IMAGE_URI\n"
+    )
+    return instance / "config"
+
+
+def _check_patterns(config: Path, stem: str) -> None:
+    """The runtime-lock.yaml matches the sample's, or there is none for either."""
+    lock = config.parent / "runtime-lock.yaml"
+    expected = SAMPLES / f"{stem}.runtime-lock.yaml"
+    assert lock.is_file() == expected.is_file()
+    if expected.is_file():
+        assert lock.read_text() == expected.read_text()
+
+
 # Every sample runs everywhere. The dls entity models are always resolvable --
 # from the submodule locally, or from the vendored copy CI installs -- so there
 # is nothing left to mark a sample as conditional on.
@@ -52,14 +76,17 @@ def test_dls_models_available():
 
 @requires_support
 @pytest.mark.parametrize("sample_xml", SAMPLE_PARAMS)
-def test_convert(sample_xml: Path):
+def test_convert(sample_xml: Path, tmp_path: Path):
     """Test that xml2yaml produces the expected YAML for a sample XML."""
-    expected_yaml = SAMPLES / f"{sample_xml.stem.lower()}.yaml"
-    out_yaml = Path("/tmp") / expected_yaml.name
+    stem = sample_xml.stem.lower()
+    expected_yaml = SAMPLES / f"{stem}.yaml"
+    config = _instance_config(tmp_path, stem)
+    out_yaml = config / "ioc.yaml"
 
     convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
 
     assert out_yaml.read_text() == expected_yaml.read_text()
+    _check_patterns(config, stem)
     # reset the interrupt vector counter
     InterruptVector.reset()
 
@@ -83,7 +110,7 @@ def test_generate(sample_xml: Path, ibek_defs):
     )
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        config = Path(tmpdir)
+        config = _instance_config(Path(tmpdir), stem)
         ioc_yaml = config / "ioc.yaml"
 
         # step 1: XML → YAML (subprocess to avoid converter state leakage)
@@ -104,6 +131,7 @@ def test_generate(sample_xml: Path, ibek_defs):
         assert ioc_yaml.read_text() == expected_yaml.read_text(), (
             f"YAML mismatch for {stem}"
         )
+        _check_patterns(config, stem)
 
         # step 2: YAML → st.cmd + ioc.subst
         result = subprocess.run(
