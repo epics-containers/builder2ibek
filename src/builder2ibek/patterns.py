@@ -4,10 +4,11 @@ Index of the runtime patterns builder2ibek can use in place of compiled support.
 A runtime pattern is a support module whose files (``*.ibek.support.yaml``, protocol,
 template) are vendored into an IOC instance with ``ibek pattern add``, so the IOC
 runs on a stock image instead of one with the module compiled in. The patterns come
-from the two libraries ibek knows by default, which this repo pins as submodules at
-release tags. The index is read from those checkouts: every library folder holding
-``<folder>/<folder>.ibek.support.yaml`` is a pattern for the module of that name, and
-the support YAML lists its entity models.
+from the ibek-runtime-streamdevice library, at its latest release tag unless
+:data:`LIBRARY_TAG_ENV` names one. :func:`pattern_index` shallow-clones the library
+at that tag into a temporary folder and indexes it: every library folder holding
+``<folder>/<folder>.ibek.support.yaml`` is a pattern for the module of that name,
+and the support YAML lists its entity models.
 
 :meth:`PatternIndex.plan` decides, for one converted IOC, which modules could come
 from a pattern. A module goes to its pattern when:
@@ -26,9 +27,15 @@ here, so a plan says what could come from a pattern, not what must.
 
 from __future__ import annotations
 
+import atexit
+import os
+import re
+import shutil
 import subprocess
+import sys
+import tempfile
 import warnings
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
@@ -37,15 +44,20 @@ from typing import Any
 from ibek.entity_factory import EntityFactory
 from ibek.ioc import clear_entity_model_ids
 from ibek.ioc_factory import IocFactory
+from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES
 from pydantic import ValidationError
 from pydantic.warnings import PydanticDeprecatedSince211
 from ruamel.yaml import YAML
 
+# The pattern library, named as ibek names it in its library registry
+LIBRARY = "ibek-runtime-streamdevice"
+LIBRARY_URL = DEFAULT_LIBRARIES[LIBRARY]
+
+# Fixes the library release to index and vendor, in place of the latest one
+LIBRARY_TAG_ENV = "BUILDER2IBEK_PATTERN_TAG"
+
 _project_root = Path(__file__).parent.parent.parent
 
-# The pattern libraries, in the order ibek probes an unqualified pattern name. Each is
-# a submodule at the repo root, named as ibek names it in its library registry.
-LIBRARIES = ("ibek-runtime-streamdevice", "ibek-runtime-support")
 
 # Modules that have both a pattern and a generic model in ibek-support* are listed
 # in exactly one of these two tables; tests/test_patterns.py checks that against the
@@ -68,6 +80,10 @@ ALIGNED: frozenset[str] = frozenset(
         "strainGauge",
     }
 )
+
+# A module with a generic model in neither table stays build-time: the pattern of
+# a library release newer than the one the tests check is not trusted until the
+# tables decide it.
 
 # The pattern model differs from the generic one: a model or parameter is missing or
 # renamed, a type or default changed. The module stays build-time until its pattern
@@ -98,12 +114,12 @@ GENERIC_DIFFERS: frozenset[str] = frozenset(
 
 
 class PatternIndexError(Exception):
-    """The pattern libraries cannot be read."""
+    """The pattern library cannot be listed, cloned or read."""
 
 
 @dataclass(frozen=True)
 class Pattern:
-    """One pattern folder in a library at its pinned tag."""
+    """One pattern folder of the library at one release tag."""
 
     library: str
     module: str
@@ -134,65 +150,95 @@ class PatternPlan:
         return [p.ref for p in self.patterns]
 
 
-def _library_version(library: Path) -> str:
-    """The release tag the library checkout is at."""
-    result = subprocess.run(
-        ["git", "-C", str(library), "describe", "--tags", "--exact-match", "HEAD"],
+class cache_outcome[T]:  # noqa: N801 -- used as a decorator
+    """Cache a function's result, or the exception it raised, for the process.
+
+    A failed network lookup is then not retried for every IOC of a reconvert.
+    """
+
+    def __init__(self, fn: Callable[[], T]):
+        self.fn = fn
+        self.__doc__ = fn.__doc__
+        self.cache_clear()
+
+    def cache_clear(self) -> None:
+        self.outcome: tuple[T, None] | tuple[None, Exception] | None = None
+
+    def __call__(self) -> T:
+        if self.outcome is None:
+            try:
+                self.outcome = (self.fn(), None)
+            except Exception as e:  # noqa: BLE001 -- re-raised by every call
+                self.outcome = (None, e)
+        value, error = self.outcome
+        if error is not None:
+            raise error
+        return value  # type: ignore[return-value]
+
+
+def git(*args: str, cwd: str | None = None) -> subprocess.CompletedProcess:
+    """Run git without ever prompting for credentials, for at most a minute."""
+    return subprocess.run(
+        ["git", *args],
+        cwd=cwd,
         capture_output=True,
         text=True,
+        timeout=60,
+        env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
     )
-    tag = result.stdout.strip()
-    if result.returncode != 0 or not tag:
-        raise PatternIndexError(
-            f"{library.name} is not checked out at a release tag, so there is no "
-            f"version to vendor its patterns at. Check out the committed pin:\n"
-            f"    git submodule update --init {library.name}"
-        )
-    return tag
+
+
+def version_key(tag: str) -> list[int]:
+    """Sort key of a release tag such as 0.8.1 or 2.8.26ec8."""
+    return [int(n) for n in re.findall(r"\d+", tag)]
+
+
+def latest_tag(url: str) -> str:
+    """The highest release tag of a git repository; pre-release tags are skipped."""
+    result = git("ls-remote", "--tags", "--refs", url)
+    if result.returncode != 0:
+        raise PatternIndexError(f"cannot list the tags of {url}: {result.stderr}")
+    tags = [
+        ref.rpartition("refs/tags/")[2]
+        for ref in result.stdout.split()
+        if ref.startswith("refs/tags/")
+    ]
+    # a release is digits, dots and an optional "ec<n>", e.g. 0.8.1 or 2.8.26ec8
+    releases = [t for t in tags if re.fullmatch(r"v?[\d.]+(ec\d+)?", t)]
+    if not releases:
+        raise PatternIndexError(f"{url} has no release tags")
+    return max(releases, key=version_key)
 
 
 class PatternIndex:
-    """The patterns in the pinned libraries, keyed by module."""
+    """The patterns in one checkout of the library, keyed by module."""
 
-    def __init__(self, root: Path = _project_root):
+    def __init__(self, root: Path, version: str):
         self.root = root
         self.patterns: dict[str, Pattern] = {}
         self._ioc_models: dict[str, Any] = {}
         yml = YAML(typ="safe", pure=True)
 
-        for name in LIBRARIES:
-            library = root / name
-            if not any(library.glob("*/*.ibek.support.yaml")):
+        if not any(root.glob("*/*.ibek.support.yaml")):
+            raise PatternIndexError(f"no patterns found in {root}")
+        for folder in sorted(p for p in root.iterdir() if p.is_dir()):
+            support_yaml = folder / f"{folder.name}.ibek.support.yaml"
+            if not support_yaml.is_file():
+                continue
+            data = yml.load(support_yaml.read_text())
+            module = data.get("module")
+            if module != folder.name:
                 raise PatternIndexError(
-                    f"no patterns found in {library}; initialise the submodule:\n"
-                    f"    git submodule update --init {name}"
+                    f"{support_yaml} declares module {module!r}; a pattern "
+                    f"folder is vendored by its folder name, so the two must match"
                 )
-            version = _library_version(library)
-            for folder in sorted(p for p in library.iterdir() if p.is_dir()):
-                support_yaml = folder / f"{folder.name}.ibek.support.yaml"
-                if not support_yaml.is_file():
-                    continue
-                data = yml.load(support_yaml.read_text())
-                module = data.get("module")
-                if module != folder.name:
-                    raise PatternIndexError(
-                        f"{support_yaml} declares module {module!r}; a pattern "
-                        f"folder is vendored by its folder name, so the two must match"
-                    )
-                if module in self.patterns:
-                    raise PatternIndexError(
-                        f"pattern {module!r} is in both {self.patterns[module].library}"
-                        f" and {name}"
-                    )
-                self.patterns[module] = Pattern(
-                    library=name,
-                    module=module,
-                    version=version,
-                    models=frozenset(
-                        m["name"] for m in data.get("entity_models") or []
-                    ),
-                    support_yaml=support_yaml,
-                )
+            self.patterns[module] = Pattern(
+                library=LIBRARY,
+                module=module,
+                version=version,
+                models=frozenset(m["name"] for m in data.get("entity_models") or []),
+                support_yaml=support_yaml,
+            )
 
     def pattern_for_module(self, module: str) -> Pattern | None:
         """The pattern builder2ibek may use for a module, or None.
@@ -259,6 +305,12 @@ class PatternIndex:
                     f"of {module}"
                 )
                 continue
+            if module not in ALIGNED and module in generic_modules():
+                plan.build_time[module] = (
+                    f"{pattern.ref}: pattern not yet aligned with the generic "
+                    f"model of {module}"
+                )
+                continue
             reason = self.rejects(pattern, module_entities)
             if reason:
                 plan.build_time[module] = reason
@@ -268,6 +320,42 @@ class PatternIndex:
 
 
 @cache
+def generic_modules(root: Path = _project_root) -> frozenset[str]:
+    """The modules with a generic model in this checkout's ibek-support*.
+
+    builder2ibek runs from a checkout, so these are the submodules. Warns once,
+    on stderr, when there are none.
+    """
+    support_yamls = list(root.glob("ibek-support*/*/*.ibek.support.yaml"))
+    if not support_yamls:
+        print(
+            f"warning: no ibek-support* checkout in {root}, so a runtime pattern "
+            f"is used even where its module has a generic model",
+            file=sys.stderr,
+        )
+    found = set()
+    for support_yaml in support_yamls:
+        match = re.search(r"^module:\s*(\S+)", support_yaml.read_text(), re.M)
+        if match:
+            found.add(match.group(1).strip("'\""))
+    return frozenset(found)
+
+
+@cache_outcome
 def pattern_index() -> PatternIndex:
-    """The index of this checkout's pinned libraries, read once."""
-    return PatternIndex()
+    """The index of the library release to convert with, cloned once per process.
+
+    The release is $BUILDER2IBEK_PATTERN_TAG, or else the latest one.
+    """
+    tag = os.environ.get(LIBRARY_TAG_ENV) or latest_tag(LIBRARY_URL)
+    # removed at exit: the index reads support YAMLs as it needs them
+    clone = tempfile.mkdtemp(prefix=f"{LIBRARY}-")
+    atexit.register(shutil.rmtree, clone, ignore_errors=True)
+    result = git(
+        "clone", "--quiet", "--depth", "1", "--branch", tag, LIBRARY_URL, cwd=clone
+    )
+    if result.returncode != 0:
+        raise PatternIndexError(
+            f"cannot clone {LIBRARY_URL} at {tag}: {result.stderr.strip()}"
+        )
+    return PatternIndex(Path(clone) / LIBRARY, tag)

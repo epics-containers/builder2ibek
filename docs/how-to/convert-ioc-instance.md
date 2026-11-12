@@ -121,6 +121,55 @@ Notice that `asyn.AsynIP` and `hidenRGA.hidenRGA_qga` remain as separate entitie
 in the output, reflecting the original XML structure.  The ibek entity models
 for both must be present in the `ibek-support*` submodules used by the Generic IOC.
 
+### Runtime patterns
+
+A module with a runtime pattern in
+[ibek-runtime-streamdevice](https://github.com/epics-containers/ibek-runtime-streamdevice)
+needs no compiled support in the image: its files are vendored into the IOC
+instance. xml2yaml checks every IOC for such modules, against the library's
+latest release tag. A module that also has a generic model in `ibek-support*`
+(the `module:` of a support YAML there) uses its pattern only once
+`src/builder2ibek/patterns.py` lists it as aligned with that model; until then
+it stays build-time. That rule needs the ibek-support submodules checked out,
+as they are when builder2ibek runs from its repository with `uv run`; without
+them xml2yaml warns once and uses every pattern. When the `--yaml` path is
+`services/<ioc>/config/ioc.yaml` in a services repo, xml2yaml adds each pattern
+with `ibek pattern add ibek-runtime-streamdevice:<module>@<tag> services/<ioc>`,
+which writes the pattern files under `config/`, `runtime-lock.yaml`,
+`ioc.schema.json` and the `ioc.yaml` schema header.
+
+- **Pattern-only IOC**: every other entity is one the `ioc-streamdevice-runtime`
+  image of the latest published GitHub release of `ioc-streamdevice` builds, as
+  its published schema lists. Its `values.yaml` image is set to that image, in
+  place of the template's `REPLACE_WITH_IMAGE_URI` or an older
+  `ioc-streamdevice-runtime` tag. When that schema cannot be fetched there is no
+  pattern-only check: xml2yaml warns, leaves `values.yaml` alone, and adds every
+  pattern.
+- **Any other IOC** keeps the image its `values.yaml` names. A pattern whose
+  entity types that image's published schema already has is installed by the
+  image and is not added. When that schema cannot be fetched (for example an
+  image on a GitLab registry ibek has no token for) every pattern is added, with
+  a warning. When `values.yaml` still holds `REPLACE_WITH_IMAGE_URI`, every
+  pattern is added with a warning: set the generic IOC image and re-run
+  xml2yaml to drop the patterns that image already installs.
+
+For a mixed IOC on a generic IOC image hosted on a GitLab registry, builder2ibek
+and `ibek pattern add` can fetch the image's published schema only when that
+GitLab server is listed in `IBEK_GITLAB_HOSTS`, a comma-separated list of
+`host[:port]` entries (a bare host means HTTPS on port 443; in a GitLab CI job
+ibek also adds `CI_SERVER_HOST` itself), with a token in
+`GITLAB_TOKEN` for a private project. Without it every pattern is added and the
+`ioc.yaml` keeps the default schema header.
+
+A pattern already in `runtime-lock.yaml` is left at its locked version; move it
+with `ibek pattern update`. Any other `--yaml` path only lists the patterns and
+the image. `BUILDER2IBEK_PATTERN_TAG` and `BUILDER2IBEK_RUNTIME_TAG` fix the
+library tag and the `ioc-streamdevice-runtime` tag in place of the latest.
+Only the placeholder or an older `ioc-streamdevice-runtime` tag on the
+`image:` line is replaced; a newer tag someone pinned is kept, with a note.
+Any problem adding patterns (no network, no git, a schema that cannot be
+fetched, an unwritable file) is a warning: the `ioc.yaml` is always written.
+
 ---
 
 ## 3. Review and adjust

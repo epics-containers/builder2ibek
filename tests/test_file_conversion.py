@@ -12,9 +12,47 @@ import pytest
 
 from builder2ibek.convert import convert_file
 from builder2ibek.converters.epics_base import InterruptVector
+from builder2ibek.vendor_patterns import RUNTIME_IMAGE, image_entity_types
 from tests.conftest import DLS_SUPPORT, HAS_COMMUNITY_SUPPORT, requires_support
+from tests.pattern_pins import RUNTIME_TAG
 
 SAMPLES = Path(__file__).parent / "samples"
+
+
+def _instance_config(root: Path, stem: str) -> Path:
+    """The config folder of a services-repo instance made from the template.
+
+    Samples convert into one so that the runtime patterns they use are added,
+    as for a real IOC; tests/conftest.py pins their versions.
+    """
+    instance = root / "services" / stem
+    (instance / "config").mkdir(parents=True)
+    (instance / "values.yaml").write_text(
+        "ioc-instance:\n  image: REPLACE_WITH_IMAGE_URI\n"
+    )
+    return instance / "config"
+
+
+def _skip_without_runtime_schema(stem: str) -> None:
+    """A sample with runtime patterns needs the pinned runtime image's schema."""
+    image = f"{RUNTIME_IMAGE}:{RUNTIME_TAG}"
+    if (SAMPLES / f"{stem}.runtime-lock.yaml").is_file() and (
+        image_entity_types(image) is None
+    ):
+        pytest.skip("needs github.com for the ioc-streamdevice-runtime schema")
+
+
+def _check_patterns(config: Path, stem: str) -> None:
+    """The runtime-lock.yaml matches the sample's, or there is none for either."""
+    lock = config.parent / "runtime-lock.yaml"
+    expected = SAMPLES / f"{stem}.runtime-lock.yaml"
+    assert lock.is_file() == expected.is_file()
+    if expected.is_file():
+        assert lock.read_text() == expected.read_text()
+        # a pattern-only sample runs on the pinned runtime image
+        image = f"{RUNTIME_IMAGE}:{RUNTIME_TAG}"
+        assert image in (config.parent / "values.yaml").read_text()
+
 
 # Every sample runs everywhere. The dls entity models are always resolvable --
 # from the submodule locally, or from the vendored copy CI installs -- so there
@@ -52,14 +90,20 @@ def test_dls_models_available():
 
 @requires_support
 @pytest.mark.parametrize("sample_xml", SAMPLE_PARAMS)
-def test_convert(sample_xml: Path):
+def test_convert(sample_xml: Path, tmp_path: Path):
     """Test that xml2yaml produces the expected YAML for a sample XML."""
-    expected_yaml = SAMPLES / f"{sample_xml.stem.lower()}.yaml"
-    out_yaml = Path("/tmp") / expected_yaml.name
+    stem = sample_xml.stem.lower()
+    _skip_without_runtime_schema(stem)
+    expected_yaml = SAMPLES / f"{stem}.yaml"
+    config = _instance_config(tmp_path, stem)
+    out_yaml = config / "ioc.yaml"
 
-    convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
+    result = convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
+
+    assert not [w for w in result.warnings if "runtime patterns not added" in w]
 
     assert out_yaml.read_text() == expected_yaml.read_text()
+    _check_patterns(config, stem)
     # reset the interrupt vector counter
     InterruptVector.reset()
 
@@ -74,6 +118,7 @@ def test_generate(sample_xml: Path, ibek_defs):
     converter modules across test iterations.
     """
     stem = sample_xml.stem.lower()
+    _skip_without_runtime_schema(stem)
     expected_yaml = SAMPLES / f"{stem}.yaml"
     expected_stcmd = SAMPLES / f"{stem}.st.cmd"
     expected_subst = SAMPLES / f"{stem}.ioc.subst"
@@ -83,7 +128,7 @@ def test_generate(sample_xml: Path, ibek_defs):
     )
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        config = Path(tmpdir)
+        config = _instance_config(Path(tmpdir), stem)
         ioc_yaml = config / "ioc.yaml"
 
         # step 1: XML → YAML (subprocess to avoid converter state leakage)
@@ -101,9 +146,11 @@ def test_generate(sample_xml: Path, ibek_defs):
         assert result.returncode == 0, (
             f"xml2yaml failed for {sample_xml.name}:\n{result.stderr}"
         )
+        assert "runtime patterns not added" not in result.stderr, result.stderr
         assert ioc_yaml.read_text() == expected_yaml.read_text(), (
             f"YAML mismatch for {stem}"
         )
+        _check_patterns(config, stem)
 
         # step 2: YAML → st.cmd + ioc.subst
         result = subprocess.run(

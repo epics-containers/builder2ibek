@@ -7,6 +7,3 @@
 [submodule "ibek-runtime-streamdevice"]
 	path = ibek-runtime-streamdevice
 	url = https://github.com/epics-containers/ibek-runtime-streamdevice
-[submodule "ibek-runtime-support"]
-	path = ibek-runtime-support
-	url = https://github.com/epics-containers/ibek-runtime-support

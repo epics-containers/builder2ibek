@@ -37,7 +37,7 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 | `/dls_sw/work/R3.14.12.7/` | Unreleased work (standard EPICS) |
 | `ibek-support-dls/<module>/` | DLS entity models + install.yml |
 | `ibek-support/<module>/` | Community entity models |
-| `ibek-runtime-streamdevice/`, `ibek-runtime-support/` | Runtime pattern libraries, pinned at release tags; indexed by `src/builder2ibek/patterns.py` |
+| `ibek-runtime-streamdevice/` | Runtime pattern library at the release the tests use; conversions clone the latest release (`src/builder2ibek/patterns.py`) |
 | `src/builder2ibek/converters/` | XML converters (one per module) |
 | `tools/pvi-from-edm/` | Separate tool: PVI from EDM screens, see its README |
 
@@ -52,6 +52,10 @@ grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -m
 # Convert a single IOC XML to ibek YAML:
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 #   --blgui  emit BLGui.status/device; only when the generic IOC binary has BLGui
+# Inside a services repo instance it also runs `ibek pattern add` for each
+# ibek-runtime-streamdevice pattern the IOC uses (latest release), and gives a
+# pattern-only IOC the latest ioc-streamdevice-runtime image; elsewhere it only
+# lists them. BUILDER2IBEK_PATTERN_TAG / BUILDER2IBEK_RUNTIME_TAG fix the tags.
 
 # Add a beamline's live Linux IOCs as dev-c7 legacy IOCs (dry run; --apply writes).
 # Services-repo files only: never deploy one while its IOC runs on its server.

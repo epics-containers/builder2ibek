@@ -39,7 +39,10 @@ XML stems to `<services-repo>/services/<ioc-name>/config/ioc.yaml`,
 re-runs `xml2yaml` for each match (preserving the existing `description`
 field, and `--blgui` when the existing ioc.yaml has `BLGui.*` entities),
 then schema-validates every reconverted ioc.yaml with
-`ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir.
+`ibek runtime generate2 --no-pvi` inside one EPICS_ROOT tempdir, together with
+the support YAMLs of the runtime patterns in its `config/`. Each xml2yaml
+adds the IOC's runtime patterns as `/ioc-convert` describes; report the
+patterns added and any image set, from the notes.
 
 Flags: `--no-validate` skips the generate2 pass; `--only <ioc-name>`
 (repeatable) limits the run.
@@ -92,9 +95,15 @@ uv run builder2ibek xml2yaml <xml> --yaml <services-repo>/services/<ioc-name>/co
 export EPICS_ROOT=$(mktemp -d /tmp/epics-reconvert-XXXXXX)
 ./update-schema
 TMPCONFIG=$(mktemp -d /tmp/reconvert-config-XXXXXX)
-for ioc_yaml in <services-repo>/services/*/config/ioc.yaml; do
-  cp "$ioc_yaml" "$TMPCONFIG/ioc.yaml"
-  ibek runtime generate2 --no-pvi "$TMPCONFIG" 2>&1 || true
-done
+# bash, not zsh: an unmatched glob must expand to nothing, not abort
+bash -c '
+for ioc_yaml in "$1"/services/*/config/ioc.yaml; do
+  config=$(dirname "$ioc_yaml")
+  find "$2" -mindepth 1 -delete
+  find "$config" -maxdepth 1 \( -name ioc.yaml -o -name "*.ibek.support.yaml" \) \
+    -exec cp {} "$2/" \;
+  echo "== $ioc_yaml"
+  ibek runtime generate2 --no-pvi "$2" 2>&1 || echo "FAILED: $ioc_yaml"
+done' _ <services-repo> "$TMPCONFIG"
 rm -rf "$TMPCONFIG" "$EPICS_ROOT"
 ```

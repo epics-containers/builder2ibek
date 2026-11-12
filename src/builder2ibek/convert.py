@@ -2,6 +2,7 @@
 Generic XML to YAML conversion functions
 """
 
+import logging
 import re
 from dataclasses import dataclass
 from dataclasses import field as dc_field
@@ -15,6 +16,9 @@ from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_f
 from builder2ibek.moduleinfos import finalizers, module_infos
 from builder2ibek.support_defaults import strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.vendor_patterns import add_patterns
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -52,6 +56,9 @@ def convert_file(
     An IOC with ADPandABlocks PandAs also gets fastcs-pandablocks instances,
     written next to the ioc.yaml (see builder2ibek.fastcs_panda); a dedicated
     PandA IOC gets only that, and no ioc.yaml.
+
+    The runtime patterns the IOC uses are added to its services-repo instance,
+    or only reported when there is none (see builder2ibek.vendor_patterns).
 
     Returns what was written and the IOC's warnings, one per dropped entity
     type plus any others; the caller reports them to the user.
@@ -94,6 +101,14 @@ def convert_file(
         (yaml.parent / name).write_text(text)
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
+
+    try:
+        patterns = add_patterns([dict(e) for e in ioc.entities], yaml)
+        result.notes += patterns.notes
+        result.warnings += patterns.warnings
+    except Exception as e:  # noqa: BLE001 -- the ioc.yaml is written; never fail
+        log.debug("adding runtime patterns failed", exc_info=True)
+        result.warnings.append(f"runtime patterns not added: {e}")
 
     return result
 

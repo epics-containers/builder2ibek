@@ -273,16 +273,21 @@ def _run_validation(result: ReconvertResult) -> None:
                 )
             return
 
-        cfg_ioc = Path(tmp_config) / "ioc.yaml"
         by_name = {c["ioc_name"]: c for c in result.ioc_candidates}
         for item in result.reconverted:
             ioc_name = item["ioc_name"]
             cand = by_name.get(ioc_name)
             if cand is None or item["status"] != "ok":
                 continue
-            shutil.copy(cand["ioc_yaml"], cfg_ioc)
+            # the ioc.yaml and the support YAMLs of the runtime patterns added
+            # next to it, which generate2 reads from the config folder
+            config = Path(cand["ioc_yaml"]).parent
+            cfg = Path(tmp_config) / ioc_name
+            cfg.mkdir()
+            for f in [config / "ioc.yaml", *config.glob("*.ibek.support.yaml")]:
+                shutil.copy(f, cfg / f.name)
             proc = subprocess.run(
-                ["ibek", "runtime", "generate2", "--no-pvi", str(tmp_config)],
+                ["ibek", "runtime", "generate2", "--no-pvi", str(cfg)],
                 env=env,
                 capture_output=True,
                 text=True,

@@ -14,8 +14,10 @@ weekly from periodic.yml, and by hand whenever you like:
 
     python3 tests/check_pin_freshness.py
 
-The runtime pattern libraries are pinned at release tags rather than main, so
-those pins are compared with the newest release tag instead.
+The runtime pattern library is pinned at a release tag rather than main, so
+that pin is compared with the newest release tag instead. Conversions use the
+library's newest release whatever the pin; the pin is what the tests and the
+samples index.
 
 ibek-support-dls is on Diamond's internal GitLab, so this can only reach it from
 inside the network. From a GitHub runner that submodule is reported unreachable
@@ -30,9 +32,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SUBMODULES = ("ibek-support", "ibek-support-dls")
-# Pinned at release tags; kept in step with builder2ibek.patterns.LIBRARIES, which
-# this script does not import so that it runs without the package installed.
-TAGGED_SUBMODULES = ("ibek-runtime-streamdevice", "ibek-runtime-support")
+# Pinned at release tags; builder2ibek.patterns.LIBRARY, which this script does
+# not import so that it runs without the package installed.
+TAGGED_SUBMODULES = ("ibek-runtime-streamdevice",)
 LS_REMOTE_TIMEOUT = 30
 
 IN_ACTIONS = os.environ.get("GITHUB_ACTIONS") == "true"

@@ -1,15 +1,25 @@
+import atexit
 import os
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
 from filelock import FileLock
+
+from tests.pattern_pins import pin_patterns
 
 REPO_ROOT = Path(__file__).parent.parent
 COMMUNITY_SUPPORT = REPO_ROOT / "ibek-support"
 DLS_SUPPORT = REPO_ROOT / "ibek-support-dls"
 
 HAS_COMMUNITY_SUPPORT = any(COMMUNITY_SUPPORT.glob("*/*.ibek.support.yaml"))
+
+pin_patterns()
+# ibek caches the image schemas it fetches; keep the tests' out of ~/.cache
+os.environ["IBEK_SCHEMA_CACHE"] = tempfile.mkdtemp(prefix="ibek-schemas-")
+atexit.register(shutil.rmtree, os.environ["IBEK_SCHEMA_CACHE"], ignore_errors=True)
 
 
 def _epics_root(tmp_path_factory) -> Path:
