@@ -57,7 +57,9 @@ To take a new release: `git -C ibek-runtime-streamdevice checkout <tag>`, set
 its generic model fails `test_alignment_matches_the_models` until the module moves
 from `GENERIC_DIFFERS` to `ALIGNED` in `patterns.py`. That holds only with the real
 ibek-support-dls checked out: with the vendored subset, most of those tests skip. `check_pin_freshness.py` warns when
-a newer release tag exists.
+a newer release tag exists. A module in `CONVERTED_TO_PATTERN` (also in
+`ALIGNED`) converts to its pattern's shapes rather than its generic model's, so
+that test skips it and its fixture in `tests/patterns/` checks it instead.
 
 ## After bumping a submodule pin
 

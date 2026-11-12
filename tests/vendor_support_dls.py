@@ -113,10 +113,26 @@ def _module_index(repo: Path) -> dict[str, list[Path]]:
     return index
 
 
+# a pattern of a runtime-lock.yaml: a two-space indented key under "patterns:"
+_LOCKED_PATTERN_RE = re.compile(r"^  ([A-Za-z0-9_-]+):\s*$", re.M)
+LOCK_SUFFIX = ".runtime-lock.yaml"
+
+
 def _modules_used_by_samples() -> set[str]:
+    """The modules the sample ioc.yaml files use.
+
+    The runtime patterns a sample vendors, listed in its <stem>.runtime-lock.yaml,
+    bring their own models, so they are left out.
+    """
     used: set[str] = set()
     for sample_yaml in SAMPLES.glob("*.yaml"):
-        used |= set(_ENTITY_TYPE_RE.findall(sample_yaml.read_text()))
+        if sample_yaml.name.endswith(LOCK_SUFFIX):
+            continue
+        modules = set(_ENTITY_TYPE_RE.findall(sample_yaml.read_text()))
+        lock = sample_yaml.with_name(sample_yaml.stem + LOCK_SUFFIX)
+        if lock.is_file():
+            modules -= set(_LOCKED_PATTERN_RE.findall(lock.read_text()))
+        used |= modules
     return used
 
 

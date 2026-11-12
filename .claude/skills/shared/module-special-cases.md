@@ -294,3 +294,31 @@ same shape in `DCMHeater`, `motionInterlockPLC`) passes required macros its
 templates need — `addr`, `UNITS` — without declaring them as parameters, while
 declaring others no template uses. Those models cannot render. Fixing them is
 its own task; do not fold it into an unrelated conversion.
+
+## `QPC` — converts to the `ibek-runtime-streamdevice` pattern
+
+`converters/QPC.py` writes the shapes of the QPC runtime pattern, not of the
+compiled `ibek-support-dls/QPC` model: `digitelQpc` has no `name`, and each
+`digitelQpcIonp` carries its controller's `port` and `unit` instead of a `QPC`
+object reference, has no `alh`, and keeps `spon`/`spoff` as the strings the XML
+gives. `patterns.py` lists QPC in `CONVERTED_TO_PATTERN`, so `xml2yaml` adds the
+pattern with `ibek pattern add`. An image that builds the compiled QPC module
+cannot run these entities, so do not add it to a generic IOC.
+
+## `mks937a` — `auto_` classes with a named model
+
+Some mks937a releases expose `mks937aImgMean`, `mks937aImgGroup`,
+`mks937aPirgGroup`, `mks937aGaugeGroup`, `mks937aImgDummy` and
+`mks937aPirgDummy` only as builder `auto_` classes. The converter maps each to
+the `ibek-support/mks937a` model of the template's name, which has the same
+parameters.
+
+## `records` — only EtherIP `ao` records convert
+
+A `records.ao` with `DTYP="EtherIP"` becomes `ether_ip.ao`: `OUT
+"@<port> <tag> <flags>"` gives `port` and `tag`, with the flags (such as the
+scan period `S 0.5`) kept in `tag`, because `ether_ip_ao.template` writes
+`OUT "@$(port) $(tag)"`. `scan` is the record's `SCAN`, `Passive` when the XML
+has none. The template sets no other field, so `VAL`, `PRIO`, `DRVH`, `DRVL`,
+`PREC`, `DESC` and the like are dropped with a warning per record. Every other
+raw record is left out with a won't-convert warning.

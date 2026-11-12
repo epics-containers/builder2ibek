@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<asyn.AsynIP name="MPC_A_04_PORT" port="127.0.0.1:7006"/>
+	<QPC.digitelQpc QPC="SR07A-VA-MPC-04" name="MPC_A_04" port="MPC_A_04_PORT"/>
+	<QPC.digitelQpcIonp HV="7000" QPC="MPC_A_04" SIZE="300" SPLY="1" SPT="1" device="SR07A-VA-IONP-07" name="IONP_A_7" spoff="1.0E-4" spon="1.0E-10"/>
+	<QPC.digitelQpcIonp HV="7000" QPC="MPC_A_04" SIZE="300" SPLY="2" SPT="2" device="SR07A-VA-IONP-08" name="IONP_A_8" spoff="1.0E-4" spon="1.0E-10"/>
+</components>

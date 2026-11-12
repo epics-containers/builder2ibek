@@ -14,6 +14,7 @@ from builder2ibek.builder import Builder
 from builder2ibek.convert import dispatch
 from builder2ibek.patterns import (
     ALIGNED,
+    CONVERTED_TO_PATTERN,
     GENERIC_DIFFERS,
     LIBRARY,
     LIBRARY_TAG_ENV,
@@ -168,6 +169,7 @@ def test_missing_library_is_an_error(tmp_path: Path):
 def test_tables_name_patterns(index: PatternIndex):
     assert not ALIGNED & GENERIC_DIFFERS
     assert ALIGNED | GENERIC_DIFFERS <= index.patterns.keys()
+    assert CONVERTED_TO_PATTERN <= ALIGNED
 
 
 def test_tables_cover_every_module_with_a_generic_model(index: PatternIndex):
@@ -227,11 +229,14 @@ def _differences(generic: Path, pattern: Path) -> list[str]:
 
 @pytest.mark.parametrize("module", sorted(ALIGNED | GENERIC_DIFFERS))
 def test_alignment_matches_the_models(index: PatternIndex, module: str):
-    """ALIGNED holds exactly the patterns that take the generic model unchanged.
+    """ALIGNED holds exactly the patterns that take the generic model unchanged,
+    apart from CONVERTED_TO_PATTERN, whose converters write the pattern's shapes.
 
     A library release that aligns a module fails this until the module moves
     from GENERIC_DIFFERS to ALIGNED.
     """
+    if module in CONVERTED_TO_PATTERN:
+        pytest.skip(f"{module} converts to its pattern, not its generic model")
     generic = _generic_support_yamls().get(module)
     if generic is None:
         pytest.skip(f"no generic model for {module} in this checkout")
