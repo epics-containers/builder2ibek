@@ -5,6 +5,7 @@ exports what it prints.
 """
 
 import os
+import shlex
 from collections.abc import MutableMapping
 from pathlib import Path
 
@@ -38,4 +39,4 @@ if __name__ == "__main__":
     env: dict[str, str] = {}
     pin_patterns(env)
     for key, value in env.items():
-        print(f"export {key}='{value}'")
+        print(f"export {key}={shlex.quote(value)}")

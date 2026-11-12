@@ -289,3 +289,23 @@ def test_set_image_never_downgrades(tmp_path: Path, ibek):
 
     assert newer in (instance / "values.yaml").read_text()
     assert f"values.yaml keeps {newer}, not older {RUNTIME}" in report.notes
+
+
+def test_only_ioc_yaml_is_an_instance(tmp_path: Path):
+    instance = _instance(tmp_path, RUNTIME)
+    assert vendor_patterns.instance_folder(instance / "config" / "ioc.yaml")
+    assert vendor_patterns.instance_folder(instance / "config" / "x.yaml") is None
+
+
+def test_image_must_install_every_type_the_ioc_uses(tmp_path: Path, ibek):
+    """An image with only some of a module's models does not replace its pattern."""
+    instance = _instance(tmp_path, VAC)
+    entities = [
+        *ENTITIES,
+        {"type": "EdwardsScroll.other", "P": "Z"},
+        {"type": "digitelMpc.digitelMpc", "name": "m"},
+    ]
+
+    add_patterns(entities, instance / "config" / "ioc.yaml")
+
+    assert _adds(ibek) == [ATTO.ref, SCROLL.ref]

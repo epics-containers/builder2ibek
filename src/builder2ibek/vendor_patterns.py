@@ -139,8 +139,13 @@ def _same_image(image: str, other: str) -> bool:
 
 def instance_folder(ioc_yaml: Path) -> Path | None:
     """The services-repo instance of ``<instance>/config/ioc.yaml``, else None."""
-    config = ioc_yaml.resolve().parent
-    if config.name == "config" and is_instance(config.parent):
+    ioc_yaml = ioc_yaml.resolve()
+    config = ioc_yaml.parent
+    if (
+        ioc_yaml.name == "ioc.yaml"
+        and config.name == "config"
+        and is_instance(config.parent)
+    ):
         return config.parent
     return None
 
@@ -230,7 +235,12 @@ def add_patterns(
         else:
             todo = []
             for pattern in plan.patterns:
-                if {f"{pattern.module}.{m}" for m in pattern.models} & baked:
+                used = {
+                    str(e["type"])
+                    for e in entities
+                    if str(e["type"]).partition(".")[0] == pattern.module
+                }
+                if used <= baked:
                     report.notes.append(f"{pattern.module}: {current} installs it")
                 else:
                     todo.append(pattern)
