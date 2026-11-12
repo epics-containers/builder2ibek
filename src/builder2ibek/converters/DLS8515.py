@@ -29,4 +29,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     elif entity_type == "DLS8516channel":
         entity.remove("name")
-        entity.fullduplex = make_bool(entity.fullduplex)
+        # fullduplex is optional: the model defaults it to false
+        if entity.get("fullduplex") is not None:
+            entity.fullduplex = make_bool(entity.fullduplex)

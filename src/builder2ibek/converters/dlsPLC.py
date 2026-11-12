@@ -27,6 +27,14 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             if hasattr(entity, field) and entity[field] is not None:
                 entity[field] = str(entity[field])
 
+    # mode and interlock labels are str in the model, but XML parses a label
+    # like mode2="0" as a number; showilk is the one int among them
+    xml = entity.xml_attributes()
+    for key, val in entity.items():
+        is_label = key.startswith("mode") or ("ilk" in key and key != "showilk")
+        if is_label and isinstance(val, (int, float)):
+            entity[key] = xml.get(key, str(val))
+
     # remove blank interlock name fields
     new_entity = entity.copy()
     for key in entity.keys():
