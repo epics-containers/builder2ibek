@@ -1,6 +1,12 @@
-"""Adding a converted IOC's runtime patterns to its instance, with ibek mocked."""
+"""Adding a converted IOC's runtime patterns to its instance, with ibek mocked.
+
+The published image schemas are mocked too, except for images not in SCHEMAS:
+those go to ibek's real fetch, which IBEK_SCHEMA_CACHE (set by conftest) keeps
+away from the user's cache.
+"""
 
 import subprocess
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -15,7 +21,10 @@ from builder2ibek.vendor_patterns import (
 )
 
 RUNTIME = f"{RUNTIME_IMAGE}:2.0ec2"
+# stand-in for a generic IOC image whose published schema is mocked
 VAC = "ghcr.io/epics-containers/ioc-dlslinuxvac:2026.8.1"
+# a registry ibek has no published schema for: fails without the network
+GITLAB = "gitlab.diamond.ac.uk:5050/controls/containers/ioc-vac:1.0"
 LOCK = """\
 version: 1
 patterns:
@@ -51,13 +60,19 @@ SCHEMAS = {
 }
 
 
+def _schema(types: frozenset[str]) -> dict:
+    mapping = {t: f"#/$defs/{t}" for t in types}
+    items = {"discriminator": {"mapping": mapping}}
+    return {"properties": {"entities": {"items": items}}}
+
+
 class FakeIndex:
     def plan(self, entities):
         return PatternPlan(patterns=[ATTO, SCROLL])
 
 
 @pytest.fixture
-def ibek(monkeypatch) -> list[tuple[str, ...]]:
+def ibek(monkeypatch) -> Iterator[list[tuple[str, ...]]]:
     """Mock the index, the image schemas and ibek; return ibek's calls."""
     calls: list[tuple[str, ...]] = []
 
@@ -65,11 +80,20 @@ def ibek(monkeypatch) -> list[tuple[str, ...]]:
         calls.append(args)
         return subprocess.CompletedProcess(args, 0, "", "")
 
+    real_fetch = vendor_patterns._fetch_base_schema
+
+    def fetch(image: str) -> dict:
+        if image in SCHEMAS:
+            return _schema(SCHEMAS[image])
+        return real_fetch(image)
+
     monkeypatch.setattr(vendor_patterns, "pattern_index", FakeIndex)
-    monkeypatch.setattr(vendor_patterns, "image_entity_types", SCHEMAS.get)
-    monkeypatch.setattr(vendor_patterns, "runtime_image", lambda: RUNTIME)
+    monkeypatch.setattr(vendor_patterns, "_fetch_base_schema", fetch)
+    monkeypatch.setattr(vendor_patterns, "runtime_image", lambda: (RUNTIME, ""))
     monkeypatch.setattr(vendor_patterns, "_ibek", run)
-    return calls
+    vendor_patterns.image_entity_types.cache_clear()
+    yield calls
+    vendor_patterns.image_entity_types.cache_clear()
 
 
 def _instance(root: Path, image: str) -> Path:
@@ -83,20 +107,33 @@ def _adds(calls) -> list[str]:
     return [c[2] for c in calls if c[:2] == ("pattern", "add")]
 
 
-def test_runtime_image_override_and_latest(monkeypatch):
+def test_runtime_image_override_release_and_tag(monkeypatch):
     runtime_image.cache_clear()
     monkeypatch.setenv(RUNTIME_TAG_ENV, "2.8.26ec8")
-    assert runtime_image() == f"{RUNTIME_IMAGE}:2.8.26ec8"
+    assert runtime_image() == (f"{RUNTIME_IMAGE}:2.8.26ec8", "")
 
+    # the latest published release of the generic IOC repo, which has no
+    # -runtime suffix
     runtime_image.cache_clear()
     monkeypatch.delenv(RUNTIME_TAG_ENV)
-    urls = []
+    apis = []
     monkeypatch.setattr(
-        vendor_patterns, "latest_tag", lambda url: urls.append(url) or "2.8.26ec9"
+        vendor_patterns, "_latest_release", lambda api: apis.append(api) or "ec9"
     )
-    assert runtime_image() == f"{RUNTIME_IMAGE}:2.8.26ec9"
-    # the image is built from the generic IOC repo without the -runtime suffix
-    assert urls == ["https://github.com/epics-containers/ioc-streamdevice"]
+    assert runtime_image() == (f"{RUNTIME_IMAGE}:ec9", "")
+    assert apis == ["https://api.github.com/repos/epics-containers/ioc-streamdevice"]
+
+    # else its highest tag, with a warning
+    runtime_image.cache_clear()
+
+    def unreachable(api):
+        raise OSError("rate limited")
+
+    monkeypatch.setattr(vendor_patterns, "_latest_release", unreachable)
+    monkeypatch.setattr(vendor_patterns, "latest_tag", lambda url: "ec10")
+    image, warning = runtime_image()
+    assert image == f"{RUNTIME_IMAGE}:ec10"
+    assert "rate limited" in warning and "may not be published" in warning
     runtime_image.cache_clear()
 
 
@@ -129,14 +166,56 @@ def test_mixed_skips_patterns_the_image_installs(tmp_path: Path, ibek):
 
 
 def test_mixed_without_image_schema_adds_all(tmp_path: Path, ibek):
-    other = "ghcr.io/epics-containers/ioc-other:1.0"
-    instance = _instance(tmp_path, other)
+    """ibek's real fetch fails for the image, and the conversion carries on."""
+    instance = _instance(tmp_path, GITLAB)
     entities = [*ENTITIES, {"type": "other.thing"}]
 
     report = add_patterns(entities, instance / "config" / "ioc.yaml")
 
     assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
-    assert any(other in w for w in report.warnings)
+    assert report.warnings == [
+        f"cannot fetch the ioc schema of {GITLAB}; adding every pattern"
+    ]
+    assert GITLAB in (instance / "values.yaml").read_text()
+
+
+def test_unreadable_values_yaml_is_a_warning(tmp_path: Path, ibek):
+    instance = _instance(tmp_path, "unused")
+    (instance / "values.yaml").write_text("ioc-instance: [unclosed\n")
+
+    report = add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml")
+
+    assert any("cannot read the image" in w for w in report.warnings)
+    assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
+    assert (instance / "values.yaml").read_text() == "ioc-instance: [unclosed\n"
+
+
+def test_mixed_with_placeholder_warns(tmp_path: Path, ibek):
+    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
+    entities = [*ENTITIES, {"type": "digitelMpc.digitelMpc", "name": "m"}]
+
+    report = add_patterns(entities, instance / "config" / "ioc.yaml")
+
+    assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
+    assert "REPLACE_WITH_IMAGE_URI" in (instance / "values.yaml").read_text()
+    assert report.warnings == [
+        "mixed IOC with no image set: patterns added to the instance; set the "
+        "generic IOC image and re-run xml2yaml to drop patterns the image "
+        "already installs"
+    ]
+
+
+def test_runtime_schema_unavailable_leaves_the_image(tmp_path: Path, ibek, monkeypatch):
+    monkeypatch.setattr(vendor_patterns, "runtime_image", lambda: (GITLAB, ""))
+    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
+
+    report = add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml")
+
+    assert "REPLACE_WITH_IMAGE_URI" in (instance / "values.yaml").read_text()
+    assert report.warnings == [
+        f"runtime image schema unavailable ({GITLAB}): pattern-only check skipped"
+    ]
+    assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
 
 
 def test_no_instance_only_reports(tmp_path: Path, ibek):
@@ -180,8 +259,9 @@ def test_offline_conversion_warns(tmp_path: Path, ibek, monkeypatch):
 
     monkeypatch.setattr(vendor_patterns, "pattern_index", unreachable)
     instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
+    entities = [*ENTITIES, {"type": "digitelMpc.digitelMpc", "name": "m"}]
 
-    report = add_patterns(ENTITIES, instance / "config" / "ioc.yaml")
+    report = add_patterns(entities, instance / "config" / "ioc.yaml")
 
     assert ibek == [] and report.notes == []
     assert report.warnings == [

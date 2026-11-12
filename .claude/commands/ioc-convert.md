@@ -80,8 +80,9 @@ ibek-runtime-streamdevice pattern the IOC uses, at the library's latest
 release, and prints what it added. A pattern-only IOC gets the latest
 `ioc-streamdevice-runtime` image in `values.yaml`; any other IOC keeps its
 generic IOC image and skips the patterns that image already installs. Patterns
-already in `runtime-lock.yaml` stay at their locked version. Report the
-patterns and the image; see
+already in `runtime-lock.yaml` stay at their locked version. If it warns that a
+mixed IOC has no image set, set the generic IOC image in `values.yaml` and
+re-run xml2yaml. Report the patterns, the image and any warnings; see
 [convert-ioc-instance.md](../../docs/how-to/convert-ioc-instance.md#runtime-patterns).
 
 **PandA IOCs (ADPandABlocks).** xml2yaml writes fastcs-pandablocks instances

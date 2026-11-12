@@ -46,6 +46,11 @@ runtime image's schema is still fetched, by ibek, which caches it. The
 submodule is pinned at a **release tag** equal to `PATTERN_TAG`. Its path does
 not match `ibek-support*`, so `update-schema` never sees the pattern models.
 
+Because conversions may use a newer release than the tests check, `plan()`
+keeps a module that has a generic model but is in neither `ALIGNED` nor
+`GENERIC_DIFFERS` build-time ("pattern not yet aligned with the generic
+model"). Taking the release into the pin is what decides it.
+
 To take a new release: `git -C ibek-runtime-streamdevice checkout <tag>`, set
 `PATTERN_TAG` to it, commit the pin, run `./tests/samples/make_samples.sh`, then
 `tests/test_patterns.py`. A release that aligns a pattern with

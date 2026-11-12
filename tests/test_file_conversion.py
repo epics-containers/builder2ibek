@@ -12,7 +12,9 @@ import pytest
 
 from builder2ibek.convert import convert_file
 from builder2ibek.converters.epics_base import InterruptVector
+from builder2ibek.vendor_patterns import RUNTIME_IMAGE
 from tests.conftest import DLS_SUPPORT, HAS_COMMUNITY_SUPPORT, requires_support
+from tests.pattern_pins import RUNTIME_TAG
 
 SAMPLES = Path(__file__).parent / "samples"
 
@@ -38,6 +40,9 @@ def _check_patterns(config: Path, stem: str) -> None:
     assert lock.is_file() == expected.is_file()
     if expected.is_file():
         assert lock.read_text() == expected.read_text()
+        # a pattern-only sample runs on the pinned runtime image
+        image = f"{RUNTIME_IMAGE}:{RUNTIME_TAG}"
+        assert image in (config.parent / "values.yaml").read_text()
 
 
 # Every sample runs everywhere. The dls entity models are always resolvable --

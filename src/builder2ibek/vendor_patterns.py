@@ -4,11 +4,16 @@ Add the runtime patterns a converted IOC uses to its services-repo instance.
 The IOC's patterns are those :meth:`~builder2ibek.patterns.PatternIndex.plan`
 picks. When every other entity is one the ioc-streamdevice-runtime image builds,
 as its published schema says, the IOC is pattern-only: it runs on the latest
-release of that image, which is written into ``values.yaml`` in place of the
-services template's placeholder or an older tag of the same image, and every
-pattern is added. Any other IOC keeps the image ``values.yaml`` names, and each
-pattern is added unless that image's published schema already has the
+published release of that image, which is written into ``values.yaml`` in place
+of the services template's placeholder or an older tag of the same image, and
+every pattern is added. Any other IOC keeps the image ``values.yaml`` names, and
+each pattern is added unless that image's published schema already has the
 pattern's entity types, which means the image installs the pattern itself.
+
+A schema that cannot be fetched, or a ``values.yaml`` that cannot be read, is a
+warning and never stops the conversion. Without the runtime image's schema
+there is no pattern-only check, so ``values.yaml`` is left alone; without the
+IOC image's schema, or with no image set, every pattern is added.
 
 Each pattern is added with ``ibek pattern add``, which clones the library and
 writes the files, ``runtime-lock.yaml``, ``ioc.schema.json`` and the
@@ -21,26 +26,31 @@ patterns and the image are only reported.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
+import ssl
 import subprocess
 import sys
+import urllib.request
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
 from typing import Any
 
+import truststore
 from ibek.globals import RUNTIME_LOCK_NAME
 from ibek.pattern_cmds.lock import RuntimeLock
-from ibek.pattern_cmds.schema import fetch_base_schema as _fetch_base_schema
 from ibek.pattern_cmds.schema import (
+    SchemaNotFoundError,
     find_image,
     is_instance,
     parse_image_ref,
     resolve_image_ref,
 )
+from ibek.pattern_cmds.schema import fetch_base_schema as _fetch_base_schema
 from ibek.pattern_cmds.sources import PatternError
 
 from builder2ibek.patterns import PatternIndexError, latest_tag, pattern_index
@@ -59,13 +69,36 @@ class PatternReport:
 
 
 @cache
-def runtime_image() -> str:
-    """The ioc-streamdevice-runtime image to run a pattern-only IOC on."""
+def runtime_image() -> tuple[str, str]:
+    """The ioc-streamdevice-runtime image to run a pattern-only IOC on.
+
+    $BUILDER2IBEK_RUNTIME_TAG, else the latest published GitHub release of the
+    generic IOC, else its highest release tag. Returns the image and a warning,
+    "" when there is none.
+    """
     tag = os.environ.get(RUNTIME_TAG_ENV)
-    if not tag:
-        org, repo, _ = resolve_image_ref(f"{RUNTIME_IMAGE}:latest")
+    if tag:
+        return f"{RUNTIME_IMAGE}:{tag}", ""
+    org, repo, _ = resolve_image_ref(f"{RUNTIME_IMAGE}:latest")
+    try:
+        tag = _latest_release(f"https://api.github.com/repos/{org}/{repo}")
+        return f"{RUNTIME_IMAGE}:{tag}", ""
+    except (OSError, ValueError, KeyError) as e:
         tag = latest_tag(f"https://github.com/{org}/{repo}")
-    return f"{RUNTIME_IMAGE}:{tag}"
+        return f"{RUNTIME_IMAGE}:{tag}", (
+            f"cannot read the latest release of {org}/{repo} ({e}); "
+            f"using its highest tag, {tag}, whose image may not be published"
+        )
+
+
+def _latest_release(api: str) -> str:
+    """The tag of a GitHub repository's latest published release."""
+    context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    request = urllib.request.Request(
+        f"{api}/releases/latest", headers={"Accept": "application/vnd.github+json"}
+    )
+    with urllib.request.urlopen(request, timeout=10, context=context) as response:
+        return json.load(response)["tag_name"]
 
 
 @cache
@@ -77,8 +110,17 @@ def image_entity_types(image: str) -> frozenset[str] | None:
         if "$ref" in items:
             items = schema["$defs"][items["$ref"].split("/")[-1]]
         return frozenset(items["discriminator"]["mapping"])
-    except (PatternError, KeyError, TypeError):
+    except (SchemaNotFoundError, PatternError, KeyError, TypeError, ValueError):
         return None
+
+
+def _same_image(image: str, other: str) -> bool:
+    """True if two image refs name the same image, at any tag."""
+    try:
+        a, b = parse_image_ref(image), parse_image_ref(other)
+    except SchemaNotFoundError:
+        return False
+    return (a.host, a.path) == (b.host, b.path)
 
 
 def instance_folder(ioc_yaml: Path) -> Path | None:
@@ -120,47 +162,66 @@ def add_patterns(
         plan = pattern_index().plan(entities)
         if not plan.patterns:
             return report
-        runtime = runtime_image()
+        runtime, warning = runtime_image()
     except PatternIndexError as e:
         report.warnings.append(f"runtime patterns not checked: {e}")
         return report
+    if warning:
+        report.warnings.append(warning)
 
     instance = instance_folder(ioc_yaml)
-    current = find_image(instance) if instance else None
+    current, image_known = None, True
+    if instance is not None:
+        try:
+            current = find_image(instance)
+        except Exception as e:  # noqa: BLE001 -- any unreadable values.yaml
+            report.warnings.append(f"cannot read the image of {instance}: {e}")
+            image_known = False
+
     modules = {p.module for p in plan.patterns}
-    image: str | None = runtime
     built = image_entity_types(runtime)
     if built is None:
-        report.warnings.append(f"cannot fetch the ioc schema of {runtime}")
-        built = frozenset()
-    pattern_only = all(
-        str(e["type"]).partition(".")[0] in modules or e["type"] in built
-        for e in entities
-    )
-    if pattern_only and (
-        current is None
-        or parse_image_ref(current).path == parse_image_ref(runtime).path
-    ):
-        todo = plan.patterns
+        report.warnings.append(
+            f"runtime image schema unavailable ({runtime}): pattern-only check skipped"
+        )
+        pattern_only = False
     else:
-        image = current
-        baked = image_entity_types(image) if image else None
-        if image and baked is None:
+        pattern_only = all(
+            str(e["type"]).partition(".")[0] in modules or e["type"] in built
+            for e in entities
+        )
+
+    image = current
+    todo = list(plan.patterns)
+    if (
+        pattern_only
+        and image_known
+        and (current is None or _same_image(current, runtime))
+    ):
+        image = runtime
+    elif current is not None:
+        baked = image_entity_types(current)
+        if baked is None:
             report.warnings.append(
-                f"cannot fetch the ioc schema of {image}; adding every pattern"
+                f"cannot fetch the ioc schema of {current}; adding every pattern"
             )
-        todo = []
-        for pattern in plan.patterns:
-            if baked and {f"{pattern.module}.{m}" for m in pattern.models} & baked:
-                report.notes.append(f"{pattern.module}: {image} installs it")
-            else:
-                todo.append(pattern)
+        else:
+            todo = []
+            for pattern in plan.patterns:
+                if {f"{pattern.module}.{m}" for m in pattern.models} & baked:
+                    report.notes.append(f"{pattern.module}: {current} installs it")
+                else:
+                    todo.append(pattern)
+    elif instance is not None and image_known and built is not None:
+        report.warnings.append(
+            "mixed IOC with no image set: patterns added to the instance; set the "
+            "generic IOC image and re-run xml2yaml to drop patterns the image "
+            "already installs"
+        )
 
     if instance is None:
-        where = (
-            image or "its generic IOC image (patterns that image installs are left out)"
-        )
         report.notes += [f"would add runtime pattern {p.ref}" for p in todo]
+        where = image or "its generic IOC image (patterns it installs are left out)"
         report.notes.append(f"image: {where}")
         return report
 
@@ -170,7 +231,11 @@ def add_patterns(
         else:
             report.warnings.append(f"set the image in values.yaml to {runtime}")
 
-    lock = RuntimeLock(instance / RUNTIME_LOCK_NAME)
+    try:
+        lock = RuntimeLock(instance / RUNTIME_LOCK_NAME)
+    except PatternError as e:
+        report.warnings.append(f"runtime patterns not added: {e}")
+        return report
     added = False
     for pattern in todo:
         locked = lock.patterns.get(pattern.module)
@@ -190,7 +255,7 @@ def add_patterns(
                 f"ibek pattern add {pattern.ref} failed: {result.stderr.strip()}"
             )
     if not added and lock.patterns:
-        # the ioc.yaml was rewritten with the default header; and the image may
+        # the ioc.yaml was rewritten with the default header, and the image may
         # have changed
         result = _ibek("pattern", "schema", str(instance))
         if result.returncode != 0:

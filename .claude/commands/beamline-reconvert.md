@@ -95,10 +95,15 @@ uv run builder2ibek xml2yaml <xml> --yaml <services-repo>/services/<ioc-name>/co
 export EPICS_ROOT=$(mktemp -d /tmp/epics-reconvert-XXXXXX)
 ./update-schema
 TMPCONFIG=$(mktemp -d /tmp/reconvert-config-XXXXXX)
-for ioc_yaml in <services-repo>/services/*/config/ioc.yaml; do
-  rm -f "$TMPCONFIG"/*
-  cp "$ioc_yaml" "$(dirname "$ioc_yaml")"/*.ibek.support.yaml "$TMPCONFIG/" 2>/dev/null
-  ibek runtime generate2 --no-pvi "$TMPCONFIG" 2>&1 || true
-done
+# bash, not zsh: an unmatched glob must expand to nothing, not abort
+bash -c '
+for ioc_yaml in "$1"/services/*/config/ioc.yaml; do
+  config=$(dirname "$ioc_yaml")
+  find "$2" -mindepth 1 -delete
+  find "$config" -maxdepth 1 \( -name ioc.yaml -o -name "*.ibek.support.yaml" \) \
+    -exec cp {} "$2/" \;
+  echo "== $ioc_yaml"
+  ibek runtime generate2 --no-pvi "$2" 2>&1 || echo "FAILED: $ioc_yaml"
+done' _ <services-repo> "$TMPCONFIG"
 rm -rf "$TMPCONFIG" "$EPICS_ROOT"
 ```

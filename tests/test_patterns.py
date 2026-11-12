@@ -328,3 +328,24 @@ def test_plan_ignores_modules_without_patterns(index: PatternIndex):
         [{"type": "epics.EpicsEnvSet"}, {"type": "devIocStats.iocAdminSoft"}]
     )
     assert plan.patterns == [] and plan.build_time == {}
+
+
+def test_plan_untabled_module_with_a_generic_model_stays_build_time(
+    index: PatternIndex, monkeypatch
+):
+    """A newer library's pattern for a module with a generic model is not used
+    until the tables decide it; a module with no generic model is."""
+    monkeypatch.setattr(patterns, "generic_modules", lambda: {"attocubeInterf"})
+    plan = index.plan([_ids3010(Q="01")])
+    assert plan.patterns == []
+    assert "not yet aligned" in plan.build_time["attocubeInterf"]
+
+    monkeypatch.setattr(patterns, "generic_modules", lambda: set())
+    assert index.plan([_ids3010(Q="01")]).refs == [index.patterns["attocubeInterf"].ref]
+
+
+def test_generic_modules_are_named_by_folder_and_file(tmp_path: Path):
+    folder = tmp_path / "ibek-support" / "quadEM"
+    folder.mkdir(parents=True)
+    (folder / "quadem.ibek.support.yaml").write_text("module: quadEM\n")
+    assert patterns.generic_modules(tmp_path) == {"quadEM", "quadem"}

@@ -55,6 +55,8 @@ LIBRARY_URL = DEFAULT_LIBRARIES[LIBRARY]
 # Fixes the library release to index and vendor, in place of the latest one
 LIBRARY_TAG_ENV = "BUILDER2IBEK_PATTERN_TAG"
 
+_project_root = Path(__file__).parent.parent.parent
+
 # Modules that have both a pattern and a generic model in ibek-support* are listed
 # in exactly one of these two tables; tests/test_patterns.py checks that against the
 # submodules, and checks each entry by comparing the two models. The tables are
@@ -76,6 +78,10 @@ ALIGNED: frozenset[str] = frozenset(
         "strainGauge",
     }
 )
+
+# A module with a generic model in neither table stays build-time: the pattern of
+# a library release newer than the one the tests check is not trusted until the
+# tables decide it.
 
 # The pattern model differs from the generic one: a model or parameter is missing or
 # renamed, a type or default changed. The module stays build-time until its pattern
@@ -258,12 +264,31 @@ class PatternIndex:
                     f"of {module}"
                 )
                 continue
+            if module not in ALIGNED and module in generic_modules():
+                plan.build_time[module] = (
+                    f"{pattern.ref}: pattern not yet aligned with the generic "
+                    f"model of {module}"
+                )
+                continue
             reason = self.rejects(pattern, module_entities)
             if reason:
                 plan.build_time[module] = reason
                 continue
             plan.patterns.append(pattern)
         return plan
+
+
+@cache
+def generic_modules(root: Path = _project_root) -> frozenset[str]:
+    """The modules with a generic model in this checkout's ibek-support*.
+
+    Named by folder and by support YAML file, which mostly agree.
+    """
+    found = set()
+    for support_yaml in root.glob("ibek-support*/*/*.ibek.support.yaml"):
+        found.add(support_yaml.parent.name)
+        found.add(support_yaml.name.removesuffix(".ibek.support.yaml"))
+    return frozenset(found)
 
 
 @cache
