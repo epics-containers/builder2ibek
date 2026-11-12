@@ -99,9 +99,12 @@ def convert_file(
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 
-    patterns = add_patterns([dict(e) for e in ioc.entities], yaml)
-    result.notes += patterns.notes
-    result.warnings += patterns.warnings
+    try:
+        patterns = add_patterns([dict(e) for e in ioc.entities], yaml)
+        result.notes += patterns.notes
+        result.warnings += patterns.warnings
+    except Exception as e:  # noqa: BLE001 -- the ioc.yaml is written; never fail
+        result.warnings.append(f"runtime patterns not added: {e}")
 
     return result
 

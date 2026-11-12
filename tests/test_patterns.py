@@ -344,8 +344,34 @@ def test_plan_untabled_module_with_a_generic_model_stays_build_time(
     assert index.plan([_ids3010(Q="01")]).refs == [index.patterns["attocubeInterf"].ref]
 
 
-def test_generic_modules_are_named_by_folder_and_file(tmp_path: Path):
-    folder = tmp_path / "ibek-support" / "quadEM"
+def test_generic_modules_are_read_from_the_module_field(tmp_path: Path):
+    folder = tmp_path / "ibek-support" / "iocStats"
     folder.mkdir(parents=True)
-    (folder / "quadem.ibek.support.yaml").write_text("module: quadEM\n")
-    assert patterns.generic_modules(tmp_path) == {"quadEM", "quadem"}
+    (folder / "iocStats.ibek.support.yaml").write_text("# x\nmodule: devIocStats\n")
+    assert patterns.generic_modules(tmp_path) == {"devIocStats"}
+
+
+def test_no_generic_models_warns(tmp_path: Path, capsys):
+    assert patterns.generic_modules(tmp_path) == frozenset()
+    assert "no ibek-support* checkout" in capsys.readouterr().err
+
+
+def test_index_failure_is_cached(monkeypatch):
+    """A beamline reconvert does not retry an unreachable library for every IOC."""
+    monkeypatch.delenv(LIBRARY_TAG_ENV)
+    calls = []
+
+    def run(cmd, **kwargs):
+        calls.append(cmd)
+        assert kwargs["env"]["GIT_TERMINAL_PROMPT"] == "0" and kwargs["timeout"]
+        return subprocess.CompletedProcess(cmd, 128, "", "unreachable")
+
+    pattern_index.cache_clear()
+    try:
+        with patch.object(patterns.subprocess, "run", side_effect=run):
+            for _ in range(2):
+                with pytest.raises(PatternIndexError, match="unreachable"):
+                    pattern_index()
+    finally:
+        pattern_index.cache_clear()
+    assert len(calls) == 1

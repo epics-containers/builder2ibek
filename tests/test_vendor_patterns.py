@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from builder2ibek import vendor_patterns
-from builder2ibek.patterns import Pattern, PatternIndexError, PatternPlan
+from builder2ibek import convert, vendor_patterns
+from builder2ibek.patterns import Pattern, PatternPlan
 from builder2ibek.vendor_patterns import (
     RUNTIME_IMAGE,
     RUNTIME_TAG_ENV,
@@ -25,6 +25,7 @@ RUNTIME = f"{RUNTIME_IMAGE}:2.0ec2"
 VAC = "ghcr.io/epics-containers/ioc-dlslinuxvac:2026.8.1"
 # a registry ibek has no published schema for: fails without the network
 GITLAB = "gitlab.diamond.ac.uk:5050/controls/containers/ioc-vac:1.0"
+SAMPLE = Path(__file__).parent / "samples" / "BL99P-EA-IOC-05.xml"
 LOCK = """\
 version: 1
 patterns:
@@ -253,17 +254,38 @@ def test_all_locked_regenerates_the_schema(tmp_path: Path, ibek, monkeypatch):
     assert ibek == [("pattern", "schema", str(instance))]
 
 
-def test_offline_conversion_warns(tmp_path: Path, ibek, monkeypatch):
-    def unreachable():
-        raise PatternIndexError("cannot list the tags of url")
+def test_any_failure_is_a_conversion_warning(tmp_path: Path, monkeypatch):
+    """Whatever adding patterns raises, the ioc.yaml is written."""
 
-    monkeypatch.setattr(vendor_patterns, "pattern_index", unreachable)
-    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
-    entities = [*ENTITIES, {"type": "digitelMpc.digitelMpc", "name": "m"}]
+    def fail(entities, ioc_yaml):
+        raise OSError("read-only file system")
 
-    report = add_patterns(entities, instance / "config" / "ioc.yaml")
+    monkeypatch.setattr(convert, "add_patterns", fail)
+    ioc_yaml = tmp_path / "ioc.yaml"
 
-    assert ibek == [] and report.notes == []
-    assert report.warnings == [
-        "runtime patterns not checked: cannot list the tags of url"
-    ]
+    result = convert.convert_file(SAMPLE, ioc_yaml, "schema")
+
+    assert ioc_yaml.is_file()
+    assert "runtime patterns not added: read-only file system" in result.warnings
+
+
+def test_set_image_replaces_only_the_image_line(tmp_path: Path):
+    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI  # set me")
+    values = instance / "values.yaml"
+    values.write_text("# was REPLACE_WITH_IMAGE_URI\n" + values.read_text())
+
+    assert vendor_patterns._set_image(instance, RUNTIME)[0]
+
+    assert values.read_text() == (
+        f"# was REPLACE_WITH_IMAGE_URI\nioc-instance:\n  image: {RUNTIME}  # set me\n"
+    )
+
+
+def test_set_image_never_downgrades(tmp_path: Path, ibek):
+    newer = f"{RUNTIME_IMAGE}:2.0ec3"
+    instance = _instance(tmp_path, newer)
+
+    report = add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml")
+
+    assert newer in (instance / "values.yaml").read_text()
+    assert f"values.yaml keeps {newer}, not older {RUNTIME}" in report.notes

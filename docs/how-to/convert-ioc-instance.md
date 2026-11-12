@@ -128,8 +128,11 @@ A module with a runtime pattern in
 needs no compiled support in the image: its files are vendored into the IOC
 instance. xml2yaml checks every IOC for such modules, against the library's
 latest release tag. A module that also has a generic model in `ibek-support*`
-uses its pattern only once `src/builder2ibek/patterns.py` lists it as aligned
-with that model; until then it stays build-time. When the `--yaml` path is
+(the `module:` of a support YAML there) uses its pattern only once
+`src/builder2ibek/patterns.py` lists it as aligned with that model; until then
+it stays build-time. That rule needs the ibek-support submodules checked out,
+as they are when builder2ibek runs from its repository with `uv run`; without
+them xml2yaml warns once and uses every pattern. When the `--yaml` path is
 `services/<ioc>/config/ioc.yaml` in a services repo, xml2yaml adds each pattern
 with `ibek pattern add ibek-runtime-streamdevice:<module>@<tag> services/<ioc>`,
 which writes the pattern files under `config/`, `runtime-lock.yaml`,
@@ -154,8 +157,10 @@ A pattern already in `runtime-lock.yaml` is left at its locked version; move it
 with `ibek pattern update`. Any other `--yaml` path only lists the patterns and
 the image. `BUILDER2IBEK_PATTERN_TAG` and `BUILDER2IBEK_RUNTIME_TAG` fix the
 library tag and the `ioc-streamdevice-runtime` tag in place of the latest.
-Problems fetching a schema or reading `values.yaml` are warnings: the `ioc.yaml`
-is always written.
+Only the placeholder or an older `ioc-streamdevice-runtime` tag on the
+`image:` line is replaced; a newer tag someone pinned is kept, with a note.
+Any problem adding patterns (no network, no git, a schema that cannot be
+fetched, an unwritable file) is a warning: the `ioc.yaml` is always written.
 
 ---
 

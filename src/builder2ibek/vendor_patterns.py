@@ -51,9 +51,13 @@ from ibek.pattern_cmds.schema import (
     resolve_image_ref,
 )
 from ibek.pattern_cmds.schema import fetch_base_schema as _fetch_base_schema
-from ibek.pattern_cmds.sources import PatternError
 
-from builder2ibek.patterns import PatternIndexError, latest_tag, pattern_index
+from builder2ibek.patterns import (
+    cache_outcome,
+    latest_tag,
+    pattern_index,
+    version_key,
+)
 
 RUNTIME_IMAGE = "ghcr.io/epics-containers/ioc-streamdevice-runtime"
 # Fixes the ioc-streamdevice-runtime tag to use, in place of the latest release
@@ -68,7 +72,7 @@ class PatternReport:
     warnings: list[str] = field(default_factory=list)
 
 
-@cache
+@cache_outcome
 def runtime_image() -> tuple[str, str]:
     """The ioc-streamdevice-runtime image to run a pattern-only IOC on.
 
@@ -83,7 +87,7 @@ def runtime_image() -> tuple[str, str]:
     try:
         tag = _latest_release(f"https://api.github.com/repos/{org}/{repo}")
         return f"{RUNTIME_IMAGE}:{tag}", ""
-    except (OSError, ValueError, KeyError) as e:
+    except Exception as e:  # noqa: BLE001 -- any failure falls back to the tags
         tag = latest_tag(f"https://github.com/{org}/{repo}")
         return f"{RUNTIME_IMAGE}:{tag}", (
             f"cannot read the latest release of {org}/{repo} ({e}); "
@@ -110,7 +114,7 @@ def image_entity_types(image: str) -> frozenset[str] | None:
         if "$ref" in items:
             items = schema["$defs"][items["$ref"].split("/")[-1]]
         return frozenset(items["discriminator"]["mapping"])
-    except (SchemaNotFoundError, PatternError, KeyError, TypeError, ValueError):
+    except Exception:  # noqa: BLE001 -- the caller warns
         return None
 
 
@@ -131,17 +135,29 @@ def instance_folder(ioc_yaml: Path) -> Path | None:
     return None
 
 
-def _set_image(instance: Path, image: str) -> bool:
-    """Set the image of a values.yaml holding the placeholder or another tag."""
+# the image: line of a values.yaml, holding the placeholder or a runtime tag
+_IMAGE_LINE = re.compile(
+    rf"""^(\s*image:\s*["']?)({IMAGE_PLACEHOLDER}|{re.escape(RUNTIME_IMAGE)}:([\w.-]+))""",
+    re.M,
+)
+
+
+def _set_image(instance: Path, image: str) -> tuple[bool, str]:
+    """Set the image: line of values.yaml to ``image``.
+
+    Only the placeholder or an older ioc-streamdevice-runtime tag is replaced.
+    Returns whether it was set, and why not.
+    """
     values = instance / "values.yaml"
-    if not values.is_file():
-        return False
-    text = values.read_text()
-    old = rf"{IMAGE_PLACEHOLDER}|{re.escape(RUNTIME_IMAGE)}:[\w.-]+"
-    new = re.sub(old, image, text)
-    if new != text:
-        values.write_text(new)
-    return image in new
+    text = values.read_text() if values.is_file() else ""
+    match = _IMAGE_LINE.search(text)
+    if match is None:
+        return False, f"set the image in values.yaml to {image}"
+    pinned = match.group(3)
+    if pinned and version_key(pinned) >= version_key(image.rpartition(":")[2]):
+        return False, f"values.yaml keeps {match.group(2)}, not older {image}"
+    values.write_text(text[: match.start(2)] + image + text[match.end(2) :])
+    return True, f"image set to {image}"
 
 
 def _ibek(*args: str) -> subprocess.CompletedProcess:
@@ -158,14 +174,10 @@ def add_patterns(
 ) -> PatternReport:
     """Add the runtime patterns of a converted IOC to its instance folder."""
     report = PatternReport()
-    try:
-        plan = pattern_index().plan(entities)
-        if not plan.patterns:
-            return report
-        runtime, warning = runtime_image()
-    except PatternIndexError as e:
-        report.warnings.append(f"runtime patterns not checked: {e}")
+    plan = pattern_index().plan(entities)
+    if not plan.patterns:
         return report
+    runtime, warning = runtime_image()
     if warning:
         report.warnings.append(warning)
 
@@ -226,16 +238,10 @@ def add_patterns(
         return report
 
     if image == runtime and current != runtime:
-        if _set_image(instance, runtime):
-            report.notes.append(f"image set to {runtime}")
-        else:
-            report.warnings.append(f"set the image in values.yaml to {runtime}")
+        done, message = _set_image(instance, runtime)
+        (report.notes if done or current else report.warnings).append(message)
 
-    try:
-        lock = RuntimeLock(instance / RUNTIME_LOCK_NAME)
-    except PatternError as e:
-        report.warnings.append(f"runtime patterns not added: {e}")
-        return report
+    lock = RuntimeLock(instance / RUNTIME_LOCK_NAME)
     added = False
     for pattern in todo:
         locked = lock.patterns.get(pattern.module)
