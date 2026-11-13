@@ -396,7 +396,6 @@ entities:
     dom: BL19I
     id: 5
     name: GAUGE5
-    s: 0
 
   - type: mks937a.mks937aGauge
     c: 52

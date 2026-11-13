@@ -1053,6 +1053,109 @@ entity_models:
         args:
           .*:
 
+  - name: auto_calcout12input
+    description: |-
+      calcout record with 12 inputs (userIO calcout12input.template)
+    parameters:
+      P:
+        type: str
+        description: Device prefix
+      R:
+        type: str
+        description: Record suffix
+        default: ""
+      CALC:
+        type: str
+        description: |-
+          Calculation. Required: EPICS 7 refuses an empty CALC, and the IOC
+          then loads none of its records
+      SCAN:
+        type: str
+        description: Scan rate
+        default: "Passive"
+      OUT:
+        type: str
+        description: Output link
+        default: ""
+      EGU:
+        type: str
+        description: Engineering units
+        default: ""
+      PREC:
+        type: str
+        description: Precision
+        default: ""
+      OOPT:
+        type: str
+        description: Output execute option
+        default: ""
+      DOPT:
+        type: str
+        description: Output data option
+        default: ""
+      OCAL:
+        type: str
+        description: |-
+          Output calculation. EPICS 7 refuses an empty OCAL, and the IOC then
+          loads none of its records, so it defaults to "0"
+        default: "0"
+      FLNK:
+        type: str
+        description: Forward link
+        default: ""
+      INPA:
+        type: str
+        description: Input link A
+        default: ""
+      INPB:
+        type: str
+        description: Input link B
+        default: ""
+      INPC:
+        type: str
+        description: Input link C
+        default: ""
+      INPD:
+        type: str
+        description: Input link D
+        default: ""
+      INPE:
+        type: str
+        description: Input link E
+        default: ""
+      INPF:
+        type: str
+        description: Input link F
+        default: ""
+      INPG:
+        type: str
+        description: Input link G
+        default: ""
+      INPH:
+        type: str
+        description: Input link H
+        default: ""
+      INPI:
+        type: str
+        description: Input link I
+        default: ""
+      INPJ:
+        type: str
+        description: Input link J
+        default: ""
+      INPK:
+        type: str
+        description: Input link K
+        default: ""
+      INPL:
+        type: str
+        description: Input link L
+        default: ""
+    databases:
+      - file: $(USERIO)/db/calcout12input.template
+        args:
+          .*:
+
   - name: userAsynRecord
     description: |-
       Generic asyn record (userIO) bound to an asyn port for raw comms.

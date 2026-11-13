@@ -2099,7 +2099,7 @@ entity_models:
         description: |-
           asyn port name of FINS driver
       addr:
-        type: str
+        type: int
         description: |-
           DM variable of the LOWERer address of the float32
       drvl:
@@ -2536,7 +2536,7 @@ entity_models:
     parameters:
       <<: [ *PQ, *timeout ]
       addr:
-        type: str
+        type: int
         description: |-
           DM variable of the int
       port:
@@ -4696,7 +4696,7 @@ entity_models:
         description: |-
           device name
       addr:
-        type: str
+        type: int
         description: |-
           DM variable to write to to reboot rga
       port:

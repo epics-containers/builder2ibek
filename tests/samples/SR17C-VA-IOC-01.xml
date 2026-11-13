@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<ether_ip.EtherIPInit device="SR17C-VA-VLVCC-01" ip="127.0.0.1" name="VLVCC_01.INFO" port="VLVCC_01_EIP"/>
+	<records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_01 S .2" PRIO="HIGH" VAL="1" name="CVRST_1" record="SR-RF-CVRST-01:CON"/>
+	<records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_02 S .2" PRIO="HIGH" VAL="1" name="CVRST_2" record="SR-RF-CVRST-02:CON"/>
+	<records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_03 S .2" PRIO="HIGH" VAL="1" name="CVRST_3" record="SR-RF-CVRST-03:CON"/>
+</components>

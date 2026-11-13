@@ -441,7 +441,6 @@ entities:
     dom: BL16I
     id: 7
     name: GAUGE07
-    s: 0
 
   - type: mks937a.mks937aGauge
     c: 51

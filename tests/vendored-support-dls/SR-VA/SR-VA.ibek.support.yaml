@@ -463,19 +463,11 @@ entity_models:
         id: "{{ id_a }}"
         input: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C1_RAW"
         name: "GAUGE_{{ q }}_{{ id_a }}"
-        device: "{{ dom }}-VA-GAUGE-{{ id_a }}:PLOG_CALC"
-        p_egu_pv: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C1_RAW"
-        plog_adc_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:PLOG_CALC"
-        plog_calc: A
       - type: mks937b.mks937bGaugeEGU
         dom: "{{ dom }}"
         id: "{{ id_b }}"
         input: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C2_RAW"
         name: "GAUGE_{{ q }}_{{ id_b }}"
-        device: "{{ dom }}-VA-GAUGE-{{ id_b }}:PLOG_CALC"
-        p_egu_pv: "{{ dom }}-VA-GCTLR-{{ gc_no }}:C2_RAW"
-        plog_adc_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:PLOG_CALC"
-        plog_calc: A
       - type: mks937b.mks937bImg
         GCTLR: "GCTLR_{{ q }}_{{ gc_no }}"
         channel: 1

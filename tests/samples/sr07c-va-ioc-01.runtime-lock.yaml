@@ -1,0 +1,12 @@
+version: 1
+patterns:
+  QPC:
+    version: 0.7.3
+    source: github.com/epics-containers/ibek-runtime-streamdevice
+    files:
+      config/QPC.ibek.support.yaml: sha256:da9afd3d4d8c0daed3c0dfa18f4621a9a197e5702e26697904a09f26308f73ec
+      config/digitelQPCController.template: sha256:df9b4679f44f5daa77737da4b8bf5f9982519b5fc13c2f5094c1823fee5b8a2b
+      config/digitelQpc.proto: sha256:2ab5a1fe5ca12949a8d710a5a3975a5baef6724318d37ecb01bfe7f872627f64
+      config/digitelQpc.pvi.device.yaml: sha256:db016da5df2b52ad427960457aecb8cd5f93eeb26b7fa644743f7115867b1ecd
+      config/digitelQpcIonp.pvi.device.yaml: sha256:e6fd6820e5c12022d256cc27f48a062fb070fc38507f781369a8e23c71959d71
+      config/digitelQpcIonp.template: sha256:8d4fcf9251bb08c6c56f90ff55e83b8154c002090cb42da3d5f22acb0ed8de97
