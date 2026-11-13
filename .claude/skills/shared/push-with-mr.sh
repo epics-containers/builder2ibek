@@ -19,7 +19,7 @@ cd "$wt"
 
 title=$(head -1 "$mr_file" | sed 's/^#* *//; s/^Title: *//')
 # first non-empty paragraph after the title, as one line
-summary=$(tail -n +2 "$mr_file" | grep -v '^#' | awk 'NF{p=1} p&&!NF{exit} p' | tr '\n' ' ' | sed 's/  */ /g; s/ $//')
+summary=$(tail -n +2 "$mr_file" | awk '/^#/{next} NF{p=1} p&&!NF{exit} p' | tr '\n' ' ' | sed 's/  */ /g; s/ $//')
 summary="$summary (Full detail in the commit message.)"
 
 git log --oneline -1 "refs/heads/$branch"
