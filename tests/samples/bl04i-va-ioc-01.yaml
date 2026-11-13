@@ -273,7 +273,6 @@ entities:
     dom: BL04I
     id: 11
     name: GAUGE11
-    s: 0
 
   - type: mks937a.mks937aGaugeGroup
     device: BL04I-VA-GGAUG-98

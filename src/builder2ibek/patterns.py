@@ -20,10 +20,6 @@ from a pattern. A module goes to its pattern when:
   model. A module is vendored whole or not at all, so one entity the pattern
   rejects keeps the whole module build-time.
 
-The converters of the modules in :data:`CONVERTED_TO_PATTERN` write their pattern's
-shapes, not their generic model's, so those modules go to their pattern although
-the generic model differs.
-
 Any other module stays build-time, so it needs an image with the module compiled
 in, and the plan says why. Which modules a given image already builds is not known
 here, so a plan says what could come from a pattern, not what must.
@@ -73,25 +69,7 @@ _project_root = Path(__file__).parent.parent.parent
 # The pattern model accepts everything the generic model does, to the same effect.
 # plan() needs only GENERIC_DIFFERS; this table records the other half of the
 # decision so that the tests can check it.
-ALIGNED: frozenset[str] = frozenset(
-    {
-        "CrateMonitor",
-        "ETLdetector",
-        "GR150",
-        "QPC",
-        "cognexDataMan100",
-        "enzLoCuM4",
-        "oxCryo",
-        "strainGauge",
-    }
-)
-
-# Modules whose builder2ibek converter emits the pattern's shapes rather than the
-# generic model's. Each is also in ALIGNED, because what builder2ibek writes for it is
-# what the pattern takes; the generic model is not what it converts to, so the tests
-# do not compare the two, and an image that builds the generic module cannot run
-# these entities.
-CONVERTED_TO_PATTERN: frozenset[str] = frozenset({"QPC"})
+ALIGNED: frozenset[str] = frozenset({"oxCryo", "strainGauge"})
 
 # A module with a generic model in neither table stays build-time: the pattern of
 # a library release newer than the one the tests check is not trusted until the

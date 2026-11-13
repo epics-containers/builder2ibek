@@ -297,13 +297,11 @@ its own task; do not fold it into an unrelated conversion.
 
 ## `QPC` — converts to the `ibek-runtime-streamdevice` pattern
 
-`converters/QPC.py` writes the shapes of the QPC runtime pattern, not of the
-compiled `ibek-support-dls/QPC` model: `digitelQpc` has no `name`, and each
-`digitelQpcIonp` carries its controller's `port` and `unit` instead of a `QPC`
-object reference, has no `alh`, and keeps `spon`/`spoff` as the strings the XML
-gives. `patterns.py` lists QPC in `CONVERTED_TO_PATTERN`, so `xml2yaml` adds the
-pattern with `ibek pattern add`. An image that builds the compiled QPC module
-cannot run these entities, so do not add it to a generic IOC.
+QPC has no compiled model in `ibek-support-dls`; only the runtime pattern
+covers it. `converters/QPC.py` writes the pattern's shapes: `digitelQpc` has no
+`name`, and each `digitelQpcIonp` carries its controller's `port` and `unit`
+instead of a `QPC` object reference, has no `alh`, and keeps `spon`/`spoff` as
+the strings the XML gives. `xml2yaml` adds the pattern with `ibek pattern add`.
 
 ## `mks937a` — `auto_` classes with a named model
 
