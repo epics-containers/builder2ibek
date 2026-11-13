@@ -301,6 +301,7 @@ def test_plan_differing_module_stays_build_time(index: PatternIndex, module: str
 
 def test_plan_rejected_entity_keeps_the_module_build_time(index: PatternIndex):
     # one entity carries a parameter the pattern model does not have
+    assert index.plan([_ids3010(Q="01")]).patterns
     plan = index.plan([_ids3010(Q="01"), _ids3010(Q="02", OFFSET4=1)])
     assert plan.patterns == []
     assert "rejects" in plan.build_time["attocubeInterf"]
