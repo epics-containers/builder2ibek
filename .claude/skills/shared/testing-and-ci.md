@@ -60,7 +60,7 @@ ibek-support-dls checked out: with the vendored subset, most of those tests skip
 a newer release tag exists. A module whose generic model is removed from
 `ibek-support*` must leave both tables, or
 `test_tables_cover_every_module_with_a_generic_model` fails; it then plans
-straight to its pattern, and its fixture in `tests/patterns/` checks that.
+straight to its pattern, which a fixture in `tests/patterns/` can check.
 
 ## After bumping a submodule pin
 

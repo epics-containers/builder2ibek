@@ -297,7 +297,7 @@ its own task; do not fold it into an unrelated conversion.
 
 ## `QPC` — converts to the `ibek-runtime-streamdevice` pattern
 
-QPC has no compiled model in `ibek-support-dls`; only the runtime pattern
+QPC has no compiled model in `ibek-support` or `ibek-support-dls`; only the runtime pattern
 covers it. `converters/QPC.py` writes the pattern's shapes: `digitelQpc` has no
 `name`, and each `digitelQpcIonp` carries its controller's `port` and `unit`
 instead of a `QPC` object reference, has no `alh`, and keeps `spon`/`spoff` as
