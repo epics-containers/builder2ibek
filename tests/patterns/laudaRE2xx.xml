@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<laudaRE2xx.lRE2xx ADDR="0" HIGH="25" HIHI="30" LOLO="5" LOW="10" P="BL99P-EA-CHILL-01" PORT="ty_40_1" SCAN="5" TEMPDESC="Chiller water temp" name="CHILL1"/>
+</components>
