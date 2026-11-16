@@ -161,6 +161,15 @@ def test_startup_commands_run_where_the_builder_ran_them():
     assert all("at_end" not in e and "post_init" not in e for e in entities)
 
 
+def test_wait_commands_are_dropped():
+    entities = convert(
+        '<utility.directoryWait directory="/dls_sw/i23/epics/autosave/BL23I-VA-IOC-02"'
+        ' name="DIRW" sleepTime="5"/>\n'
+        '<utility.pingWait delay="3" ip="127.0.0.1"/>'
+    )
+    assert not [e for e in entities if e["type"].startswith("utility.")]
+
+
 @requires_support
 def test_st_cmd_has_the_builder_order_and_values(tmp_path: Path, ibek_defs):
     """generate2 renders the converted entities: an empty dbpf and epicsEnvSet

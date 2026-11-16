@@ -15,5 +15,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.delete_me()
         return
 
+    # directoryWait waits, without end, for a directory on the builder IOC's
+    # host, such as its autosave folder under /dls_sw. The container mounts
+    # its own volumes (autosave at /autosave) before the IOC starts, and
+    # those host paths do not exist in it.
     if entity_type == "directoryWait":
-        entity.remove("name")
+        entity.delete_me()
+        return
