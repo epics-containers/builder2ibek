@@ -142,6 +142,26 @@ def test_fill_reaches_only_empty_xml_attributes():
     assert extra == {"type": "nomodel.e", "A": None}
 
 
+def test_empty_attribute_is_filled_under_its_new_name():
+    """A converter's rename carries the empty XML attribute with it: Hy8401
+    sampleSize becomes triggered, an int, so an empty one takes the default."""
+    entities = convert(
+        '<Hy8401ip.Hy8401 carrier="CARRIER" ipslot="0" name="ADC" sampleSize=""/>'
+    )
+    (adc,) = of_type(entities, "Hy8401ip.Hy8401")
+    assert "triggered" not in adc and "sampleSize" not in adc
+
+
+def test_rename_moves_the_xml_attribute():
+    from builder2ibek.types import Entity
+
+    entity = Entity(old="")
+    entity.set_xml_attributes({"old": "", "other": "x"})
+    entity.rename("old", "new")
+    assert entity == {"new": ""}
+    assert entity.xml_attributes() == {"new": "", "other": "x"}
+
+
 @pytest.mark.parametrize(
     "attribute,post_init",
     [

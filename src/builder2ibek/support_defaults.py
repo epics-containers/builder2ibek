@@ -62,6 +62,10 @@ def _load_pattern_specs():
     """
     for entity_type, params in _models(_project_root / _STREAMDEVICE_PATTERNS):
         _param_specs.setdefault(entity_type, _specs(params))
+    # An ibek-runtime-support model replaces the generic one for the whole
+    # run, even for a module that plan() keeps build-time in this IOC. That is
+    # accepted: no known module gives a parameter a different type in its
+    # pattern and its generic model, so the fill comes out the same either way.
     for entity_type, params in _models(_project_root / _SUPPORT_PATTERNS):
         _param_specs[entity_type] = _specs(params)
 
