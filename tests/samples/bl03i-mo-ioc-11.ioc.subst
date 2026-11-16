@@ -54,7 +54,7 @@ pattern
 file "autohome.template" {
 pattern 
 	{ "GRP10", "CTRL",              "PORT",    "GRP9", "GRP8", "GRP3", "GRP2",  "GRP1", "GRP7", "GRP6", "GRP5", "GRP4", "STATUS11", "STATUSSV11", "STATUS13", "STATUS12", "STATUS15", "STATUS14", "DESC", "P",                "STATE13", "STATE12", "STATE11", "STATUSSV12", "STATE15", "STATE14", "STATUSSV13", "PLC", "STATUSSV14", "STATUSSV15" }
-	{ "",      "BL03I-MO-PPMAC-01", "PPMAC01", "",     "",     "",     "QBPM1", "All",  "",     "",     "",     "",     "",         "NO_ALARM",   "",         "",         "",         "",         "",     "BL03I-DI-QBPM-01", "",        "",        "",        "NO_ALARM",   "",        "",        "NO_ALARM",   "12",  "NO_ALARM",   "NO_ALARM"   }
+	{ "",      "BL03I-MO-PPMAC-01", "PPMAC01", "",     "",     "",     "QBPM1", "",     "",     "",     "",     "",     "",         "NO_ALARM",   "",         "",         "",         "",         "",     "BL03I-DI-QBPM-01", "",        "",        "",        "NO_ALARM",   "",        "",        "NO_ALARM",   "12",  "NO_ALARM",   "NO_ALARM"   }
 }
 
 file "$(POSITIONER)/db/multipositioner.template" {

@@ -9,6 +9,7 @@ written in the XML.
 
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import has_value
 
 xml_component = "QPC"
 
@@ -35,7 +36,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # the pattern model has no name: ion pumps carry the port and unit
         entity.remove("name")
         unit = entity.get("unit")
-        if unit is not None:
+        if has_value(unit):
             entity.unit = _unit(unit)
 
     elif entity_type == "digitelQpcIonp":
@@ -53,7 +54,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         else:
             entity.port = controller["port"]
             unit = controller.get("unit")
-            if unit is not None:
+            if has_value(unit):
                 entity.unit = _unit(unit)
 
         xml = entity.xml_attributes()

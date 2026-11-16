@@ -78,6 +78,42 @@ def test_empty_optional_str_param_stays_empty():
     assert cori["NODE"] == ""
 
 
+def test_empty_attribute_no_converter_handles():
+    """A str parameter no converter touches is "" too, overriding a model
+    default the builder never used; an empty float, which the builder could not
+    have converted, takes the model default."""
+    entities = convert(
+        '<mks937b.mks937bRelays GAUGE="IMG01" relay_desc="MPS I/L 1"'
+        ' relay_off_desc="" relay_number="2" relay_off_level=""/>'
+    )
+    (relays,) = of_type(entities, "mks937b.mks937bRelays")
+    assert relays["relay_off_desc"] == ""
+    assert "relay_off_level" not in relays
+
+
+@pytest.mark.parametrize(
+    "spec,value",
+    [
+        ({"type": "str", "default": "x"}, ""),
+        ({"type": "bool", "default": True}, False),
+        ({"type": "int", "default": 1}, None),
+        ({"type": "float"}, None),
+        ({"type": "object"}, None),
+        ({"type": "enum", "values": {"A": None, "B": None}}, None),
+        ({"type": "enum", "values": {"": None, "B": None}}, ""),
+    ],
+)
+def test_empty_attribute_by_type(monkeypatch, spec: dict, value: Any):
+    """As the builder read an empty attribute: str "", bool False; it could not
+    convert an int or float, so those take the model default (None)"""
+    from builder2ibek import support_defaults
+
+    monkeypatch.setitem(support_defaults._param_specs, "m.e", {"p": spec})
+    assert support_defaults.empty_attribute("m.e", "p") == value
+    assert support_defaults.empty_attribute("m.e", "unknown") is None
+    assert support_defaults.empty_attribute("m.none", "p") is None
+
+
 @pytest.mark.parametrize(
     "attribute,post_init",
     [

@@ -9,14 +9,14 @@ def handler(entity, entity_type, ioc, realHandler=None):
     entity.remove("gda_desc")
     entity.remove("gda_curr_name")
 
-    # Convert special string values with known correct types
+    # Convert special string values with known correct types. An empty
+    # attribute stays "" here: convert.py gives it the builder's value for
+    # the parameter's type once the converter has set the entity type.
     for key, value in entity.items():
         if value == "False":
             entity[key] = False
         elif value == "True":
             entity[key] = True
-        elif value == "":
-            entity[key] = None
 
     if realHandler:
         return realHandler(entity, entity_type, ioc)

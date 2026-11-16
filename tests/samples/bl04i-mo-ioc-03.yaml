@@ -461,6 +461,7 @@ entities:
     EGU: deg
     ERES: 0.00219727
     HLSV: NO_ALARM
+    HOME: ''
     HOMEVIS: 0
     JAR: 30
     M: :PHI
@@ -907,12 +908,14 @@ entities:
     Controller: GeoBrick_4
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: X Translation
     P: BL04I-MO-BS-01:X
     PLC: 10
     PmacController: GeoBrick_1
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: X Translation
     GRP3: Z Translation
     P: BL04I-MO-MAPT-01:XZ
@@ -920,6 +923,7 @@ entities:
     PmacController: GeoBrick_1
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: X Translation
     GRP3: Y Translation
     P: BL04I-MO-SCAT-01
@@ -927,6 +931,7 @@ entities:
     PmacController: GeoBrick_1
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: Y Translation
     GRP3: Z Translation
     P: BL04I-MO-GONIO-01:PLATE
@@ -934,6 +939,7 @@ entities:
     PmacController: GeoBrick_1
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: Y Translation
     GRP3: Z Translation
     P: BL04I-MO-SCIN-01
@@ -941,6 +947,7 @@ entities:
     PmacController: GeoBrick_2
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: X Translation
     GRP3: X Gap
     GRP4: Y Translation
@@ -950,12 +957,14 @@ entities:
     PmacController: GeoBrick_2
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: Y Translation
     P: BL04I-MO-MAPT-01:Y
     PLC: 12
     PmacController: GeoBrick_2
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: Y Translation
     GRP3: Z Translation
     P: BL04I-MO-BS-01:YZ
@@ -963,6 +972,7 @@ entities:
     PmacController: GeoBrick_3
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: Y Centering
     GRP3: Z Centering
     P: BL04I-MO-GONIO-01:SAMP
@@ -970,12 +980,14 @@ entities:
     PmacController: GeoBrick_3
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: Kappa
     P: BL04I-MO-GONIO-01:KAPPA
     PLC: 12
     PmacController: GeoBrick_3
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: X Translation
     GRP3: Y Translation
     P: BL04I-MO-FSWT-01

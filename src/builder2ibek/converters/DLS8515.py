@@ -1,7 +1,7 @@
 from builder2ibek.converters.epics_base import add_interrupt_vector
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import make_bool
+from builder2ibek.utils import has_value, make_bool
 
 xml_component = "DLS8515"
 
@@ -30,5 +30,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type == "DLS8516channel":
         entity.remove("name")
         # fullduplex is optional: the model defaults it to false
-        if entity.get("fullduplex") is not None:
+        if has_value(entity.get("fullduplex")):
             entity.fullduplex = make_bool(entity.fullduplex)

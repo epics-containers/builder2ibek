@@ -1,6 +1,5 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import str_or_empty
 
 xml_component = "zebra"
 
@@ -26,7 +25,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             "M4HOMESETTLE",
         ]:
             if key in entity:
-                entity[key] = str_or_empty(entity[key])
+                entity[key] = str(entity[key])
         # Q is optional with default "" - remove if empty to keep ioc.yaml clean
         if entity.get("Q") == "":
             entity.remove("Q")

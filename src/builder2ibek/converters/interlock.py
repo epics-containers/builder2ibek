@@ -2,7 +2,7 @@ import sys
 
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import hex_to_int, is_jinja, jinja_int
+from builder2ibek.utils import has_value, hex_to_int, is_jinja, jinja_int
 
 xml_component = "interlock"
 
@@ -38,7 +38,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # dlsPLC.interlock addr is the first DM address of the interlock.
         # A cross-referenced addr arrives as a Jinja string; scale it inside
         # the expression.
-        if entity.addr is not None:
+        if has_value(entity.addr):
             entity.addr = _scaled(entity.addr)
 
     if entity_type == "overrideRequestMain":

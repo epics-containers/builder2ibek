@@ -1,6 +1,5 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import str_or_empty
 
 xml_component = "insertionDevice"
 
@@ -20,4 +19,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "insertionDevice4V_generic_DTTemplate":
         if "comptable" in entity:
-            entity.comptable = str_or_empty(entity.comptable)
+            entity.comptable = str(entity.comptable)

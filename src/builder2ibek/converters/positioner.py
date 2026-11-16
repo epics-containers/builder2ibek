@@ -2,7 +2,6 @@ from pathlib import Path
 
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import str_or_empty
 
 xml_component = "positioner"
 
@@ -49,7 +48,7 @@ def assign_slot(entity: Entity, ioc: Generic_IOC):
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "positioner":
         if "DEADBAND" in entity:
-            entity.DEADBAND = str_or_empty(entity.DEADBAND)
+            entity.DEADBAND = str(entity.DEADBAND)
         entity.remove("name")
         assign_slot(entity, ioc)
 

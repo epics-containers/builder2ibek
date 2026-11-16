@@ -1,5 +1,6 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import has_value
 
 xml_component = "TimingTemplates"
 
@@ -24,7 +25,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # Map card="<N>" to event_receiver reference to the EventReceiverPMC
         # that mrfTiming creates with name "EVR<N>".
         card = entity.get("card")
-        if card is not None:
+        if has_value(card):
             entity.event_receiver = f"EVR{card}"
             entity.remove("card")
 

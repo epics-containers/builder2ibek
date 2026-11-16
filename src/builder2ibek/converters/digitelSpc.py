@@ -1,5 +1,6 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import has_value
 
 xml_component = "digitelSpc"
 
@@ -12,7 +13,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "digitelSpc":
         # transform unit into quoted 2 digit format (only if present)
         unit = entity.get("unit")
-        if unit is not None:
+        if has_value(unit):
             unit_enum = f"{int(unit):02d}"
             entity.unit = unit_enum
     elif entity_type == "digitelSpcIonp":

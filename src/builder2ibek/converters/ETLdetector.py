@@ -1,6 +1,5 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import str_or_empty
 
 xml_component = "ETLdetector"
 
@@ -17,4 +16,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.remove("name")
         # Ensure addr stays as string (supports hex with 0x prefix)
         if "addr" in entity:
-            entity.addr = str_or_empty(entity.addr)
+            entity.addr = str(entity.addr)

@@ -1,5 +1,6 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import has_value
 
 xml_component = "mks937a"
 
@@ -32,5 +33,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     # it as a zero-padded string (e.g. "02") which the generic converter
     # preserves. Coerce to int so ioc.yaml holds a bare integer; the support
     # YAML re-pads with Jinja (`{{ '%02d' % id }}`) when rendering databases.
-    if entity_type in ("mks937aGauge", "mks937aGaugeEGU") and entity.id is not None:
+    if entity_type in ("mks937aGauge", "mks937aGaugeEGU") and has_value(entity.id):
         entity.id = int(entity.id)
