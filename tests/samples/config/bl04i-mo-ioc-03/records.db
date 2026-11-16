@@ -1,5 +1,7 @@
 # Raw records from the records.* elements of BL04I-MO-IOC-03.xml,
 # loaded after ioc.db through post_db_files in ioc.yaml.
+# Do not edit: builder2ibek xml2yaml regenerates this file and
+# overwrites any edit. Edit the XML instead.
 
 record(mbbi, "BL04I-MO-GONIO-01:CURRENT_DEVICE")
 {

@@ -1,4 +1,5 @@
 import codecs
+import warnings
 from pathlib import Path
 
 from builder2ibek.converters.globalHandler import globalHandler
@@ -58,9 +59,16 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
 
 
 def _decode(value: str) -> str:
-    """A field value as builder wrote it: backslash escapes decoded"""
+    """
+    A field value as builder wrote it: backslash escapes decoded. A backslash
+    that starts no escape, as in \\d, stays as it is, as builder left it.
+    """
     try:
-        return codecs.escape_decode(value.encode("latin-1"))[0].decode("latin-1")
+        with warnings.catch_warnings():
+            # escape_decode warns about such a backslash, then keeps it
+            warnings.simplefilter("ignore", DeprecationWarning)
+            decoded = codecs.escape_decode(value.encode("latin-1"))[0]
+        return decoded.decode("latin-1")
     except (UnicodeEncodeError, ValueError):
         return value
 
@@ -125,7 +133,9 @@ def finalize(ioc: Generic_IOC):
     source = ioc.source_file.name
     header = (
         f"{HEADER_START}{source},\n"
-        f"# loaded after ioc.db through post_db_files in ioc.yaml.\n\n"
+        f"# loaded after ioc.db through post_db_files in ioc.yaml.\n"
+        f"# Do not edit: builder2ibek xml2yaml regenerates this file and\n"
+        f"# overwrites any edit. Edit the XML instead.\n\n"
     )
     ioc.side_files[RECORDS_DB] = header + render_records(ioc.raw_records)
     # ibek loads each post_db_files entry after ioc.db, so a raw record that
@@ -166,11 +176,15 @@ def keep_own_records_db(ioc: Generic_IOC, folder: Path):
     ioc.extra_warnings = [w for w in ioc.extra_warnings if WRITTEN not in w]
     text = (
         f"{ioc.source_file.stem}: {path} was not written by builder2ibek, so "
-        f"it is left as it is"
+        f"it is kept as it is. The ioc.yaml gets no post_db_files entry for "
+        f"it: it is loaded only by whatever the ioc.yaml already does with it, "
+        f"such as its own epics.StartupCommand"
     )
     if count:
+        plural = "record" if count == 1 else "records"
         text += (
-            f"; the XML's {count} raw records are not written: add any that "
-            f"are still wanted to that file"
+            f". {count} raw {plural} from the XML {'was' if count == 1 else 'were'} "
+            f"not written. To have builder2ibek write and load them, rename or "
+            f"remove the hand-written {RECORDS_DB}"
         )
     ioc.extra_warnings.append(text)

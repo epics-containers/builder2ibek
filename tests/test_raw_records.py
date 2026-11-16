@@ -39,6 +39,8 @@ XML = r"""<?xml version="1.0" ?>
 RECORDS_DB = """\
 # Raw records from the records.* elements of BL01C-VA-IOC-01.xml,
 # loaded after ioc.db through post_db_files in ioc.yaml.
+# Do not edit: builder2ibek xml2yaml regenerates this file and
+# overwrites any edit. Edit the XML instead.
 
 record(calcout, "BL01C-EA-TABLE-01:LED:DISABLE")
 {
@@ -107,6 +109,27 @@ def test_backslash_escapes_decoded(tmp_path: Path):
     assert "\\\\" not in text
 
 
+def test_backslash_starting_no_escape_kept(tmp_path: Path):
+    """A backslash that starts no escape stays, with no DeprecationWarning"""
+    xml = XML.replace('CALC="A"', r'CALC="A\d"')
+    _convert(_write_xml(tmp_path, xml), tmp_path / "ioc.yaml")
+    assert 'field(CALC, "A\\d")' in (tmp_path / "records.db").read_text()
+
+
+def test_one_raw_record_singular(tmp_path: Path):
+    xml = _strip_records(XML).replace(
+        "</components>",
+        '  <records.ai name="AI" record="BL01C-EA-TABLE-01:AI"/>\n</components>',
+    )
+    _, warnings = _convert(_write_xml(tmp_path, xml), tmp_path / "ioc.yaml")
+    assert any(w.startswith(f"{IOC}: 1 raw record written") for w in warnings)
+    own = tmp_path / "records.db"
+    own.write_text(OWN_RECORDS_DB)
+    _, warnings = _convert(_write_xml(tmp_path, xml), tmp_path / "ioc.yaml")
+    (warning,) = [w for w in warnings if "records.db" in w]
+    assert "1 raw record from the XML was not written" in warning
+
+
 def test_hardware_dtyp_records_written(tmp_path: Path):
     _convert(_write_xml(tmp_path, XML), tmp_path / "ioc.yaml")
     text = (tmp_path / "records.db").read_text()
@@ -173,7 +196,9 @@ def test_own_records_db_kept_with_raw_records(tmp_path: Path):
     assert "post_db_files" not in _top_level(tmp_path)
     (warning,) = [w for w in warnings if "records.db" in w]
     assert warning.startswith(f"{IOC}: {own} was not written by builder2ibek")
-    assert "3 raw records are not written" in warning
+    assert "loaded only by whatever the ioc.yaml already does with it" in warning
+    assert "3 raw records from the XML were not written" in warning
+    assert "rename or remove the hand-written records.db" in warning
 
 
 def test_own_records_db_kept_without_raw_records(tmp_path: Path):
@@ -184,7 +209,8 @@ def test_own_records_db_kept_without_raw_records(tmp_path: Path):
     )
     assert own.read_text() == OWN_RECORDS_DB
     (warning,) = [w for w in warnings if "records.db" in w]
-    assert "was not written by builder2ibek, so it is left as it is" in warning
+    assert "was not written by builder2ibek, so it is kept as it is" in warning
+    assert "raw record" not in warning
 
 
 def test_duplicate_record_name_warns(tmp_path: Path):
