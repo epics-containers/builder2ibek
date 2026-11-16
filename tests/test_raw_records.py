@@ -1,7 +1,7 @@
 """
 Raw records.* components: every one but an EtherIP ao goes to records.db next
-to the ioc.yaml, in builder's own <IOC>.db layout, and an epics.StartupCommand
-loads it.
+to the ioc.yaml, in builder's own <IOC>.db layout, and the ioc.yaml's
+post_db_files loads it after ioc.db.
 
 raw_records/BL03I-VA-IOC-02.xml is the builder XML of that IOC, with its PLC
 address replaced by loopback; raw_records/BL03I-VA-IOC-02.db is the <IOC>.db
@@ -16,7 +16,6 @@ from builder2ibek.convert import convert_file
 
 HERE = Path(__file__).parent / "raw_records"
 SCHEMA = "/epics/ibek-defs/ioc.schema.json"
-LOAD = {"type": "epics.StartupCommand", "command": "dbLoadRecords config/records.db"}
 
 IOC = "BL01C-VA-IOC-01"
 
@@ -39,7 +38,7 @@ XML = r"""<?xml version="1.0" ?>
 
 RECORDS_DB = """\
 # Raw records from the records.* elements of BL01C-VA-IOC-01.xml,
-# loaded by an epics.StartupCommand in ioc.yaml.
+# loaded after ioc.db through post_db_files in ioc.yaml.
 
 record(calcout, "BL01C-EA-TABLE-01:LED:DISABLE")
 {
@@ -71,6 +70,10 @@ record(bo, "BL01C-VA-VLVCC-01:RESET")
 def _convert(xml: Path, yaml: Path) -> tuple[list[dict], list[str]]:
     warnings = convert_file(xml, yaml, SCHEMA).warnings
     return YAML(typ="safe").load(yaml.read_text())["entities"], warnings
+
+
+def _top_level(tmp_path: Path) -> dict:
+    return YAML(typ="safe").load((tmp_path / "ioc.yaml").read_text())
 
 
 def _write_xml(tmp_path: Path, text: str) -> Path:
@@ -111,11 +114,13 @@ def test_hardware_dtyp_records_written(tmp_path: Path):
     assert 'record(bo, "BL01C-VA-VLVCC-01:RESET")' in text
 
 
-def test_startup_command_loads_records(tmp_path: Path):
+def test_post_db_files_loads_records(tmp_path: Path):
     entities, warnings = _convert(_write_xml(tmp_path, XML), tmp_path / "ioc.yaml")
     assert not [e for e in entities if e["type"].startswith("records.")]
-    assert entities[-1] == LOAD
-    assert entities.count(LOAD) == 1
+    assert not [e for e in entities if e["type"] == "epics.StartupCommand"]
+    top = _top_level(tmp_path)
+    assert top["post_db_files"] == ["records.db"]
+    assert list(top) == ["ioc_name", "description", "post_db_files", "entities"]
     (note,) = [w for w in warnings if "raw records" in w]
     assert note.startswith(f"{IOC}: 3 raw records written to config/records.db")
     assert not [w for w in warnings if "won't convert" in w]
@@ -145,7 +150,7 @@ def test_stale_records_db_removed(tmp_path: Path):
     )
     assert not (tmp_path / "records.db").exists()
     assert keep.read_text() == "keep"
-    assert LOAD not in entities
+    assert "post_db_files" not in _top_level(tmp_path)
     assert not [w for w in warnings if "raw records" in w]
 
 
@@ -165,7 +170,7 @@ def test_own_records_db_kept_with_raw_records(tmp_path: Path):
     own.write_text(OWN_RECORDS_DB)
     entities, warnings = _convert(_write_xml(tmp_path, XML), tmp_path / "ioc.yaml")
     assert own.read_text() == OWN_RECORDS_DB
-    assert LOAD not in entities
+    assert "post_db_files" not in _top_level(tmp_path)
     (warning,) = [w for w in warnings if "records.db" in w]
     assert warning.startswith(f"{IOC}: {own} was not written by builder2ibek")
     assert "3 raw records are not written" in warning

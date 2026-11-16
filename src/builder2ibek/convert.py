@@ -45,6 +45,7 @@ def convert_file(
         for field in [
             "ioc_name",
             "description",
+            "post_db_files",
             "entities",
             "  - type",
         ]:

@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.13"
 resolution-markers = [
     "python_full_version >= '3.15'",
@@ -171,7 +171,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "ibek", specifier = ">=4.9.0" }]
+requires-dist = [{ name = "ibek", specifier = ">=4.12.0" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -564,7 +564,7 @@ wheels = [
 
 [[package]]
 name = "ibek"
-version = "4.9.0"
+version = "4.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "gitpython" },
@@ -576,9 +576,9 @@ dependencies = [
     { name = "truststore" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/33/7e/2abe749fab54934bd9fa23887c04606b8d40ca32e8b34b57495476cb6836/ibek-4.9.0.tar.gz", hash = "sha256:ba657f2e304c6b557d71d5313ab7dda2ed16d2652717503e2e2460d906f8105d", size = 375406, upload-time = "2026-11-10T14:20:07.998Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/b3/edca7b3253f686d1e15a4d001a9f3d732e9fac064eb310f9883442ecfdef/ibek-4.12.0.tar.gz", hash = "sha256:84852c902d7d62ce2e24575ba1e292fbc60d094d29d591f22fdff82250caaaa6", size = 459484, upload-time = "2026-11-16T09:54:26.782Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0e/a9/2898a1888f3e86304dacdf96432491c5954ef32521c8492cf11758432ad8/ibek-4.9.0-py3-none-any.whl", hash = "sha256:9160d7049bc531bf678cafb301349634624b04c223132ef3f4e920275d7cf42b", size = 87750, upload-time = "2026-11-10T14:20:06.826Z" },
+    { url = "https://files.pythonhosted.org/packages/75/85/18970aac0d28ae664b502a953aa562c8c8125d1d0f6cfe756ea52625f469/ibek-4.12.0-py3-none-any.whl", hash = "sha256:063aee923a87b76d3ee0247713046c38ac2da264a78dc9c30ee6199b061f5853", size = 124111, upload-time = "2026-11-16T09:54:25.447Z" },
 ]
 
 [[package]]

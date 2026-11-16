@@ -8,8 +8,6 @@ xml_component = "records"
 
 # the raw records file, written next to the ioc.yaml and loaded from there
 RECORDS_DB = "records.db"
-LOAD_COMMAND = f"dbLoadRecords config/{RECORDS_DB}"
-LOAD_ENTITY = {"type": "epics.StartupCommand", "command": LOAD_COMMAND}
 # the first line of a records.db that builder2ibek writes; a records.db without
 # it is someone's own, which builder2ibek never overwrites or removes
 HEADER_START = "# Raw records from the records.* elements of "
@@ -119,28 +117,27 @@ def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:
 
 def finalize(ioc: Generic_IOC):
     """
-    Write the IOC's raw records to records.db next to the ioc.yaml and load
-    them with an epics.StartupCommand. ibek's st.cmd loads ioc.db after every
-    entity's startup commands, so these records load just before ioc.db.
+    Write the IOC's raw records to records.db next to the ioc.yaml and list
+    it in the ioc.yaml's post_db_files, which ibek loads after ioc.db.
     """
     if not ioc.raw_records:
         return
     source = ioc.source_file.name
     header = (
-        f"{HEADER_START}{source},\n# loaded by an epics.StartupCommand in ioc.yaml.\n\n"
+        f"{HEADER_START}{source},\n"
+        f"# loaded after ioc.db through post_db_files in ioc.yaml.\n\n"
     )
     ioc.side_files[RECORDS_DB] = header + render_records(ioc.raw_records)
-    # Load order: st.cmd runs startup commands before it loads ioc.db, so the
-    # raw records load BEFORE the template records. builder's IOCs load
-    # <IOC>.db AFTER the expanded db, which is the order wanted; this command
-    # is the place to change once ibek can load a file after ioc.db.
-    ioc.entities.append(dict(LOAD_ENTITY))
+    # ibek loads each post_db_files entry after ioc.db, so a raw record that
+    # shares a name with a template record sets that record's fields, as in
+    # builder's IOCs
+    ioc.post_db_files.append(RECORDS_DB)
     count = len(ioc.raw_records)
     plural = "record" if count == 1 else "records"
     ioc.extra_warnings.append(
         f"{ioc.source_file.stem}: {count} raw {plural} {WRITTEN} as builder "
         f"wrote them, hardware DTYPs included, "
-        f"and loaded by an epics.StartupCommand before ioc.db: check that "
+        f"and loaded after ioc.db through post_db_files: check that "
         f"each is still wanted"
     )
 
@@ -157,15 +154,15 @@ def generated(path: Path) -> bool:
 def keep_own_records_db(ioc: Generic_IOC, folder: Path):
     """
     Leave a records.db in folder alone when builder2ibek did not write it.
-    The IOC's raw records then go nowhere: the side file, its StartupCommand
-    and the note about them are taken out, and a warning says so.
+    The IOC's raw records then go nowhere: the side file, its post_db_files
+    entry and the note about them are taken out, and a warning says so.
     """
     path = folder / RECORDS_DB
     if not path.exists() or generated(path):
         return
     count = len(ioc.raw_records)
     ioc.side_files.pop(RECORDS_DB, None)
-    ioc.entities = [e for e in ioc.entities if dict(e) != LOAD_ENTITY]
+    ioc.post_db_files = [f for f in ioc.post_db_files if f != RECORDS_DB]
     ioc.extra_warnings = [w for w in ioc.extra_warnings if WRITTEN not in w]
     text = (
         f"{ioc.source_file.stem}: {path} was not written by builder2ibek, so "

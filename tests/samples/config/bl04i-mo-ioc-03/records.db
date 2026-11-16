@@ -1,5 +1,5 @@
 # Raw records from the records.* elements of BL04I-MO-IOC-03.xml,
-# loaded by an epics.StartupCommand in ioc.yaml.
+# loaded after ioc.db through post_db_files in ioc.yaml.
 
 record(mbbi, "BL04I-MO-GONIO-01:CURRENT_DEVICE")
 {

@@ -99,6 +99,9 @@ class Generic_IOC(BaseModel):
     )
     ioc_name: str
     description: str
+    # config files ibek loads with dbLoadRecords after ioc.db (ibek 4.12.0);
+    # left out of the ioc.yaml when empty
+    post_db_files: list[str] = Field(default_factory=list, exclude_if=lambda v: not v)
     entities: list[dict[str, Any]]
     raw_entities: list[dict[str, Any]] = Field(default_factory=list, exclude=True)
     source_file: Path

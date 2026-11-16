@@ -151,7 +151,8 @@ worked examples, and tips.
 
 Raw `records.*` components in the builder XML have no entity model. builder2ibek
 writes them, as builder did, to `config/records.db` beside the `ioc.yaml` and
-loads that file with an `epics.StartupCommand`. A set of these records that
+lists it in the ioc.yaml's `post_db_files`, which ibek 4.12.0 and later loads
+after `ioc.db`, as builder loaded them. A set of these records that
 several IOCs share is a candidate for a template of its own.
 
 ## 7. Test in a devcontainer

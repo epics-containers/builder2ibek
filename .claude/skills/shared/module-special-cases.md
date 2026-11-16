@@ -326,11 +326,15 @@ Every other raw record, hardware DTYPs included, goes to `records.db` next to
 the ioc.yaml, written as builder wrote its `<IOC>.db`: records sorted by name,
 fields sorted and padded, the XML's backslash escapes decoded (`\\r\\n` in
 the XML is `\r\n` in the file). `record` and `name` (the GUI label) are not
-fields. The records converter's `finalize` appends an
-`epics.StartupCommand: dbLoadRecords config/records.db` entity, which st.cmd
-runs just before it loads ioc.db, and one warning with the count. xml2yaml removes a
+fields. The records converter's `finalize` sets the ioc.yaml's top-level
+`post_db_files: [records.db]`, which ibek (4.12.0 and later) loads with
+`dbLoadRecords config/records.db` after ioc.db and before iocInit, as builder
+loaded `<IOC>.db` after the expanded db. A raw record named like a template
+record therefore sets that record's fields. It also adds one warning with the
+count. The field is written whatever ibek the target image has; an image whose
+ibek predates `post_db_files` rejects the ioc.yaml. xml2yaml removes a
 `records.db` beside the ioc.yaml when the XML has no raw records. It only
 replaces or removes a `records.db` that starts with its own header line; any
 other `records.db` (one written by hand) is left alone, the raw records and
-their StartupCommand are left out, and a warning says so. A record name the XML
+the `post_db_files` entry are left out, and a warning says so. A record name the XML
 defines twice keeps its first definition, with a warning.

@@ -139,10 +139,8 @@ def test_gui_only_templates_dropped(tmp_path: Path):
 def test_raw_records_go_to_records_db(tmp_path: Path):
     entities, warnings = _convert(tmp_path, XML)
     assert not [e for e in entities if e["type"].startswith("records.")]
-    assert entities[-1] == {
-        "type": "epics.StartupCommand",
-        "command": "dbLoadRecords config/records.db",
-    }
+    ioc_yaml = YAML(typ="safe").load((tmp_path / "ioc.yaml").read_text())
+    assert ioc_yaml["post_db_files"] == ["records.db"]
     text = (tmp_path / "records.db").read_text()
     assert text.count("record(") == 3
     assert 'record(ai, "BL01C-EA-TABLE-01:AI")' in text
