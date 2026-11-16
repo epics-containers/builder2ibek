@@ -135,11 +135,11 @@ def test_ether_ip_ao_unchanged(tmp_path: Path):
 
 
 def test_stale_records_db_removed(tmp_path: Path):
-    """With no raw records, xml2yaml removes records.db and nothing else"""
+    """With no raw records, xml2yaml removes the records.db it wrote, nothing else"""
     no_records = _strip_records(XML)
     keep = tmp_path / "keep.db"
     keep.write_text("keep")
-    (tmp_path / "records.db").write_text("stale")
+    (tmp_path / "records.db").write_text(RECORDS_DB)
     entities, warnings = _convert(
         _write_xml(tmp_path, no_records), tmp_path / "ioc.yaml"
     )
@@ -149,10 +149,51 @@ def test_stale_records_db_removed(tmp_path: Path):
     assert not [w for w in warnings if "raw records" in w]
 
 
-def test_records_db_kept_when_written(tmp_path: Path):
-    (tmp_path / "records.db").write_text("stale")
+def test_records_db_rewritten(tmp_path: Path):
+    """A records.db builder2ibek wrote is replaced"""
+    (tmp_path / "records.db").write_text(RECORDS_DB.replace('"A"', '"B"'))
     _convert(_write_xml(tmp_path, XML), tmp_path / "ioc.yaml")
     assert (tmp_path / "records.db").read_text() == RECORDS_DB
+
+
+OWN_RECORDS_DB = 'record(ai, "BL01C-EA-OWN-01:AI")\n{\n}\n'
+
+
+def test_own_records_db_kept_with_raw_records(tmp_path: Path):
+    """A records.db builder2ibek did not write is neither overwritten nor loaded"""
+    own = tmp_path / "records.db"
+    own.write_text(OWN_RECORDS_DB)
+    entities, warnings = _convert(_write_xml(tmp_path, XML), tmp_path / "ioc.yaml")
+    assert own.read_text() == OWN_RECORDS_DB
+    assert LOAD not in entities
+    (warning,) = [w for w in warnings if "records.db" in w]
+    assert warning.startswith(f"{IOC}: {own} was not written by builder2ibek")
+    assert "3 raw records are not written" in warning
+
+
+def test_own_records_db_kept_without_raw_records(tmp_path: Path):
+    own = tmp_path / "records.db"
+    own.write_text(OWN_RECORDS_DB)
+    _, warnings = _convert(
+        _write_xml(tmp_path, _strip_records(XML)), tmp_path / "ioc.yaml"
+    )
+    assert own.read_text() == OWN_RECORDS_DB
+    (warning,) = [w for w in warnings if "records.db" in w]
+    assert "was not written by builder2ibek, so it is left as it is" in warning
+
+
+def test_duplicate_record_name_warns(tmp_path: Path):
+    """builder refuses a record defined twice: the first is kept, with a warning"""
+    xml = XML.replace(
+        "</components>",
+        '  <records.ai name="DUP" record="BL01C-EA-TABLE-01:LED:DISABLE"/>\n'
+        "</components>",
+    )
+    _, warnings = _convert(_write_xml(tmp_path, xml), tmp_path / "ioc.yaml")
+    assert (tmp_path / "records.db").read_text() == RECORDS_DB
+    (warning,) = [w for w in warnings if "more than once" in w]
+    assert "records.ai BL01C-EA-TABLE-01:LED:DISABLE" in warning
+    assert "only the first, a records.calcout" in warning
 
 
 def _strip_records(xml: str) -> str:

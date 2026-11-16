@@ -1,4 +1,5 @@
 import codecs
+from pathlib import Path
 
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
@@ -8,6 +9,12 @@ xml_component = "records"
 # the raw records file, written next to the ioc.yaml and loaded from there
 RECORDS_DB = "records.db"
 LOAD_COMMAND = f"dbLoadRecords config/{RECORDS_DB}"
+LOAD_ENTITY = {"type": "epics.StartupCommand", "command": LOAD_COMMAND}
+# the first line of a records.db that builder2ibek writes; a records.db without
+# it is someone's own, which builder2ibek never overwrites or removes
+HEADER_START = "# Raw records from the records.* elements of "
+# the warning that says where the raw records went contains this
+WRITTEN = f"written to config/{RECORDS_DB}"
 
 # XML attributes of a records.* element that are not record fields: record is
 # the record name and name is the builder's GUI label
@@ -79,9 +86,18 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if not xml.get("record"):
         ioc.wont_convert(entity, "a raw record with no record name")
         return
+    name = _decode(xml["record"])
     fields = {k: _decode(v) for k, v in xml.items() if k not in NOT_FIELDS}
-    ioc.raw_records[_decode(xml["record"])] = (entity_type, fields)
     entity.delete_me()
+    if name in ioc.raw_records:
+        # builder stops with "Record already defined" here
+        ioc.extra_warnings.append(
+            f"{ioc.source_file.stem}: records.{entity_type} {name} is defined "
+            f"more than once in the XML: only the first, a "
+            f"records.{ioc.raw_records[name][0]}, goes to {RECORDS_DB}"
+        )
+        return
+    ioc.raw_records[name] = (entity_type, fields)
 
 
 def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:
@@ -111,16 +127,53 @@ def finalize(ioc: Generic_IOC):
         return
     source = ioc.source_file.name
     header = (
-        f"# Raw records from the records.* elements of {source},\n"
-        f"# loaded by an epics.StartupCommand in ioc.yaml.\n\n"
+        f"{HEADER_START}{source},\n# loaded by an epics.StartupCommand in ioc.yaml.\n\n"
     )
     ioc.side_files[RECORDS_DB] = header + render_records(ioc.raw_records)
-    ioc.entities.append({"type": "epics.StartupCommand", "command": LOAD_COMMAND})
+    # Load order: st.cmd runs startup commands before it loads ioc.db, so the
+    # raw records load BEFORE the template records. builder's IOCs load
+    # <IOC>.db AFTER the expanded db, which is the order wanted; this command
+    # is the place to change once ibek can load a file after ioc.db.
+    ioc.entities.append(dict(LOAD_ENTITY))
     count = len(ioc.raw_records)
     plural = "record" if count == 1 else "records"
     ioc.extra_warnings.append(
-        f"{ioc.source_file.stem}: {count} raw {plural} written to "
-        f"config/{RECORDS_DB} as builder wrote them, hardware DTYPs included, "
+        f"{ioc.source_file.stem}: {count} raw {plural} {WRITTEN} as builder "
+        f"wrote them, hardware DTYPs included, "
         f"and loaded by an epics.StartupCommand before ioc.db: check that "
         f"each is still wanted"
     )
+
+
+def generated(path: Path) -> bool:
+    """Whether the records.db at path is one builder2ibek wrote"""
+    try:
+        with path.open(encoding="latin-1") as f:
+            return f.readline().startswith(HEADER_START)
+    except OSError:
+        return False
+
+
+def keep_own_records_db(ioc: Generic_IOC, folder: Path):
+    """
+    Leave a records.db in folder alone when builder2ibek did not write it.
+    The IOC's raw records then go nowhere: the side file, its StartupCommand
+    and the note about them are taken out, and a warning says so.
+    """
+    path = folder / RECORDS_DB
+    if not path.exists() or generated(path):
+        return
+    count = len(ioc.raw_records)
+    ioc.side_files.pop(RECORDS_DB, None)
+    ioc.entities = [e for e in ioc.entities if dict(e) != LOAD_ENTITY]
+    ioc.extra_warnings = [w for w in ioc.extra_warnings if WRITTEN not in w]
+    text = (
+        f"{ioc.source_file.stem}: {path} was not written by builder2ibek, so "
+        f"it is left as it is"
+    )
+    if count:
+        text += (
+            f"; the XML's {count} raw records are not written: add any that "
+            f"are still wanted to that file"
+        )
+    ioc.extra_warnings.append(text)

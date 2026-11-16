@@ -329,4 +329,8 @@ the XML is `\r\n` in the file). `record` and `name` (the GUI label) are not
 fields. The records converter's `finalize` appends an
 `epics.StartupCommand: dbLoadRecords config/records.db` entity, which st.cmd
 runs just before it loads ioc.db, and one warning with the count. xml2yaml removes a
-`records.db` beside the ioc.yaml when the XML has no raw records.
+`records.db` beside the ioc.yaml when the XML has no raw records. It only
+replaces or removes a `records.db` that starts with its own header line; any
+other `records.db` (one written by hand) is left alone, the raw records and
+their StartupCommand are left out, and a warning says so. A record name the XML
+defines twice keeps its first definition, with a warning.
