@@ -3,6 +3,7 @@ from typing import ClassVar
 
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import str_or_empty
 
 xml_component = "EPICS_BASE"
 yaml_component = "epics"
@@ -56,8 +57,10 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.type = "epics.EpicsCaMaxArrayBytes"
         else:
             entity.rename("key", "name")
-            # EpicsEnvSet value must be a string
-            entity.value = str(entity.value)
+            # EpicsEnvSet value must be a string. ibek writes it unquoted, and
+            # iocsh's epicsEnvSet rejects a missing value, so an empty one is
+            # written as "", which sets the variable to the empty string
+            entity.value = str_or_empty(entity.value) or '""'
             # remove IOCSH settings as epics-containers makes the iocsh prompt
             if "IOCSH" in entity.name:
                 entity.delete_me()
@@ -84,5 +87,6 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
             entity.delete_me()
 
     elif entity_type == "dbpf":
-        entity.value = str(entity.value)
+        # dbpf "PV" "" puts an empty string, as the XML asks
+        entity.value = str_or_empty(entity.value)
         entity.remove("name")
