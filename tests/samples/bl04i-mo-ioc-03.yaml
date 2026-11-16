@@ -1069,3 +1069,6 @@ entities:
 
   - type: pvlogging.PvLogging
     access_file: /epics/support/pvlogging/src/access.acf
+
+  - type: epics.StartupCommand
+    command: dbLoadRecords config/records.db

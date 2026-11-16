@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<autosave.Autosave iocName="BL03I-VA-IOC-02" name="Vacuum IOC 2" path="/dls_sw/i03/epics/autosave"/>
+	<pvlogging.PvLogging name="VA2.PVLOG"/>
+	<devIocStats.devIocStatsHelper ioc="BL03I-VA-IOC-02" name="VA2IOC"/>
+	<FINS.FINSUDPInit ip="127.0.0.1" name="fins_VLVCC2"/>
+	<dlsPLC.read100 century="0" device="BL03I-VA-VLVCC-02" name="RD0.0" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="2" device="BL03I-VA-VLVCC-02" name="RD2.0" port="fins_VLVCC2"/>
+	<dlsPLC.read100 century="8" device="BL03I-VA-VLVCC-02" name="RD8.0" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="800" desc="MPS0 Absorber Permit" device="BL03I-VA-VLVCC-02" ilk0="DCM Xstal Temp 1" ilk1="DCM Xstal Temp 2" ilk2="DCM Xstal Pl Temp 1" ilk3="DCM Xstal Pl Temp 2" ilk4="DCM Back Pl Temp 1" ilk5="DCM Back Pl Temp 2" interlock=":INT5" name="VLVCC2.ILK1" port="fins_VLVCC2"/>
+	<dlsPLC.interlock addr="830" desc="MPS0 GeoBrick 6 Motion" device="BL03I-VA-VLVCC-02" ilk0="DCM Perp Temp" ilk1="DCM Bragg Rot POTLim" ilk2="DCM Bragg Rot NOTLim" ilk3="DCM Perp POTLim" ilk4="DCM Perp NOTLim" ilk5="DCM Pitch POTLim" ilk6="DCM Pitch NOTLim" ilk7="DCM Roll POTLim" ilk8="DCM Roll NOTLim" interlock=":INT6" name="VLVCC2.ILK2" port="fins_VLVCC2"/>
+	<dlsPLC.temperature desc="DCM Perp" device="BL03I-MO-DCM-01" high="150" hihi="200" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T6" offset="10" port="fins_VLVCC2" temp=":TEMP6" tmpcc="BL03I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="Crystal Heater Plate 1" device="BL03I-MO-DCM-01" high="35" hihi="40" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T3" offset="12" port="fins_VLVCC2" temp=":TEMP3" tmpcc="BL03I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="Crystal 1" device="BL03I-MO-DCM-01" high="-135" hihi="-125" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T1" offset="13" port="fins_VLVCC2" temp=":TEMP1" tmpcc="BL03I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="Crystal Heater Plate 2" device="BL03I-MO-DCM-01" high="35" hihi="40" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T4" offset="14" port="fins_VLVCC2" temp=":TEMP4" tmpcc="BL03I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="Crystal 2" device="BL03I-MO-DCM-01" high="-175" hihi="-165" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T2" offset="15" port="fins_VLVCC2" temp=":TEMP2" tmpcc="BL03I-VA-VLVCC-02"/>
+	<!--<dlsPLC.temperature desc="DCM Pitch" device="BL03I-MO-DCM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T6" offset="16" port="fins_VLVCC2" temp=":TEMP6" tmpcc="BL03I-VA-VLVCC-02"/>-->
+	<!--<dlsPLC.temperature desc="DCM Roll" device="BL03I-MO-DCM-01" high="45" hihi="50" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T7" offset="17" port="fins_VLVCC2" temp=":TEMP7" tmpcc="BL03I-VA-VLVCC-02"/>-->
+	<dlsPLC.temperature desc="Back Plate Sub Assembly" device="BL03I-MO-DCM-01" high="35" hihi="40" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T5" offset="18" port="fins_VLVCC2" temp=":TEMP5" tmpcc="BL03I-VA-VLVCC-02"/>
+	<dlsPLC.temperature desc="Perp Sub Assembly" device="BL03I-MO-DCM-01" high="35" hihi="40" hopr="50" lolo="0" lopr="0" low="0" name="DCM.T7" offset="19" port="fins_VLVCC2" temp=":TEMP7" tmpcc="BL03I-VA-VLVCC-02"/>
+	<records.subArray DESC="VLVCC 2 RIO Error Status" DTYP="Soft Channel" FTVL="FLOAT" INDX="9" INP="BL03I-VA-VLVCC-02:DM0XX CP MS" MALM="100" NELM="1" record="BL03I-VA-VLVCC-02:RIO_ERROR_STATUS"/>
+	<records.subArray DESC="Diamond Filter Switch Bits" DTYP="Soft Channel" FTVL="FLOAT" INDX="4" INP="BL03I-VA-VLVCC-02:DM0XX CP MS" MALM="100" NELM="1" record="BL03I-MO-FLTR-01:SWITCH_BITS"/>
+	<records.mbbiDirect DESC="VLVCC 2 RIO Error Status Bits" DTYP="Soft Channel" INP="BL03I-VA-VLVCC-02:RIO_ERROR_STATUS CP" NOBT="16" record="BL03I-VA-VLVCC-02:RIO_ERROR_STATUS_BITS"/>
+	<alarmMonitor.alarmNoAck ALARMSTAT="MPS0 in Alarm" CONDITION="A=0" INPA="BL03I-VA-VLVCC-02:RIO_ERROR_STATUS_BITS.B0" INPB="" P="BL03I-VA-VLVCC-02:TRIO1:ALARM" R="" name="ALNOSMS1"/>
+</components>

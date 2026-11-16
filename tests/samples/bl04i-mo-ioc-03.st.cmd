@@ -67,6 +67,7 @@ seq recover, "P=BL04I-MO-FSWT-01"
 asSetFilename /epics/support/pvlogging/src/access.acf
 set_logging_enable 1
 set_max_array_length 10
+dbLoadRecords config/records.db
 
 dbLoadRecords /ioc.db
 iocInit

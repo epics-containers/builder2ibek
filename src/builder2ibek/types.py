@@ -121,6 +121,11 @@ class Generic_IOC(BaseModel):
     nd_attributes: dict[str, list[dict[str, str]]] = Field(
         default_factory=dict, exclude=True
     )
+    # raw records.* elements by record name, each its record type and fields;
+    # the records converter's finalize writes them to records.db
+    raw_records: dict[str, tuple[str, dict[str, str]]] = Field(
+        default_factory=dict, exclude=True
+    )
     # warnings that are not about a dropped entity type
     extra_warnings: list[str] = Field(default_factory=list, exclude=True)
     # the PandAs split out for fastcs-pandablocks (a fastcs_panda.PandaSplit)

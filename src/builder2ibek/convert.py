@@ -12,6 +12,7 @@ from typing import Any
 from ruamel.yaml import YAML, CommentedMap
 
 from builder2ibek.builder import Builder, Element
+from builder2ibek.converters.records import RECORDS_DB
 from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_fastcs
 from builder2ibek.moduleinfos import finalizers, module_infos
 from builder2ibek.support_defaults import fill_empty_attributes, strip_defaults
@@ -99,6 +100,11 @@ def convert_file(
     for name, text in ioc.side_files.items():
         print(f"writing {yaml.parent / name}")
         (yaml.parent / name).write_text(text)
+    # with no raw records, an existing records.db is stale
+    stale_records = yaml.parent / RECORDS_DB
+    if RECORDS_DB not in ioc.side_files and stale_records.is_file():
+        print(f"removing {stale_records}: the XML has no raw records")
+        stale_records.unlink()
     with yaml.open("w") as stream:
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 

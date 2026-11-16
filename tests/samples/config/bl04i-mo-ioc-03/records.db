@@ -1,0 +1,20 @@
+# Raw records from the records.* elements of BL04I-MO-IOC-03.xml,
+# loaded by an epics.StartupCommand in ioc.yaml.
+
+record(mbbi, "BL04I-MO-GONIO-01:CURRENT_DEVICE")
+{
+    field(DESC, "Current Mounted Goniometer")
+    field(FRST, "In Situ")
+    field(FVST, "SmarGon")
+    field(INP,  "BL04I-MO-GONIO-01:READ_DEVICE_SWITCHES.AINP CP")
+    field(SXST, "Old Gonio")
+}
+
+record(asyn, "BL04I-MO-GONIO-01:READ_DEVICE_SWITCHES")
+{
+    field(AOUT, "P862")
+    field(DESC, "Poll device switch state")
+    field(PINI, "YES")
+    field(PORT, "BRICK_3")
+    field(SCAN, ".5 second")
+}

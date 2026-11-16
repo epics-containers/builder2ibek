@@ -119,12 +119,16 @@ def test_ether_ip_ao(tmp_path: Path):
     assert "PRIO=HIGH, VAL=1" in dropped[1]
 
 
-def test_other_raw_records_still_dropped(tmp_path: Path):
+def test_other_raw_records_go_to_records_db(tmp_path: Path):
     entities, warnings = _convert(tmp_path)
     assert not [e for e in entities if e["type"].startswith("records.")]
-    assert any(
-        w.startswith(f"{IOC}: won't convert 2 records.ao entities") for w in warnings
-    )
-    assert any(
-        w.startswith(f"{IOC}: won't convert 1 records.bo entity") for w in warnings
-    )
+    text = (tmp_path / "records.db").read_text()
+    for name in (
+        "SR99C-VA-VLVCC-01:BAD",
+        "SR99C-VA-SOFT:OUT",
+        "SR99C-VA-VLVCC-01:RESET",
+    ):
+        assert f'"{name}"' in text
+    assert "GB:IDX_SP" not in text
+    assert "SR-RF-CVRST-01:CON" not in text
+    assert not [w for w in warnings if "won't convert" in w and "records." in w]

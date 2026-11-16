@@ -1,13 +1,17 @@
+import codecs
+
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "records"
 
-REASON = (
-    "raw records have no entity model: recreate any that are still needed "
-    "as a template in the IOC instance's config folder or in a support "
-    "module (docs/how-to/after-beamline-convert.md, Custom templates)"
-)
+# the raw records file, written next to the ioc.yaml and loaded from there
+RECORDS_DB = "records.db"
+LOAD_COMMAND = f"dbLoadRecords config/{RECORDS_DB}"
+
+# XML attributes of a records.* element that are not record fields: record is
+# the record name and name is the builder's GUI label
+NOT_FIELDS = {"record", "name"}
 
 # The record fields ether_ip.ao carries: record is the record name, OUT becomes
 # port and tag, SCAN becomes scan. name is the builder's GUI label.
@@ -48,19 +52,75 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
     return True
 
 
+def _decode(value: str) -> str:
+    """A field value as builder wrote it: backslash escapes decoded"""
+    try:
+        return codecs.escape_decode(value.encode("latin-1"))[0].decode("latin-1")
+    except (UnicodeEncodeError, ValueError):
+        return value
+
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     XML to YAML specialist convertor function for raw records
 
-    A records.ao with DTYP EtherIP becomes an ether_ip.ao. builder2ibek won't
-    convert any other raw record: each one is left out, with one warning per
-    record type naming the IOC and how many were dropped.
+    A records.ao with DTYP EtherIP becomes an ether_ip.ao. Every other raw
+    record, whatever its DTYP, leaves the ioc.yaml and goes to records.db
+    (see finalize), with its fields as builder wrote them.
     """
+    xml = entity.xml_attributes()
     if (
         entity_type == "ao"
-        and entity.xml_attributes().get("DTYP") == "EtherIP"
+        and xml.get("DTYP") == "EtherIP"
         and _ether_ip_ao(entity, ioc)
     ):
         return
-    ioc.wont_convert(entity, REASON)
+    if not xml.get("record"):
+        ioc.wont_convert(entity, "a raw record with no record name")
+        return
+    fields = {k: _decode(v) for k, v in xml.items() if k not in NOT_FIELDS}
+    ioc.raw_records[_decode(xml["record"])] = (entity_type, fields)
+    entity.delete_me()
+
+
+def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:
+    """
+    The records in builder's <IOC>.db layout: records sorted by name, each
+    record's fields sorted, and field names padded to four characters
+    """
+    blocks = []
+    for name in sorted(records):
+        record_type, fields = records[name]
+        lines = [f'record({record_type}, "{name}")', "{"]
+        for key in sorted(fields):
+            pad = " " * (4 - len(key))
+            lines.append(f'    field({key}, {pad}"{fields[key]}")')
+        lines.append("}")
+        blocks.append("\n".join(lines) + "\n")
+    return "\n".join(blocks)
+
+
+def finalize(ioc: Generic_IOC):
+    """
+    Write the IOC's raw records to records.db next to the ioc.yaml and load
+    them with an epics.StartupCommand. ibek's st.cmd loads ioc.db after every
+    entity's startup commands, so these records load just before ioc.db.
+    """
+    if not ioc.raw_records:
+        return
+    source = ioc.source_file.name
+    header = (
+        f"# Raw records from the records.* elements of {source},\n"
+        f"# loaded by an epics.StartupCommand in ioc.yaml.\n\n"
+    )
+    ioc.side_files[RECORDS_DB] = header + render_records(ioc.raw_records)
+    ioc.entities.append({"type": "epics.StartupCommand", "command": LOAD_COMMAND})
+    count = len(ioc.raw_records)
+    plural = "record" if count == 1 else "records"
+    ioc.extra_warnings.append(
+        f"{ioc.source_file.stem}: {count} raw {plural} written to "
+        f"config/{RECORDS_DB} as builder wrote them, hardware DTYPs included, "
+        f"and loaded by an epics.StartupCommand before ioc.db: check that "
+        f"each is still wanted"
+    )

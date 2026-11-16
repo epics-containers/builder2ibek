@@ -313,12 +313,20 @@ Some mks937a releases expose `mks937aImgMean`, `mks937aImgGroup`,
 the `ibek-support/mks937a` model of the template's name, which has the same
 parameters.
 
-## `records` — only EtherIP `ao` records convert
+## `records` — EtherIP `ao` records convert; the rest go to `records.db`
 
 A `records.ao` with `DTYP="EtherIP"` becomes `ether_ip.ao`: `OUT
 "@<port> <tag> <flags>"` gives `port` and `tag`, with the flags (such as the
 scan period `S 0.5`) kept in `tag`, because `ether_ip_ao.template` writes
 `OUT "@$(port) $(tag)"`. `scan` is the record's `SCAN`, `Passive` when the XML
 has none. The template sets no other field, so `VAL`, `PRIO`, `DRVH`, `DRVL`,
-`PREC`, `DESC` and the like are dropped with a warning per record. Every other
-raw record is left out with a won't-convert warning.
+`PREC`, `DESC` and the like are dropped with a warning per record.
+
+Every other raw record, hardware DTYPs included, goes to `records.db` next to
+the ioc.yaml, written as builder wrote its `<IOC>.db`: records sorted by name,
+fields sorted and padded, the XML's backslash escapes decoded (`\\r\\n` in
+the XML is `\r\n` in the file). `record` and `name` (the GUI label) are not
+fields. The records converter's `finalize` appends an
+`epics.StartupCommand: dbLoadRecords config/records.db` entity, which st.cmd
+runs just before it loads ioc.db, and one warning with the count. xml2yaml removes a
+`records.db` beside the ioc.yaml when the XML has no raw records.
