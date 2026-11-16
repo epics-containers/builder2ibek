@@ -14,10 +14,10 @@ pattern
 	{ ""    }
 }
 
-file "$(BL04I)/db/BL04I_flux.template" {
+file "BL04I_flux.template" {
 pattern 
-	{ "type",                  "entity_enabled", "dom"   }
-	{ "BL04I.auto_BL04I_flux", "True",           "BL04I" }
+	{ "dom"   }
+	{ "BL04I" }
 }
 
 file "pmacStatus.template" {
@@ -67,15 +67,15 @@ pattern
 	{ "BL04I-MO-BS-01",    ":Z",           "GeoBrick_3", "BRICK_3", "0",  "BL04I-MO-STEP-03", "20.0",  "0.1",  "1",     "0.1",  "None", "55.5",      "0",       "mm",  "NO_ALARM", "0.0",  "20.0",  "BL04I-MO-BS-01:YZ",       "0.0",  "1",   "asynMotor", "0.0",    "-58.0",    "",     "#",               "",     "200",    "0.0", "0.0",  "0.0001",     "0",    "2",    "0",    "0.0",           "0.0004",       "0.0",    "NO_ALARM", "1.0",  "Beamstop Z",            "1.0",  "0.0004",       "0",   "MAJOR",    "0",    "0.0",  "4",    "",     "0",    "0.0", "1",   "1.0", "Use motor summary screen" }
 }
 
-file "$(BL04I)/db/asynMotorAlias.template" {
+file "asynMotorAlias.template" {
 pattern 
-	{ "type",                      "entity_enabled", "P",                      "alias"                      }
-	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:X",    "BL04I-AL-SLITS-04:X:CENTER" }
-	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:Y",    "BL04I-AL-SLITS-04:Y:CENTER" }
-	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:XGAP", "BL04I-AL-SLITS-04:X:SIZE"   }
-	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:YGAP", "BL04I-AL-SLITS-04:Y:SIZE"   }
-	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:X",    "BL04I-AL-SLITS-04:X:CENTRE" }
-	{ "BL04I.auto_asynMotorAlias", "True",           "BL04I-AL-SLITS-04:Y",    "BL04I-AL-SLITS-04:Y:CENTRE" }
+	{ "P",                      "alias"                      }
+	{ "BL04I-AL-SLITS-04:X",    "BL04I-AL-SLITS-04:X:CENTER" }
+	{ "BL04I-AL-SLITS-04:Y",    "BL04I-AL-SLITS-04:Y:CENTER" }
+	{ "BL04I-AL-SLITS-04:XGAP", "BL04I-AL-SLITS-04:X:SIZE"   }
+	{ "BL04I-AL-SLITS-04:YGAP", "BL04I-AL-SLITS-04:Y:SIZE"   }
+	{ "BL04I-AL-SLITS-04:X",    "BL04I-AL-SLITS-04:X:CENTRE" }
+	{ "BL04I-AL-SLITS-04:Y",    "BL04I-AL-SLITS-04:Y:CENTRE" }
 }
 
 file "$(POSITIONER)/db/multipositioner.template" {
@@ -155,10 +155,10 @@ pattern
 	{ "mxEH.RobotInterface_PLC_Statuses", "True",           "BL04I", "BRICK_3",         "P812",         "P813",          "BRICK_2",           "P801",           "P832",            "BRICK_2",           "P802",           "P830",            "BRICK_3",          "P810",                   "P811"                   }
 }
 
-file "$(BL04I)/db/GonioReady.db" {
+file "GonioReady.template" {
 pattern 
-	{ "type",                  "entity_enabled", "dom"   }
-	{ "BL04I.auto_GonioReady", "True",           "BL04I" }
+	{ "dom"   }
+	{ "BL04I" }
 }
 
 file "$(TRANSFOCATOR)/db/transfocator.db" {

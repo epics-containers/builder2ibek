@@ -12,7 +12,11 @@ import pytest
 
 from builder2ibek.convert import convert_file
 from builder2ibek.converters.epics_base import InterruptVector
-from builder2ibek.vendor_patterns import RUNTIME_IMAGE, image_entity_types
+from builder2ibek.vendor_patterns import (
+    IMAGE_PLACEHOLDER,
+    RUNTIME_IMAGE,
+    image_entity_types,
+)
 from tests.conftest import DLS_SUPPORT, HAS_COMMUNITY_SUPPORT, requires_support
 from tests.pattern_pins import RUNTIME_TAG
 
@@ -42,6 +46,11 @@ def _skip_without_runtime_schema(stem: str) -> None:
         pytest.skip("needs github.com for the ioc-streamdevice-runtime schema")
 
 
+# Samples with runtime patterns that are not pattern-only: they keep the image
+# values.yaml names
+MIXED_SAMPLES = {"bl04i-mo-ioc-03"}
+
+
 def _check_patterns(config: Path, stem: str) -> None:
     """The runtime-lock.yaml matches the sample's, or there is none for either."""
     lock = config.parent / "runtime-lock.yaml"
@@ -49,9 +58,12 @@ def _check_patterns(config: Path, stem: str) -> None:
     assert lock.is_file() == expected.is_file()
     if expected.is_file():
         assert lock.read_text() == expected.read_text()
-        # a pattern-only sample runs on the pinned runtime image
-        image = f"{RUNTIME_IMAGE}:{RUNTIME_TAG}"
-        assert image in (config.parent / "values.yaml").read_text()
+        values = (config.parent / "values.yaml").read_text()
+        if stem in MIXED_SAMPLES:
+            assert IMAGE_PLACEHOLDER in values
+        else:
+            # a pattern-only sample runs on the pinned runtime image
+            assert f"{RUNTIME_IMAGE}:{RUNTIME_TAG}" in values
 
 
 # Every sample runs everywhere. The dls entity models are always resolvable --

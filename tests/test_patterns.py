@@ -18,15 +18,25 @@ from builder2ibek.patterns import (
     LIBRARY,
     LIBRARY_TAG_ENV,
     LIBRARY_URL,
+    SUPPORT_LIBRARY,
+    SUPPORT_LIBRARY_URL,
     PatternIndex,
     PatternIndexError,
     latest_tag,
     pattern_index,
+    support_pattern_index,
 )
 from tests.conftest import DLS_SUPPORT, REPO_ROOT
-from tests.pattern_pins import PATTERN_LIBRARY, PATTERN_TAG
+from tests.pattern_pins import (
+    PATTERN_LIBRARY,
+    PATTERN_TAG,
+    SUPPORT_PATTERN_LIBRARY,
+    SUPPORT_PATTERN_TAG,
+)
 
 FIXTURES = Path(__file__).parent / "patterns"
+# the same, for modules of the ibek-runtime-support library
+SUPPORT_FIXTURES = Path(__file__).parent / "support-patterns"
 
 _yaml = YAML(typ="safe", pure=True)
 
@@ -52,33 +62,58 @@ def index() -> PatternIndex:
 # -- the library -----------------------------------------------------------------
 
 
-def test_library_is_the_one_ibek_vendors_from():
+@pytest.fixture(scope="module")
+def support_index() -> PatternIndex:
+    return support_pattern_index()
+
+
+LIBRARIES = [
+    pytest.param(LIBRARY, LIBRARY_URL, id=LIBRARY),
+    pytest.param(SUPPORT_LIBRARY, SUPPORT_LIBRARY_URL, id=SUPPORT_LIBRARY),
+]
+PINNED = [
+    pytest.param(pattern_index, PATTERN_LIBRARY, PATTERN_TAG, id=LIBRARY),
+    pytest.param(
+        support_pattern_index,
+        SUPPORT_PATTERN_LIBRARY,
+        SUPPORT_PATTERN_TAG,
+        id=SUPPORT_LIBRARY,
+    ),
+]
+
+
+@pytest.mark.parametrize("library,library_url", LIBRARIES)
+def test_library_is_the_one_ibek_vendors_from(library: str, library_url: str):
     """The submodule the tests index is the library `ibek pattern add` clones."""
     url = subprocess.run(
-        ["git", "config", "-f", ".gitmodules", f"submodule.{LIBRARY}.url"],
+        ["git", "config", "-f", ".gitmodules", f"submodule.{library}.url"],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
         check=True,
     ).stdout.strip()
-    assert url == DEFAULT_LIBRARIES[LIBRARY] == LIBRARY_URL
+    assert url == DEFAULT_LIBRARIES[library] == library_url
 
 
-def test_tests_index_the_pinned_tag(index: PatternIndex):
+@pytest.mark.parametrize("make_index,submodule,tag", PINNED)
+def test_tests_index_the_pinned_tag(make_index, submodule: Path, tag: str):
     """conftest pins the tag the submodule is checked out at."""
     tags = subprocess.run(
-        ["git", "-C", str(PATTERN_LIBRARY), "tag", "--points-at", "HEAD"],
+        ["git", "-C", str(submodule), "tag", "--points-at", "HEAD"],
         capture_output=True,
         text=True,
         check=True,
     ).stdout.split()
-    assert PATTERN_TAG in tags
-    assert {p.version for p in index.patterns.values()} == {PATTERN_TAG}
+    assert tag in tags
+    assert {p.version for p in make_index().patterns.values()} == {tag}
 
 
-def test_every_pattern_folder_is_indexed(index: PatternIndex):
-    folders = {p.parent.name for p in PATTERN_LIBRARY.glob("*/*.ibek.support.yaml")}
+@pytest.mark.parametrize("make_index,submodule,tag", PINNED)
+def test_every_pattern_folder_is_indexed(make_index, submodule: Path, tag: str):
+    folders = {p.parent.name for p in submodule.glob("*/*.ibek.support.yaml")}
+    index = make_index()
     assert folders and set(index.patterns) == folders
+    assert {p.library for p in index.patterns.values()} == {submodule.name}
 
 
 def _ls_remote(*tags: str) -> subprocess.CompletedProcess:
@@ -376,3 +411,65 @@ def test_index_failure_is_cached(monkeypatch):
     finally:
         pattern_index.cache_clear()
     assert len(calls) == 1
+
+
+# -- ibek-runtime-support -------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "fixture", sorted(SUPPORT_FIXTURES.glob("*.xml")), ids=lambda p: p.stem
+)
+def test_converted_xml_maps_to_the_support_pattern(
+    support_index: PatternIndex, fixture: Path
+):
+    """Beamline modules go to their pattern even where ibek-support-dls has a
+    generic model: they are not built into generic IOCs."""
+    module = fixture.stem
+    entities = _convert(fixture)
+    assert any(str(e["type"]).startswith(f"{module}.") for e in entities)
+    plan = support_index.plan(entities)
+    assert plan.build_time == {}
+    assert plan.refs == [f"{SUPPORT_LIBRARY}:{module}@{SUPPORT_PATTERN_TAG}"]
+
+
+def test_support_plan_keeps_a_differing_default_build_time(
+    support_index: PatternIndex, monkeypatch
+):
+    """A parameter left to the generic model's default must default the same
+    way in the pattern, which would otherwise fill in its own."""
+    entity = {"type": "BL21I.TTHBumpstripMonitor", "P": "X", "R": ":Y"}
+    monkeypatch.setattr(patterns, "entity_defaults", lambda t: {"DESC": "generic"})
+    plan = support_index.plan([entity])
+    assert plan.patterns == []
+    assert "BL21I.TTHBumpstripMonitor.DESC defaults to" in plan.build_time["BL21I"]
+
+    # given in the entity, the default does not matter
+    assert support_index.plan([{**entity, "DESC": "set"}]).patterns
+
+
+def test_aligned_module_with_a_default_conflict_stays_build_time(
+    index: PatternIndex, monkeypatch
+):
+    """The default check covers ibek-runtime-streamdevice too: an ALIGNED
+    module whose entity leaves a parameter to a generic default the pattern
+    does not share stays build-time."""
+    module = "laudaRE2xx"
+    assert module in ALIGNED
+    entities = _convert(FIXTURES / f"{module}.xml")
+    assert index.plan(entities).patterns == [index.patterns[module]]
+
+    (entity,) = [e for e in entities if str(e["type"]).startswith(f"{module}.")]
+    params = index._parameters[module][str(entity["type"]).partition(".")[2]]
+    # a parameter the pattern defaults, which builder2ibek would leave out of
+    # the entity if its value were the generic default
+    left_out = sorted(p for p in params if "default" in params[p])[0]
+    entities = [
+        {k: v for k, v in e.items() if e is not entity or k != left_out}
+        for e in entities
+    ]
+    monkeypatch.setattr(
+        patterns, "entity_defaults", lambda t: {left_out: "not the pattern's"}
+    )
+    plan = index.plan(entities)
+    assert plan.patterns == []
+    assert f"{entity['type']}.{left_out} defaults to" in plan.build_time[module]

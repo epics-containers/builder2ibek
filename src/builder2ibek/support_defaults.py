@@ -54,7 +54,12 @@ def entity_params(entity_type: str) -> set[str] | None:
     return _params.get(entity_type)
 
 
-def _values_match(entity_val: Any, default_val: Any) -> bool:
+def entity_defaults(entity_type: str) -> dict[str, Any]:
+    """The defaults of an entity model's parameters, by name; {} if none."""
+    return _defaults.get(entity_type, {})
+
+
+def values_match(entity_val: Any, default_val: Any) -> bool:
     """Compare entity value to default, with numeric type tolerance."""
     if entity_val == default_val:
         return True
@@ -72,7 +77,7 @@ def strip_defaults(entity: dict[str, Any]):
         return
 
     for param_name, default_val in defaults.items():
-        if param_name in entity and _values_match(entity[param_name], default_val):
+        if param_name in entity and values_match(entity[param_name], default_val):
             del entity[param_name]
 
 

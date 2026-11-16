@@ -11,8 +11,8 @@ cd $THIS
 
 set -e
 
-# Pin the runtime pattern library and the ioc-streamdevice-runtime image as the
-# tests do: clones of the library read the submodule
+# Pin the runtime pattern libraries and the ioc-streamdevice-runtime image as
+# the tests do: clones of the libraries read their submodules
 eval "$(python3 ../pattern_pins.py)"
 
 # pass a list of XML files as args or use all xml files in the samples dir
