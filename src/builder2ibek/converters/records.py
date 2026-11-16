@@ -19,9 +19,34 @@ WRITTEN = f"written to config/{RECORDS_DB}"
 # the record name and name is the builder's GUI label
 NOT_FIELDS = {"record", "name"}
 
+# Record fields ether_ip.ao takes as parameters of the same name, each with the
+# type its model gives it
+ETHER_IP_AO_PARAMS = {
+    "DRVH": float,
+    "DRVL": float,
+    "PREC": int,
+    "PRIO": str,
+    "VAL": str,
+}
+
 # The record fields ether_ip.ao carries: record is the record name, OUT becomes
-# port and tag, SCAN becomes scan. name is the builder's GUI label.
-ETHER_IP_AO_FIELDS = {"record", "name", "DTYP", "OUT", "SCAN"}
+# port and tag, SCAN becomes scan, and the ETHER_IP_AO_PARAMS keep their names.
+# name is the builder's GUI label.
+ETHER_IP_AO_FIELDS = {"record", "name", "DTYP", "OUT", "SCAN", *ETHER_IP_AO_PARAMS}
+
+
+def _param_value(value: str, kind: type) -> float | int | str:
+    """
+    A record field's value as an ether_ip.ao parameter of type kind. Raises
+    ValueError for a value that is not a number of that kind, such as an empty
+    DRVH or a PREC of 2.5.
+    """
+    if kind is int:
+        number = float(value)
+        if not number.is_integer():
+            raise ValueError(value)
+        return int(number)
+    return kind(value)
 
 
 def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
@@ -31,14 +56,24 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
     "@VLVCC_01_EIP GB_Index_Setpoint S 0.5". ether_ip_ao.template writes
     "@$(port) $(tag)", so the tag carries the flags, such as the scan period
     "S <seconds>", unchanged. scan is the record's SCAN field, Passive when the
-    XML leaves it out. Returns False if OUT is not an EtherIP link.
+    XML leaves it out. DRVH, DRVL, PREC, PRIO and VAL pass through when the XML
+    has them; one whose value is not of the model's type is warned about with
+    the fields ether_ip.ao has no place for. Returns False if OUT is not an
+    EtherIP link.
     """
     xml = entity.xml_attributes()
     port, _, tag = xml.get("OUT", "").strip().removeprefix("@").partition(" ")
     if not xml.get("OUT", "").strip().startswith("@") or not port or not tag:
         return False
 
-    dropped = sorted(k for k in xml if k not in ETHER_IP_AO_FIELDS)
+    params, unusable = {}, []
+    for key, kind in ETHER_IP_AO_PARAMS.items():
+        if key in xml:
+            try:
+                params[key] = _param_value(xml[key], kind)
+            except ValueError:
+                unusable.append(key)
+    dropped = sorted(k for k in xml if k not in ETHER_IP_AO_FIELDS or k in unusable)
     if dropped:
         fields = ", ".join(f"{k}={xml[k]}" for k in dropped)
         ioc.extra_warnings.append(
@@ -55,6 +90,7 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
     entity.port = port
     entity.tag = tag.strip()
     entity.scan = xml.get("SCAN", "Passive")
+    entity.update(params)
     return True
 
 

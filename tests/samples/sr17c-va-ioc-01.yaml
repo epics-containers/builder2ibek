@@ -23,18 +23,24 @@ entities:
     port: VLVCC_01_EIP
 
   - type: ether_ip.ao
+    PRIO: HIGH
+    VAL: '1'
     port: VLVCC_01_EIP
     record: SR-RF-CVRST-01:CON
     scan: Passive
     tag: CAVITY_RESET_01 S .2
 
   - type: ether_ip.ao
+    PRIO: HIGH
+    VAL: '1'
     port: VLVCC_01_EIP
     record: SR-RF-CVRST-02:CON
     scan: Passive
     tag: CAVITY_RESET_02 S .2
 
   - type: ether_ip.ao
+    PRIO: HIGH
+    VAL: '1'
     port: VLVCC_01_EIP
     record: SR-RF-CVRST-03:CON
     scan: Passive
