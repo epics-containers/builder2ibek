@@ -54,6 +54,18 @@ class Entity(dict[str, Any]):
         # kept off the dict, so that it never reaches the YAML
         self.__dict__["_xml_attributes"] = dict(attributes)
 
+    def place_first(self):
+        """Put this entity before all others in the ioc.yaml"""
+        self.__dict__["_placement"] = "first"
+
+    def place_last(self):
+        """Put this entity after all others in the ioc.yaml"""
+        self.__dict__["_placement"] = "last"
+
+    def placement(self) -> str:
+        """ "first", "last", or "" for the place its XML element gives it"""
+        return self.__dict__.get("_placement", "")
+
     def add_entity(self, entity: "Entity | dict[str, Any]"):
         self._extra_entities.append(entity)
 

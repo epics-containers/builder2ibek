@@ -3,11 +3,15 @@ Conversion of the startup-script elements of a builder XML: EPICS_BASE dbpf,
 EpicsEnvSet and StartupCommand, and the utility module's wait commands.
 """
 
+import subprocess
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from builder2ibek.builder import Builder
-from builder2ibek.convert import dispatch
+from builder2ibek.convert import convert_file, dispatch
+from tests.conftest import requires_support
 
 
 def convert(body: str) -> list[dict[str, Any]]:
@@ -69,7 +73,127 @@ def test_empty_optional_str_param_stays_empty():
         '\n<bronkhorstFlowBus.coriFlow NODE="" P="BL01C-EA-FLOW-01" PORT="f"/>'
     )
     (zebra,) = of_type(entities, "zebra.zebra")
-    (zebra,) = of_type(entities, "zebra.zebra")
     assert zebra["PREC"] == "" and zebra["M1MULT"] == "0.25"
     (cori,) = of_type(entities, "bronkhorstFlowBus.coriFlow")
     assert cori["NODE"] == ""
+
+
+@pytest.mark.parametrize(
+    "attribute,post_init",
+    [
+        ("", False),
+        (' post_init=""', False),
+        (' post_init="FALSE"', False),
+        (' post_init="T"', True),
+        (' post_init="0"', True),
+        (' post_init="yes"', True),
+    ],
+)
+def test_post_init_is_read_as_the_builder_read_it(attribute: str, post_init: bool):
+    """Only an empty value or "false", in any case, is False."""
+    entities = convert(f'<EPICS_BASE.StartupCommand command="echo x"{attribute}/>')
+    (command,) = [e for e in entities if e.get("command") == "echo x"]
+    expected = "epics.PostStartupCommand" if post_init else "epics.StartupCommand"
+    assert command["type"] == expected
+
+
+def test_empty_at_end_keeps_xml_order():
+    entities = convert(
+        '<EPICS_BASE.StartupCommand at_end="" command="echo first"/>\n'
+        '<asyn.AsynIP name="gauge" port="127.0.0.1:7005"/>'
+    )
+    names = [e.get("command") or e.get("name") for e in entities]
+    assert names.index("echo first") < names.index("gauge")
+
+
+def test_pre_init_command_needing_records_warns():
+    builder = Builder()
+    builder.load_string(
+        '<?xml version="1.0" ?>\n<components arch="linux-x86_64">\n'
+        '<EPICS_BASE.StartupCommand command="dbpf X:Y 1"/>\n'
+        '<EPICS_BASE.StartupCommand command="dbLoadRecords x.db"/>\n'
+        '<EPICS_BASE.StartupCommand command="dbpr X:Y" post_init="True"/>\n'
+        "</components>"
+    )
+    ioc = dispatch(builder, Path("BL01C-VA-IOC-01.xml"))
+    assert len(ioc.extra_warnings) == 1
+    assert "'dbpf X:Y 1' runs before dbLoadRecords" in ioc.extra_warnings[0]
+
+
+def test_startup_commands_run_where_the_builder_ran_them():
+    """
+    The builder ran an at_end StartupCommand (the default) after every
+    device's commands: pre-init ones after the asyn port they trace is made,
+    post-init ones straight after iocInit. at_end="False" keeps XML order.
+    """
+    entities = convert(
+        '<EPICS_BASE.StartupCommand command="asynSetTraceIOMask(&quot;gauge&quot;'
+        ', -1, 0x2)" name="IO"/>\n'
+        '<EPICS_BASE.StartupCommand at_end="True" command="asynSetTraceMask('
+        '&quot;gauge&quot;, -1, 0x9)" name="Trace"/>\n'
+        '<EPICS_BASE.StartupCommand at_end="False" command="echo in order"/>\n'
+        '<asyn.AsynIP name="gauge" port="127.0.0.1:7005"/>\n'
+        '<EPICS_BASE.dbpf pv="BL01C-VA-GAUGE-15:P.EGU" value="mbar"/>\n'
+        '<EPICS_BASE.StartupCommand command="echo after iocInit" post_init="True"/>'
+        '\n<EPICS_BASE.StartupCommand at_end="False" command="echo post in order"'
+        ' post_init="True"/>'
+    )
+    order = [
+        e.get("command") or e.get("name") or e.get("pv")
+        for e in entities
+        if e["type"].startswith(("epics.", "asyn."))
+    ]
+    assert order == [
+        "echo after iocInit",
+        "EPICS_TZ",
+        "STREAM_PROTOCOL_PATH",
+        "echo in order",
+        "gauge",
+        "BL01C-VA-GAUGE-15:P.EGU",
+        "echo post in order",
+        'asynSetTraceIOMask("gauge", -1, 0x2)',
+        'asynSetTraceMask("gauge", -1, 0x9)',
+    ]
+    by_command = {e["command"]: e["type"] for e in entities if "command" in e}
+    assert by_command["echo after iocInit"] == "epics.PostStartupCommand"
+    assert by_command["echo post in order"] == "epics.PostStartupCommand"
+    assert by_command["echo in order"] == "epics.StartupCommand"
+    assert all("at_end" not in e and "post_init" not in e for e in entities)
+
+
+@requires_support
+def test_st_cmd_has_the_builder_order_and_values(tmp_path: Path, ibek_defs):
+    """generate2 renders the converted entities: an empty dbpf and epicsEnvSet
+    value, and at_end commands before and after the devices' commands."""
+    xml = tmp_path / "BL01C-VA-IOC-01.xml"
+    xml.write_text(
+        '<?xml version="1.0" ?>\n<components arch="linux-x86_64">\n'
+        '<EPICS_BASE.EpicsEnvSet key="EMPTY" value=""/>\n'
+        '<EPICS_BASE.StartupCommand command="asynSetTraceMask(gauge, -1, 0x9)"/>\n'
+        '<EPICS_BASE.StartupCommand command="echo post" post_init="True"/>\n'
+        '<asyn.AsynIP name="gauge" port="127.0.0.1:7005"/>\n'
+        '<EPICS_BASE.dbpf pv="BL01C-VA-SPACE-13:P.EGU" value=""/>\n'
+        "</components>"
+    )
+    config = tmp_path / "config"
+    convert_file(xml, config / "ioc.yaml", "/epics/ibek-defs/ioc.schema.json")
+    result = subprocess.run(
+        [
+            "ibek",
+            "runtime",
+            "generate2",
+            str(config),
+            "--output",
+            str(tmp_path),
+            "--no-pvi",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    lines = (tmp_path / "st.cmd").read_text().splitlines()
+    assert 'epicsEnvSet EMPTY ""' in lines
+    port = next(i for i, x in enumerate(lines) if x.startswith("drvAsynIPPort"))
+    assert lines.index("asynSetTraceMask(gauge, -1, 0x9)") > port
+    assert lines.index("iocInit") < lines.index("echo post")
+    assert lines.index("echo post") < lines.index('dbpf "BL01C-VA-SPACE-13:P.EGU" ""')

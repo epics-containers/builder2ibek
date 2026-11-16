@@ -163,7 +163,25 @@ def dispatch(
     for finalize in finalizers:
         finalize(ioc)
 
+    ioc.entities = placed(ioc.entities)
+
     return ioc
+
+
+def placed(entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    The entities in ioc.yaml order: those a converter placed first, then the
+    rest in XML order, then those placed last
+    """
+
+    def placement(entity: dict[str, Any]) -> str:
+        return entity.placement() if isinstance(entity, Entity) else ""
+
+    return (
+        [e for e in entities if placement(e) == "first"]
+        + [e for e in entities if placement(e) not in ("first", "last")]
+        + [e for e in entities if placement(e) == "last"]
+    )
 
 
 def do_dispatch(builder: Builder, ioc: Generic_IOC):
@@ -181,8 +199,16 @@ def do_dispatch(builder: Builder, ioc: Generic_IOC):
 
         ioc.already_converted.append(entity)
 
-    ioc.entities = [Entity(ordered_params(e)) for e in ioc.entities]  # type: ignore
+    ioc.entities = [reordered_params(e) for e in ioc.entities]  # type: ignore
     return ioc
+
+
+def reordered_params(entity: dict[str, Any]) -> Entity:
+    """The entity with its keys in ioc.yaml order, keeping its placement"""
+    result = Entity(ordered_params(entity))
+    if isinstance(entity, Entity):
+        result.__dict__.update(entity.__dict__)
+    return result
 
 
 def ordered_params(entity: dict[str, Any]) -> dict[str, Any]:
