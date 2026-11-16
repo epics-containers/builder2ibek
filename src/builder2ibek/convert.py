@@ -247,6 +247,7 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
     if extras:
         for extra_entity in extras:
             fill_empty_attributes(extra_entity)
+            drop_none_values(extra_entity)
             ioc.entities.append(extra_entity)
         # move the new entity to after these extras at it is likely to depend on them
         ioc.entities.remove(entity)
@@ -265,13 +266,16 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
         add_defaults(entity, info.defaults)
 
     fill_empty_attributes(entity)
+    drop_none_values(entity)
 
-    # remove fields that have None value
+    strip_defaults(entity)
+
+
+def drop_none_values(entity: dict[str, Any]):
+    """Remove the parameters set to None, leaving them to the model default"""
     for key in list(entity.keys()):
         if entity[key] is None:
             del entity[key]
-
-    strip_defaults(entity)
 
 
 def add_defaults(entity: dict[str, Any], defaults: dict[str, dict[str, Any]]):

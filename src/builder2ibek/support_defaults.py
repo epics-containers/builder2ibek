@@ -1,12 +1,21 @@
 """
 Load defaults from ibek support YAML files so we can omit parameters
-whose values match the defaults during conversion.
+whose values match the defaults during conversion, and the parameter types
+that decide what an empty XML attribute becomes (see empty_attribute).
+
+The models are read from the submodules of a source checkout: ibek-support*
+for the generic models, and the pinned runtime pattern libraries
+(ibek-runtime-streamdevice, ibek-runtime-support) for the parameter types of
+pattern entities. An installed builder2ibek has none of them, so it finds no
+models and drops every empty attribute, leaving each to its model default.
 """
 
 from pathlib import Path
 from typing import Any
 
 from ruamel.yaml import YAML
+
+from builder2ibek.types import Entity
 
 _project_root = Path(__file__).parent.parent.parent
 
@@ -17,41 +26,62 @@ _params: dict[str, set[str]] = {}
 # {entity_type: {param_name: param_spec}}
 _param_specs: dict[str, dict[str, dict[str, Any]]] = {}
 
+# The runtime pattern libraries, as patterns.py chooses between a pattern and
+# the generic model: an ibek-runtime-streamdevice pattern only stands in for a
+# module with no generic model (or one that matches it), while an
+# ibek-runtime-support pattern is used even where a generic model exists.
+_STREAMDEVICE_PATTERNS = "ibek-runtime-streamdevice"
+_SUPPORT_PATTERNS = "ibek-runtime-support"
+
+
+def _models(base_dir: Path):
+    """(entity_type, parameters) for each entity model in a support folder."""
+    yml = YAML(typ="safe", pure=True)
+    for yaml_file in sorted(base_dir.glob("*/*.ibek.support.yaml")):
+        try:
+            data = yml.load(yaml_file.read_text())
+        except Exception:
+            continue
+        if not data:
+            continue
+        module_name = data.get("module", "")
+        for model in data.get("entity_models", []):
+            entity_name = model.get("name", "")
+            if entity_name:
+                yield f"{module_name}.{entity_name}", model.get("parameters") or {}
+
+
+def _specs(params: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {k: v for k, v in params.items() if isinstance(v, dict)}
+
+
+def _load_pattern_specs():
+    """
+    The parameter types of the runtime pattern models, from the pinned
+    submodules. They only feed empty_attribute: defaults stay the generic ones.
+    """
+    for entity_type, params in _models(_project_root / _STREAMDEVICE_PATTERNS):
+        _param_specs.setdefault(entity_type, _specs(params))
+    for entity_type, params in _models(_project_root / _SUPPORT_PATTERNS):
+        _param_specs[entity_type] = _specs(params)
+
 
 def _load_all_support_yamls():
     """Load all support YAML files from ibek-support/ and ibek-support-dls/."""
-    yml = YAML(typ="safe", pure=True)
-
     for base_dir in _project_root.glob("ibek-support*"):
-        for yaml_file in base_dir.glob("*/*.ibek.support.yaml"):
-            try:
-                data = yml.load(yaml_file.read_text())
-            except Exception:
-                continue
-            if not data:
-                continue
-
-            module_name = data.get("module", "")
-            for model in data.get("entity_models", []):
-                entity_name = model.get("name", "")
-                if not entity_name:
-                    continue
-                entity_type = f"{module_name}.{entity_name}"
-                params = model.get("parameters", {})
-                _params[entity_type] = set(params)
-                _param_specs[entity_type] = {
-                    k: v for k, v in params.items() if isinstance(v, dict)
-                }
-                defaults = {}
-                for param_name, param_spec in params.items():
-                    if isinstance(param_spec, dict) and "default" in param_spec:
-                        default_val = param_spec["default"]
-                        # Skip Jinja2 template defaults — they're dynamic
-                        if isinstance(default_val, str) and "{{" in default_val:
-                            continue
-                        defaults[param_name] = default_val
-                if defaults:
-                    _defaults[entity_type] = defaults
+        for entity_type, params in _models(base_dir):
+            _params[entity_type] = set(params)
+            _param_specs[entity_type] = _specs(params)
+            defaults = {}
+            for param_name, param_spec in params.items():
+                if isinstance(param_spec, dict) and "default" in param_spec:
+                    default_val = param_spec["default"]
+                    # Skip Jinja2 template defaults — they're dynamic
+                    if isinstance(default_val, str) and "{{" in default_val:
+                        continue
+                    defaults[param_name] = default_val
+            if defaults:
+                _defaults[entity_type] = defaults
 
 
 def entity_params(entity_type: str) -> set[str] | None:
@@ -87,11 +117,25 @@ def empty_attribute(entity_type: str, param: str) -> Any:
 
 
 def fill_empty_attributes(entity: dict[str, Any]):
-    """Give each empty XML attribute of entity the value the builder used"""
+    """
+    Give each empty XML attribute of entity the value the builder used.
+
+    convert.py calls this for each entity, and the extra entities its converter
+    adds, once the converter has run. For an entity made from an XML element,
+    only the parameters whose XML attribute is empty are filled: a "" the
+    converter set in place of a missing attribute is its own choice. An extra
+    entity has no XML attributes, so each of its "" values is filled. A value
+    set after the fill, by a finalizer or by the ADCore NDAttributes pass, is
+    not filled either.
+    """
     entity_type = str(entity.get("type", ""))
+    xml = entity.xml_attributes() if isinstance(entity, Entity) else {}
     for key, value in list(entity.items()):
-        if value == "" and key != "type":
-            entity[key] = empty_attribute(entity_type, key)
+        if value != "" or key == "type":
+            continue
+        if xml and xml.get(key) != "":
+            continue
+        entity[key] = empty_attribute(entity_type, key)
 
 
 def values_match(entity_val: Any, default_val: Any) -> bool:
@@ -116,5 +160,7 @@ def strip_defaults(entity: dict[str, Any]):
             del entity[param_name]
 
 
-# Load at import time
+# Load at import time: generic models first, so that a streamdevice pattern
+# only adds the types of modules they lack
 _load_all_support_yamls()
+_load_pattern_specs()
