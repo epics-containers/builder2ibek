@@ -1,7 +1,7 @@
 version: 1
 patterns:
   QPC:
-    version: 0.7.3
+    version: 0.8.1
     source: github.com/epics-containers/ibek-runtime-streamdevice
     files:
       config/QPC.ibek.support.yaml: sha256:da9afd3d4d8c0daed3c0dfa18f4621a9a197e5702e26697904a09f26308f73ec

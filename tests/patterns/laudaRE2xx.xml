@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<laudaRE2xx.lMCxxx ADDR="0" DESC="Lauda microCool MC600 Chiller" HIGH="30" HIHI="40" LOLO="10" LOW="15" P="BL12I-OP-CHILL-01" PORT="ty_lauda" SCAN="1" name="LAUDA.MC600"/>
+</components>
