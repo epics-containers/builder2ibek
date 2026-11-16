@@ -1,7 +1,7 @@
 version: 1
 patterns:
   attocubeInterf:
-    version: 0.8.1
+    version: 0.8.2
     source: github.com/epics-containers/ibek-runtime-streamdevice
     files:
       config/attocubeInterf.ibek.support.yaml: sha256:30c6ff9abb398be70d0658a29bd3e9508280d10892bd8bc7c95c627aca33050c
