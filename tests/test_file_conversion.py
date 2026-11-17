@@ -6,6 +6,7 @@ Tests to validate the full conversion pipeline:
 
 import subprocess
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -100,6 +101,15 @@ def test_dls_models_available():
     )
 
 
+@pytest.fixture(autouse=True)
+def _reset_interrupt_vectors() -> Iterator[None]:
+    """Each sample numbers its interrupt vectors from the start, whatever the
+    test before it on this worker did, failed or not."""
+    InterruptVector.reset()
+    yield
+    InterruptVector.reset()
+
+
 @requires_support
 @pytest.mark.parametrize("sample_xml", SAMPLE_PARAMS)
 def test_convert(sample_xml: Path, tmp_path: Path):
@@ -121,8 +131,6 @@ def test_convert(sample_xml: Path, tmp_path: Path):
     if expected_records.exists():
         assert out_records.read_text() == expected_records.read_text()
     _check_patterns(config, stem)
-    # reset the interrupt vector counter
-    InterruptVector.reset()
 
 
 @requires_support

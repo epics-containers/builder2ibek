@@ -230,8 +230,14 @@ def dropped_comment(dropped: list[DroppedEntity]) -> str:
     lines = [
         "# DROPPED FOR MANUAL REVIEW by builder2ibek. A beamline module comes only",
         "# from its runtime pattern (ibek-runtime-support), which does not take the",
-        "# entities below, nor those that refer to them. A builder repo such as",
-        "# BL15I-BUILDER is never a pattern: its templates migrate into BL15I.",
+        "# entities below, nor those that refer to them.",
+    ]
+    if any(builder_module_target(module_of(d.entity)) for d in dropped):
+        lines += [
+            "# A builder repo such as BL15I-BUILDER is never a pattern: its",
+            "# templates migrate into the beamline module, such as BL15I.",
+        ]
+    lines += [
         "# Each is shown, commented out, as builder2ibek converted it, after the",
         "# reason it was dropped.",
     ]

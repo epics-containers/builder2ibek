@@ -55,12 +55,17 @@ superseded one-for-one by `save_restoreStatus.db` (`$(device):SRSTATUS` →
 `$(P)SR_status`, and so on). See
 [builder-py-analysis.md](builder-py-analysis.md) Step 2 for the general rule.
 
-## `BL<nn><x>-BUILDER` / `BL<nn><x>` — vendor as a runtime pattern, never build
+## `BL<nn><x>` — vendor as a runtime pattern, never build; `BL<nn><x>-BUILDER` — migrate
 
-A beamline module (`BL15I-BUILDER`, `BL21I`, `BL04I`, …) holds templates for one
-beamline only. It has no business in a generic IOC image, and a `-BUILDER` repo's
-top-level Makefile descends into `etc/` and `iocs/`, so building it tries to build
-**every IOC on that beamline**.
+A beamline module (`BL21I`, `BL04I`, …) holds templates for one beamline only.
+It has no business in a generic IOC image, so it comes only from its runtime
+pattern in `ibek-runtime-support`.
+
+A beamline builder repo (`BL15I-BUILDER`, …) is never a pattern and never built:
+its top-level Makefile descends into `etc/` and `iocs/`, so building it tries to
+build **every IOC on that beamline**. Migrate the templates an IOC needs into the
+`BL<nn><x>` module's pattern (`BL15I-BUILDER` → `BL15I`) instead, and give each
+model the `BL<nn><x>` module's name.
 
 **Check for compiled code first.** These are template-only in almost every case,
 which is what makes them vendorable:
@@ -82,8 +87,10 @@ grep -l 'DTYP' $B/db/*.template          # device support => needs a built modul
   Two things differ from a build-time support YAML:
   - `databases[].file` is a **bare filename** (`BL15I-SumTheDiode.template`), not
     `$(MODULE)/db/…` — `ibek runtime place-files` puts it beside the support YAML.
-  - Keep `module:` equal to the XML component name so the `ioc.yaml` entity types
-    (`BL15I-BUILDER.auto_BL15I_SumTheDiode`) do not change.
+  - `module:` is the `BL<nn><x>` folder name, so the `ioc.yaml` entity types are
+    `BL<nn><x>.<model>` (`BL21I.TTHBumpstripMonitor`). An entity migrated from a
+    builder repo changes type with it, so the IOC's XML (or its converter) has to
+    name the `BL<nn><x>` model.
 
   Do **not** also create `ibek-support-dls/<Module>/`. Vendor only the templates
   an IOC actually needs; add more as other IOCs want them.

@@ -87,6 +87,8 @@ def test_convert_drops_what_the_pattern_does_not_take(tmp_path: Path):
     assert lines[0].startswith("# yaml-language-server:")
     assert "DROPPED FOR MANUAL REVIEW" in text
     assert f"# Dropped: no model BL21I.FS1Control in {BL21I}" in lines
+    # no builder repo entity was dropped, so the header does not mention one
+    assert "builder repo" not in text
     assert "#   - type: BL21I.FS1Control" in lines
     assert "#     P: BL21I-OP-FS-01" in lines
     assert (
@@ -172,6 +174,7 @@ def test_builder_module_entities_are_dropped_by_type(tmp_path: Path):
         _builder_warning(xml.stem, "auto_BL15I_SumTheDiode") + " (x3)",
         _builder_warning(xml.stem, "cryocooler_fill"),
     ]
+    assert "# A builder repo such as BL15I-BUILDER is never a pattern: its" in text
     assert text.count(f"# Dropped: {BL15I_REASON}") == 4
     assert "#   - type: BL15I-BUILDER.cryocooler_fill" in text.splitlines()
     assert not [n for n in result.notes if "BL15I-BUILDER@" in n]

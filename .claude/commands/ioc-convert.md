@@ -131,14 +131,20 @@ produce more than one ibek entity, use `entity.add_entity(extra)` and
 `db/` directory of the support module. These need a support YAML entity model
 with just parameters and a `databases` section — no `pre_init` or `post_init`.
 
-**Beamline modules (`BL<nn><x>-BUILDER`, `BL<nn><x>`)** — these get **vendored
-as runtime patterns** from `ibek-runtime-support`, never built into the image.
-xml2yaml routes a `BL<nn><x>` module (`BL21I`, `BL19I`, …) to its pattern and
-drops each entity the pattern does not take, with a warning and a
-`DROPPED FOR MANUAL REVIEW` comment at the top of the `ioc.yaml`. Report those
-to the user; to restore one, add its entity model to the pattern folder rather
-than to a build-time module. `converters/BL15I-BUILDER.py` drops the entities it
-has no model for itself. **First check the module for compiled code — if it has `src/`, a `.dbd`,
+**Beamline modules (`BL<nn><x>`)** — these come only from **runtime patterns**
+in `ibek-runtime-support`, never built into the image. xml2yaml routes a
+`BL<nn><x>` module (`BL21I`, `BL19I`, …) to its pattern and drops each entity
+the pattern does not take, with a warning and a `DROPPED FOR MANUAL REVIEW`
+comment at the top of the `ioc.yaml`. Report those to the user; to restore one,
+add its entity model to the pattern folder rather than to a build-time module.
+
+**Beamline builder repos (`BL<nn><x>-BUILDER`)** — never a pattern and never
+built. `convert_file` drops every one of their entities to the same
+`DROPPED FOR MANUAL REVIEW` comment, with one warning per entity type: their
+templates need migrating into the `BL<nn><x>` module's pattern. Report those
+to the user.
+
+**First check the module for compiled code — if it has `src/`, a `.dbd`,
 or `DTYP` device support it cannot be vendored: stop and report it to the user.**
 Full recipe and the check commands are in
 [module-special-cases.md](../skills/shared/module-special-cases.md).
