@@ -125,33 +125,44 @@ for both must be present in the `ibek-support*` submodules used by the Generic I
 
 A module with a runtime pattern in
 [ibek-runtime-streamdevice](https://github.com/epics-containers/ibek-runtime-streamdevice)
+or [ibek-runtime-support](https://github.com/epics-containers/ibek-runtime-support)
 needs no compiled support in the image: its files are vendored into the IOC
-instance. xml2yaml checks every IOC for such modules, against the library's
-latest release tag. A module that also has a generic model in `ibek-support*`
+instance. xml2yaml checks every IOC for such modules, against each library's
+latest release tag. A module with a pattern in both libraries is an error. A module that also has a generic model in `ibek-support*`
 (the `module:` of a support YAML there) uses its pattern only once
 `src/builder2ibek/patterns.py` lists it as aligned with that model; until then
-it stays build-time. That rule needs the ibek-support submodules checked out,
+it stays build-time. It also stays build-time when an entity leaves a parameter
+to the generic model's default and the pattern defaults it differently:
+builder2ibek drops a value equal to the generic default, so the pattern would
+fill in its own. That rule needs the ibek-support submodules checked out,
 as they are when builder2ibek runs from its repository with `uv run`; without
 them xml2yaml warns once and uses every pattern. When the `--yaml` path is
 `services/<ioc>/config/ioc.yaml` in a services repo, xml2yaml adds each pattern
-with `ibek pattern add ibek-runtime-streamdevice:<module>@<tag> services/<ioc>`,
+with `ibek pattern add <library>:<module>@<tag> services/<ioc>`,
 which writes the pattern files under `config/`, `runtime-lock.yaml`,
 `ioc.schema.json` and the `ioc.yaml` schema header.
 
-Beamline modules (`BL04I`, `BL11I`, `BL19I`, `BL21I` and the like) and other
-support made only of soft records come from the
-[ibek-runtime-support](https://github.com/epics-containers/ibek-runtime-support)
-library instead, at its latest release tag, and are added the same way as
-`ibek-runtime-support:<module>@<tag>`. These modules are not built into generic
-IOCs, so one goes to its pattern even where `ibek-support-dls` has a generic
-model, as long as every entity validates against the pattern and no parameter
-the ioc.yaml leaves to the generic model's default has a different default in
-the pattern; otherwise xml2yaml warns, as no generic IOC builds the module.
-Any ibek-runtime-support pattern keeps an IOC off the `ioc-streamdevice-runtime`
-image, even alongside ibek-runtime-streamdevice patterns, so xml2yaml never
-sets or bumps the image of such an IOC: pick its generic IOC image in
-`values.yaml` yourself. One library that cannot be reached is a warning; the
-other library's patterns are still added.
+A beamline module, one named `BL<nn><x>` such as `BL21I` (not `BL15I-BUILDER`
+or `I19Server`), is never compiled into a generic IOC, so it comes only from
+its pattern in ibek-runtime-support, whatever generic model `ibek-support-dls`
+has for it. xml2yaml keeps each of its entities the pattern has a model for and
+accepts. It leaves out of the `ioc.yaml` every other entity of the module, every
+entity of a beamline module with no pattern (such as `BL20J`), and every entity
+that refers to the id of one left out. Each is a warning that names the IOC,
+the entity type, its `name`, `P` and `R`, and the reason. A comment at the top
+of the `ioc.yaml`, headed `DROPPED FOR MANUAL REVIEW`, lists each with its
+reason and its YAML as builder2ibek converted it, commented out, so that it can
+be found in the services repo, added to the pattern, and restored.
+
+Only the beamline modules of ibek-runtime-support are routed to it; its other
+patterns are not used. An IOC that uses one of them, such as `detectorPlugins`,
+keeps its entities with a warning. A builder repo such as `BL15I-BUILDER` is
+never a pattern: its templates are to be migrated into the beamline module
+(`BL15I`), so every one of its entities is left out and listed for review in
+the same way, with one warning per entity type. A kept
+entity leaves out each parameter whose value is its pattern model's default. An
+entity is taken to refer to a dropped one only through an `object` parameter of
+its pattern or generic model.
 
 - **Pattern-only IOC**: every other entity is one the `ioc-streamdevice-runtime`
   image of the latest published GitHub release of `ioc-streamdevice` builds, as
@@ -162,7 +173,8 @@ other library's patterns are still added.
   pattern.
 - **Any other IOC** keeps the image its `values.yaml` names. A pattern whose
   entity types that image's published schema already has is installed by the
-  image and is not added. When that schema cannot be fetched (for example an
+  image and is not added, except a beamline module's pattern, which is always
+  added: beamline modules are deployed per instance. When that schema cannot be fetched (for example an
   image on a GitLab registry ibek has no token for) every pattern is added, with
   a warning. When `values.yaml` still holds `REPLACE_WITH_IMAGE_URI`, every
   pattern is added with a warning: set the generic IOC image and re-run
@@ -185,7 +197,12 @@ latest.
 Only the placeholder or an older `ioc-streamdevice-runtime` tag on the
 `image:` line is replaced; a newer tag someone pinned is kept, with a note.
 Any problem adding patterns (no network, no git, a schema that cannot be
-fetched, an unwritable file) is a warning: the `ioc.yaml` is always written.
+fetched, an unwritable file) is a warning, and the `ioc.yaml` is written, with
+one exception: an IOC with beamline entities fails to convert, and nothing is
+written, when ibek-runtime-support cannot be indexed. Each library is indexed on
+its own, so ibek-runtime-support failing costs no other IOC its
+ibek-runtime-streamdevice patterns, nor the reverse. A beamline module with a
+pattern in both libraries is a warning, and an IOC that uses it fails.
 
 ---
 
