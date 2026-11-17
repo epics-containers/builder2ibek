@@ -2,8 +2,10 @@
 Generic XML to YAML conversion functions
 """
 
+import io
 import logging
 import re
+from collections import Counter
 from dataclasses import dataclass
 from dataclasses import field as dc_field
 from pathlib import Path
@@ -15,7 +17,21 @@ from builder2ibek.builder import Builder, Element
 from builder2ibek.converters.records import RECORDS_DB, generated, keep_own_records_db
 from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_fastcs
 from builder2ibek.moduleinfos import finalizers, module_infos
-from builder2ibek.support_defaults import fill_empty_attributes, strip_defaults
+from builder2ibek.patterns import (
+    SUPPORT_LIBRARY,
+    BeamlinePatternError,
+    DroppedEntity,
+    PatternIndex,
+    drop_beamline_entities,
+    is_beamline_module,
+    module_of,
+    pattern_index,
+)
+from builder2ibek.support_defaults import (
+    builder_module_target,
+    fill_empty_attributes,
+    strip_defaults,
+)
 from builder2ibek.types import Entity, Generic_IOC
 from builder2ibek.vendor_patterns import add_patterns
 
@@ -50,6 +66,10 @@ def convert_file(
             "  - type",
         ]:
             yaml = re.sub(rf"(\n{field})", "\n\\g<1>", yaml)
+        if dropped:
+            # below the schema header, which ibek pattern add rewrites
+            header, _, rest = yaml.partition("\n")
+            yaml = f"{header}\n\n{dropped_comment(dropped)}{rest}"
         return yaml
 
     """
@@ -60,7 +80,12 @@ def convert_file(
     PandA IOC gets only that, and no ioc.yaml.
 
     The runtime patterns the IOC uses are added to its services-repo instance,
-    or only reported when there is none (see builder2ibek.vendor_patterns).
+    or only reported when there is none (see builder2ibek.vendor_patterns). An
+    entity of a beamline module that its runtime pattern does not take is left
+    out, with a warning and a comment in the ioc.yaml that lists it for manual
+    review (see builder2ibek.patterns.drop_beamline_entities). Raises
+    BeamlinePatternError, writing nothing, when the IOC has beamline entities
+    and ibek-runtime-support cannot be indexed.
 
     Returns what was written and the IOC's warnings, one per dropped entity
     type plus any others; the caller reports them to the user.
@@ -69,6 +94,7 @@ def convert_file(
     builder.load(xml)
     ioc = dispatch(builder, xml, yaml.parent, description=description, blgui=blgui)
     keep_own_records_db(ioc, yaml.parent)
+    dropped = drop_unpatterned_entities(ioc)
 
     result = ConvertResult()
     split = ioc.panda_split
@@ -123,6 +149,104 @@ def convert_file(
         result.warnings.append(f"runtime patterns not added: {e}")
 
     return result
+
+
+IDENTIFYING_PARAMS = ("name", "P", "R")
+
+
+def describe(entity: dict[str, Any]) -> str:
+    """An entity's type and the parameters that identify it, for a warning."""
+    names = [f"{p}={entity[p]}" for p in IDENTIFYING_PARAMS if p in entity]
+    return f"{entity['type']} ({', '.join(names)})" if names else str(entity["type"])
+
+
+def drop_unpatterned_entities(ioc: Generic_IOC) -> list[DroppedEntity]:
+    """Take out of the IOC the beamline entities no runtime pattern takes.
+
+    So too every entity of a beamline builder repo such as BL15I-BUILDER, which
+    is never a pattern. Warns once for the dropped entities that share a type,
+    identifying parameters and reason, with a count when there is more than
+    one; a builder repo's entities are grouped by type alone. Returns the
+    dropped entities for the ioc.yaml comment.
+    Strips from each beamline entity kept the parameters its pattern model
+    defaults to the same value. Raises BeamlinePatternError when the IOC has
+    beamline entities and ibek-runtime-support cannot be indexed: nothing is
+    written then.
+    """
+    modules = {module_of(e) for e in ioc.entities}
+    beamline = sorted(filter(is_beamline_module, modules))
+    if not beamline and not any(map(builder_module_target, modules)):
+        return []
+    errors: list[str] = []
+    index: PatternIndex | None = None
+    if beamline:
+        try:
+            index = pattern_index()
+        except Exception as e:  # noqa: BLE001 -- raised below
+            errors.append(str(e) or type(e).__name__)
+        else:
+            if SUPPORT_LIBRARY in index.failures:
+                errors.append(index.failures[SUPPORT_LIBRARY] or "unknown error")
+            errors += [
+                index.module_failures[m] for m in beamline if m in index.module_failures
+            ]
+    if errors:
+        error = "; ".join(errors)
+        raise BeamlinePatternError(
+            f"{Path(ioc.source_file).stem} uses beamline modules "
+            f"{', '.join(beamline)}, which come only from runtime patterns, and "
+            f"{SUPPORT_LIBRARY} cannot be indexed for them: {error}"
+        )
+    kept, dropped = drop_beamline_entities(ioc.entities, index)
+    for entity in kept:
+        if index is not None and is_beamline_module(module_of(entity)):
+            index.strip_defaults(entity)  # type: ignore[arg-type]
+    ioc.entities = list(kept)  # type: ignore[arg-type]
+    stem = Path(ioc.source_file).stem
+
+    def what(entity: dict[str, Any]) -> str:
+        # a builder repo's content migrates by template, not by instance
+        if builder_module_target(module_of(entity)):
+            return str(entity["type"])
+        return describe(entity)
+
+    # entities alike, e.g. one template loaded many times, warn once
+    counts = Counter(
+        f"{stem}: dropped {what(dict(d.entity))} from the ioc.yaml for "
+        f"manual review: {d.reason}"
+        for d in dropped
+    )
+    ioc.extra_warnings += [
+        warning if n == 1 else f"{warning} (x{n})" for warning, n in counts.items()
+    ]
+    return dropped
+
+
+def dropped_comment(dropped: list[DroppedEntity]) -> str:
+    """The ioc.yaml comment that lists the dropped entities for manual review."""
+    ruamel = YAML()
+    ruamel.default_flow_style = False
+    ruamel.indent(mapping=2, sequence=4, offset=2)
+    lines = [
+        "# DROPPED FOR MANUAL REVIEW by builder2ibek. A beamline module comes only",
+        "# from its runtime pattern (ibek-runtime-support), which does not take the",
+        "# entities below, nor those that refer to them.",
+    ]
+    if any(builder_module_target(module_of(d.entity)) for d in dropped):
+        lines += [
+            "# A builder repo such as BL15I-BUILDER is never a pattern: its",
+            "# templates migrate into the beamline module, such as BL15I.",
+        ]
+    lines += [
+        "# Each is shown, commented out, as builder2ibek converted it, after the",
+        "# reason it was dropped.",
+    ]
+    for d in dropped:
+        lines += ["#", f"# Dropped: {d.reason}"]
+        text = io.StringIO()
+        ruamel.dump([dict(d.entity)], text)
+        lines += [f"# {line}".rstrip() for line in text.getvalue().splitlines()]
+    return "\n".join(lines) + "\n"
 
 
 def dispatch(
@@ -283,7 +407,10 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
     fill_empty_attributes(entity)
     drop_none_values(entity)
 
-    strip_defaults(entity)
+    # a beamline module's defaults are its pattern model's, which only
+    # drop_unpatterned_entities knows
+    if not is_beamline_module(module_of(entity)):
+        strip_defaults(entity)
 
 
 def drop_none_values(entity: dict[str, Any]):

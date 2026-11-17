@@ -80,10 +80,8 @@ ibek-runtime-streamdevice and ibek-runtime-support (beamline module) pattern
 the IOC uses, at each library's latest release, and prints what it added. A
 pattern-only IOC gets the latest `ioc-streamdevice-runtime` image in
 `values.yaml`; any other IOC keeps its generic IOC image and skips the
-patterns that image already installs. ibek-runtime-support patterns never
-make an IOC pattern-only, so for an IOC that uses them, pick the generic IOC
-image yourself. Patterns
-already in `runtime-lock.yaml` stay at their locked version. If it warns that a
+patterns that image already installs, except beamline patterns, which are
+always added. Patterns already in `runtime-lock.yaml` stay at their locked version. If it warns that a
 mixed IOC has no image set, set the generic IOC image in `values.yaml` and
 re-run xml2yaml. Report the patterns, the image and any warnings; see
 [convert-ioc-instance.md](../../docs/how-to/convert-ioc-instance.md#runtime-patterns).
@@ -133,14 +131,20 @@ produce more than one ibek entity, use `entity.add_entity(extra)` and
 `db/` directory of the support module. These need a support YAML entity model
 with just parameters and a `databases` section — no `pre_init` or `post_init`.
 
-**Beamline modules (`BL<nn><x>-BUILDER`, `BL<nn><x>`)** — these get **vendored
-as runtime patterns**, not built into the image, unless
-[module-special-cases.md](../skills/shared/module-special-cases.md) lists the
-beamline as an exception: `BL19I` and `BL11I` predate the rule and are still
-build-time modules. Check there first. Some converters currently drop
-their entities wholesale (`converters/BL15I-BUILDER.py`); if the IOC needs one,
-add the entity model to a pattern folder rather than restoring a build-time
-module. **First check the module for compiled code — if it has `src/`, a `.dbd`,
+**Beamline modules (`BL<nn><x>`)** — these come only from **runtime patterns**
+in `ibek-runtime-support`, never built into the image. xml2yaml routes a
+`BL<nn><x>` module (`BL21I`, `BL19I`, …) to its pattern and drops each entity
+the pattern does not take, with a warning and a `DROPPED FOR MANUAL REVIEW`
+comment at the top of the `ioc.yaml`. Report those to the user; to restore one,
+add its entity model to the pattern folder rather than to a build-time module.
+
+**Beamline builder repos (`BL<nn><x>-BUILDER`)** — never a pattern and never
+built. `convert_file` drops every one of their entities to the same
+`DROPPED FOR MANUAL REVIEW` comment, with one warning per entity type: their
+templates need migrating into the `BL<nn><x>` module's pattern. Report those
+to the user.
+
+**First check the module for compiled code — if it has `src/`, a `.dbd`,
 or `DTYP` device support it cannot be vendored: stop and report it to the user.**
 Full recipe and the check commands are in
 [module-special-cases.md](../skills/shared/module-special-cases.md).

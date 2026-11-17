@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 from builder2ibek import convert, vendor_patterns
-from builder2ibek.patterns import Pattern, PatternIndexError, PatternPlan
+from builder2ibek.patterns import Pattern, PatternPlan
 from builder2ibek.vendor_patterns import (
     RUNTIME_IMAGE,
     RUNTIME_TAG_ENV,
@@ -36,11 +36,9 @@ patterns:
 """
 
 
-def _pattern(
-    module: str, model: str, library: str = "ibek-runtime-streamdevice"
-) -> Pattern:
+def _pattern(module: str, model: str) -> Pattern:
     return Pattern(
-        library=library,
+        library="ibek-runtime-streamdevice",
         module=module,
         version="0.8.1",
         models=frozenset({model}),
@@ -50,7 +48,6 @@ def _pattern(
 
 ATTO = _pattern("attocubeInterf", "ids3010")
 SCROLL = _pattern("EdwardsScroll", "EdwardsScroll")
-BL21I = _pattern("BL21I", "ARMAirControl", "ibek-runtime-support")
 ENTITIES = [
     {"type": "asyn.AsynIP", "name": "p", "port": "localhost:1"},
     {"type": "attocubeInterf.ids3010", "P": "X", "PORT": "p", "Q": "01"},
@@ -71,16 +68,11 @@ def _schema(types: frozenset[str]) -> dict:
 
 
 class FakeIndex:
+    failures: dict[str, str] = {}
+    unindexed: dict[str, str] = {}
+
     def plan(self, entities):
         return PatternPlan(patterns=[ATTO, SCROLL])
-
-
-class FakeSupportIndex:
-    """The ibek-runtime-support index: BL21I for the IOCs that use it."""
-
-    def plan(self, entities):
-        used = any(str(e["type"]).startswith("BL21I.") for e in entities)
-        return PatternPlan(patterns=[BL21I] if used else [])
 
 
 @pytest.fixture
@@ -100,7 +92,6 @@ def ibek(monkeypatch) -> Iterator[list[tuple[str, ...]]]:
         return real_fetch(image)
 
     monkeypatch.setattr(vendor_patterns, "pattern_index", FakeIndex)
-    monkeypatch.setattr(vendor_patterns, "support_pattern_index", FakeSupportIndex)
     monkeypatch.setattr(vendor_patterns, "_fetch_base_schema", fetch)
     monkeypatch.setattr(vendor_patterns, "runtime_image", lambda: (RUNTIME, ""))
     monkeypatch.setattr(vendor_patterns, "_ibek", run)
@@ -176,6 +167,60 @@ def test_mixed_skips_patterns_the_image_installs(tmp_path: Path, ibek):
     assert VAC in (instance / "values.yaml").read_text()
     assert _adds(ibek) == [ATTO.ref]
     assert f"EdwardsScroll: {VAC} installs it" in report.notes
+
+
+BL21I = Pattern(
+    library="ibek-runtime-support",
+    module="BL21I",
+    version="0.4.0",
+    models=frozenset({"TTHBumpstripMonitor"}),
+    support_yaml=Path("unused"),
+)
+
+
+@pytest.mark.parametrize(
+    ("failing", "warned"),
+    [("ibek-runtime-streamdevice", True), ("ibek-runtime-support", False)],
+)
+def test_library_failure_warns_only_for_streamdevice(
+    tmp_path: Path, ibek, monkeypatch, failing: str, warned: bool
+):
+    """The other library's patterns are still added."""
+
+    class Index(FakeIndex):
+        failures = {failing: "unreachable"}
+
+    monkeypatch.setattr(vendor_patterns, "pattern_index", Index)
+    instance = _instance(tmp_path, VAC)
+    report = add_patterns(ENTITIES, instance / "config" / "ioc.yaml")
+    assert _adds(ibek) == [ATTO.ref]
+    expected = [f"{failing} patterns not added: unreachable"] if warned else []
+    assert [w for w in report.warnings if "not added" in w] == expected
+
+
+def test_beamline_pattern_is_added_even_when_the_image_has_it(
+    tmp_path: Path, ibek, monkeypatch
+):
+    """Beamline modules are always deployed per instance with ibek pattern add."""
+    beamline = {"type": "BL21I.TTHBumpstripMonitor", "P": "A", "R": ":1"}
+    monkeypatch.setitem(SCHEMAS, VAC, SCHEMAS[VAC] | {beamline["type"]})
+
+    class Index:
+        failures: dict[str, str] = {}
+        unindexed: dict[str, str] = {}
+
+        def plan(self, entities):
+            return PatternPlan(patterns=[SCROLL, BL21I])
+
+    monkeypatch.setattr(vendor_patterns, "pattern_index", Index)
+    instance = _instance(tmp_path, VAC)
+    entities = [ENTITIES[0], ENTITIES[2], beamline]
+
+    report = add_patterns(entities, instance / "config" / "ioc.yaml")
+
+    assert _adds(ibek) == [BL21I.ref]
+    assert f"EdwardsScroll: {VAC} installs it" in report.notes
+    assert not [n for n in report.notes if n.startswith("BL21I:")]
 
 
 def test_mixed_without_image_schema_adds_all(tmp_path: Path, ibek):
@@ -321,86 +366,3 @@ def test_image_must_install_every_type_the_ioc_uses(tmp_path: Path, ibek):
     add_patterns(entities, instance / "config" / "ioc.yaml")
 
     assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
-
-
-def test_support_patterns_are_added_too(tmp_path: Path, ibek):
-    instance = _instance(tmp_path, GITLAB)
-    entities = [*ENTITIES, {"type": "BL21I.ARMAirControl", "P": "X"}]
-
-    add_patterns(entities, instance / "config" / "ioc.yaml")
-
-    assert _adds(ibek) == [ATTO.ref, SCROLL.ref, BL21I.ref]
-    assert BL21I.ref == "ibek-runtime-support:BL21I@0.8.1"
-
-
-def test_support_patterns_do_not_make_an_ioc_pattern_only(tmp_path: Path, ibek):
-    """The runtime image may lack the records an ibek-runtime-support pattern
-    loads, so the IOC keeps its image."""
-    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
-    entities = [*ENTITIES[:2], {"type": "BL21I.ARMAirControl", "P": "X"}]
-
-    report = add_patterns(entities, instance / "config" / "ioc.yaml")
-
-    assert "REPLACE_WITH_IMAGE_URI" in (instance / "values.yaml").read_text()
-    assert _adds(ibek) == [ATTO.ref, SCROLL.ref, BL21I.ref]
-    assert any("mixed IOC with no image set" in w for w in report.warnings)
-
-
-def test_no_instance_lists_support_patterns(tmp_path: Path, ibek):
-    entities = [*ENTITIES, {"type": "BL21I.ARMAirControl", "P": "X"}]
-
-    report = add_patterns(entities, tmp_path / "ioc.yaml")
-
-    assert ibek == []
-    assert f"would add runtime pattern {BL21I.ref}" in report.notes
-
-
-@pytest.mark.parametrize(
-    "error",
-    [
-        PatternIndexError("cannot clone the library"),
-        subprocess.TimeoutExpired(["git", "clone"], 60),
-    ],
-    ids=["index-error", "git-timeout"],
-)
-@pytest.mark.parametrize("failing", ["pattern_index", "support_pattern_index"])
-def test_one_library_failing_leaves_the_other(
-    tmp_path: Path, ibek, monkeypatch, failing: str, error: Exception
-):
-    def fail():
-        raise error
-
-    monkeypatch.setattr(vendor_patterns, failing, fail)
-    instance = _instance(tmp_path, GITLAB)
-    entities = [*ENTITIES, {"type": "BL21I.ARMAirControl", "P": "X"}]
-
-    report = add_patterns(entities, instance / "config" / "ioc.yaml")
-
-    if failing == "pattern_index":
-        assert _adds(ibek) == [BL21I.ref]
-        library = "ibek-runtime-streamdevice"
-    else:
-        assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
-        library = "ibek-runtime-support"
-    assert f"{library} runtime patterns not added: {error}" in report.warnings
-
-
-def test_support_module_left_build_time_is_a_warning(tmp_path: Path, ibek, monkeypatch):
-    """No generic IOC builds a beamline module, so one its pattern rejects is
-    reported rather than left to fail at generate2."""
-    reason = "ibek-runtime-support:BL21I@0.8.1 rejects 0.P: Field required"
-    monkeypatch.setattr(
-        FakeSupportIndex,
-        "plan",
-        lambda self, e: PatternPlan(build_time={"BL21I": reason}),
-    )
-    instance = _instance(tmp_path, GITLAB)
-    entities = [*ENTITIES, {"type": "BL21I.ARMAirControl"}]
-
-    report = add_patterns(entities, instance / "config" / "ioc.yaml")
-
-    assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
-    assert (
-        "BL21I is not added as a runtime pattern, and generic IOCs do not "
-        f"build it: {reason}"
-    ) in report.warnings

@@ -41,7 +41,7 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 | `ibek-support-dls/<module>/` | DLS entity models + install.yml |
 | `ibek-support/<module>/` | Community entity models |
 | `ibek-runtime-streamdevice/` | Runtime pattern library at the release the tests use; conversions clone the latest release (`src/builder2ibek/patterns.py`) |
-| `ibek-runtime-support/` | Runtime pattern library of beamline modules, likewise |
+| `ibek-runtime-support/` | Runtime pattern library of the beamline modules (`BL\d\d[A-Z]`), pinned and cloned the same way |
 | `src/builder2ibek/converters/` | XML converters (one per module) |
 | `tools/pvi-from-edm/` | Separate tool: PVI from EDM screens, see its README |
 
@@ -57,11 +57,15 @@ grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -m
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 #   --blgui  emit BLGui.status/device; only when the generic IOC binary has BLGui
 # Inside a services repo instance it also runs `ibek pattern add` for each
-# ibek-runtime-streamdevice and ibek-runtime-support (beamline module) pattern
-# the IOC uses (latest releases), and gives a pattern-only IOC the latest
-# ioc-streamdevice-runtime image; elsewhere it only lists them.
-# BUILDER2IBEK_PATTERN_TAG / BUILDER2IBEK_SUPPORT_PATTERN_TAG /
-# BUILDER2IBEK_RUNTIME_TAG fix the tags.
+# ibek-runtime-streamdevice or ibek-runtime-support pattern the IOC uses (latest
+# releases), and gives a pattern-only IOC the latest ioc-streamdevice-runtime
+# image; elsewhere it only lists them. A beamline module's entity its
+# ibek-runtime-support pattern does not take is dropped, with a warning and an
+# ioc.yaml comment for manual review; with no index of ibek-runtime-support such
+# an IOC fails to convert. Beamline patterns are always added, per instance.
+# BUILDER2IBEK_PATTERN_TAG (streamdevice),
+# BUILDER2IBEK_SUPPORT_PATTERN_TAG (support) and BUILDER2IBEK_RUNTIME_TAG (image)
+# fix the tags.
 
 # Add a beamline's live Linux IOCs as dev-c7 legacy IOCs (dry run; --apply writes).
 # Services-repo files only: never deploy one while its IOC runs on its server.

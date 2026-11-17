@@ -3,26 +3,14 @@ from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "BL15I-BUILDER"
 
-# Entity types that have an entity model in
-# ibek-support-dls/BL15I-BUILDER/BL15I-BUILDER.ibek.support.yaml.
-# Everything else is still dropped - see the docstring below.
-converted = ["auto_BL15I_SumTheDiode"]
-
 
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
-    XML to YAML specialist convertor function for BL15I-BUILDER module.
+    XML to YAML specialist convertor function for the BL15I-BUILDER module.
 
-    BL15I-BUILDER defines beamline-specific AutoSubstitution templates.
-    Only the ones listed in `converted` have an entity model so far; the rest
-    are skipped until someone needs them.
+    BL15I-BUILDER is the I15 beamline's builder repo, which is never a runtime
+    pattern: its templates are to be migrated into the BL15I beamline module.
+    Until then convert_file drops each of its entities from the ioc.yaml and
+    lists it for manual review (see builder2ibek.patterns.drop_beamline_entities).
     """
-    if entity_type not in converted:
-        entity.delete_me()
-        return
-
-    # builder's object name is not passed to the template - the substitutions
-    # pattern is P, SHUTTER, DIODE and the two gda_* tags, which the global
-    # handler has already stripped.
-    entity.remove("name")

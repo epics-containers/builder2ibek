@@ -2,22 +2,15 @@
 Add the runtime patterns a converted IOC uses to its services-repo instance.
 
 The IOC's patterns are those :meth:`~builder2ibek.patterns.PatternIndex.plan`
-picks from the ibek-runtime-streamdevice and ibek-runtime-support libraries. When
-every entity is either from an ibek-runtime-streamdevice pattern or one the
-ioc-streamdevice-runtime image builds, as its published schema says, the IOC is
-pattern-only: it runs on the latest published release of that image, which is
-written into ``values.yaml`` in place of the services template's placeholder or an
-older tag of the same image, and every pattern is added. Any other IOC keeps the
-image ``values.yaml`` names, and each pattern is added unless that image's
-published schema already has the pattern's entity types, which means the image
-installs the pattern itself.
-
-A library that cannot be indexed is a warning, and the other library's
-patterns are still added.
-
-An IOC whose patterns all come from ibek-runtime-support is not pattern-only,
-so builder2ibek never sets or bumps its image: the user picks the generic IOC
-image in ``values.yaml``.
+picks. When every other entity is one the ioc-streamdevice-runtime image builds,
+as its published schema says, the IOC is pattern-only: it runs on the latest
+published release of that image, which is written into ``values.yaml`` in place
+of the services template's placeholder or an older tag of the same image, and
+every pattern is added. Any other IOC keeps the image ``values.yaml`` names, and
+each pattern is added unless that image's published schema already has the
+pattern's entity types, which means the image installs the pattern itself. A
+beamline module's pattern is added whatever the image has: beamline modules are
+always deployed per instance.
 
 A schema that cannot be fetched, or a ``values.yaml`` that cannot be read, is a
 warning and never stops the conversion. Without the runtime image's schema
@@ -63,13 +56,11 @@ from ibek.pattern_cmds.schema import fetch_base_schema as _fetch_base_schema
 from ibek.pattern_cmds.sources import PatternError
 
 from builder2ibek.patterns import (
-    LIBRARY,
     SUPPORT_LIBRARY,
-    PatternPlan,
     cache_outcome,
+    is_beamline_module,
     latest_tag,
     pattern_index,
-    support_pattern_index,
     version_key,
 )
 
@@ -197,43 +188,37 @@ def _ibek(*args: str) -> subprocess.CompletedProcess:
         return subprocess.CompletedProcess([ibek, *args], 1, "", str(e))
 
 
-def plan_patterns(
-    entities: Sequence[Mapping[str, Any]], report: PatternReport
-) -> PatternPlan:
-    """The patterns of both libraries an IOC's entities could come from.
-
-    A library that cannot be cloned, indexed or planned is a warning, and the
-    other library's patterns are still added. So is an ibek-runtime-support
-    module that stays build-time: no generic IOC builds those modules, so its
-    entities would have no model.
-    """
-    plan = PatternPlan()
-    for library, index in (
-        (LIBRARY, pattern_index),
-        (SUPPORT_LIBRARY, support_pattern_index),
-    ):
-        try:
-            library_plan = index().plan(entities)
-        except Exception as e:  # noqa: BLE001 -- a git timeout, a bad library, ...
-            report.warnings.append(f"{library} runtime patterns not added: {e}")
-            continue
-        plan.patterns += library_plan.patterns
-        plan.build_time.update(library_plan.build_time)
-        if library == SUPPORT_LIBRARY:
-            report.warnings += [
-                f"{module} is not added as a runtime pattern, and generic IOCs "
-                f"do not build it: {reason}"
-                for module, reason in library_plan.build_time.items()
-            ]
-    return plan
-
-
 def add_patterns(
     entities: Sequence[Mapping[str, Any]], ioc_yaml: Path
 ) -> PatternReport:
     """Add the runtime patterns of a converted IOC to its instance folder."""
     report = PatternReport()
-    plan = plan_patterns(entities, report)
+    index = pattern_index()
+    # an IOC with beamline entities has already failed when ibek-runtime-support
+    # could not be indexed, and no other IOC uses it
+    report.warnings += [
+        f"{library} patterns not added: {error}"
+        for library, error in index.failures.items()
+        if library != SUPPORT_LIBRARY
+    ]
+    plan = index.plan(entities)
+    # never keep silently the entities of a pattern builder2ibek does not use;
+    # a builder repo's (BL15I-BUILDER) were dropped before the ioc.yaml was
+    # written (see builder2ibek.patterns.drop_beamline_entities)
+    used_modules = sorted({str(e["type"]).partition(".")[0] for e in entities})
+    report.warnings += [
+        f"{module} has a pattern in {index.unindexed[module]} that builder2ibek "
+        f"does not use: its entities are kept, so they need an image that "
+        f"builds {module}"
+        for module in used_modules
+        if module in index.unindexed
+    ]
+    # a beamline module has no build-time route: never skip one silently
+    report.warnings += [
+        f"beamline module {module} gets no runtime pattern: {reason}"
+        for module, reason in plan.build_time.items()
+        if is_beamline_module(module)
+    ]
     if not plan.patterns:
         return report
     runtime, warning = runtime_image()
@@ -249,9 +234,7 @@ def add_patterns(
             report.warnings.append(f"cannot read the image of {instance}: {e}")
             image_known = False
 
-    # an ibek-runtime-support pattern may need record support the runtime image
-    # does not build, so only the StreamDevice patterns make an IOC pattern-only
-    modules = {p.module for p in plan.patterns if p.library == LIBRARY}
+    modules = {p.module for p in plan.patterns}
     built = image_entity_types(runtime)
     if built is None:
         report.warnings.append(
@@ -281,6 +264,10 @@ def add_patterns(
         else:
             todo = []
             for pattern in plan.patterns:
+                if is_beamline_module(pattern.module):
+                    # deployed per instance, whatever the image builds
+                    todo.append(pattern)
+                    continue
                 used = {
                     str(e["type"])
                     for e in entities

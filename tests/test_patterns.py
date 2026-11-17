@@ -15,28 +15,19 @@ from builder2ibek.convert import dispatch
 from builder2ibek.patterns import (
     ALIGNED,
     GENERIC_DIFFERS,
-    LIBRARY,
-    LIBRARY_TAG_ENV,
-    LIBRARY_URL,
+    LIBRARIES,
+    STREAMDEVICE_LIBRARY,
     SUPPORT_LIBRARY,
-    SUPPORT_LIBRARY_URL,
     PatternIndex,
     PatternIndexError,
+    is_beamline_module,
     latest_tag,
     pattern_index,
-    support_pattern_index,
 )
 from tests.conftest import DLS_SUPPORT, REPO_ROOT
-from tests.pattern_pins import (
-    PATTERN_LIBRARY,
-    PATTERN_TAG,
-    SUPPORT_PATTERN_LIBRARY,
-    SUPPORT_PATTERN_TAG,
-)
+from tests.pattern_pins import PINNED_LIBRARIES
 
 FIXTURES = Path(__file__).parent / "patterns"
-# the same, for modules of the ibek-runtime-support library
-SUPPORT_FIXTURES = Path(__file__).parent / "support-patterns"
 
 _yaml = YAML(typ="safe", pure=True)
 
@@ -62,28 +53,8 @@ def index() -> PatternIndex:
 # -- the library -----------------------------------------------------------------
 
 
-@pytest.fixture(scope="module")
-def support_index() -> PatternIndex:
-    return support_pattern_index()
-
-
-LIBRARIES = [
-    pytest.param(LIBRARY, LIBRARY_URL, id=LIBRARY),
-    pytest.param(SUPPORT_LIBRARY, SUPPORT_LIBRARY_URL, id=SUPPORT_LIBRARY),
-]
-PINNED = [
-    pytest.param(pattern_index, PATTERN_LIBRARY, PATTERN_TAG, id=LIBRARY),
-    pytest.param(
-        support_pattern_index,
-        SUPPORT_PATTERN_LIBRARY,
-        SUPPORT_PATTERN_TAG,
-        id=SUPPORT_LIBRARY,
-    ),
-]
-
-
-@pytest.mark.parametrize("library,library_url", LIBRARIES)
-def test_library_is_the_one_ibek_vendors_from(library: str, library_url: str):
+@pytest.mark.parametrize("library", LIBRARIES)
+def test_library_is_the_one_ibek_vendors_from(library: str):
     """The submodule the tests index is the library `ibek pattern add` clones."""
     url = subprocess.run(
         ["git", "config", "-f", ".gitmodules", f"submodule.{library}.url"],
@@ -92,12 +63,14 @@ def test_library_is_the_one_ibek_vendors_from(library: str, library_url: str):
         text=True,
         check=True,
     ).stdout.strip()
-    assert url == DEFAULT_LIBRARIES[library] == library_url
+    assert url == DEFAULT_LIBRARIES[library]
+    assert REPO_ROOT / library in PINNED_LIBRARIES
 
 
-@pytest.mark.parametrize("make_index,submodule,tag", PINNED)
-def test_tests_index_the_pinned_tag(make_index, submodule: Path, tag: str):
-    """conftest pins the tag the submodule is checked out at."""
+@pytest.mark.parametrize("submodule", PINNED_LIBRARIES, ids=lambda p: p.name)
+def test_tests_index_the_pinned_tag(index: PatternIndex, submodule: Path):
+    """conftest pins the tag each submodule is checked out at."""
+    tag = PINNED_LIBRARIES[submodule]
     tags = subprocess.run(
         ["git", "-C", str(submodule), "tag", "--points-at", "HEAD"],
         capture_output=True,
@@ -105,15 +78,54 @@ def test_tests_index_the_pinned_tag(make_index, submodule: Path, tag: str):
         check=True,
     ).stdout.split()
     assert tag in tags
-    assert {p.version for p in make_index().patterns.values()} == {tag}
+    assert index.libraries[submodule.name] == tag
+    assert {
+        p.version for p in index.patterns.values() if p.library == submodule.name
+    } == {tag}
 
 
-@pytest.mark.parametrize("make_index,submodule,tag", PINNED)
-def test_every_pattern_folder_is_indexed(make_index, submodule: Path, tag: str):
-    folders = {p.parent.name for p in submodule.glob("*/*.ibek.support.yaml")}
-    index = make_index()
-    assert folders and set(index.patterns) == folders
-    assert {p.library for p in index.patterns.values()} == {submodule.name}
+def test_every_pattern_folder_is_indexed(index: PatternIndex):
+    """Every folder, except ibek-runtime-support's of non-beamline modules."""
+    for submodule in PINNED_LIBRARIES:
+        folders = {p.parent.name for p in submodule.glob("*/*.ibek.support.yaml")}
+        if submodule.name == SUPPORT_LIBRARY:
+            folders = set(filter(is_beamline_module, folders))
+        indexed = {m for m, p in index.patterns.items() if p.library == submodule.name}
+        assert folders and indexed == folders
+
+
+def test_support_library_routes_only_beamline_modules(index: PatternIndex):
+    """BL15I-BUILDER and detectorPlugins get no pattern from ibek-runtime-support.
+
+    A detectorPlugins-only IOC is then never moved onto the streamdevice
+    runtime image, which has no areaDetector.
+    """
+    folders = {p.name for p in (REPO_ROOT / SUPPORT_LIBRARY).iterdir()}
+    assert {"BL15I-BUILDER", "detectorPlugins"} <= folders
+    assert "BL15I-BUILDER" not in index.patterns
+    assert "detectorPlugins" not in index.patterns
+    # skipped, but recorded so that an IOC using one gets a warning
+    assert {"BL15I-BUILDER", "detectorPlugins"} <= index.unindexed.keys()
+    plan = index.plan(
+        [
+            {"type": "detectorPlugins.detectorPlugins", "PREFIX": "X"},
+            {"type": "BL15I-BUILDER.auto_BL15I_SumTheDiode", "P": "X"},
+        ]
+    )
+    assert plan.patterns == [] and plan.build_time == {}
+
+
+def test_beamline_modules():
+    beamline = ["BL04I", "BL11I", "BL19I", "BL21I", "BL20J"]
+    other = ["BL15I-BUILDER", "BL46P-BUILDER", "I19Server", "BLGui"]
+    assert all(map(is_beamline_module, beamline))
+    assert not any(map(is_beamline_module, other))
+
+
+def test_beamline_patterns_are_in_ibek_runtime_support(index: PatternIndex):
+    beamline = {m: p for m, p in index.patterns.items() if is_beamline_module(m)}
+    assert {"BL04I", "BL11I", "BL19I", "BL21I"} <= beamline.keys()
+    assert {p.library for p in beamline.values()} == {SUPPORT_LIBRARY}
 
 
 def _ls_remote(*tags: str) -> subprocess.CompletedProcess:
@@ -137,22 +149,33 @@ def test_latest_tag_unreachable():
             latest_tag("url")
 
 
-@pytest.mark.parametrize("override", ["0.7.3", ""])
-def test_pattern_index_clones_the_tag(monkeypatch, override: str):
-    """The override tag, else the latest, is shallow-cloned and indexed."""
-    monkeypatch.setenv(LIBRARY_TAG_ENV, override)
+def _fake_clones(modules: dict[str, str | list[str]]):
+    """A subprocess.run that clones each library with these pattern folders."""
     calls = []
 
     def run(cmd, **kwargs):
         calls.append(cmd)
         if cmd[1] == "ls-remote":
             return _ls_remote("0.7.3", "0.8.1")
-        clone = Path(kwargs["cwd"]) / LIBRARY / "foo"
-        clone.mkdir(parents=True)
-        (clone / "foo.ibek.support.yaml").write_text(
-            "module: foo\nentity_models: [{name: bar}]\n"
-        )
+        library = next(lib for lib in LIBRARIES if cmd[-1] == DEFAULT_LIBRARIES[lib])
+        folders = modules[library]
+        for module in [folders] if isinstance(folders, str) else folders:
+            clone = Path(kwargs["cwd"]) / library / module
+            clone.mkdir(parents=True)
+            (clone / f"{module}.ibek.support.yaml").write_text(
+                f"module: {module}\nentity_models: [{{name: bar}}]\n"
+            )
         return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    return run, calls
+
+
+@pytest.mark.parametrize("override", ["0.7.3", ""])
+def test_pattern_index_clones_the_tag(monkeypatch, override: str):
+    """Each library's override tag, else its latest, is shallow-cloned and indexed."""
+    for tag_env in LIBRARIES.values():
+        monkeypatch.setenv(tag_env, override)
+    run, calls = _fake_clones({STREAMDEVICE_LIBRARY: "foo", SUPPORT_LIBRARY: "BL99X"})
 
     pattern_index.cache_clear()
     try:
@@ -161,14 +184,39 @@ def test_pattern_index_clones_the_tag(monkeypatch, override: str):
     finally:
         pattern_index.cache_clear()
     tag = override or "0.8.1"
-    assert calls[-1][:2] == ["git", "clone"] and calls[-1][-3:] == [
-        "--branch",
-        tag,
-        LIBRARY_URL,
+    clones = [c for c in calls if c[:2] == ["git", "clone"]]
+    assert [c[-3:] for c in clones] == [
+        ["--branch", tag, DEFAULT_LIBRARIES[library]] for library in LIBRARIES
     ]
-    assert len(calls) == (1 if override else 2)
-    assert index.patterns["foo"].ref == f"{LIBRARY}:foo@{tag}"
+    assert len(calls) == (2 if override else 4)
+    assert index.patterns["foo"].ref == f"{STREAMDEVICE_LIBRARY}:foo@{tag}"
+    assert index.patterns["BL99X"].ref == f"{SUPPORT_LIBRARY}:BL99X@{tag}"
     assert index.patterns["foo"].models == {"bar"}
+
+
+def test_beamline_module_in_both_libraries_fails_only_that_module(monkeypatch, capsys):
+    """ibek-runtime-support is left out for the module; nothing else is lost."""
+    for tag_env in LIBRARIES.values():
+        monkeypatch.setenv(tag_env, "1.0.0")
+    run, _ = _fake_clones(
+        {STREAMDEVICE_LIBRARY: ["foo", "BL99X"], SUPPORT_LIBRARY: ["BL98X", "BL99X"]}
+    )
+    pattern_index.cache_clear()
+    try:
+        with patch.object(patterns.subprocess, "run", side_effect=run):
+            index = pattern_index()
+    finally:
+        pattern_index.cache_clear()
+    both = (
+        f"BL99X has a pattern in both {STREAMDEVICE_LIBRARY}:BL99X@1.0.0 and "
+        f"{SUPPORT_LIBRARY}:BL99X@1.0.0"
+    )
+    assert index.module_failures == {"BL99X": both}
+    assert f"warning: {both}" in capsys.readouterr().err
+    assert index.failures == {}
+    assert index.patterns["foo"].library == STREAMDEVICE_LIBRARY
+    assert index.patterns["BL98X"].library == SUPPORT_LIBRARY
+    assert index.patterns["BL99X"].library == STREAMDEVICE_LIBRARY
 
 
 def test_ref_is_what_ibek_pattern_add_takes(index: PatternIndex):
@@ -212,7 +260,12 @@ def test_tables_cover_every_module_with_a_generic_model(index: PatternIndex):
     has only a vendored subset of ibek-support-dls. So the full comparison runs
     only where the real submodule is checked out.
     """
-    overlap = index.patterns.keys() & _generic_support_yamls().keys()
+    # a beamline module goes to its pattern whatever its generic model
+    overlap = {
+        m
+        for m in index.patterns.keys() & _generic_support_yamls().keys()
+        if not is_beamline_module(m)
+    }
     decided = ALIGNED | GENERIC_DIFFERS
     assert overlap <= decided, f"undecided: {sorted(overlap - decided)}"
     if (DLS_SUPPORT / ".git").exists():
@@ -394,7 +447,8 @@ def test_no_generic_models_warns(tmp_path: Path, capsys):
 
 def test_index_failure_is_cached(monkeypatch):
     """A beamline reconvert does not retry an unreachable library for every IOC."""
-    monkeypatch.delenv(LIBRARY_TAG_ENV)
+    for tag_env in LIBRARIES.values():
+        monkeypatch.delenv(tag_env)
     calls = []
 
     def run(cmd, **kwargs):
@@ -410,56 +464,47 @@ def test_index_failure_is_cached(monkeypatch):
                     pattern_index()
     finally:
         pattern_index.cache_clear()
-    assert len(calls) == 1
+    # one ls-remote per library
+    assert len(calls) == len(LIBRARIES)
 
 
-# -- ibek-runtime-support -------------------------------------------------------
+@pytest.mark.parametrize("failing", list(LIBRARIES))
+def test_each_library_is_indexed_on_its_own(monkeypatch, failing: str):
+    """A library that cannot be cloned costs nothing of the other's patterns."""
+    for tag_env in LIBRARIES.values():
+        monkeypatch.setenv(tag_env, "1.0.0")
+    good, calls = _fake_clones({STREAMDEVICE_LIBRARY: "foo", SUPPORT_LIBRARY: "BL99X"})
 
+    def run(cmd, **kwargs):
+        if cmd[-1] == DEFAULT_LIBRARIES[failing]:
+            return subprocess.CompletedProcess(cmd, 128, "", "unreachable")
+        return good(cmd, **kwargs)
 
-@pytest.mark.parametrize(
-    "fixture", sorted(SUPPORT_FIXTURES.glob("*.xml")), ids=lambda p: p.stem
-)
-def test_converted_xml_maps_to_the_support_pattern(
-    support_index: PatternIndex, fixture: Path
-):
-    """Beamline modules go to their pattern even where ibek-support-dls has a
-    generic model: they are not built into generic IOCs."""
-    module = fixture.stem
-    entities = _convert(fixture)
-    assert any(str(e["type"]).startswith(f"{module}.") for e in entities)
-    plan = support_index.plan(entities)
-    assert plan.build_time == {}
-    assert plan.refs == [f"{SUPPORT_LIBRARY}:{module}@{SUPPORT_PATTERN_TAG}"]
-
-
-def test_support_plan_keeps_a_differing_default_build_time(
-    support_index: PatternIndex, monkeypatch
-):
-    """A parameter left to the generic model's default must default the same
-    way in the pattern, which would otherwise fill in its own."""
-    entity = {"type": "BL21I.TTHBumpstripMonitor", "P": "X", "R": ":Y"}
-    monkeypatch.setattr(patterns, "entity_defaults", lambda t: {"DESC": "generic"})
-    plan = support_index.plan([entity])
-    assert plan.patterns == []
-    assert "BL21I.TTHBumpstripMonitor.DESC defaults to" in plan.build_time["BL21I"]
-
-    # given in the entity, the default does not matter
-    assert support_index.plan([{**entity, "DESC": "set"}]).patterns
+    pattern_index.cache_clear()
+    try:
+        with patch.object(patterns.subprocess, "run", side_effect=run):
+            index = pattern_index()
+    finally:
+        pattern_index.cache_clear()
+    assert set(index.failures) == {failing}
+    assert "unreachable" in index.failures[failing]
+    indexed = {p.library for p in index.patterns.values()}
+    assert indexed == set(LIBRARIES) - {failing}
 
 
 def test_aligned_module_with_a_default_conflict_stays_build_time(
     index: PatternIndex, monkeypatch
 ):
-    """The default check covers ibek-runtime-streamdevice too: an ALIGNED
-    module whose entity leaves a parameter to a generic default the pattern
-    does not share stays build-time."""
+    """An ALIGNED module whose entity leaves a parameter to a generic default
+    the pattern does not share stays build-time."""
     module = "laudaRE2xx"
     assert module in ALIGNED
     entities = _convert(FIXTURES / f"{module}.xml")
     assert index.plan(entities).patterns == [index.patterns[module]]
 
     (entity,) = [e for e in entities if str(e["type"]).startswith(f"{module}.")]
-    params = index._parameters[module][str(entity["type"]).partition(".")[2]]
+    params = index.param_specs(str(entity["type"]))
+    assert params is not None
     # a parameter the pattern defaults, which builder2ibek would leave out of
     # the entity if its value were the generic default
     left_out = sorted(p for p in params if "default" in params[p])[0]
@@ -473,3 +518,13 @@ def test_aligned_module_with_a_default_conflict_stays_build_time(
     plan = index.plan(entities)
     assert plan.patterns == []
     assert f"{entity['type']}.{left_out} defaults to" in plan.build_time[module]
+
+
+def test_beamline_module_has_no_default_conflict(index: PatternIndex, monkeypatch):
+    """A beamline entity's defaults are stripped against its pattern model, not
+    the generic one, so the generic default check does not apply to it."""
+    monkeypatch.setattr(
+        PatternIndex, "default_conflicts", lambda self, p, e: "a default conflict"
+    )
+    entity = {"type": "BL21I.TTHBumpstripMonitor", "P": "X", "R": ":Y", "DESC": "d"}
+    assert index.plan([entity]).patterns == [index.patterns["BL21I"]]

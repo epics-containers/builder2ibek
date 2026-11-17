@@ -55,12 +55,17 @@ superseded one-for-one by `save_restoreStatus.db` (`$(device):SRSTATUS` →
 `$(P)SR_status`, and so on). See
 [builder-py-analysis.md](builder-py-analysis.md) Step 2 for the general rule.
 
-## `BL<nn><x>-BUILDER` / `BL<nn><x>` — vendor as a runtime pattern, never build
+## `BL<nn><x>` — vendor as a runtime pattern, never build; `BL<nn><x>-BUILDER` — migrate
 
-A beamline module (`BL15I-BUILDER`, `BL21I`, `BL04I`, …) holds templates for one
-beamline only. It has no business in a generic IOC image, and a `-BUILDER` repo's
-top-level Makefile descends into `etc/` and `iocs/`, so building it tries to build
-**every IOC on that beamline**.
+A beamline module (`BL21I`, `BL04I`, …) holds templates for one beamline only.
+It has no business in a generic IOC image, so it comes only from its runtime
+pattern in `ibek-runtime-support`.
+
+A beamline builder repo (`BL15I-BUILDER`, …) is never a pattern and never built:
+its top-level Makefile descends into `etc/` and `iocs/`, so building it tries to
+build **every IOC on that beamline**. Migrate the templates an IOC needs into the
+`BL<nn><x>` module's pattern (`BL15I-BUILDER` → `BL15I`) instead, and give each
+model the `BL<nn><x>` module's name.
 
 **Check for compiled code first.** These are template-only in almost every case,
 which is what makes them vendorable:
@@ -75,13 +80,17 @@ grep -l 'DTYP' $B/db/*.template          # device support => needs a built modul
 - **No hits → vendor it.** Add a pattern folder to `ibek-runtime-support`
   (`<Module>/<Module>.ibek.support.yaml` + a pristine copy of each `.template`
   needed). Once the pattern is in a release, xml2yaml adds it to every
-  services-repo instance that uses the module (`ibek pattern add
-  ibek-runtime-support:<Module>@<tag> <instance>`).
+  services-repo instance that uses a `BL<nn><x>` module (`ibek pattern add
+  ibek-runtime-support:<Module>@<tag> <instance>`). xml2yaml does not index
+  any other module there. A `BL<nn><x>-BUILDER` module is never a pattern:
+  migrate its templates into the `BL<nn><x>` module instead.
   Two things differ from a build-time support YAML:
   - `databases[].file` is a **bare filename** (`BL15I-SumTheDiode.template`), not
     `$(MODULE)/db/…` — `ibek runtime place-files` puts it beside the support YAML.
-  - Keep `module:` equal to the XML component name so the `ioc.yaml` entity types
-    (`BL15I-BUILDER.auto_BL15I_SumTheDiode`) do not change.
+  - `module:` is the `BL<nn><x>` folder name, so the `ioc.yaml` entity types are
+    `BL<nn><x>.<model>` (`BL21I.TTHBumpstripMonitor`). An entity migrated from a
+    builder repo changes type with it, so the IOC's XML (or its converter) has to
+    name the `BL<nn><x>` model.
 
   Do **not** also create `ibek-support-dls/<Module>/`. Vendor only the templates
   an IOC actually needs; add more as other IOCs want them.
@@ -97,8 +106,22 @@ generation when `values.yaml` has no published image pinned — expected on a
 freshly-created instance, not an error. See
 [ibek-pattern-vendoring](../ibek-pattern-vendoring/SKILL.md).
 
-`BL19I`/`BL11I` predate this rule and are still build-time modules in
-`ibek-support-dls/` — leave them unless you are converting an IOC that needs them.
+xml2yaml routes every `BL<nn><x>` module (`is_beamline_module` in
+`src/builder2ibek/support_defaults.py`) to its `ibek-runtime-support` pattern, whatever
+`ibek-support-dls/` holds for it, and drops each entity the pattern does not
+take, or that refers to one it drops: a warning per entity, and a
+`DROPPED FOR MANUAL REVIEW` comment at the top of the `ioc.yaml` with the
+entity's converted YAML. A module with no pattern (`BL20J`) has all its entities
+dropped that way. When ibek-runtime-support cannot be indexed, an IOC with
+beamline entities fails to convert instead. The pattern is always added with
+`ibek pattern add`, even to an image that has the module compiled in: beamline
+modules are deployed per instance. Only the beamline modules of
+`ibek-runtime-support` are indexed. An IOC that uses another module there,
+such as `detectorPlugins`, keeps its entities with a warning. Every entity of a
+`BL<nn><x>-BUILDER` module is dropped the same way as an unpatterned beamline
+entity, with one warning per entity type, since its templates are to be
+migrated into `BL<nn><x>`. A kept entity drops only the parameters equal to its
+pattern model's defaults, never the generic model's.
 
 ## `positioner.motorpositioner` — `motor` is a suffix, not a PV
 

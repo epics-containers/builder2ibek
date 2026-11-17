@@ -38,32 +38,30 @@ answer, not a failure. Report it; do not try to fix it.
 Conversions index the latest releases of `ibek-runtime-streamdevice` and
 `ibek-runtime-support`, each cloned into a temporary folder, and run on the
 latest `ioc-streamdevice-runtime` tag. `BUILDER2IBEK_PATTERN_TAG`,
-`BUILDER2IBEK_SUPPORT_PATTERN_TAG` and `BUILDER2IBEK_RUNTIME_TAG` fix the
-three. `tests/pattern_pins.py` sets them for the tests and `make_samples.sh`,
-and points git clones of the libraries, builder2ibek's and `ibek pattern
-add`'s, at the `ibek-runtime-streamdevice` and `ibek-runtime-support`
-submodules, so samples such as `bl08j-mo-ioc-13` and `bl04i-mo-ioc-03`
+`BUILDER2IBEK_SUPPORT_PATTERN_TAG` and `BUILDER2IBEK_RUNTIME_TAG` fix the three.
+`tests/pattern_pins.py` sets them for the tests and `make_samples.sh`, and
+points git clones of each library, builder2ibek's and `ibek pattern add`'s, at
+its submodule, so samples such as `bl08j-mo-ioc-13` and `bl04i-mo-ioc-03`
 (`*.runtime-lock.yaml`) are reproducible and offline. The runtime image's
-schema is fetched by ibek, which caches it. Each submodule is pinned at a
-**release tag** equal to `PATTERN_TAG` or `SUPPORT_PATTERN_TAG`. Their paths
-do not match `ibek-support*`, so `update-schema` never sees the pattern
-models.
+schema is still fetched, by ibek, which caches it. Each submodule is pinned at
+a **release tag** equal to its tag in `PINNED_LIBRARIES`. Their paths do not
+match `ibek-support*`, so `update-schema` never sees the pattern models.
 
-The `ALIGNED` / `GENERIC_DIFFERS` tables below apply to
-`ibek-runtime-streamdevice` only. An `ibek-runtime-support` module (a
-beamline module) is never built into a generic IOC, so it goes to its pattern
-even where `ibek-support-dls` has a generic model. For both libraries, a
-module stays build-time when the pattern rejects an entity, or when an entity
-leaves a parameter to a generic default the pattern does not share.
+`tests/test_beamline_patterns.py` checks that the beamline patterns of the
+pinned `ibek-runtime-support` load only record types the
+`ioc-streamdevice-runtime` image provides.
 
 Because conversions may use a newer release than the tests check, `plan()`
 keeps a module that has a generic model but is in neither `ALIGNED` nor
 `GENERIC_DIFFERS` build-time ("pattern not yet aligned with the generic
-model"). Taking the release into the pin is what decides it.
+model"). Taking the release into the pin is what decides it. A beamline module
+(`BL<nn><x>`) is outside both tables: it always goes to its pattern. Any other
+module also stays build-time when an entity leaves a parameter to a generic
+default (which builder2ibek drops) that the pattern does not share.
 
-To take a new release: `git -C ibek-runtime-streamdevice checkout <tag>`
-(or `ibek-runtime-support`), set `PATTERN_TAG` (or `SUPPORT_PATTERN_TAG`) to
-it, commit the pin, run `./tests/samples/make_samples.sh`, then
+To take a new release: `git -C ibek-runtime-streamdevice checkout <tag>` (or
+`ibek-runtime-support`), set `PATTERN_TAG` (or `SUPPORT_PATTERN_TAG`) to it,
+commit the pin, run `./tests/samples/make_samples.sh`, then
 `tests/test_patterns.py`. A release that aligns a pattern with
 its generic model fails `test_alignment_matches_the_models` until the module moves
 from `GENERIC_DIFFERS` to `ALIGNED` in `patterns.py`. That holds only with the real

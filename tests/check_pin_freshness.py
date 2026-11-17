@@ -32,9 +32,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SUBMODULES = ("ibek-support", "ibek-support-dls")
-# Pinned at release tags; builder2ibek.patterns.LIBRARY and SUPPORT_LIBRARY,
-# which this script does not import so that it runs without the package
-# installed.
+# Pinned at release tags; builder2ibek.patterns.LIBRARIES, which this script
+# does not import so that it runs without the package installed.
 TAGGED_SUBMODULES = ("ibek-runtime-streamdevice", "ibek-runtime-support")
 LS_REMOTE_TIMEOUT = 30
 
