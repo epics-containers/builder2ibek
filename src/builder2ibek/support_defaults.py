@@ -124,6 +124,11 @@ def fill_empty_attributes(entity: dict[str, Any]):
     """
     Give each empty XML attribute of entity the value the builder used.
 
+    By the parameter's type in the entity model: a str parameter becomes "",
+    a bool parameter becomes False, an enum that lists "" as a value stays "",
+    and every other type is dropped (set to None, so the model's default
+    applies), as is a parameter with no model to say.
+
     convert.py calls this for each entity, and the extra entities its converter
     adds, once the converter has run. For an entity made from an XML element,
     only the parameters whose XML attribute is empty are filled: a "" the
