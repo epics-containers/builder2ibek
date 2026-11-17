@@ -67,7 +67,12 @@ import truststore
 from ruamel.yaml import YAML
 
 from builder2ibek.builder import Builder
-from builder2ibek.convert import convert_file, dispatch, drop_unpatterned_entities
+from builder2ibek.convert import (
+    ConvertResult,
+    convert_file,
+    dispatch,
+    drop_unpatterned_entities,
+)
 from builder2ibek.devc7 import (
     DLS_SW,
     INIT_DIR,
@@ -97,7 +102,9 @@ from builder2ibek.reconvert import (
 from builder2ibek.vendor_patterns import (
     ModuleStatus,
     PatternReport,
+    SchemaUnavailableError,
     classify_modules,
+    fetch_entity_types,
     image_entity_types,
     is_pattern_only,
     module_report,
@@ -114,6 +121,10 @@ LINUX_ARCH = "linux-x86_64"
 ANSIBLE_RE = re.compile(
     r"(?:^\s*RUN\s+|&&\s*(?:\\\s*)?)ansible\.sh\s+([^\s&\\]+)([^\n&]*)", re.M
 )
+# the arguments of an ``ibek pattern install`` in a Dockerfile
+INSTALL_RE = re.compile(r"\bibek\s+pattern\s+install\b([^\n&]*)")
+# a pattern reference, library:module@version
+PATTERN_REF_RE = re.compile(r"[\w.-]+:[\w.-]+@[\w.-]+")
 
 
 class PlanFailedError(Exception):
@@ -230,10 +241,54 @@ def support_models() -> dict[str, frozenset[str]]:
     return models
 
 
-def _gitlab_candidate(generic: GenericImage, base: frozenset[str]) -> Candidate:
-    """Entity types of a GitLab generic IOC from the modules its Dockerfile
-    builds at its latest release, plus the ``base`` types every generic IOC has
-    (ioc-generic's)."""
+def _gitlab_file(generic: GenericImage, path: str, tag: str) -> str:
+    project = urllib.parse.quote(generic.repo, safe="")
+    return _gitlab_get(
+        generic.gitlab,
+        f"projects/{project}/repository/files/{urllib.parse.quote(path, safe='')}"
+        f"/raw?ref={urllib.parse.quote(tag, safe='')}",
+    ).decode()
+
+
+def _installed_patterns(generic: GenericImage, dockerfile: str, tag: str) -> list[str]:
+    """The pattern references the Dockerfile's ``ibek pattern install`` lines
+    install: those given on the line, and those in each ``--list`` file, read
+    from the repository at ``tag``."""
+    refs: list[str] = []
+    for args in INSTALL_RE.findall(dockerfile):
+        listed = re.findall(r"--list[=\s]+(\S+)", args)
+        for word in args.split():
+            if PATTERN_REF_RE.fullmatch(word):
+                refs.append(word)
+        for path in listed:
+            for line in _gitlab_file(generic, path, tag).splitlines():
+                line = line.split("#", 1)[0].strip()
+                if line:
+                    refs.append(line)
+    return refs
+
+
+def _pattern_types(refs: Iterable[str]) -> frozenset[str]:
+    """The entity types of the patterns ``refs`` name, from the models of the
+    pattern index; raises when the index cannot be built, and a module the
+    index does not hold adds nothing."""
+    index = pattern_index()
+    types: set[str] = set()
+    for ref in refs:
+        module = ref.partition(":")[2].partition("@")[0]
+        pattern = index.patterns.get(module)
+        if pattern is not None:
+            types |= {f"{module}.{model}" for model in pattern.models}
+    return frozenset(types)
+
+
+def _gitlab_candidate(
+    generic: GenericImage, base: frozenset[str], tag: str | None = None
+) -> Candidate:
+    """Entity types of a GitLab generic IOC at ``tag``, else its latest
+    release: those of the modules its Dockerfile builds with ``ansible.sh``,
+    of the runtime patterns it installs with ``ibek pattern install``, and the
+    ``base`` types every generic IOC has (ioc-generic's)."""
     cand = Candidate(generic)
     if not base:
         cand.problem = (
@@ -244,19 +299,19 @@ def _gitlab_candidate(generic: GenericImage, base: frozenset[str]) -> Candidate:
         return cand
     project = urllib.parse.quote(generic.repo, safe="")
     try:
-        latest = json.loads(
-            _gitlab_get(generic.gitlab, f"projects/{project}/releases/permalink/latest")
-        )
-        tag = latest["tag_name"]
-        dockerfile = _gitlab_get(
-            generic.gitlab,
-            f"projects/{project}/repository/files/Dockerfile/raw?ref="
-            + urllib.parse.quote(tag, safe=""),
-        ).decode()
+        if tag is None:
+            latest = json.loads(
+                _gitlab_get(
+                    generic.gitlab, f"projects/{project}/releases/permalink/latest"
+                )
+            )
+            tag = str(latest["tag_name"])
+        dockerfile = _gitlab_file(generic, "Dockerfile", tag)
+        installed = _installed_patterns(generic, dockerfile, tag)
     except Exception as e:  # noqa: BLE001 -- unreachable, no token, no release
         cand.problem = (
-            f"cannot read its latest release and Dockerfile from {generic.gitlab} "
-            f"(set {GITLAB_TOKEN_ENV}): {e}"
+            f"cannot read its release, Dockerfile and pattern lists from "
+            f"{generic.gitlab} (set {GITLAB_TOKEN_ENV}): {e}"
         )
         cand.failed = True
         return cand
@@ -266,44 +321,76 @@ def _gitlab_candidate(generic: GenericImage, base: frozenset[str]) -> Candidate:
     for name, rest in ANSIBLE_RE.findall(dockerfile):
         if "--tags" not in rest:
             types |= models.get(name, frozenset())
+    if installed:
+        try:
+            types |= _pattern_types(installed)
+        except Exception as e:  # noqa: BLE001 -- the pattern index failed
+            cand.problem = f"the patterns it installs are not known: {e}"
+            cand.failed = True
+            return cand
     cand.types = frozenset(types)
     return cand
+
+
+def _github_candidate(generic: GenericImage) -> Candidate:
+    cand = Candidate(generic)
+    try:
+        tag = _github_release(generic.repo)
+    except Exception as e:  # noqa: BLE001 -- rate limit, unreachable, ...
+        cand.failed = True
+        try:
+            tag = latest_tag(f"https://github.com/{generic.repo}")
+        except Exception:  # noqa: BLE001
+            cand.problem = f"no latest release: {e}"
+            return cand
+        cand.problem = (
+            f"latest release unreadable ({e}); used its highest tag {tag}, "
+            f"set GITHUB_TOKEN to read releases"
+        )
+    cand.ref = f"{generic.image}:{tag}"
+    try:
+        cand.types = fetch_entity_types(cand.ref)
+    except SchemaUnavailableError as e:
+        # a release whose schema cannot be fetched is not one with none
+        cand.failed = True
+        cand.problem = cand.problem or str(e)
+        return cand
+    if cand.types is None:
+        cand.problem = cand.problem or f"no published ioc schema for {cand.ref}"
+    return cand
+
+
+def _base_types(found: Iterable[Candidate]) -> frozenset[str]:
+    """The types every generic IOC has: ioc-generic's."""
+    return next(
+        (c.types for c in found if c.generic.repo.endswith("/ioc-generic") and c.types),
+        frozenset(),
+    )
 
 
 @cache
 def candidates() -> tuple[Candidate, ...]:
     """Every generic IOC in GENERIC_IMAGES at its latest release."""
-    found: list[Candidate] = []
-    for generic in GENERIC_IMAGES:
-        if generic.gitlab:
-            continue
-        cand = Candidate(generic)
-        try:
-            tag = _github_release(generic.repo)
-        except Exception as e:  # noqa: BLE001 -- rate limit, unreachable, ...
-            cand.failed = True
-            try:
-                tag = latest_tag(f"https://github.com/{generic.repo}")
-            except Exception:  # noqa: BLE001
-                cand.problem = f"no latest release: {e}"
-                found.append(cand)
-                continue
-            cand.problem = (
-                f"latest release unreadable ({e}); used its highest tag {tag}, "
-                f"set GITHUB_TOKEN to read releases"
-            )
-        cand.ref = f"{generic.image}:{tag}"
-        cand.types = image_entity_types(cand.ref)
-        if cand.types is None:
-            cand.problem = cand.problem or f"no published ioc schema for {cand.ref}"
-        found.append(cand)
-    # every generic IOC has the base types ioc-generic has
-    base = next(
-        (c.types for c in found if c.generic.repo.endswith("/ioc-generic") and c.types),
-        frozenset(),
-    )
+    found = [_github_candidate(g) for g in GENERIC_IMAGES if not g.gitlab]
+    base = _base_types(found)
     found += [_gitlab_candidate(g, base) for g in GENERIC_IMAGES if g.gitlab]
     return tuple(found)
+
+
+def gitlab_image_types(image: str) -> tuple[frozenset[str] | None, str]:
+    """The entity types beamline2yaml matches a GitLab generic IOC of
+    GENERIC_IMAGES on, at the tag ``image`` names, and a problem ("" if none).
+
+    (None, "") for any other image, whose published schema says what it
+    builds. Lets ``xml2yaml --image`` decide as beamline2yaml does.
+    """
+    name, _, tag = image.rpartition(":")
+    generic = next((g for g in GENERIC_IMAGES if g.gitlab and g.image == name), None)
+    if generic is None or "/" in tag:
+        return None, ""
+    base_image = next(g for g in GENERIC_IMAGES if g.repo.endswith("/ioc-generic"))
+    cand = _gitlab_candidate(generic, _base_types([_github_candidate(base_image)]), tag)
+    return cand.types, cand.problem
 
 
 @dataclass
@@ -313,6 +400,9 @@ class ImageChoice:
     types: frozenset[str] | None = None  # the chosen image's entity types
     missing: list[str] = field(default_factory=list)  # with no image
     detail: str = ""
+    # with no image: the candidate that builds the most, and its types
+    closest: str = ""
+    closest_types: frozenset[str] | None = None
 
 
 def choose_image(
@@ -362,7 +452,12 @@ def choose_image(
     detail = f"no generic IOC builds every type; closest {closest.ref}"
     if not missing and streamdevice and not closest.generic.streamdevice:
         detail += ", which has no StreamDevice for the patterns"
-    return ImageChoice(missing=missing, detail=detail)
+    return ImageChoice(
+        missing=missing,
+        detail=detail,
+        closest=closest.ref,
+        closest_types=closest.types,
+    )
 
 
 @dataclass
@@ -492,8 +587,12 @@ def _plan_entry(
             + (f"; missing {', '.join(choice.missing)}" if choice.missing else "")
             + ")"
         )
+    # with no image, against the closest one, so that what it lacks shows
     entry.modules = classify_modules(
-        entities, pattern_plan, entry.image or None, choice.types
+        entities,
+        pattern_plan,
+        entry.image or choice.closest or None,
+        choice.types if entry.image else choice.closest_types,
     )
     entry.warnings += module_report(entry.modules)[1]
     entry.patterns = [
@@ -583,9 +682,15 @@ def _failures(plan: Plan) -> list[str]:
             f"{library} not indexed: {error}"
             for library, error in index.failures.items()
         ]
-    _, warning = runtime_image()
+    runtime, warning = runtime_image()
     if warning:
         failures.append(warning)
+    try:
+        # decides which IOCs are pattern-only
+        if fetch_entity_types(runtime) is None:
+            failures.append(f"no published ioc schema for {runtime}")
+    except SchemaUnavailableError as e:
+        failures.append(str(e))
     if any(e.action in ("add", "replace", "blocked") for e in plan.entries):
         cands = candidates()
         plan.images = [
@@ -598,24 +703,34 @@ def _failures(plan: Plan) -> list[str]:
         ]
         if not any(c.types is not None and c.ref for c in cands):
             failures.append("no generic IOC has a usable ioc schema")
+    services = Path(plan.services_repo) / "services"
+    failures += [
+        f"{backup} is left from an interrupted --apply: move it back to "
+        f"{services / e.folder} or remove it"
+        for e in plan.entries
+        if os.path.lexists(backup := backup_path(services, e.folder))
+    ]
     return failures
+
+
+def backup_path(services: Path, folder: str) -> Path:
+    """Where --apply keeps an IOC's existing folder until its new one is
+    converted and validated."""
+    return services / f".{folder}.beamline2yaml-backup"
 
 
 def _make_folder(services: Path, entry: Entry) -> Path | None:
     """(Re)make an IOC's folder from .ioc_template with its values.yaml header.
 
     A dev-c7 legacy folder is moved aside first; returns where, so that it can
-    be put back if the conversion fails (see :func:`_restore`).
+    be put back (see :func:`_restore`).
     """
     folder = services / entry.folder
     backup = None
     if entry.action == "replace":
         if _folder_kind(folder) != "dev-c7 legacy" or folder.is_symlink():
             raise FileExistsError(f"{folder} is no longer a dev-c7 legacy folder")
-        backup = services / f".{entry.folder}.beamline2yaml-backup"
-        if os.path.lexists(backup):
-            raise FileExistsError(f"{backup} is in the way: remove it first")
-        folder.rename(backup)
+        backup = _move_aside(services, entry.folder)
     elif os.path.lexists(folder):
         raise FileExistsError(f"{folder} appeared since the plan was made")
     try:
@@ -628,19 +743,51 @@ def _make_folder(services: Path, entry: Entry) -> Path | None:
     return backup
 
 
+def _move_aside(services: Path, name: str, copy: bool = False) -> Path:
+    """Move, or copy, an IOC's folder to its backup path."""
+    folder = services / name
+    backup = backup_path(services, name)
+    if os.path.lexists(backup):
+        raise FileExistsError(f"{backup} is in the way: move it back or remove it")
+    if copy:
+        shutil.copytree(folder, backup, symlinks=True)
+    else:
+        folder.rename(backup)
+    return backup
+
+
 def _restore(folder: Path, backup: Path | None) -> None:
-    """Remove a folder written for a conversion, and put back the legacy
-    folder it replaced."""
+    """Remove a folder written for a conversion, and put back the folder it
+    replaced."""
     shutil.rmtree(folder, ignore_errors=True)
     if backup is not None:
         backup.rename(folder)
+
+
+def _conversion_problem(entry: Entry, result: ConvertResult) -> str:
+    """Why a conversion that raised nothing still failed, or ""."""
+    if entry.action != "fastcs" and not result.ioc_yaml_written:
+        why = "a PandA another instance serves" if result.refused else "fastcs"
+        return f"no ioc.yaml written ({why})"
+    if result.pattern_errors:
+        return "; ".join(result.pattern_errors)
+    return ""
+
+
+class ConversionFailedError(Exception):
+    """A conversion that returned, but did not do all it had to."""
 
 
 def apply_plan(
     plan: Plan, descriptions: Mapping[str, str] | None = None, validate: bool = True
 ) -> None:
     """Write and convert the planned folders. Raises PlanFailedError, writing
-    nothing, when a step of the plan failed."""
+    nothing, when a step of the plan failed.
+
+    An IOC's existing folder is kept aside until its new one is converted and,
+    with ``validate``, its ioc.yaml passes the schema check; after any failure,
+    or an interrupt, the folder is put back as it was.
+    """
     if plan.failures:
         raise PlanFailedError(
             "not applied, as a step of the plan failed: " + "; ".join(plan.failures)
@@ -650,68 +797,102 @@ def apply_plan(
         raise FileNotFoundError(f"{services / TEMPLATE}/values.yaml not found")
     descriptions = descriptions or {}
     configs: dict[str, Path] = {}
-    for entry in plan.entries:
-        if entry.action not in ("add", "replace", "fastcs"):
-            continue
-        folder = services / entry.folder
-        yaml = folder / "config" / "ioc.yaml"
-        made, backup = False, None
-        image, image_types = None, None
-        if entry.image and not entry.pattern_only:
-            image = entry.image
-            image_types = next(
-                (c.types for c in candidates() if c.ref == entry.image), None
-            )
-        try:
-            if entry.action != "fastcs":
-                backup = _make_folder(services, entry)
-                made = True
-            with contextlib.redirect_stdout(sys.stderr):
-                result = convert_file(
-                    Path(entry.xml),
-                    yaml,
-                    IOC_SCHEMA,
-                    description=descriptions.get(entry.folder, ""),
-                    image=image,
-                    image_types=image_types,
-                )
-        except Exception as e:  # noqa: BLE001 -- report any converter error
-            if made:
-                _restore(folder, backup)
-            entry.status = "error"
-            kept = "; the dev-c7 legacy folder is put back" if backup else ""
-            entry.warnings.append(f"conversion failed: {type(e).__name__}: {e}{kept}")
-            continue
-        if backup is not None:
-            shutil.rmtree(backup)
-        # the conversion's module report replaces the plan's: its notes are
-        # rendered from entry.modules, its unresolved modules are warnings
-        old_warnings = module_report(entry.modules)[1]
-        notes = module_report(result.modules)[0]
-        if result.modules:
-            entry.modules = result.modules
-        entry.notes = _dedupe(
-            [*entry.notes, *(n for n in result.notes if n not in notes)]
+    # the folders kept aside, by IOC, until their new ones are validated
+    kept: dict[str, tuple[Path, Path]] = {}
+    try:
+        for entry in plan.entries:
+            if entry.action in ("add", "replace", "fastcs"):
+                backup = _apply_entry(services, entry, descriptions)
+                if entry.status == "ok":
+                    configs[entry.ioc] = services / entry.folder / "config"
+                if backup is not None:
+                    kept[entry.ioc] = (services / entry.folder, backup)
+        if validate and configs:
+            by_name = {e.ioc: e for e in plan.entries}
+            for v in validate_configs(configs):
+                entry = by_name[v["ioc_name"]]
+                entry.schema = v["status"]
+                entry.schema_error = v.get("stderr", "")
+                if entry.schema != "ok" and entry.ioc in kept:
+                    _restore(*kept.pop(entry.ioc))
+                    entry.status = "error"
+                    entry.warnings.append(
+                        "schema validation failed: the previous folder is put back"
+                    )
+    except BaseException:
+        for folder, backup in kept.values():
+            _restore(folder, backup)
+        raise
+    for _, backup in kept.values():
+        shutil.rmtree(backup)
+
+
+def _apply_entry(
+    services: Path, entry: Entry, descriptions: Mapping[str, str]
+) -> Path | None:
+    """Write and convert one IOC's folder. Returns where its previous folder
+    is kept, or None. After a failure the previous folder is back in place,
+    and entry.status is "error"; an interrupt re-raises after that."""
+    folder = services / entry.folder
+    yaml = folder / "config" / "ioc.yaml"
+    image, image_types = None, None
+    if entry.image and not entry.pattern_only:
+        image = entry.image
+        image_types = next(
+            (c.types for c in candidates() if c.ref == entry.image), None
         )
-        entry.warnings = _dedupe(
-            [*(w for w in entry.warnings if w not in old_warnings), *result.warnings]
-        )
-        if result.ioc_yaml_written:
-            entry.status = "ok"
-            configs[entry.ioc] = yaml.parent
+    existed = os.path.lexists(folder)
+    backup: Path | None = None
+    made = False
+    try:
+        if entry.action == "fastcs":
+            # converted in place, so a copy is kept
+            if existed:
+                backup = _move_aside(services, entry.folder, copy=True)
         else:
-            entry.status = "refused" if result.refused else "fastcs"
-            values = folder / "values.yaml"
-            if entry.status == "fastcs" and entry.header and values.is_file():
-                text = values.read_text()
-                if entry.header.split(".")[0] not in text.replace("\n# ", " "):
-                    values.write_text(add_header(text, entry.header))
-    if validate and configs:
-        by_name = {e.ioc: e for e in plan.entries}
-        for v in validate_configs(configs):
-            entry = by_name[v["ioc_name"]]
-            entry.schema = v["status"]
-            entry.schema_error = v.get("stderr", "")
+            backup = _make_folder(services, entry)
+        made = True
+        with contextlib.redirect_stdout(sys.stderr):
+            result = convert_file(
+                Path(entry.xml),
+                yaml,
+                IOC_SCHEMA,
+                description=descriptions.get(entry.folder, ""),
+                image=image,
+                image_types=image_types,
+            )
+        problem = _conversion_problem(entry, result)
+        if problem:
+            raise ConversionFailedError(problem)
+    except BaseException as e:
+        if made and (backup is not None or not existed):
+            _restore(folder, backup)
+        if not isinstance(e, Exception):
+            raise
+        entry.status = "error"
+        put_back = "; the previous folder is put back" if backup else ""
+        entry.warnings.append(f"conversion failed: {type(e).__name__}: {e}{put_back}")
+        return None
+    # the conversion's module report replaces the plan's: its notes are
+    # rendered from entry.modules, its unresolved modules are warnings
+    old_warnings = module_report(entry.modules)[1]
+    notes = module_report(result.modules)[0]
+    if result.modules:
+        entry.modules = result.modules
+    entry.notes = _dedupe([*entry.notes, *(n for n in result.notes if n not in notes)])
+    entry.warnings = _dedupe(
+        [*(w for w in entry.warnings if w not in old_warnings), *result.warnings]
+    )
+    if result.ioc_yaml_written:
+        entry.status = "ok"
+    else:
+        entry.status = "refused" if result.refused else "fastcs"
+        values = folder / "values.yaml"
+        if entry.header and values.is_file():
+            text = values.read_text()
+            if entry.header.split(".")[0] not in text.replace("\n# ", " "):
+                values.write_text(add_header(text, entry.header))
+    return backup
 
 
 def _status(e: Entry) -> str:

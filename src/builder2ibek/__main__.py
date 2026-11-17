@@ -3,7 +3,7 @@ from pathlib import Path
 import typer
 
 from builder2ibek import __version__
-from builder2ibek.beamline2yaml import beamline2yaml_cli
+from builder2ibek.beamline2yaml import beamline2yaml_cli, gitlab_image_types
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
@@ -80,7 +80,9 @@ def xml2yaml(
 
     --image names the generic IOC image to plan against in place of the one in
     values.yaml: patterns it installs are left out, and a values.yaml that
-    still has the placeholder gets it. Each module the IOC uses is reported as
+    still has the placeholder gets it. A GitLab generic IOC that beamline2yaml
+    knows, which publishes no schema, is matched on the modules its Dockerfile
+    builds and the patterns it installs, as beamline2yaml matches it. Each module the IOC uses is reported as
     a pattern, build-time (compiled into the image) or unresolved: a module no
     image here builds and no runtime pattern takes, so nothing can run it.
 
@@ -93,9 +95,21 @@ def xml2yaml(
     A PandA another instance already serves (same prefix or box) is refused
     with a warning, and an existing instance is never overwritten.
     """
+    image_types = None
+    if image:
+        # a GitLab generic IOC publishes no schema: match it as beamline2yaml does
+        image_types, problem = gitlab_image_types(image)
+        if problem:
+            typer.echo(f"warning: {image}: {problem}", err=True)
     try:
         result = convert_file(
-            xml, yaml, schema, description=description, blgui=blgui, image=image
+            xml,
+            yaml,
+            schema,
+            description=description,
+            blgui=blgui,
+            image=image,
+            image_types=image_types,
         )
     except (FileExistsError, BeamlinePatternError) as e:
         typer.echo(f"error: {e}", err=True)
@@ -162,7 +176,8 @@ def beamline2yaml(
     runtime patterns) and schema-validates each ioc.yaml with ibek generate2;
     no IOC is started. It writes nothing when a pattern library, GitHub or
     GitLab lookup failed, and puts a replaced legacy folder back when its
-    conversion fails. GitLab generic IOCs need GITLAB_TOKEN.
+    conversion, a runtime pattern or its schema check fails, or on an
+    interrupt. GitLab generic IOCs need GITLAB_TOKEN.
     """
     code = beamline2yaml_cli(
         beamline,

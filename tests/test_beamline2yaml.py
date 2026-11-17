@@ -16,7 +16,7 @@ from builder2ibek.patterns import (
     Pattern,
     PatternPlan,
 )
-from builder2ibek.vendor_patterns import ModuleStatus
+from builder2ibek.vendor_patterns import ModuleStatus, SchemaUnavailableError
 
 SAMPLES = Path(__file__).parent / "samples"
 XML = SAMPLES / "BL11I-CS-IOC-09.xml"
@@ -172,7 +172,7 @@ def test_candidates_fall_back_to_the_latest_tag(monkeypatch):
 
     monkeypatch.setattr(b2y, "_github_release", unreadable)
     monkeypatch.setattr(b2y, "latest_tag", lambda url: "2.0")
-    monkeypatch.setattr(b2y, "image_entity_types", lambda ref: BASE)
+    monkeypatch.setattr(b2y, "fetch_entity_types", lambda ref: BASE)
     b2y.candidates.cache_clear()
     try:
         (got,) = b2y.candidates()
@@ -185,6 +185,7 @@ def test_candidates_fall_back_to_the_latest_tag(monkeypatch):
 
 class FakeIndex:
     failures: dict[str, str] = {}
+    patterns: dict[str, Pattern] = {}
 
 
 @pytest.fixture
@@ -204,6 +205,7 @@ def repo(tmp_path: Path, monkeypatch) -> Path:
     monkeypatch.setattr(b2y, "plan_patterns", lambda e, r: PatternPlan())
     monkeypatch.setattr(b2y, "runtime_image", lambda: (RUNTIME, ""))
     monkeypatch.setattr(b2y, "image_entity_types", lambda image: BASE)
+    monkeypatch.setattr(b2y, "fetch_entity_types", lambda image: BASE)
     big = b2y.Candidate(b2y.GenericImage("org/ioc-all", "ghcr.io/org/ioc-all"), ALL)
 
     def all_types():
@@ -311,10 +313,7 @@ def test_apply_puts_the_legacy_folder_back_when_conversion_fails(
 
     (entry,) = plan.entries
     assert entry.status == "error"
-    assert (
-        "converter crashed; the dev-c7 legacy folder is put back"
-        in (entry.warnings[-1])
-    )
+    assert "converter crashed; the previous folder is put back" in (entry.warnings[-1])
     assert (folder / "keep").read_text() == "x"
     assert (folder / "values.yaml").read_text() == "dev-c7:\n  iocVersion: 1-0\n"
     assert not (folder / "config").exists()
@@ -345,7 +344,14 @@ def test_apply_refuses_a_folder_that_changed(repo: Path):
 
 @pytest.mark.parametrize(
     "failure",
-    ["index", "runtime", "candidate", "no-schema"],
+    [
+        "index",
+        "runtime",
+        "runtime-schema",
+        "candidate",
+        "no-schema",
+        "leftover-backup",
+    ],
 )
 def test_a_failed_step_stops_apply(repo: Path, monkeypatch, capsys, failure: str):
     folder = _legacy(repo)
@@ -355,6 +361,14 @@ def test_a_failed_step_stops_apply(repo: Path, monkeypatch, capsys, failure: str
         )
     elif failure == "runtime":
         monkeypatch.setattr(b2y, "runtime_image", lambda: (RUNTIME, "rate limited"))
+    elif failure == "runtime-schema":
+
+        def timed_out(image):
+            raise SchemaUnavailableError(f"cannot fetch the ioc schema of {image}")
+
+        monkeypatch.setattr(b2y, "fetch_entity_types", timed_out)
+    elif failure == "leftover-backup":
+        b2y.backup_path(repo / "services", folder.name).mkdir()
     else:
         generic = b2y.GenericImage("org/ioc-x", "ghcr.io/org/ioc-x")
         bad = b2y.Candidate(
@@ -519,3 +533,320 @@ def test_apply_takes_the_conversion_module_report(repo: Path, monkeypatch):
     # the module notes are rendered from entry.modules
     assert entry.notes == ["other"]
     assert entry.warnings == [warning]
+
+
+def test_gitlab_candidate_adds_the_patterns_it_installs(monkeypatch):
+    """ibek pattern install in the Dockerfile, from a --list file or on the
+    line, installs patterns whose types the image then has."""
+    dockerfile = (
+        "RUN ansible.sh asyn\n"
+        "COPY runtime-patterns.txt runtime-patterns.txt\n"
+        "RUN ibek pattern install --list runtime-patterns.txt\n"
+        "RUN ibek pattern install ibek-runtime-streamdevice:QPC@0.8.1\n"
+    )
+    listed = (
+        "# patterns this image installs\n"
+        "ibek-runtime-streamdevice:EdwardsScroll@0.8.1\n"
+        "ibek-runtime-streamdevice:NotIndexed@0.8.1  # no such pattern\n"
+    )
+
+    def get(host, path):
+        if "releases" in path:
+            return json.dumps({"tag_name": "2026.1.1"}).encode()
+        if "runtime-patterns.txt" in path:
+            assert "ref=2026.1.1" in path
+            return listed.encode()
+        return dockerfile.encode()
+
+    class Index:
+        patterns = {
+            "EdwardsScroll": Pattern(
+                STREAMDEVICE_LIBRARY,
+                "EdwardsScroll",
+                "0.8.3",
+                frozenset({"Scroll"}),
+                XML,
+            ),
+            "QPC": Pattern(
+                STREAMDEVICE_LIBRARY, "QPC", "0.8.3", frozenset({"QPC"}), XML
+            ),
+        }
+
+    monkeypatch.setattr(b2y, "_gitlab_get", get)
+    monkeypatch.setattr(b2y, "pattern_index", Index)
+    monkeypatch.setattr(b2y, "support_models", lambda: {})
+    generic = b2y.GenericImage("g/ioc-vac", "reg/ioc-vac", gitlab="gitlab.example")
+
+    got = b2y._gitlab_candidate(generic, BASE)
+
+    assert got.types == BASE | {"EdwardsScroll.Scroll", "QPC.QPC"}
+    assert not got.failed
+
+
+def test_gitlab_candidate_fails_without_the_pattern_index(monkeypatch):
+    def get(host, path):
+        if "releases" in path:
+            return json.dumps({"tag_name": "1"}).encode()
+        if path.endswith("ref=1") and "Dockerfile" in path:
+            return b"RUN ibek pattern install ibek-runtime-streamdevice:QPC@0.8.1\n"
+        raise AssertionError(path)
+
+    def no_index():
+        raise OSError("clone timed out")
+
+    monkeypatch.setattr(b2y, "_gitlab_get", get)
+    monkeypatch.setattr(b2y, "pattern_index", no_index)
+    generic = b2y.GenericImage("g/ioc-vac", "reg/ioc-vac", gitlab="gitlab.example")
+
+    got = b2y._gitlab_candidate(generic, BASE)
+
+    assert got.failed and "clone timed out" in got.problem
+
+
+def test_xml2yaml_image_types_of_a_gitlab_candidate(monkeypatch):
+    """xml2yaml --image matches a GitLab generic IOC as beamline2yaml does,
+    at the tag it names."""
+    vac = next(g for g in b2y.GENERIC_IMAGES if g.gitlab)
+    seen = []
+
+    def gitlab(generic, base, tag=None):
+        seen.append((generic, base, tag))
+        return b2y.Candidate(generic, f"{generic.image}:{tag}", base | {"x.y"})
+
+    monkeypatch.setattr(b2y, "_gitlab_candidate", gitlab)
+    monkeypatch.setattr(b2y, "_github_release", lambda repo: "1.0")
+    monkeypatch.setattr(b2y, "fetch_entity_types", lambda image: BASE)
+
+    types, problem = b2y.gitlab_image_types(f"{vac.image}:2026.11.4")
+
+    assert (types, problem) == (BASE | {"x.y"}, "")
+    assert seen == [(vac, BASE, "2026.11.4")]
+    assert b2y.gitlab_image_types("ghcr.io/org/ioc-pmac:1") == (None, "")
+
+
+def test_unfetchable_schema_is_a_failure_not_a_missing_one(monkeypatch):
+    monkeypatch.setattr(b2y, "_github_release", lambda repo: "1.0")
+    generic = b2y._gh("ioc-generic")
+
+    def timed_out(image):
+        raise SchemaUnavailableError("timed out")
+
+    monkeypatch.setattr(b2y, "fetch_entity_types", timed_out)
+    got = b2y._github_candidate(generic)
+    assert got.failed and got.problem == "timed out"
+
+    monkeypatch.setattr(b2y, "fetch_entity_types", lambda image: None)
+    got = b2y._github_candidate(generic)
+    assert not got.failed and got.problem.startswith("no published ioc schema")
+
+
+def test_blocked_ioc_modules_are_classified_against_the_closest(
+    repo: Path, monkeypatch
+):
+    narrow = b2y.Candidate(
+        b2y.GenericImage("org/ioc-narrow", "ghcr.io/org/ioc-narrow"),
+        "ghcr.io/org/ioc-narrow:1",
+        BASE,
+    )
+    monkeypatch.setattr(b2y, "candidates", lambda: (narrow,))
+
+    (entry,) = b2y.build_plan("BL11I", repo).entries
+
+    kinds = {m.module: (m.kind, m.reason) for m in entry.modules}
+    assert kinds["asyn"] == ("build-time", "")
+    assert kinds["hidenRGA"] == (
+        "unresolved",
+        "ghcr.io/org/ioc-narrow:1 does not build hidenRGA.hidenRGA_qga",
+    )
+
+
+LEGACY = "dev-c7:\n  iocVersion: 1-0\n"
+
+
+def _assert_legacy_back(repo: Path, folder: Path):
+    assert (folder / "keep").read_text() == "x"
+    assert (folder / "values.yaml").read_text() == LEGACY
+    assert not (folder / "config").exists()
+    assert not list((repo / "services").glob(".*backup"))
+
+
+@pytest.mark.parametrize(
+    "result",
+    [
+        ConvertResult(
+            warnings=["ibek pattern add X failed: boom"],
+            pattern_errors=["ibek pattern add X failed: boom"],
+        ),
+        ConvertResult(ioc_yaml_written=False),
+    ],
+    ids=["pattern-add-failed", "no-ioc-yaml"],
+)
+def test_incomplete_conversion_puts_the_legacy_folder_back(
+    repo: Path, monkeypatch, result: ConvertResult
+):
+    folder = _legacy(repo)
+    (folder / "keep").write_text("x")
+    monkeypatch.setattr(b2y, "convert_file", _fake_convert(result=result))
+
+    plan = b2y.build_plan("BL11I", repo)
+    b2y.apply_plan(plan, validate=False)
+
+    assert plan.entries[0].status == "error"
+    assert "the previous folder is put back" in plan.entries[0].warnings[-1]
+    _assert_legacy_back(repo, folder)
+
+
+def test_schema_failure_puts_the_legacy_folder_back(repo: Path, monkeypatch):
+    folder = _legacy(repo)
+    (folder / "keep").write_text("x")
+    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
+    monkeypatch.setattr(
+        b2y,
+        "validate_configs",
+        lambda configs: [
+            {"ioc_name": n, "status": "fail", "stderr": "bad"} for n in configs
+        ],
+    )
+
+    plan = b2y.build_plan("BL11I", repo)
+    b2y.apply_plan(plan)
+
+    (entry,) = plan.entries
+    assert (entry.status, entry.schema) == ("error", "fail")
+    _assert_legacy_back(repo, folder)
+
+
+def test_schema_pass_removes_the_backup(repo: Path, monkeypatch):
+    folder = _legacy(repo)
+    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
+    monkeypatch.setattr(
+        b2y,
+        "validate_configs",
+        lambda configs: [{"ioc_name": n, "status": "ok"} for n in configs],
+    )
+
+    plan = b2y.build_plan("BL11I", repo)
+    b2y.apply_plan(plan)
+
+    assert (plan.entries[0].status, plan.entries[0].schema) == ("ok", "ok")
+    assert (folder / "config" / "ioc.yaml").is_file()
+    assert not list((repo / "services").glob(".*backup"))
+
+
+@pytest.mark.parametrize("when", ["converting", "validating"])
+def test_interrupt_puts_the_legacy_folder_back(repo: Path, monkeypatch, when: str):
+    folder = _legacy(repo)
+    (folder / "keep").write_text("x")
+
+    def interrupt(*args, **kwargs):
+        raise KeyboardInterrupt
+
+    if when == "converting":
+        monkeypatch.setattr(b2y, "convert_file", interrupt)
+    else:
+        monkeypatch.setattr(b2y, "convert_file", _fake_convert())
+        monkeypatch.setattr(b2y, "validate_configs", interrupt)
+
+    plan = b2y.build_plan("BL11I", repo)
+    with pytest.raises(KeyboardInterrupt):
+        b2y.apply_plan(plan)
+
+    _assert_legacy_back(repo, folder)
+
+
+def test_fastcs_on_a_legacy_folder_is_put_back_on_failure(repo: Path, monkeypatch):
+    """xml2yaml replaces a legacy folder with the fastcs instance; a copy is
+    kept until it has."""
+    folder = _legacy(repo)
+    (folder / "keep").write_text("x")
+
+    def fail(xml, yaml, schema, description="", image=None, image_types=None):
+        import shutil
+
+        shutil.rmtree(folder)
+        folder.mkdir()
+        (folder / "half").write_text("written")
+        raise RuntimeError("fastcs write failed")
+
+    monkeypatch.setattr(b2y, "convert_file", fail)
+    entry = b2y.Entry(XML.stem, str(XML), folder.name, "fastcs")
+    plan = b2y.Plan("BL11I", str(repo), str(XML.parent), "work", [entry])
+
+    b2y.apply_plan(plan, validate=False)
+
+    assert entry.status == "error"
+    assert not (folder / "half").exists()
+    _assert_legacy_back(repo, folder)
+
+
+def test_fastcs_on_a_legacy_folder_drops_the_copy_on_success(repo: Path, monkeypatch):
+    folder = _legacy(repo)
+
+    def fastcs(xml, yaml, schema, description="", image=None, image_types=None):
+        (folder / "values.yaml").write_text("fastcs: {}\n")
+        return ConvertResult(ioc_yaml_written=False)
+
+    monkeypatch.setattr(b2y, "convert_file", fastcs)
+    entry = b2y.Entry(XML.stem, str(XML), folder.name, "fastcs")
+    plan = b2y.Plan("BL11I", str(repo), str(XML.parent), "work", [entry])
+
+    b2y.apply_plan(plan, validate=False)
+
+    assert entry.status == "fastcs"
+    assert (folder / "values.yaml").read_text() == "fastcs: {}\n"
+    assert not list((repo / "services").glob(".*backup"))
+
+
+MIXED_XML = """\
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+\t<asyn.AsynIP name="VA_TSERV1_1" port="127.0.0.1:4001"/>
+\t<asyn.AsynIP name="VA_TSERV1_8" port="127.0.0.1:4008"/>
+\t<asyn.AsynIP name="VA_TSERV1_12" port="127.0.0.1:4012"/>
+\t<digitelMpc.digitelMpc device="BL08J-VA-MPC-01" name="MPC1" port="VA_TSERV1_1"/>
+\t<EdwardsScroll.EdwardsScroll P="BL08J-VA-SCROL-01" name="SCROLL1" port="VA_TSERV1_8"/>
+\t<EdwardsNextTurbo.EdwardsNextTurbo P="BL08J-VA-TURBO-01" name="TURBO1"
+\t\tport="VA_TSERV1_12"/>
+</components>
+"""
+
+
+def test_mixed_vacuum_ioc(repo: Path, monkeypatch, tmp_path: Path):
+    """A trimmed BL08J-VA-IOC-02, planned with the pinned pattern libraries:
+    a vacuum image that builds digitelMpc and installs EdwardsScroll, so only
+    EdwardsNextTurbo is added as a pattern."""
+    from builder2ibek import vendor_patterns
+
+    xml = tmp_path / "BL08J-VA-IOC-02.xml"
+    xml.write_text(MIXED_XML)
+    monkeypatch.setattr(b2y, "discover_xmls", lambda _b: ([xml], xml.parent, "work"))
+    monkeypatch.setattr(b2y, "plan_patterns", vendor_patterns.plan_patterns)
+    monkeypatch.setattr(b2y, "pattern_index", vendor_patterns.pattern_index)
+
+    builder = b2y.Builder()
+    builder.load(xml)
+    types = {str(e["type"]) for e in b2y.dispatch(builder, xml).entities}
+    vac = b2y.Candidate(
+        b2y.GenericImage("org/ioc-vac", "ghcr.io/org/ioc-vac", streamdevice=True),
+        "ghcr.io/org/ioc-vac:1",
+        frozenset(t for t in types if not t.startswith("EdwardsNextTurbo.")),
+    )
+    generic = b2y.Candidate(
+        b2y.GenericImage("org/ioc-generic", "ghcr.io/org/ioc-generic"),
+        "ghcr.io/org/ioc-generic:1",
+        BASE,
+    )
+    monkeypatch.setattr(b2y, "candidates", lambda: (generic, vac))
+
+    (entry,) = b2y.build_plan("BL08J", repo).entries
+
+    assert entry.action == "add"
+    assert entry.image == "ghcr.io/org/ioc-vac:1"
+    assert [p.partition("@")[0] for p in entry.patterns] == [
+        "ibek-runtime-streamdevice:EdwardsNextTurbo"
+    ]
+    kinds = {m.module: (m.kind, m.reason) for m in entry.modules}
+    assert kinds["EdwardsNextTurbo"] == ("pattern", "")
+    assert kinds["EdwardsScroll"] == ("build-time", "ghcr.io/org/ioc-vac:1 installs it")
+    assert kinds["digitelMpc"][0] == "build-time"
+    assert not [m for m in entry.modules if m.kind == "unresolved"]

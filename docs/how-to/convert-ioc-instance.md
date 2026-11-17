@@ -185,7 +185,11 @@ its pattern or generic model.
   `ioc-streamdevice-runtime`. A `values.yaml` that still holds
   `REPLACE_WITH_IMAGE_URI` gets the image; one that names another image is left
   alone, with a warning. With any other `--yaml` path the patterns left out are
-  only listed.
+  only listed. For a GitLab generic IOC that `beamline2yaml` knows
+  (ioc-dlslinuxvac), which publishes no schema, the entity types are those of
+  the modules its Dockerfile builds with `ansible.sh` and of the patterns it
+  installs with `ibek pattern install`, read from GitLab at the tag given
+  (`GITLAB_TOKEN`).
 
 After the patterns, xml2yaml reports each module the IOC uses as one of:
 
