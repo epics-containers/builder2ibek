@@ -8,12 +8,6 @@ pattern
 	{ ""    }
 }
 
-file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern 
-	{ "IOC" }
-	{ ""    }
-}
-
 file "$(DLSPLC)/db/dlsPLC_read100.template" {
 pattern 
 	{ "type",           "entity_enabled", "timeout", "device",            "port",            "century", "SCAN"     }

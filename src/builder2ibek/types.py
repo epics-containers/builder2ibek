@@ -129,6 +129,10 @@ class Generic_IOC(BaseModel):
     raw_records: dict[str, tuple[str, dict[str, str]]] = Field(
         default_factory=dict, exclude=True
     )
+    # raw records.* elements that became an entity, by record name, each the
+    # entity's type; the records converter checks names against these and
+    # raw_records to warn about a record defined more than once
+    converted_records: dict[str, str] = Field(default_factory=dict, exclude=True)
     # warnings that are not about a dropped entity type
     extra_warnings: list[str] = Field(default_factory=list, exclude=True)
     # the PandAs split out for fastcs-pandablocks (a fastcs_panda.PandaSplit)

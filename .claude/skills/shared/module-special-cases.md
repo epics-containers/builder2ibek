@@ -319,8 +319,12 @@ A `records.ao` with `DTYP="EtherIP"` becomes `ether_ip.ao`: `OUT
 "@<port> <tag> <flags>"` gives `port` and `tag`, with the flags (such as the
 scan period `S 0.5`) kept in `tag`, because `ether_ip_ao.template` writes
 `OUT "@$(port) $(tag)"`. `scan` is the record's `SCAN`, `Passive` when the XML
-has none. The template sets no other field, so `VAL`, `PRIO`, `DRVH`, `DRVL`,
-`PREC`, `DESC` and the like are dropped with a warning per record.
+has none. `DRVH`, `DRVL`, `PREC`, `PRIO` and `VAL` pass through as parameters of
+the same name; `PRIO` takes the menu index (`0`, `1`, `2`) or name in any case
+and becomes `LOW`, `MEDIUM` or `HIGH`. Any other field, such as `DESC` or
+`EGU`, and any of those five whose value is of the wrong type for its parameter,
+such as an empty `DRVH` or a `PRIO` of `3`, is dropped with a warning per
+record.
 
 Every other raw record, hardware DTYPs included, goes to `records.db` next to
 the ioc.yaml, written as builder wrote its `<IOC>.db`: records sorted by name,
@@ -337,4 +341,5 @@ ibek predates `post_db_files` rejects the ioc.yaml. xml2yaml removes a
 replaces or removes a `records.db` that starts with its own header line; any
 other `records.db` (one written by hand) is left alone, the raw records and
 the `post_db_files` entry are left out, and a warning says so. A record name the XML
-defines twice keeps its first definition, with a warning.
+defines twice keeps its first definition, with a warning, whether each is
+an EtherIP `ao` or a raw record for `records.db`.

@@ -34,11 +34,19 @@ XML = """<?xml version="1.0" ?>
     device="SR99A-VA-IONP-09" spoff="1e-5" spon="1e-9"/>
   <ether_ip.EtherIPInit device="SR99C-VA-VLVCC-01" ip="127.0.0.1"
     name="VLVCC_01.INFO" port="VLVCC_01_EIP"/>
-  <records.ao DRVH="3000" DRVL="0" DTYP="EtherIP"
+  <records.ao DRVH="3000" DRVL="-10" DTYP="EtherIP" EGU="mm"
     OUT="@VLVCC_01_EIP GB_Index_Setpoint S 0.5" PREC="2" SCAN="Passive"
     name="GB.IDXSP" record="SR99C-VA-VLVCC-01:GB:IDX_SP"/>
   <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_01 S .2"
     PRIO="HIGH" VAL="1" name="CVRST_1" record="SR-RF-CVRST-01:CON"/>
+  <records.ao DRVH="" DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_04 S .2"
+    PREC="2.5" name="CVRST_4" record="SR-RF-CVRST-04:CON"/>
+  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_05 S .2"
+    PRIO="2" name="CVRST_5" record="SR-RF-CVRST-05:CON"/>
+  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_06 S .2"
+    PRIO="medium" name="CVRST_6" record="SR-RF-CVRST-06:CON"/>
+  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_07 S .2"
+    PRIO="" name="CVRST_7" record="SR-RF-CVRST-07:CON"/>
   <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP" name="BAD"
     record="SR99C-VA-VLVCC-01:BAD"/>
   <records.ao OUT="SR99C-VA-OTHER:VAL" name="SOFT" record="SR99C-VA-SOFT:OUT"/>
@@ -101,22 +109,52 @@ def test_qpc_ion_pump_takes_its_controllers_port_and_unit(tmp_path: Path):
 
 def test_ether_ip_ao(tmp_path: Path):
     entities, warnings = _convert(tmp_path)
-    setpoint, reset = _by_type(entities, "ether_ip.ao")
+    setpoint, reset, unusable, *_ = _by_type(entities, "ether_ip.ao")
     assert setpoint == {
         "type": "ether_ip.ao",
         "record": "SR99C-VA-VLVCC-01:GB:IDX_SP",
         "port": "VLVCC_01_EIP",
         "tag": "GB_Index_Setpoint S 0.5",
         "scan": "Passive",
+        "DRVH": 3000.0,
+        "DRVL": -10.0,
+        "PREC": 2,
     }
-    assert reset["tag"] == "CAVITY_RESET_01 S .2"
-    assert reset["scan"] == "Passive"
+    assert reset == {
+        "type": "ether_ip.ao",
+        "record": "SR-RF-CVRST-01:CON",
+        "port": "VLVCC_01_EIP",
+        "tag": "CAVITY_RESET_01 S .2",
+        "scan": "Passive",
+        "PRIO": "HIGH",
+        "VAL": "1",
+    }
 
-    dropped = [w for w in warnings if "became ether_ip.ao" in w]
-    assert len(dropped) == 2
-    assert "SR99C-VA-VLVCC-01:GB:IDX_SP" in dropped[0]
-    assert "DRVH=3000, DRVL=0, PREC=2" in dropped[0]
-    assert "PRIO=HIGH, VAL=1" in dropped[1]
+    assert unusable == {
+        "type": "ether_ip.ao",
+        "record": "SR-RF-CVRST-04:CON",
+        "port": "VLVCC_01_EIP",
+        "tag": "CAVITY_RESET_04 S .2",
+        "scan": "Passive",
+    }
+
+    first, second, third = [w for w in warnings if "became ether_ip.ao" in w]
+    assert "SR99C-VA-VLVCC-01:GB:IDX_SP" in first
+    assert "has no field for, or an unusable value of, EGU=mm:" in first
+    assert "SR-RF-CVRST-04:CON" in second
+    assert "has no field for, or an unusable value of, DRVH=, PREC=2.5:" in second
+    assert "SR-RF-CVRST-07:CON" in third
+    assert "has no field for, or an unusable value of, PRIO=:" in third
+
+
+def test_ether_ip_ao_prio_menu_index_and_case(tmp_path: Path):
+    """PRIO takes the ao menu's index or name in any case, as the enum's name"""
+    entities, _ = _convert(tmp_path)
+    by_record = {e["record"]: e for e in _by_type(entities, "ether_ip.ao")}
+    assert by_record["SR-RF-CVRST-01:CON"]["PRIO"] == "HIGH"
+    assert by_record["SR-RF-CVRST-05:CON"]["PRIO"] == "HIGH"
+    assert by_record["SR-RF-CVRST-06:CON"]["PRIO"] == "MEDIUM"
+    assert "PRIO" not in by_record["SR-RF-CVRST-07:CON"]
 
 
 def test_other_raw_records_go_to_records_db(tmp_path: Path):

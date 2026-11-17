@@ -8,12 +8,6 @@ pattern
 	{ ""    }
 }
 
-file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern 
-	{ "IOC" }
-	{ ""    }
-}
-
 file "EdwardsGauge.template" {
 pattern 
 	{ "type",                                "entity_enabled", "P",                 "port"  }

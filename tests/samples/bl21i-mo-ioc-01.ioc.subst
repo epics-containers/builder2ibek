@@ -7,9 +7,3 @@ pattern
 	{ "IOC" }
 	{ ""    }
 }
-
-file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern 
-	{ "IOC" }
-	{ ""    }
-}

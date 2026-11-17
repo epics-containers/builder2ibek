@@ -1,5 +1,6 @@
 import codecs
 import warnings
+from collections.abc import Callable
 from pathlib import Path
 
 from builder2ibek.converters.globalHandler import globalHandler
@@ -19,9 +20,49 @@ WRITTEN = f"written to config/{RECORDS_DB}"
 # the record name and name is the builder's GUI label
 NOT_FIELDS = {"record", "name"}
 
+
+# the values of the ao record's PRIO menu, in menu index order: the ether_ip.ao
+# PRIO enum
+PRIORITIES = ("LOW", "MEDIUM", "HIGH")
+
+
+def _int(value: str) -> int:
+    """value as an int. Raises ValueError for one that is not a whole number,
+    such as 2.5."""
+    number = float(value)
+    if not number.is_integer():
+        raise ValueError(value)
+    return int(number)
+
+
+def _priority(value: str) -> str:
+    """
+    A PRIO value as the ether_ip.ao PRIO enum: a menu index (0, 1 or 2) or a
+    menu name in any case. Raises ValueError for any other value.
+    """
+    value = value.strip()
+    if value in ("0", "1", "2"):
+        return PRIORITIES[int(value)]
+    if value.upper() in PRIORITIES:
+        return value.upper()
+    raise ValueError(value)
+
+
+# Record fields ether_ip.ao takes as parameters of the same name, each with the
+# function that turns its value into the model's type, raising ValueError for a
+# value that the type cannot hold, such as an empty DRVH
+ETHER_IP_AO_PARAMS: dict[str, Callable[[str], float | int | str]] = {
+    "DRVH": float,
+    "DRVL": float,
+    "PREC": _int,
+    "PRIO": _priority,
+    "VAL": str,
+}
+
 # The record fields ether_ip.ao carries: record is the record name, OUT becomes
-# port and tag, SCAN becomes scan. name is the builder's GUI label.
-ETHER_IP_AO_FIELDS = {"record", "name", "DTYP", "OUT", "SCAN"}
+# port and tag, SCAN becomes scan, and the ETHER_IP_AO_PARAMS keep their names.
+# name is the builder's GUI label.
+ETHER_IP_AO_FIELDS = {"record", "name", "DTYP", "OUT", "SCAN", *ETHER_IP_AO_PARAMS}
 
 
 def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
@@ -31,20 +72,32 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
     "@VLVCC_01_EIP GB_Index_Setpoint S 0.5". ether_ip_ao.template writes
     "@$(port) $(tag)", so the tag carries the flags, such as the scan period
     "S <seconds>", unchanged. scan is the record's SCAN field, Passive when the
-    XML leaves it out. Returns False if OUT is not an EtherIP link.
+    XML leaves it out. DRVH, DRVL, PREC, PRIO and VAL pass through when the XML
+    has them; one whose value the model cannot take is warned about with the
+    fields ether_ip.ao has no place for. Returns False if OUT is not an
+    EtherIP link or the record has no name.
     """
     xml = entity.xml_attributes()
     port, _, tag = xml.get("OUT", "").strip().removeprefix("@").partition(" ")
     if not xml.get("OUT", "").strip().startswith("@") or not port or not tag:
         return False
+    if not xml.get("record"):
+        return False
 
-    dropped = sorted(k for k in xml if k not in ETHER_IP_AO_FIELDS)
+    params, unusable = {}, []
+    for key, kind in ETHER_IP_AO_PARAMS.items():
+        if key in xml:
+            try:
+                params[key] = kind(xml[key])
+            except ValueError:
+                unusable.append(key)
+    dropped = sorted(k for k in xml if k not in ETHER_IP_AO_FIELDS or k in unusable)
     if dropped:
         fields = ", ".join(f"{k}={xml[k]}" for k in dropped)
         ioc.extra_warnings.append(
             f"{ioc.source_file.stem}: records.ao {xml['record']} became "
-            f"ether_ip.ao, which has no field for {fields}: those fields are "
-            f"left out of the record"
+            f"ether_ip.ao, which has no field for, or an unusable value of, "
+            f"{fields}: those fields are left out of the record"
         )
 
     for key in list(entity.keys()):
@@ -55,6 +108,7 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
     entity.port = port
     entity.tag = tag.strip()
     entity.scan = xml.get("SCAN", "Passive")
+    entity.update(params)
     return True
 
 
@@ -83,27 +137,42 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     (see finalize), with its fields as builder wrote them.
     """
     xml = entity.xml_attributes()
+    name = _decode(xml.get("record", ""))
+    if _defined_before(name, entity_type, ioc):
+        entity.delete_me()
+        return
     if (
         entity_type == "ao"
         and xml.get("DTYP") == "EtherIP"
         and _ether_ip_ao(entity, ioc)
     ):
+        ioc.converted_records[name] = "ether_ip.ao"
         return
-    if not xml.get("record"):
+    if not name:
         ioc.wont_convert(entity, "a raw record with no record name")
         return
-    name = _decode(xml["record"])
     fields = {k: _decode(v) for k, v in xml.items() if k not in NOT_FIELDS}
     entity.delete_me()
-    if name in ioc.raw_records:
-        # builder stops with "Record already defined" here
-        ioc.extra_warnings.append(
-            f"{ioc.source_file.stem}: records.{entity_type} {name} is defined "
-            f"more than once in the XML: only the first, a "
-            f"records.{ioc.raw_records[name][0]}, goes to {RECORDS_DB}"
-        )
-        return
     ioc.raw_records[name] = (entity_type, fields)
+
+
+def _defined_before(name: str, entity_type: str, ioc: Generic_IOC) -> bool:
+    """
+    Whether an earlier records.* element defines the record name, which
+    builder refuses with "Record already defined". The first one stays, and
+    a warning names both.
+    """
+    if name in ioc.raw_records:
+        first = f"a records.{ioc.raw_records[name][0]}, goes to {RECORDS_DB}"
+    elif name in ioc.converted_records:
+        first = f"a records.ao, becomes {ioc.converted_records[name]}"
+    else:
+        return False
+    ioc.extra_warnings.append(
+        f"{ioc.source_file.stem}: records.{entity_type} {name} is defined "
+        f"more than once in the XML: only the first, {first}"
+    )
+    return True
 
 
 def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:

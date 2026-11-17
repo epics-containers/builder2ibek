@@ -8,12 +8,6 @@ pattern
 	{ ""    }
 }
 
-file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern 
-	{ "IOC" }
-	{ ""    }
-}
-
 file "digitelQPCController.template" {
 pattern 
 	{ "type",           "entity_enabled", "QPC",             "port",          "unit", "PMP", "SYSTEM" }

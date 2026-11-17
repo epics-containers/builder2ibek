@@ -8,12 +8,6 @@ pattern
 	{ ""    }
 }
 
-file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern 
-	{ "IOC" }
-	{ ""    }
-}
-
 file "$(ADARAVIS)/db/aravisCamera.template" {
 pattern 
 	{ "XMLSIZE", "P",               "R",     "PORT",     "TIMEOUT", "ADDR" }

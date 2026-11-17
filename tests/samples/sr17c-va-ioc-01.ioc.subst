@@ -8,12 +8,6 @@ pattern
 	{ ""    }
 }
 
-file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern 
-	{ "IOC" }
-	{ ""    }
-}
-
 file "ether_ip_plcInfo.template" {
 pattern 
 	{ "port",         "device"            }
@@ -26,4 +20,15 @@ pattern
 	{ "SR-RF-CVRST-01:CON", "VLVCC_01_EIP", "Passive", "CAVITY_RESET_01 S .2" }
 	{ "SR-RF-CVRST-02:CON", "VLVCC_01_EIP", "Passive", "CAVITY_RESET_02 S .2" }
 	{ "SR-RF-CVRST-03:CON", "VLVCC_01_EIP", "Passive", "CAVITY_RESET_03 S .2" }
+}
+
+file "ether_ip_ao_field.template" {
+pattern 
+	{ "record",             "field_name", "value" }
+	{ "SR-RF-CVRST-01:CON", "PRIO",       "HIGH"  }
+	{ "SR-RF-CVRST-01:CON", "VAL",        "1"     }
+	{ "SR-RF-CVRST-02:CON", "PRIO",       "HIGH"  }
+	{ "SR-RF-CVRST-02:CON", "VAL",        "1"     }
+	{ "SR-RF-CVRST-03:CON", "PRIO",       "HIGH"  }
+	{ "SR-RF-CVRST-03:CON", "VAL",        "1"     }
 }
