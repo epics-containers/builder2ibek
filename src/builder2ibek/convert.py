@@ -248,11 +248,14 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
 
     if element.module in module_infos:
         info = module_infos[element.module]
+        yaml_component = info.yaml_component
     else:
+        # the fallback handler, under the XML's own module name; the shared
+        # "generic" entry also serves DLS's generic module, so never change it
         info = module_infos["generic"]
-        info.yaml_component = element.module
+        yaml_component = element.module
 
-    entity.type = f"{info.yaml_component}.{element.name}"
+    entity.type = f"{yaml_component}.{element.name}"
     new_xml = info.handler(entity, element.name, ioc)
     # if the handler added some new entities add them into the IOC
     extras = entity.get_extra_entities()
