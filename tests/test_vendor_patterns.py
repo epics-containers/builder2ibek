@@ -535,3 +535,58 @@ def test_xml2yaml_prints_the_module_report(tmp_path: Path, ibek, monkeypatch):
     assert seen == [VAC]
     assert "pattern modules: x" in result.output
     assert "warning: unresolved module y" in result.output
+
+
+def test_fetch_entity_types_tells_unfetchable_from_unpublished(monkeypatch):
+    from ibek.pattern_cmds.schema import SchemaFetchError, SchemaNotFoundError
+
+    def raises(error):
+        def fetch(image):
+            raise error
+
+        return fetch
+
+    monkeypatch.setattr(
+        vendor_patterns, "_fetch_base_schema", raises(SchemaNotFoundError("404"))
+    )
+    assert vendor_patterns.fetch_entity_types(VAC) is None
+
+    for error in (SchemaFetchError("timed out"), OSError("unreachable")):
+        monkeypatch.setattr(vendor_patterns, "_fetch_base_schema", raises(error))
+        with pytest.raises(vendor_patterns.SchemaUnavailableError, match=VAC):
+            vendor_patterns.fetch_entity_types(VAC)
+
+    monkeypatch.setattr(
+        vendor_patterns, "_fetch_base_schema", lambda image: _schema(SCHEMAS[VAC])
+    )
+    assert vendor_patterns.fetch_entity_types(VAC) == SCHEMAS[VAC]
+
+
+def test_failed_pattern_add_is_an_error(tmp_path: Path, ibek, monkeypatch):
+    def run(*args: str):
+        return subprocess.CompletedProcess(args, 1, "", "network down")
+
+    monkeypatch.setattr(vendor_patterns, "_ibek", run)
+    instance = _instance(tmp_path, VAC)
+
+    report = add_patterns(ENTITIES, instance / "config" / "ioc.yaml")
+
+    error = f"ibek pattern add {ATTO.ref} failed: network down"
+    assert report.errors == [error]
+    assert error in report.warnings
+
+
+def test_pattern_errors_reach_the_conversion_result(tmp_path: Path, monkeypatch):
+    def failing(entities, ioc_yaml, image, image_types):
+        return vendor_patterns.PatternReport(warnings=["e"], errors=["e"])
+
+    monkeypatch.setattr(convert, "add_patterns", failing)
+    result = convert.convert_file(SAMPLE, tmp_path / "ioc.yaml", "schema")
+    assert result.pattern_errors == ["e"]
+
+    def crash(entities, ioc_yaml, image, image_types):
+        raise OSError("read-only")
+
+    monkeypatch.setattr(convert, "add_patterns", crash)
+    result = convert.convert_file(SAMPLE, tmp_path / "ioc.yaml", "schema")
+    assert result.pattern_errors == ["runtime patterns not added: read-only"]

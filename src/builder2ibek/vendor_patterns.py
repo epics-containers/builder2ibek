@@ -56,6 +56,7 @@ import truststore
 from ibek.globals import RUNTIME_LOCK_NAME
 from ibek.pattern_cmds.lock import RuntimeLock
 from ibek.pattern_cmds.schema import (
+    SchemaFetchError,
     SchemaNotFoundError,
     find_image,
     is_instance,
@@ -101,6 +102,8 @@ class PatternReport:
     warnings: list[str] = field(default_factory=list)
     #: each module of the IOC, in the order its entities first appear
     modules: list[ModuleStatus] = field(default_factory=list)
+    #: patterns that were to be added and were not, also among the warnings
+    errors: list[str] = field(default_factory=list)
 
 
 @cache_outcome
@@ -136,25 +139,49 @@ def _latest_release(api: str) -> str:
         return json.load(response)["tag_name"]
 
 
-@cache
-def image_entity_types(image: str) -> frozenset[str] | None:
-    """The entity types in an image's published ioc schema, None if unavailable."""
+class SchemaUnavailableError(Exception):
+    """An image's published ioc schema could not be fetched: a network error,
+    not a schema that was never published."""
+
+
+def fetch_entity_types(image: str) -> frozenset[str] | None:
+    """The entity types in an image's published ioc schema.
+
+    None when no schema is published for the image, or what is published is
+    not an ibek IOC schema. Raises SchemaUnavailableError when the fetch fails
+    and nothing is cached, so that a caller can tell a network problem from a
+    missing schema.
+    """
     try:
         schema = _fetch_base_schema(image)
+    except SchemaFetchError as e:
+        raise SchemaUnavailableError(
+            f"cannot fetch the ioc schema of {image}: {e}"
+        ) from e
+    except OSError as e:
+        raise SchemaUnavailableError(
+            f"cannot fetch the ioc schema of {image}: {e}"
+        ) from e
+    except (SchemaNotFoundError, PatternError, ValueError):
+        # not published, or not JSON
+        return None
+    try:
         items = schema["properties"]["entities"]["items"]
         if "$ref" in items:
             items = schema["$defs"][items["$ref"].split("/")[-1]]
         return frozenset(items["discriminator"]["mapping"])
-    except (
-        SchemaNotFoundError,
-        PatternError,
-        OSError,
-        ValueError,
-        KeyError,
-        TypeError,
-    ):
-        # not published, unreachable, not JSON or not an ibek IOC schema; the
-        # caller warns
+    except (KeyError, TypeError):
+        # not an ibek IOC schema
+        return None
+
+
+@cache
+def image_entity_types(image: str) -> frozenset[str] | None:
+    """The entity types in an image's published ioc schema, None if
+    unavailable for any reason; the caller warns."""
+    try:
+        return fetch_entity_types(image)
+    except SchemaUnavailableError:
         return None
 
 
@@ -509,13 +536,15 @@ def _vendor(
             report.notes.append(f"added runtime pattern {pattern.ref}")
             added = True
         else:
-            report.warnings.append(
-                f"ibek pattern add {pattern.ref} failed: {result.stderr.strip()}"
-            )
+            error = f"ibek pattern add {pattern.ref} failed: {result.stderr.strip()}"
+            report.warnings.append(error)
+            report.errors.append(error)
     if not added and lock.patterns:
         # the ioc.yaml was rewritten with the default header, and the image may
         # have changed
         result = _ibek("pattern", "schema", str(instance))
         if result.returncode != 0:
-            report.warnings.append(f"ibek pattern schema failed: {result.stderr}")
+            error = f"ibek pattern schema failed: {result.stderr}"
+            report.warnings.append(error)
+            report.errors.append(error)
     return image

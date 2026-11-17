@@ -53,6 +53,8 @@ class ConvertResult:
     refused: list[str] = dc_field(default_factory=list)
     # how each module of the ioc.yaml runs: pattern, build-time or unresolved
     modules: list[ModuleStatus] = dc_field(default_factory=list)
+    # runtime patterns that were to be added and were not (also warnings)
+    pattern_errors: list[str] = dc_field(default_factory=list)
 
 
 def convert_file(
@@ -160,9 +162,11 @@ def convert_file(
         result.notes += patterns.notes
         result.warnings += patterns.warnings
         result.modules = patterns.modules
+        result.pattern_errors = patterns.errors
     except Exception as e:  # noqa: BLE001 -- the ioc.yaml is written; never fail
         log.debug("adding runtime patterns failed", exc_info=True)
         result.warnings.append(f"runtime patterns not added: {e}")
+        result.pattern_errors.append(f"runtime patterns not added: {e}")
 
     return result
 
