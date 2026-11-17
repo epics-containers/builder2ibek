@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<currAmp.YMCS0012 P="BL02I-DI-QBPM-01" addr="0" gda_bpm_desc="Pre-HFM QBPM BPM" gda_bpm_name="QBPM1.BPM" gda_desc="Pre-HFM QBPM Intensity" gda_name="QBPM1.INTEN" name="QBPM1.OB3" port="ty_41_1" prec="4"/>
+	<currAmp.auto_currAmpOffsets P="BL02I-DI-QBPM-01" gda_bpm_name="QBPM1.BPM" name="QBPM1.OB4"/>
+	<currAmp.YMCS0009 P="BL16I-DI-IAMP-08" addr="0" name="D7.IAMP" port="ty_50_7" prec="4"/>
+	<currAmp.auto_currAmpSingle DESC="Diode 1 current" N="1" P="BL16I-DI-PHDGN-01" PCURR="BL16I-DI-IAMP-01" Q=":DIODE:I" name="D1.I1"/>
+	<currAmp.auto_currAmp_ai DESC="S2 Current 1 X-" DTYPE="Hy8401ip" EGU="uA" EGUF="-10" EGUL="10" HOPR="10" INP="#C51 S0 @MEAN=100" LOPR="0" P="BL19I-AL-SLITS-02" PREC="4" Q=":I1" SCAN="1 second" gda_desc="S2 Current 1 X-" gda_name="S2.I1" name="C41I1"/>
+	<currAmp.auto_currAmpADC INP1="BL24I-DI-QBPM-01:ADC_A:MOVINGAVERAGE" INP2="BL24I-DI-QBPM-01:ADC_B:MOVINGAVERAGE" INP3="BL24I-DI-QBPM-01:ADC_C:MOVINGAVERAGE" INP4="BL24I-DI-QBPM-01:ADC_D:MOVINGAVERAGE" P="BL24I-DI-QBPM-01" RANGE="10" name="BPM1.OB11"/>
+</components>

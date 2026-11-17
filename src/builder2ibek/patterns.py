@@ -94,7 +94,9 @@ _project_root = Path(__file__).parent.parent.parent
 # The pattern model accepts everything the generic model does, to the same effect.
 # plan() needs only GENERIC_DIFFERS; this table records the other half of the
 # decision so that the tests can check it.
-ALIGNED: frozenset[str] = frozenset({"laudaRE2xx", "oxCryo", "strainGauge"})
+ALIGNED: frozenset[str] = frozenset(
+    {"currAmp", "eurotherm2k", "fw102", "laudaRE2xx", "oxCryo", "strainGauge"}
+)
 
 # A module with a generic model in neither table stays build-time: the pattern of
 # a library release newer than the one the tests check is not trusted until the
@@ -110,10 +112,7 @@ GENERIC_DIFFERS: frozenset[str] = frozenset(
         "agilent33220A",
         "agilent53220",
         "alicatGasFlow",
-        "currAmp",
         "digitelMpc",
-        "eurotherm2k",
-        "fw102",
         "harvardSyringe",
         "keithley6514",
         "lakeshore340",
