@@ -3,7 +3,7 @@ General utility functions to assist conversion
 """
 
 import re
-from typing import Any
+from typing import Any, TypeGuard
 
 from builder2ibek.types import Entity
 
@@ -16,7 +16,7 @@ def str_or_empty(value: Any) -> str:
     return "" if value is None else str(value)
 
 
-def has_value(value: Any) -> bool:
+def has_value(value: Any) -> TypeGuard[Any]:
     """
     True unless value is absent (None) or an empty XML attribute (""), which
     convert.py gives the builder's value for the parameter's type.
