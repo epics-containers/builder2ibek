@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<BL21I.SCM10 device="BL21I-VA-CRYO-01:SERIAL" name="SMPL.SCM10_01" port="vts_SCM10_01"/>
+</components>

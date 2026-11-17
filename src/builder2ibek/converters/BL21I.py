@@ -35,3 +35,11 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.rename("RL-D_SWITCH", "RL_D_SWITCH")
         entity.rename("RL-C_SWITCH", "RL_C_SWITCH")
         entity.rename("RL-AB_SWITCH", "RL_AB_SWITCH")
+
+    if entity_type == "SCM10":
+        # The SCM10 temperature monitor comes from its ibek-runtime-streamdevice
+        # pattern; INTERFACE keeps its default, RS232
+        entity.type = "scientificInstSCM10.scm10"
+        entity.rename("device", "P")
+        entity.rename("port", "PORT")
+        entity.remove("name")
