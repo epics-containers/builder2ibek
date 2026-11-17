@@ -137,27 +137,42 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     (see finalize), with its fields as builder wrote them.
     """
     xml = entity.xml_attributes()
+    name = _decode(xml.get("record", ""))
+    if _defined_before(name, entity_type, ioc):
+        entity.delete_me()
+        return
     if (
         entity_type == "ao"
         and xml.get("DTYP") == "EtherIP"
         and _ether_ip_ao(entity, ioc)
     ):
+        ioc.converted_records[name] = "ether_ip.ao"
         return
-    if not xml.get("record"):
+    if not name:
         ioc.wont_convert(entity, "a raw record with no record name")
         return
-    name = _decode(xml["record"])
     fields = {k: _decode(v) for k, v in xml.items() if k not in NOT_FIELDS}
     entity.delete_me()
-    if name in ioc.raw_records:
-        # builder stops with "Record already defined" here
-        ioc.extra_warnings.append(
-            f"{ioc.source_file.stem}: records.{entity_type} {name} is defined "
-            f"more than once in the XML: only the first, a "
-            f"records.{ioc.raw_records[name][0]}, goes to {RECORDS_DB}"
-        )
-        return
     ioc.raw_records[name] = (entity_type, fields)
+
+
+def _defined_before(name: str, entity_type: str, ioc: Generic_IOC) -> bool:
+    """
+    Whether an earlier records.* element defines the record name, which
+    builder refuses with "Record already defined". The first one stays, and
+    a warning names both.
+    """
+    if name in ioc.raw_records:
+        first = f"a records.{ioc.raw_records[name][0]}, goes to {RECORDS_DB}"
+    elif name in ioc.converted_records:
+        first = f"a records.ao, becomes {ioc.converted_records[name]}"
+    else:
+        return False
+    ioc.extra_warnings.append(
+        f"{ioc.source_file.stem}: records.{entity_type} {name} is defined "
+        f"more than once in the XML: only the first, {first}"
+    )
+    return True
 
 
 def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:

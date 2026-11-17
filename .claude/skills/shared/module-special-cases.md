@@ -341,4 +341,5 @@ ibek predates `post_db_files` rejects the ioc.yaml. xml2yaml removes a
 replaces or removes a `records.db` that starts with its own header line; any
 other `records.db` (one written by hand) is left alone, the raw records and
 the `post_db_files` entry are left out, and a warning says so. A record name the XML
-defines twice keeps its first definition, with a warning.
+defines twice keeps its first definition, with a warning, whether each is
+an EtherIP `ao` or a raw record for `records.db`.

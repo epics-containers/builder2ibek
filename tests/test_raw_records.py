@@ -242,6 +242,38 @@ def test_ether_ip_ao_with_no_record_name_wont_convert(tmp_path: Path):
     assert "a raw record with no record name" in warning
 
 
+def test_raw_record_named_like_ether_ip_ao_warns(tmp_path: Path):
+    """A raw record named like an earlier EtherIP ao is left out, with a warning"""
+    xml = XML.replace(
+        "</components>",
+        '  <records.ai name="DUP" record="BL01C-VA-VLVCC-01:GB:IDX_SP"/>\n'
+        "</components>",
+    )
+    entities, warnings = _convert(_write_xml(tmp_path, xml), tmp_path / "ioc.yaml")
+    assert len([e for e in entities if e["type"] == "ether_ip.ao"]) == 1
+    assert (tmp_path / "records.db").read_text() == RECORDS_DB
+    (warning,) = [w for w in warnings if "more than once" in w]
+    assert "records.ai BL01C-VA-VLVCC-01:GB:IDX_SP" in warning
+    assert "only the first, a records.ao, becomes ether_ip.ao" in warning
+
+
+def test_ether_ip_ao_named_like_raw_record_warns(tmp_path: Path):
+    """An EtherIP ao named like an earlier raw record is left out, with a warning"""
+    xml = XML.replace(
+        "</components>",
+        '  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP OTHER S .2"\n'
+        '    record="BL01C-EA-TABLE-01:LED:DISABLE"/>\n'
+        "</components>",
+    )
+    entities, warnings = _convert(_write_xml(tmp_path, xml), tmp_path / "ioc.yaml")
+    (ao,) = [e for e in entities if e["type"] == "ether_ip.ao"]
+    assert ao["record"] == "BL01C-VA-VLVCC-01:GB:IDX_SP"
+    assert (tmp_path / "records.db").read_text() == RECORDS_DB
+    (warning,) = [w for w in warnings if "more than once" in w]
+    assert "records.ao BL01C-EA-TABLE-01:LED:DISABLE" in warning
+    assert "only the first, a records.calcout, goes to records.db" in warning
+
+
 def _strip_records(xml: str) -> str:
     """The XML without its records.* elements, which span several lines"""
     lines, skipping = [], False
