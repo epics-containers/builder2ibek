@@ -3,6 +3,7 @@ from pathlib import Path
 import typer
 
 from builder2ibek import __version__
+from builder2ibek.beamline2yaml import beamline2yaml_cli
 from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
@@ -107,15 +108,76 @@ def xml2yaml(
 
 @cli.command()
 def beamline2yaml(
-    input: Path = typer.Argument(..., help="Path to root folder BLXX-BUILDER"),
-    output: Path = typer.Argument(..., help="Output root folder"),
+    beamline: str = typer.Argument(
+        ..., help="Beamline prefix of the BUILDER (e.g. 'BL08J' or 'i08')"
+    ),
+    services_repo: Path = typer.Option(
+        ..., "--services-repo", help="Path to the beamline services repo"
+    ),
+    apply: bool = typer.Option(
+        False,
+        "--apply",
+        help="Write and convert the planned folders (default: print the plan only)",
+    ),
+    validate: bool = typer.Option(
+        True,
+        "--validate/--no-validate",
+        help="With --apply, schema-validate each ioc.yaml with ibek generate2",
+    ),
+    only: list[str] = typer.Option(
+        [], "--only", help="Limit to specific ioc-names (repeatable)"
+    ),
+    descriptions_json: Path | None = typer.Option(
+        None,
+        "--descriptions-json",
+        help="JSON object mapping ioc-name -> one-line description",
+    ),
+    json_out: bool = typer.Option(
+        False, "--json", help="Emit the plan as JSON on stdout"
+    ),
+    init_dir: Path | None = typer.Option(
+        None, help="DLS init configuration [default: <dls-sw>/prod/etc/init]"
+    ),
+    redirect_table: Path | None = typer.Option(
+        None,
+        help="DLS IOC redirector table "
+        "[default: <dls-sw>/prod/etc/redirector/redirect_table]",
+    ),
+    dls_sw: Path = typer.Option(
+        DLS_SW, help="Root that /dls_sw paths resolve under (for tests)"
+    ),
 ):
     """
-    TODO: Convert all IOCs in a BLXXI-SUPPORT project into a set of ibek services
-    folders (not yet implemented)
+    Convert every IOC in a beamline's BUILDER to an ibek services folder.
+
+    Plans each XML IOC (work area, else latest prod; macro templates left
+    out): a new folder or a dev-c7 legacy one is made from .ioc_template with
+    a generic IOC image chosen from the modules it uses; a dedicated PandA IOC
+    becomes a fastcs-pandablocks instance; an existing ibek folder is left to
+    reconvert. An IOC that cannot run (no generic IOC image, an unresolved
+    module, or a non-Linux target) is blocked: it is reported, no folder is
+    written and a dev-c7 legacy folder is kept. Whether each IOC is live is
+    reported; a live IOC's values.yaml warns to stop it on its server first.
+    --apply writes the folders, runs xml2yaml with the chosen image (which adds
+    runtime patterns) and schema-validates each ioc.yaml with ibek generate2;
+    no IOC is started. It writes nothing when a pattern library, GitHub or
+    GitLab lookup failed, and puts a replaced legacy folder back when its
+    conversion fails. GitLab generic IOCs need GITLAB_TOKEN.
     """
-    typer.echo("Not implemented yet")
-    raise typer.Exit(code=1)
+    code = beamline2yaml_cli(
+        beamline,
+        services_repo,
+        apply=apply,
+        validate=validate,
+        only=list(only) or None,
+        descriptions_json=descriptions_json,
+        json_out=json_out,
+        init_dir=init_dir,
+        redirect_table=redirect_table,
+        dls_sw=dls_sw,
+    )
+    if code:
+        raise typer.Exit(code)
 
 
 @cli.command()

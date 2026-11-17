@@ -273,6 +273,22 @@ def read_location(services_repo: Path) -> str:
     return str((data.get("global") or {}).get("location") or "")
 
 
+def running_header(launches: list[LaunchEntry], folder: str) -> str:
+    """The values.yaml warning for a service whose IOC still runs on the
+    servers of ``launches``."""
+    servers = ", ".join(e.server for e in launches)
+    header = (
+        f"WARNING: this IOC still runs on {servers}. Stop it there first,"
+        " then deploy and start this service: with hostNetwork both would"
+        " serve the same PVs. If it has to be deployed before that, deploy"
+        f" it stopped (ec stop --commit {folder} immediately); both"
+        " serve the same PVs for that short window."
+    )
+    if any(e.manualstart for e in launches):
+        header += f" {MANUALSTART_NOTE[0].upper()}{MANUALSTART_NOTE[1:]}."
+    return header
+
+
 def build_plan(
     prefix: str,
     services_repo: Path,
@@ -363,18 +379,10 @@ def build_plan(
                 if match
                 else "no prod build yet"
             )
-        servers = ", ".join(e.server for e in launches[ioc])
         entry.manualstart = any(e.manualstart for e in launches[ioc])
-        entry.header = (
-            f"WARNING: this IOC still runs on {servers}. Stop it there first,"
-            " then deploy and start this service: with hostNetwork both would"
-            " serve the same PVs. If it has to be deployed before that, deploy"
-            f" it stopped (ec stop --commit {entry.folder} immediately); both"
-            " serve the same PVs for that short window."
-        )
+        entry.header = running_header(launches[ioc], entry.folder)
         if entry.manualstart:
             entry.notes.append(MANUALSTART_NOTE)
-            entry.header += f" {MANUALSTART_NOTE[0].upper()}{MANUALSTART_NOTE[1:]}."
         entry.action = "add"
     return plan
 
@@ -386,17 +394,23 @@ def _scalar(value: object) -> str:
     return text if loaded == text and ":" not in text else json.dumps(text)
 
 
+def add_header(text: str, header: str) -> str:
+    """``header`` as a comment at the top of a values.yaml ``text``, after any
+    yaml-language-server modeline."""
+    if not header:
+        return text
+    comment = "".join(f"# {line}\n" for line in textwrap.wrap(header, 76))
+    first, nl, rest = text.partition("\n")
+    if first.startswith("# yaml-language-server"):
+        return f"{first}{nl}{comment}{rest}"
+    return comment + text
+
+
 def render_values(template: str, values: dict[str, object], header: str = "") -> str:
     """Replace the template's iocVersion placeholder with ``values``,
     keeping every comment. ``header`` becomes a comment at the top, after
     any yaml-language-server modeline."""
-    if header:
-        comment = "".join(f"# {line}\n" for line in textwrap.wrap(header, 76))
-        first, nl, rest = template.partition("\n")
-        if first.startswith("# yaml-language-server"):
-            template = f"{first}{nl}{comment}{rest}"
-        else:
-            template = comment + template
+    template = add_header(template, header)
     lines: list[str] = []
     for key, value in values.items():
         if isinstance(value, list):

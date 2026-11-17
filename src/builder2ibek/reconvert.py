@@ -238,13 +238,25 @@ def run_reconvert(
 
 
 def _run_validation(result: ReconvertResult) -> None:
-    """Validate each reconverted ioc.yaml with `ibek runtime generate2`.
+    """Validate each reconverted ioc.yaml with `ibek runtime generate2`."""
+    by_name = {c["ioc_name"]: c for c in result.ioc_candidates}
+    configs = {
+        item["ioc_name"]: Path(by_name[item["ioc_name"]]["ioc_yaml"]).parent
+        for item in result.reconverted
+        if item["status"] == "ok" and item["ioc_name"] in by_name
+    }
+    result.validation.extend(validate_configs(configs))
 
-    One EPICS_ROOT tempdir and one config tempdir are created per
-    `reconvert` invocation; the generate2 calls run sequentially inside
-    them. CLAUDE.md hard rule 6 (EPICS_ROOT isolation) is satisfied per
-    invocation — parallelism is out of scope for this command.
+
+def validate_configs(configs: dict[str, Path]) -> list[dict]:
+    """Validate the ioc.yaml of each config folder with `ibek runtime generate2`.
+
+    One EPICS_ROOT tempdir and one config tempdir are created per call; the
+    generate2 calls run sequentially inside them, so no IOC is started and
+    nothing outside the tempdirs is written. Returns one
+    ``{"ioc_name", "status": "ok" | "fail", "stderr"?}`` per config.
     """
+    validation: list[dict] = []
     with (
         tempfile.TemporaryDirectory(prefix="epics-reconvert-") as epics_root,
         tempfile.TemporaryDirectory(prefix="reconvert-config-") as tmp_config,
@@ -260,32 +272,19 @@ def _run_validation(result: ReconvertResult) -> None:
             text=True,
         )
         if schema_proc.returncode != 0:
-            for item in result.reconverted:
-                result.validation.append(
-                    {
-                        "ioc_name": item["ioc_name"],
-                        "status": "fail",
-                        "stderr": (
-                            "update-schema failed: "
-                            + (schema_proc.stderr or schema_proc.stdout).strip()
-                        ),
-                    }
-                )
-            return
+            stderr = "update-schema failed: " + (
+                (schema_proc.stderr or schema_proc.stdout).strip()
+            )
+            return [
+                {"ioc_name": name, "status": "fail", "stderr": stderr}
+                for name in configs
+            ]
 
-        by_name = {c["ioc_name"]: c for c in result.ioc_candidates}
-        for item in result.reconverted:
-            ioc_name = item["ioc_name"]
-            cand = by_name.get(ioc_name)
-            if cand is None or item["status"] != "ok":
-                continue
-            # the ioc.yaml and the support YAMLs of the runtime patterns added
-            # next to it, which generate2 reads from the config folder
-            config = Path(cand["ioc_yaml"]).parent
+        for ioc_name, config in configs.items():
+            # the whole config folder: generate2 reads the ioc.yaml, the support
+            # YAMLs of runtime patterns and post_db_files such as records.db
             cfg = Path(tmp_config) / ioc_name
-            cfg.mkdir()
-            for f in [config / "ioc.yaml", *config.glob("*.ibek.support.yaml")]:
-                shutil.copy(f, cfg / f.name)
+            shutil.copytree(config, cfg)
             proc = subprocess.run(
                 ["ibek", "runtime", "generate2", "--no-pvi", str(cfg)],
                 env=env,
@@ -293,15 +292,16 @@ def _run_validation(result: ReconvertResult) -> None:
                 text=True,
             )
             if proc.returncode == 0:
-                result.validation.append({"ioc_name": ioc_name, "status": "ok"})
+                validation.append({"ioc_name": ioc_name, "status": "ok"})
             else:
-                result.validation.append(
+                validation.append(
                     {
                         "ioc_name": ioc_name,
                         "status": "fail",
                         "stderr": (proc.stderr or proc.stdout).strip(),
                     }
                 )
+    return validation
 
 
 def _render_human(result: ReconvertResult) -> str:

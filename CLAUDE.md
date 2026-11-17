@@ -56,6 +56,8 @@ grep -i <module> $(find /dls_sw/work/R3.14.12.7/support/*BUILDER/etc/makeIocs -m
 # Convert a single IOC XML to ibek YAML:
 uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 #   --blgui  emit BLGui.status/device; only when the generic IOC binary has BLGui
+#   --image  generic IOC image to plan against (sets a placeholder values.yaml)
+#   it reports each module as pattern, build-time or unresolved
 # Inside a services repo instance it also runs `ibek pattern add` for each
 # ibek-runtime-streamdevice or ibek-runtime-support pattern the IOC uses (latest
 # releases), and gives a pattern-only IOC the latest ioc-streamdevice-runtime
@@ -66,6 +68,17 @@ uv run builder2ibek xml2yaml <path/to/IOC.xml> --yaml <output/ioc.yaml>
 # BUILDER2IBEK_PATTERN_TAG (streamdevice),
 # BUILDER2IBEK_SUPPORT_PATTERN_TAG (support) and BUILDER2IBEK_RUNTIME_TAG (image)
 # fix the tags.
+
+# Convert every BUILDER XML IOC of a beamline into services folders (dry run;
+# --apply writes, runs xml2yaml and validates with generate2, never starts an
+# IOC). New and dev-c7 folders are made from .ioc_template with a generic IOC
+# image matched to the IOC's entity types; ibek folders are left to reconvert.
+# An IOC with no image, an unresolved module or a non-Linux target is
+# "blocked": reported, no folder written, a dev-c7 folder kept. --apply writes
+# nothing when a pattern library, GitHub or GitLab lookup failed.
+# GITHUB_TOKEN avoids the release API rate limit; GITLAB_TOKEN reads GitLab
+# generic IOCs (ioc-dlslinuxvac).
+uv run builder2ibek beamline2yaml <BL08J> --services-repo <path/to/services-repo>
 
 # Add a beamline's live Linux IOCs as dev-c7 legacy IOCs (dry run; --apply writes).
 # Services-repo files only: never deploy one while its IOC runs on its server.
