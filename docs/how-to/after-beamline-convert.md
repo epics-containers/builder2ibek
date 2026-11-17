@@ -149,6 +149,12 @@ services repo for use across multiple IOCs on that beamline.
 See [Runtime Support](runtime-support.md) for full setup instructions,
 worked examples, and tips.
 
+Raw `records.*` components in the builder XML have no entity model. builder2ibek
+writes them, as builder did, to `config/records.db` beside the `ioc.yaml` and
+lists it in the ioc.yaml's `post_db_files`, which ibek 4.12.0 and later loads
+after `ioc.db`, as builder loaded them. A set of these records that
+several IOCs share is a candidate for a template of its own.
+
 ## 7. Test in a devcontainer
 
 Before deploying, verify that your IOC works inside a devcontainer. Use

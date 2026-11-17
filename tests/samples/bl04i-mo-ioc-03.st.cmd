@@ -69,6 +69,7 @@ set_logging_enable 1
 set_max_array_length 10
 
 dbLoadRecords /ioc.db
+dbLoadRecords config/records.db
 iocInit
 
 dbpf "BL04I-MO-STEP-04:AXIS5:DESC" "FSWT Transition"

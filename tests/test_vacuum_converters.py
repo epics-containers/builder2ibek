@@ -1,7 +1,7 @@
 """
 Converter fixes for vacuum IOCs: XML attributes that parse as numbers but are
 str in the model, leaf entities that must drop name, GUI-only templates that
-create no records, and raw records, which are dropped with a warning.
+create no records, and raw records, which go to records.db.
 """
 
 from pathlib import Path
@@ -136,20 +136,16 @@ def test_gui_only_templates_dropped(tmp_path: Path):
     assert "insertionDevice.idcpmu5VacuumGui" not in types
 
 
-def test_raw_records_dropped_with_warning(tmp_path: Path):
+def test_raw_records_go_to_records_db(tmp_path: Path):
     entities, warnings = _convert(tmp_path, XML)
     assert not [e for e in entities if e["type"].startswith("records.")]
-    record_warnings = [w for w in warnings if "records." in w]
-    assert len(record_warnings) == 2
-    assert any(
-        w.startswith(f"{IOC}: won't convert 2 records.calcout entities")
-        for w in record_warnings
-    )
-    assert all("config folder" in w for w in record_warnings)
-    assert any(
-        w.startswith(f"{IOC}: won't convert 1 records.ai entity")
-        for w in record_warnings
-    )
+    ioc_yaml = YAML(typ="safe").load((tmp_path / "ioc.yaml").read_text())
+    assert ioc_yaml["post_db_files"] == ["records.db"]
+    text = (tmp_path / "records.db").read_text()
+    assert text.count("record(") == 3
+    assert 'record(ai, "BL01C-EA-TABLE-01:AI")' in text
+    assert not [w for w in warnings if "won't convert" in w and "records." in w]
+    assert any(w.startswith(f"{IOC}: 3 raw records written") for w in warnings)
 
 
 def test_dls8516channel_fullduplex_optional(tmp_path: Path):

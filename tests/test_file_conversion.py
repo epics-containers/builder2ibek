@@ -115,6 +115,11 @@ def test_convert(sample_xml: Path, tmp_path: Path):
     assert not [w for w in result.warnings if "runtime patterns not added" in w]
 
     assert out_yaml.read_text() == expected_yaml.read_text()
+    expected_records = SAMPLES / "config" / stem / "records.db"
+    out_records = config / "records.db"
+    assert out_records.exists() == expected_records.exists()
+    if expected_records.exists():
+        assert out_records.read_text() == expected_records.read_text()
     _check_patterns(config, stem)
     # reset the interrupt vector counter
     InterruptVector.reset()
