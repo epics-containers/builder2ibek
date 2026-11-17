@@ -1,5 +1,6 @@
 import codecs
 import warnings
+from collections.abc import Callable
 from pathlib import Path
 
 from builder2ibek.converters.globalHandler import globalHandler
@@ -19,13 +20,42 @@ WRITTEN = f"written to config/{RECORDS_DB}"
 # the record name and name is the builder's GUI label
 NOT_FIELDS = {"record", "name"}
 
+
+# the values of the ao record's PRIO menu, in menu index order: the ether_ip.ao
+# PRIO enum
+PRIORITIES = ("LOW", "MEDIUM", "HIGH")
+
+
+def _int(value: str) -> int:
+    """value as an int. Raises ValueError for one that is not a whole number,
+    such as 2.5."""
+    number = float(value)
+    if not number.is_integer():
+        raise ValueError(value)
+    return int(number)
+
+
+def _priority(value: str) -> str:
+    """
+    A PRIO value as the ether_ip.ao PRIO enum: a menu index (0, 1 or 2) or a
+    menu name in any case. Raises ValueError for any other value.
+    """
+    value = value.strip()
+    if value in ("0", "1", "2"):
+        return PRIORITIES[int(value)]
+    if value.upper() in PRIORITIES:
+        return value.upper()
+    raise ValueError(value)
+
+
 # Record fields ether_ip.ao takes as parameters of the same name, each with the
-# type its model gives it
-ETHER_IP_AO_PARAMS = {
+# function that turns its value into the model's type, raising ValueError for a
+# value that the type cannot hold, such as an empty DRVH
+ETHER_IP_AO_PARAMS: dict[str, Callable[[str], float | int | str]] = {
     "DRVH": float,
     "DRVL": float,
-    "PREC": int,
-    "PRIO": str,
+    "PREC": _int,
+    "PRIO": _priority,
     "VAL": str,
 }
 
@@ -33,20 +63,6 @@ ETHER_IP_AO_PARAMS = {
 # port and tag, SCAN becomes scan, and the ETHER_IP_AO_PARAMS keep their names.
 # name is the builder's GUI label.
 ETHER_IP_AO_FIELDS = {"record", "name", "DTYP", "OUT", "SCAN", *ETHER_IP_AO_PARAMS}
-
-
-def _param_value(value: str, kind: type) -> float | int | str:
-    """
-    A record field's value as an ether_ip.ao parameter of type kind. Raises
-    ValueError for a value that is not a number of that kind, such as an empty
-    DRVH or a PREC of 2.5.
-    """
-    if kind is int:
-        number = float(value)
-        if not number.is_integer():
-            raise ValueError(value)
-        return int(number)
-    return kind(value)
 
 
 def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
@@ -57,20 +73,22 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
     "@$(port) $(tag)", so the tag carries the flags, such as the scan period
     "S <seconds>", unchanged. scan is the record's SCAN field, Passive when the
     XML leaves it out. DRVH, DRVL, PREC, PRIO and VAL pass through when the XML
-    has them; one whose value is not of the model's type is warned about with
-    the fields ether_ip.ao has no place for. Returns False if OUT is not an
-    EtherIP link.
+    has them; one whose value the model cannot take is warned about with the
+    fields ether_ip.ao has no place for. Returns False if OUT is not an
+    EtherIP link or the record has no name.
     """
     xml = entity.xml_attributes()
     port, _, tag = xml.get("OUT", "").strip().removeprefix("@").partition(" ")
     if not xml.get("OUT", "").strip().startswith("@") or not port or not tag:
+        return False
+    if not xml.get("record"):
         return False
 
     params, unusable = {}, []
     for key, kind in ETHER_IP_AO_PARAMS.items():
         if key in xml:
             try:
-                params[key] = _param_value(xml[key], kind)
+                params[key] = kind(xml[key])
             except ValueError:
                 unusable.append(key)
     dropped = sorted(k for k in xml if k not in ETHER_IP_AO_FIELDS or k in unusable)
@@ -78,8 +96,8 @@ def _ether_ip_ao(entity: Entity, ioc: Generic_IOC) -> bool:
         fields = ", ".join(f"{k}={xml[k]}" for k in dropped)
         ioc.extra_warnings.append(
             f"{ioc.source_file.stem}: records.ao {xml['record']} became "
-            f"ether_ip.ao, which has no field for {fields}: those fields are "
-            f"left out of the record"
+            f"ether_ip.ao, which has no field for, or an unusable value of, "
+            f"{fields}: those fields are left out of the record"
         )
 
     for key in list(entity.keys()):

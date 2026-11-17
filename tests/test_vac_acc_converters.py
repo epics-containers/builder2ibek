@@ -41,6 +41,12 @@ XML = """<?xml version="1.0" ?>
     PRIO="HIGH" VAL="1" name="CVRST_1" record="SR-RF-CVRST-01:CON"/>
   <records.ao DRVH="" DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_04 S .2"
     PREC="2.5" name="CVRST_4" record="SR-RF-CVRST-04:CON"/>
+  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_05 S .2"
+    PRIO="2" name="CVRST_5" record="SR-RF-CVRST-05:CON"/>
+  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_06 S .2"
+    PRIO="medium" name="CVRST_6" record="SR-RF-CVRST-06:CON"/>
+  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP CAVITY_RESET_07 S .2"
+    PRIO="" name="CVRST_7" record="SR-RF-CVRST-07:CON"/>
   <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP" name="BAD"
     record="SR99C-VA-VLVCC-01:BAD"/>
   <records.ao OUT="SR99C-VA-OTHER:VAL" name="SOFT" record="SR99C-VA-SOFT:OUT"/>
@@ -103,7 +109,7 @@ def test_qpc_ion_pump_takes_its_controllers_port_and_unit(tmp_path: Path):
 
 def test_ether_ip_ao(tmp_path: Path):
     entities, warnings = _convert(tmp_path)
-    setpoint, reset, unusable = _by_type(entities, "ether_ip.ao")
+    setpoint, reset, unusable, *_ = _by_type(entities, "ether_ip.ao")
     assert setpoint == {
         "type": "ether_ip.ao",
         "record": "SR99C-VA-VLVCC-01:GB:IDX_SP",
@@ -132,11 +138,23 @@ def test_ether_ip_ao(tmp_path: Path):
         "scan": "Passive",
     }
 
-    first, second = [w for w in warnings if "became ether_ip.ao" in w]
+    first, second, third = [w for w in warnings if "became ether_ip.ao" in w]
     assert "SR99C-VA-VLVCC-01:GB:IDX_SP" in first
-    assert "has no field for EGU=mm:" in first
+    assert "has no field for, or an unusable value of, EGU=mm:" in first
     assert "SR-RF-CVRST-04:CON" in second
-    assert "has no field for DRVH=, PREC=2.5:" in second
+    assert "has no field for, or an unusable value of, DRVH=, PREC=2.5:" in second
+    assert "SR-RF-CVRST-07:CON" in third
+    assert "has no field for, or an unusable value of, PRIO=:" in third
+
+
+def test_ether_ip_ao_prio_menu_index_and_case(tmp_path: Path):
+    """PRIO takes the ao menu's index or name in any case, as the enum's name"""
+    entities, _ = _convert(tmp_path)
+    by_record = {e["record"]: e for e in _by_type(entities, "ether_ip.ao")}
+    assert by_record["SR-RF-CVRST-01:CON"]["PRIO"] == "HIGH"
+    assert by_record["SR-RF-CVRST-05:CON"]["PRIO"] == "HIGH"
+    assert by_record["SR-RF-CVRST-06:CON"]["PRIO"] == "MEDIUM"
+    assert "PRIO" not in by_record["SR-RF-CVRST-07:CON"]
 
 
 def test_other_raw_records_go_to_records_db(tmp_path: Path):

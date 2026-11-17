@@ -227,6 +227,21 @@ def test_duplicate_record_name_warns(tmp_path: Path):
     assert "only the first, a records.calcout" in warning
 
 
+def test_ether_ip_ao_with_no_record_name_wont_convert(tmp_path: Path):
+    xml = XML.replace(
+        "</components>",
+        '  <records.ao DTYP="EtherIP" OUT="@VLVCC_01_EIP NO_NAME S .2"/>\n'
+        "</components>",
+    )
+    entities, warnings = _convert(_write_xml(tmp_path, xml), tmp_path / "ioc.yaml")
+    (ao,) = [e for e in entities if e["type"] == "ether_ip.ao"]
+    assert ao["record"] == "BL01C-VA-VLVCC-01:GB:IDX_SP"
+    assert (tmp_path / "records.db").read_text() == RECORDS_DB
+    (warning,) = [w for w in warnings if "won't convert" in w]
+    assert "1 records.ao entity" in warning
+    assert "a raw record with no record name" in warning
+
+
 def _strip_records(xml: str) -> str:
     """The XML without its records.* elements, which span several lines"""
     lines, skipping = [], False

@@ -320,8 +320,11 @@ A `records.ao` with `DTYP="EtherIP"` becomes `ether_ip.ao`: `OUT
 scan period `S 0.5`) kept in `tag`, because `ether_ip_ao.template` writes
 `OUT "@$(port) $(tag)"`. `scan` is the record's `SCAN`, `Passive` when the XML
 has none. `DRVH`, `DRVL`, `PREC`, `PRIO` and `VAL` pass through as parameters of
-the same name. Any other field, such as `DESC` or `EGU`, is dropped with a
-warning per record.
+the same name; `PRIO` takes the menu index (`0`, `1`, `2`) or name in any case
+and becomes `LOW`, `MEDIUM` or `HIGH`. Any other field, such as `DESC` or
+`EGU`, and any of those five whose value is of the wrong type for its parameter,
+such as an empty `DRVH` or a `PRIO` of `3`, is dropped with a warning per
+record.
 
 Every other raw record, hardware DTYPs included, goes to `records.db` next to
 the ioc.yaml, written as builder wrote its `<IOC>.db`: records sorted by name,
