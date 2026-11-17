@@ -138,6 +138,21 @@ with `ibek pattern add ibek-runtime-streamdevice:<module>@<tag> services/<ioc>`,
 which writes the pattern files under `config/`, `runtime-lock.yaml`,
 `ioc.schema.json` and the `ioc.yaml` schema header.
 
+Beamline modules (`BL04I`, `BL11I`, `BL19I`, `BL21I` and the like) and other
+support made only of soft records come from the
+[ibek-runtime-support](https://github.com/epics-containers/ibek-runtime-support)
+library instead, at its latest release tag, and are added the same way as
+`ibek-runtime-support:<module>@<tag>`. These modules are not built into generic
+IOCs, so one goes to its pattern even where `ibek-support-dls` has a generic
+model, as long as every entity validates against the pattern and no parameter
+the ioc.yaml leaves to the generic model's default has a different default in
+the pattern; otherwise xml2yaml warns, as no generic IOC builds the module.
+Any ibek-runtime-support pattern keeps an IOC off the `ioc-streamdevice-runtime`
+image, even alongside ibek-runtime-streamdevice patterns, so xml2yaml never
+sets or bumps the image of such an IOC: pick its generic IOC image in
+`values.yaml` yourself. One library that cannot be reached is a warning; the
+other library's patterns are still added.
+
 - **Pattern-only IOC**: every other entity is one the `ioc-streamdevice-runtime`
   image of the latest published GitHub release of `ioc-streamdevice` builds, as
   its published schema lists. Its `values.yaml` image is set to that image, in
@@ -163,8 +178,10 @@ ibek also adds `CI_SERVER_HOST` itself), with a token in
 
 A pattern already in `runtime-lock.yaml` is left at its locked version; move it
 with `ibek pattern update`. Any other `--yaml` path only lists the patterns and
-the image. `BUILDER2IBEK_PATTERN_TAG` and `BUILDER2IBEK_RUNTIME_TAG` fix the
-library tag and the `ioc-streamdevice-runtime` tag in place of the latest.
+the image. `BUILDER2IBEK_PATTERN_TAG`, `BUILDER2IBEK_SUPPORT_PATTERN_TAG` and
+`BUILDER2IBEK_RUNTIME_TAG` fix the ibek-runtime-streamdevice tag, the
+ibek-runtime-support tag and the `ioc-streamdevice-runtime` tag in place of the
+latest.
 Only the placeholder or an older `ioc-streamdevice-runtime` tag on the
 `image:` line is replaced; a newer tag someone pinned is kept, with a note.
 Any problem adding patterns (no network, no git, a schema that cannot be

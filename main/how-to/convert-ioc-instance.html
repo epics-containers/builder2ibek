@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.5.1.dev38+g21b79202d documentation</title>
+    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.5.1.dev44+g88d6e434d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=616c1497"></script>
+    <script src="../_static/documentation_options.js?v=960e9e41"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -611,6 +611,20 @@ them xml2yaml warns once and uses every pattern. When the <code class="docutils 
 with <code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">pattern</span> <span class="pre">add</span> <span class="pre">ibek-runtime-streamdevice:&lt;module&gt;&#64;&lt;tag&gt;</span> <span class="pre">services/&lt;ioc&gt;</span></code>,
 which writes the pattern files under <code class="docutils literal notranslate"><span class="pre">config/</span></code>, <code class="docutils literal notranslate"><span class="pre">runtime-lock.yaml</span></code>,
 <code class="docutils literal notranslate"><span class="pre">ioc.schema.json</span></code> and the <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> schema header.</p>
+<p>Beamline modules (<code class="docutils literal notranslate"><span class="pre">BL04I</span></code>, <code class="docutils literal notranslate"><span class="pre">BL11I</span></code>, <code class="docutils literal notranslate"><span class="pre">BL19I</span></code>, <code class="docutils literal notranslate"><span class="pre">BL21I</span></code> and the like) and other
+support made only of soft records come from the
+<a class="reference external" href="https://github.com/epics-containers/ibek-runtime-support">ibek-runtime-support</a>
+library instead, at its latest release tag, and are added the same way as
+<code class="docutils literal notranslate"><span class="pre">ibek-runtime-support:&lt;module&gt;&#64;&lt;tag&gt;</span></code>. These modules are not built into generic
+IOCs, so one goes to its pattern even where <code class="docutils literal notranslate"><span class="pre">ibek-support-dls</span></code> has a generic
+model, as long as every entity validates against the pattern and no parameter
+the ioc.yaml leaves to the generic model’s default has a different default in
+the pattern; otherwise xml2yaml warns, as no generic IOC builds the module.
+Any ibek-runtime-support pattern keeps an IOC off the <code class="docutils literal notranslate"><span class="pre">ioc-streamdevice-runtime</span></code>
+image, even alongside ibek-runtime-streamdevice patterns, so xml2yaml never
+sets or bumps the image of such an IOC: pick its generic IOC image in
+<code class="docutils literal notranslate"><span class="pre">values.yaml</span></code> yourself. One library that cannot be reached is a warning; the
+other library’s patterns are still added.</p>
 <ul class="simple">
 <li><p><strong>Pattern-only IOC</strong>: every other entity is one the <code class="docutils literal notranslate"><span class="pre">ioc-streamdevice-runtime</span></code>
 image of the latest published GitHub release of <code class="docutils literal notranslate"><span class="pre">ioc-streamdevice</span></code> builds, as
@@ -636,8 +650,10 @@ ibek also adds <code class="docutils literal notranslate"><span class="pre">CI_S
 <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> keeps the default schema header.</p>
 <p>A pattern already in <code class="docutils literal notranslate"><span class="pre">runtime-lock.yaml</span></code> is left at its locked version; move it
 with <code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">pattern</span> <span class="pre">update</span></code>. Any other <code class="docutils literal notranslate"><span class="pre">--yaml</span></code> path only lists the patterns and
-the image. <code class="docutils literal notranslate"><span class="pre">BUILDER2IBEK_PATTERN_TAG</span></code> and <code class="docutils literal notranslate"><span class="pre">BUILDER2IBEK_RUNTIME_TAG</span></code> fix the
-library tag and the <code class="docutils literal notranslate"><span class="pre">ioc-streamdevice-runtime</span></code> tag in place of the latest.
+the image. <code class="docutils literal notranslate"><span class="pre">BUILDER2IBEK_PATTERN_TAG</span></code>, <code class="docutils literal notranslate"><span class="pre">BUILDER2IBEK_SUPPORT_PATTERN_TAG</span></code> and
+<code class="docutils literal notranslate"><span class="pre">BUILDER2IBEK_RUNTIME_TAG</span></code> fix the ibek-runtime-streamdevice tag, the
+ibek-runtime-support tag and the <code class="docutils literal notranslate"><span class="pre">ioc-streamdevice-runtime</span></code> tag in place of the
+latest.
 Only the placeholder or an older <code class="docutils literal notranslate"><span class="pre">ioc-streamdevice-runtime</span></code> tag on the
 <code class="docutils literal notranslate"><span class="pre">image:</span></code> line is replaced; a newer tag someone pinned is kept, with a note.
 Any problem adding patterns (no network, no git, a schema that cannot be
