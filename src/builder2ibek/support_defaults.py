@@ -5,11 +5,13 @@ that decide what an empty XML attribute becomes (see empty_attribute).
 
 The models are read from the submodules of a source checkout: ibek-support*
 for the generic models, and the pinned runtime pattern libraries
-(ibek-runtime-streamdevice, ibek-runtime-support) for the parameter types of
-pattern entities. An installed builder2ibek has none of them, so it finds no
-models and drops every empty attribute, leaving each to its model default.
+(ibek-runtime-streamdevice, and the beamline modules of ibek-runtime-support)
+for the parameter types of pattern entities. An installed builder2ibek has
+none of them, so it finds no models and drops every empty attribute, leaving
+each to its model default.
 """
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -28,10 +30,18 @@ _param_specs: dict[str, dict[str, dict[str, Any]]] = {}
 
 # The runtime pattern libraries, as patterns.py chooses between a pattern and
 # the generic model: an ibek-runtime-streamdevice pattern only stands in for a
-# module with no generic model (or one that matches it), while an
-# ibek-runtime-support pattern is used even where a generic model exists.
+# module with no generic model (or one that matches it), while a beamline
+# module comes only from its ibek-runtime-support pattern.
 _STREAMDEVICE_PATTERNS = "ibek-runtime-streamdevice"
 _SUPPORT_PATTERNS = "ibek-runtime-support"
+
+# A beamline module holds the templates of one beamline, e.g. BL21I
+BEAMLINE_MODULE = re.compile(r"BL\d\d[A-Z]")
+
+
+def is_beamline_module(module: str) -> bool:
+    """True for a beamline module, such as BL21I; BL15I-BUILDER is not one."""
+    return BEAMLINE_MODULE.fullmatch(module) is not None
 
 
 def _models(base_dir: Path):
@@ -62,12 +72,11 @@ def _load_pattern_specs():
     """
     for entity_type, params in _models(_project_root / _STREAMDEVICE_PATTERNS):
         _param_specs.setdefault(entity_type, _specs(params))
-    # An ibek-runtime-support model replaces the generic one for the whole
-    # run, even for a module that plan() keeps build-time in this IOC. That is
-    # accepted: no known module gives a parameter a different type in its
-    # pattern and its generic model, so the fill comes out the same either way.
+    # a beamline module never uses a generic model, so its pattern model
+    # replaces any; ibek-runtime-support's other modules are not used
     for entity_type, params in _models(_project_root / _SUPPORT_PATTERNS):
-        _param_specs[entity_type] = _specs(params)
+        if is_beamline_module(entity_type.partition(".")[0]):
+            _param_specs[entity_type] = _specs(params)
 
 
 def _load_all_support_yamls():
@@ -91,6 +100,19 @@ def _load_all_support_yamls():
 def entity_params(entity_type: str) -> set[str] | None:
     """The parameter names of an entity model, or None if no model is found."""
     return _params.get(entity_type)
+
+
+def generic_param_types(entity_type: str) -> dict[str, str] | None:
+    """
+    The type of each parameter of a non-beamline entity model, or None if no
+    model is found.
+    """
+    if entity_type not in _params or is_beamline_module(entity_type.partition(".")[0]):
+        return None
+    return {
+        name: str(spec.get("type", ""))
+        for name, spec in _param_specs.get(entity_type, {}).items()
+    }
 
 
 def entity_defaults(entity_type: str) -> dict[str, Any]:

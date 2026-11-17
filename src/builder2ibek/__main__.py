@@ -8,6 +8,7 @@ from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
 from builder2ibek.devc7 import DLS_SW, devc7_cli
 from builder2ibek.migrate_autosave import migrate_folder
+from builder2ibek.patterns import BeamlinePatternError
 from builder2ibek.reconvert import reconvert_cli
 
 cli = typer.Typer()
@@ -56,11 +57,20 @@ def xml2yaml(
     Convert a builder XML IOC to an ibek ioc.yaml.
 
     Given services/<ioc>/config/ioc.yaml in a services repo, each
-    ibek-runtime-streamdevice pattern the IOC uses is added with `ibek pattern
-    add`, at the library's latest release. A pattern-only IOC gets the latest
-    ioc-streamdevice-runtime image in values.yaml; any other IOC keeps its image
-    and skips the patterns that image installs. Elsewhere the patterns are only
-    listed. BUILDER2IBEK_PATTERN_TAG and BUILDER2IBEK_RUNTIME_TAG fix the tags.
+    ibek-runtime-streamdevice or ibek-runtime-support pattern the IOC uses is
+    added with `ibek pattern add`, at the library's latest release. A
+    pattern-only IOC gets the latest ioc-streamdevice-runtime image in
+    values.yaml; any other IOC keeps its image and skips the patterns that image
+    installs. Elsewhere the patterns are only listed. BUILDER2IBEK_PATTERN_TAG,
+    BUILDER2IBEK_SUPPORT_PATTERN_TAG and BUILDER2IBEK_RUNTIME_TAG fix the
+    ibek-runtime-streamdevice, ibek-runtime-support and image tags.
+
+    A beamline module (BL<nn><x>, e.g. BL21I) comes only from its
+    ibek-runtime-support pattern. Each of its entities the pattern does not
+    take, and each entity that refers to one, is left out of the ioc.yaml with
+    a warning, and listed in a comment at the top of the ioc.yaml for manual
+    review. An IOC with beamline entities fails to convert when the pattern
+    libraries cannot be indexed, e.g. with no network.
 
     ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
     that holds only PandAs and boilerplate becomes one fastcs instance in place
@@ -73,7 +83,7 @@ def xml2yaml(
     """
     try:
         result = convert_file(xml, yaml, schema, description=description, blgui=blgui)
-    except FileExistsError as e:
+    except (FileExistsError, BeamlinePatternError) as e:
         typer.echo(f"error: {e}", err=True)
         raise typer.Exit(1) from e
     for note in result.notes:

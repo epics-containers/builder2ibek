@@ -89,6 +89,16 @@ def test_empty_str_param_of_a_pattern_entity_stays_empty():
     assert etl["addr"] == ""
 
 
+def test_empty_str_param_of_a_beamline_entity_stays_empty():
+    """A beamline module's ibek-runtime-support pattern model types the
+    parameter, as it is the only model a beamline module uses."""
+    entities = convert(
+        '<BL21I.TTHBumpstripMonitor P="BL21I-MO-TTH-01" R=":BUMP" DESC=""/>'
+    )
+    (bump,) = of_type(entities, "BL21I.TTHBumpstripMonitor")
+    assert bump["DESC"] == ""
+
+
 def test_empty_attribute_no_converter_handles():
     """A str parameter no converter touches is "" too, overriding a model
     default the builder never used; an empty float, which the builder could not

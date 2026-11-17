@@ -46,9 +46,9 @@ def _skip_without_runtime_schema(stem: str) -> None:
         pytest.skip("needs github.com for the ioc-streamdevice-runtime schema")
 
 
-# Samples with runtime patterns that are not pattern-only: they keep the image
-# values.yaml names
-MIXED_SAMPLES = {"bl04i-mo-ioc-03"}
+# Samples with runtime patterns that also need compiled support, so their
+# values.yaml keeps the services template's image placeholder
+MIXED_PATTERN_SAMPLES = {"bl04i-mo-ioc-03"}
 
 
 def _check_patterns(config: Path, stem: str) -> None:
@@ -59,7 +59,7 @@ def _check_patterns(config: Path, stem: str) -> None:
     if expected.is_file():
         assert lock.read_text() == expected.read_text()
         values = (config.parent / "values.yaml").read_text()
-        if stem in MIXED_SAMPLES:
+        if stem in MIXED_PATTERN_SAMPLES:
             assert IMAGE_PLACEHOLDER in values
         else:
             # a pattern-only sample runs on the pinned runtime image
@@ -112,7 +112,7 @@ def test_convert(sample_xml: Path, tmp_path: Path):
 
     result = convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
 
-    assert not [w for w in result.warnings if "runtime patterns not added" in w]
+    assert not [w for w in result.warnings if "patterns not added" in w]
 
     assert out_yaml.read_text() == expected_yaml.read_text()
     expected_records = SAMPLES / "config" / stem / "records.db"
@@ -163,7 +163,7 @@ def test_generate(sample_xml: Path, ibek_defs):
         assert result.returncode == 0, (
             f"xml2yaml failed for {sample_xml.name}:\n{result.stderr}"
         )
-        assert "runtime patterns not added" not in result.stderr, result.stderr
+        assert "patterns not added" not in result.stderr, result.stderr
         assert ioc_yaml.read_text() == expected_yaml.read_text(), (
             f"YAML mismatch for {stem}"
         )

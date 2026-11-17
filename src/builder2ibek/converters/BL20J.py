@@ -7,14 +7,11 @@ xml_component = "BL20J"
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
-    XML to YAML specialist convertor function for the pvlogging support module
+    XML to YAML specialist convertor function for the BL20J beamline module
 
-
-    TODO we will NEVER support beamline specific support modules
-    inside of GENERIC IOCs
-    the example this was added for was BL20J-MO-IOC-02, see
+    BL20J has no runtime pattern, so convert_file drops its entities from the
+    ioc.yaml and lists them for manual review (see
+    builder2ibek.patterns.drop_beamline_entities). BL20J-MO-IOC-02 is an IOC
+    that uses it, see
     /dls_sw/work/R3.14.12.7/support/BL20J-BUILDER/etc/makeIocs/BL20J-MO-IOC-02.xml
-
-    TODO above requires review and implementing differently.
     """
-    entity.delete_me()

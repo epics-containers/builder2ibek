@@ -4,28 +4,22 @@ Index of the runtime patterns builder2ibek can use in place of compiled support.
 A runtime pattern is a support module whose files (``*.ibek.support.yaml``, protocol,
 template) are vendored into an IOC instance with ``ibek pattern add``, so the IOC
 runs on a stock image instead of one with the module compiled in. The patterns come
-from two libraries, each at its latest release tag unless an environment variable
-names one:
-
-- ibek-runtime-streamdevice (:data:`LIBRARY`, :data:`LIBRARY_TAG_ENV`): StreamDevice
-  device support, indexed by :func:`pattern_index`;
-- ibek-runtime-support (:data:`SUPPORT_LIBRARY`, :data:`SUPPORT_LIBRARY_TAG_ENV`):
-  beamline modules and other soft-record support, indexed by
-  :func:`support_pattern_index`.
-
-Each index shallow-clones its library at that tag into a temporary folder: every
-library folder holding ``<folder>/<folder>.ibek.support.yaml`` is a pattern for the
-module of that name, and the support YAML lists its entity models.
+from the libraries in :data:`LIBRARIES`, ibek-runtime-streamdevice and
+ibek-runtime-support, each at its latest release tag unless the environment
+variable :data:`LIBRARIES` names for that library is set. :func:`pattern_index`
+shallow-clones each library at its tag into a temporary folder and indexes it:
+every library folder holding ``<folder>/<folder>.ibek.support.yaml`` is a pattern
+for the module of that name, and the support YAML lists its entity models. Only
+the beamline modules of ibek-runtime-support are indexed. A module may have a
+pattern in only one library. A library that cannot be indexed is left out, so
+that the other's patterns are still used.
 
 :meth:`PatternIndex.plan` decides, for one converted IOC, which modules could come
 from a pattern. A module goes to its pattern when:
 
-- for ibek-runtime-streamdevice, it is not listed in :data:`GENERIC_DIFFERS`, and it
-  either has no generic model in ``ibek-support*`` or is listed in :data:`ALIGNED`.
-  A module in GENERIC_DIFFERS has a pattern that does not match its generic model,
-  so an entity valid for one is not the same device for the other;
-- for ibek-runtime-support, whose modules are not built into generic IOCs, the
-  pattern is used even where ``ibek-support*`` has a generic model;
+- it is not listed in :data:`GENERIC_DIFFERS`. Those modules also have a generic
+  model in ``ibek-support*`` that their pattern does not match, so an entity valid
+  for one is not the same device for the other;
 - no parameter the IOC's entities leave to the generic model's default has a
   different default in the pattern: builder2ibek drops a value equal to the
   generic default, so the pattern would fill in its own;
@@ -36,6 +30,12 @@ from a pattern. A module goes to its pattern when:
 Any other module stays build-time, so it needs an image with the module compiled
 in, and the plan says why. Which modules a given image already builds is not known
 here, so a plan says what could come from a pattern, not what must.
+
+A beamline module (:func:`is_beamline_module`) never stays build-time: beamline
+modules are not compiled into generic IOCs. :func:`drop_beamline_entities` takes
+out of the IOC each of its entities that the module's pattern does not take, before
+the ioc.yaml is written, and :meth:`PatternIndex.plan` sends the module to its
+pattern without the rules above, which are about generic models.
 """
 
 from __future__ import annotations
@@ -48,35 +48,36 @@ import subprocess
 import sys
 import tempfile
 import warnings
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import cache
 from pathlib import Path
 from typing import Any
 
 from ibek.entity_factory import EntityFactory
-from ibek.ioc import clear_entity_model_ids
+from ibek.ioc import clear_entity_model_ids, id_to_entity
 from ibek.ioc_factory import IocFactory
 from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES
 from pydantic import ValidationError
 from pydantic.warnings import PydanticDeprecatedSince211
 from ruamel.yaml import YAML
 
-from builder2ibek.support_defaults import entity_defaults, values_match
+from builder2ibek.support_defaults import (
+    entity_defaults,
+    generic_param_types,
+    is_beamline_module,
+    values_match,
+)
 
-# The StreamDevice pattern library, named as ibek names it in its library registry
-LIBRARY = "ibek-runtime-streamdevice"
-LIBRARY_URL = DEFAULT_LIBRARIES[LIBRARY]
-
-# Fixes the library release to index and vendor, in place of the latest one
-LIBRARY_TAG_ENV = "BUILDER2IBEK_PATTERN_TAG"
-
-# The library of beamline modules and other support made only of soft records
+# The pattern libraries, named as ibek names them in its library registry, each
+# with the environment variable that fixes the release to index and vendor in
+# place of the latest one
+STREAMDEVICE_LIBRARY = "ibek-runtime-streamdevice"
 SUPPORT_LIBRARY = "ibek-runtime-support"
-SUPPORT_LIBRARY_URL = DEFAULT_LIBRARIES[SUPPORT_LIBRARY]
-
-# Fixes the release of SUPPORT_LIBRARY, in place of the latest one
-SUPPORT_LIBRARY_TAG_ENV = "BUILDER2IBEK_SUPPORT_PATTERN_TAG"
+LIBRARIES: dict[str, str] = {
+    STREAMDEVICE_LIBRARY: "BUILDER2IBEK_PATTERN_TAG",
+    SUPPORT_LIBRARY: "BUILDER2IBEK_SUPPORT_PATTERN_TAG",
+}
 
 _project_root = Path(__file__).parent.parent.parent
 
@@ -125,6 +126,13 @@ GENERIC_DIFFERS: frozenset[str] = frozenset(
 
 class PatternIndexError(Exception):
     """The pattern library cannot be listed, cloned or read."""
+
+
+class BeamlinePatternError(Exception):
+    """An IOC has beamline entities, but the pattern libraries cannot be indexed.
+
+    Its conversion fails rather than drop entities that a pattern may well take.
+    """
 
 
 @dataclass(frozen=True)
@@ -220,22 +228,70 @@ def latest_tag(url: str) -> str:
     return max(releases, key=version_key)
 
 
-class PatternIndex:
-    """The patterns in one checkout of a library, keyed by module."""
+def module_of(entity: Mapping[str, Any]) -> str:
+    """The module of an entity, from its type."""
+    return str(entity["type"]).partition(".")[0]
 
-    def __init__(self, root: Path, version: str, library: str = LIBRARY):
-        self.root = root
-        self.library = library
+
+def params_of_type(
+    entity: Mapping[str, Any], types: Mapping[str, str] | None, typ: str
+) -> set[str]:
+    """The values an entity gives its model's parameters of one type.
+
+    ``types`` maps each parameter of the model to its type; with no model there
+    are none. A Jinja value is left out: it names nothing until rendered.
+    """
+    return {
+        entity[param]
+        for param, t in (types or {}).items()
+        if t == typ and isinstance(entity.get(param), str) and "{{" not in entity[param]
+    }
+
+
+class _ForeignEntity:
+    """Stands in for an entity of another module that a checked entity refers to.
+
+    ibek resolves an ``object`` parameter by looking its id up among the entities
+    it has validated; :meth:`PatternIndex.rejects` validates only one module's.
+    """
+
+    def __init__(self, id: str):
+        self.id = id
+
+    def __str__(self) -> str:
+        return self.id
+
+
+class PatternIndex:
+    """The patterns of the indexed library checkouts, keyed by module."""
+
+    def __init__(
+        self,
+        root: Path,
+        version: str,
+        library: str = STREAMDEVICE_LIBRARY,
+        only: Callable[[str], bool] | None = None,
+    ):
+        """Index the library checked out at ``root``.
+
+        ``only``, when given, picks the pattern folders to index by name.
+        """
+        # the release indexed of each library
+        self.libraries: dict[str, str] = {library: version}
+        # why each library that could not be indexed was not
+        self.failures: dict[str, str] = {}
+        # why each beamline module ibek-runtime-support cannot serve does not
+        self.module_failures: dict[str, str] = {}
         self.patterns: dict[str, Pattern] = {}
         self._ioc_models: dict[str, Any] = {}
-        self._parameters: dict[str, dict[str, dict[str, Any]]] = {}
+        self._specs: dict[str, dict[str, dict[str, Any]]] = {}
         yml = YAML(typ="safe", pure=True)
 
         if not any(root.glob("*/*.ibek.support.yaml")):
             raise PatternIndexError(f"no patterns found in {root}")
         for folder in sorted(p for p in root.iterdir() if p.is_dir()):
             support_yaml = folder / f"{folder.name}.ibek.support.yaml"
-            if not support_yaml.is_file():
+            if not support_yaml.is_file() or (only and not only(folder.name)):
                 continue
             data = yml.load(support_yaml.read_text())
             module = data.get("module")
@@ -244,17 +300,30 @@ class PatternIndex:
                     f"{support_yaml} declares module {module!r}; a pattern "
                     f"folder is vendored by its folder name, so the two must match"
                 )
-            models = data.get("entity_models") or []
             self.patterns[module] = Pattern(
                 library=library,
                 module=module,
                 version=version,
-                models=frozenset(m["name"] for m in models),
+                models=frozenset(m["name"] for m in data.get("entity_models") or []),
                 support_yaml=support_yaml,
             )
-            self._parameters[module] = {
-                m["name"]: m.get("parameters") or {} for m in models
-            }
+
+    def add(self, other: PatternIndex) -> None:
+        """Index the patterns of another library as well.
+
+        A module with a pattern in both is an error: which one to vendor would be
+        a guess.
+        """
+        both = sorted(self.patterns.keys() & other.patterns.keys())
+        if both:
+            raise PatternIndexError(
+                "a module has a pattern in more than one library: "
+                + ", ".join(
+                    f"{self.patterns[m].ref} and {other.patterns[m].ref}" for m in both
+                )
+            )
+        self.libraries.update(other.libraries)
+        self.patterns.update(other.patterns)
 
     def pattern_for_module(self, module: str) -> Pattern | None:
         """The pattern builder2ibek may use for a module, or None.
@@ -262,7 +331,7 @@ class PatternIndex:
         None when there is no pattern, or when its pattern differs from the
         module's generic model.
         """
-        if self.library == LIBRARY and module in GENERIC_DIFFERS:
+        if module in GENERIC_DIFFERS:
             return None
         return self.patterns.get(module)
 
@@ -277,9 +346,7 @@ class PatternIndex:
         """
         for entity in entities:
             entity_type = str(entity["type"])
-            parameters = self._parameters[pattern.module].get(
-                entity_type.partition(".")[2], {}
-            )
+            parameters = self.param_specs(entity_type) or {}
             for name, default in entity_defaults(entity_type).items():
                 if name in entity or name not in parameters:
                     continue
@@ -300,8 +367,72 @@ class PatternIndex:
             self._ioc_models[pattern.module] = model
         return model
 
-    def rejects(self, pattern: Pattern, entities: list[Mapping[str, Any]]) -> str:
-        """Why the pattern model rejects these entities, or "" if it accepts them."""
+    def param_specs(self, entity_type: str) -> dict[str, dict[str, Any]] | None:
+        """The parameters of the pattern model of an entity type, by name.
+
+        None when no pattern has that model.
+        """
+        module, _, model = entity_type.partition(".")
+        pattern = self.patterns.get(module)
+        if pattern is None:
+            return None
+        specs = self._specs.get(module)
+        if specs is None:
+            data = YAML(typ="safe", pure=True).load(pattern.support_yaml.read_text())
+            specs = {
+                m["name"]: {
+                    param: spec or {}
+                    for param, spec in (m.get("parameters") or {}).items()
+                }
+                for m in data.get("entity_models") or []
+            }
+            self._specs[module] = specs
+        return specs.get(model)
+
+    def param_types(self, entity_type: str) -> dict[str, str] | None:
+        """The type of each parameter of an entity type's pattern model, or None."""
+        specs = self.param_specs(entity_type)
+        if specs is None:
+            return None
+        return {param: str(spec.get("type", "")) for param, spec in specs.items()}
+
+    def strip_defaults(self, entity: dict[str, Any]) -> None:
+        """Remove the parameters whose values match the pattern model's defaults."""
+        for param, spec in (self.param_specs(str(entity["type"])) or {}).items():
+            default = spec.get("default")
+            if "default" not in spec or (isinstance(default, str) and "{{" in default):
+                continue
+            if param in entity and values_match(entity[param], default):
+                del entity[param]
+
+    def _params_of_type(self, entity: Mapping[str, Any], typ: str) -> set[str]:
+        """The values an entity gives the parameters of one type of its model."""
+        return params_of_type(entity, self.param_types(str(entity["type"])), typ)
+
+    def ids(self, entity: Mapping[str, Any]) -> set[str]:
+        """The ids an entity defines, by its pattern model."""
+        return self._params_of_type(entity, "id")
+
+    def foreign_ids(self, entities: Iterable[Mapping[str, Any]]) -> set[str]:
+        """The ids these entities refer to that none of them defines."""
+        refs: set[str] = set()
+        ids: set[str] = set()
+        for entity in entities:
+            refs |= self._params_of_type(entity, "object")
+            ids |= self.ids(entity)
+        return refs - ids
+
+    def rejects(
+        self,
+        pattern: Pattern,
+        entities: list[Mapping[str, Any]],
+        foreign_ids: Iterable[str] = (),
+    ) -> str:
+        """Why the pattern model rejects these entities, or "" if it accepts them.
+
+        ``foreign_ids`` are ids defined by entities of other modules, which the
+        entities checked may refer to.
+        """
         types = {str(e["type"]).partition(".")[2] for e in entities}
         missing = sorted(types - pattern.models)
         if missing:
@@ -311,6 +442,8 @@ class PatternIndex:
         # ibek registers each entity's id in one global table, so start it empty
         # and leave it empty: these entities are only being checked
         clear_entity_model_ids()
+        for foreign in foreign_ids:
+            id_to_entity[foreign] = _ForeignEntity(foreign)  # type: ignore[assignment]
         try:
             with warnings.catch_warnings():
                 # raised from inside ibek's Entity, not from anything here
@@ -326,6 +459,12 @@ class PatternIndex:
             return f"{pattern.ref} rejects {where}: {error['msg']}"
         except ValueError as e:
             return f"{pattern.ref} rejects an entity: {e}"
+        except Exception as e:
+            # a beamline module has no build-time route to fall back on, so any
+            # failure is a rejection, and drops the entity for review
+            if not is_beamline_module(pattern.module):
+                raise
+            return f"{pattern.ref} rejects an entity: {type(e).__name__}: {e}"
         finally:
             clear_entity_model_ids()
         return ""
@@ -334,12 +473,24 @@ class PatternIndex:
         """Decide which of an IOC's modules could come from a pattern."""
         by_module: dict[str, list[Mapping[str, Any]]] = {}
         for entity in entities:
-            module = str(entity["type"]).partition(".")[0]
+            module = module_of(entity)
             if module in self.patterns:
                 by_module.setdefault(module, []).append(entity)
 
         plan = PatternPlan()
         for module, module_entities in by_module.items():
+            if is_beamline_module(module):
+                # no generic model applies: beamline modules are not compiled
+                # into generic IOCs
+                beamline = self.patterns[module]
+                reason = self.rejects(
+                    beamline, module_entities, self.foreign_ids(module_entities)
+                )
+                if reason:
+                    plan.build_time[module] = reason
+                else:
+                    plan.patterns.append(beamline)
+                continue
             pattern = self.pattern_for_module(module)
             if pattern is None:
                 plan.build_time[module] = (
@@ -347,11 +498,7 @@ class PatternIndex:
                     f"of {module}"
                 )
                 continue
-            if (
-                self.library == LIBRARY
-                and module not in ALIGNED
-                and module in generic_modules()
-            ):
+            if module not in ALIGNED and module in generic_modules():
                 plan.build_time[module] = (
                     f"{pattern.ref}: pattern not yet aligned with the generic "
                     f"model of {module}"
@@ -365,6 +512,107 @@ class PatternIndex:
                 continue
             plan.patterns.append(pattern)
         return plan
+
+
+@dataclass(frozen=True)
+class DroppedEntity:
+    """An entity left out of the ioc.yaml for manual review, and why."""
+
+    entity: Mapping[str, Any]
+    reason: str
+
+
+def drop_beamline_entities(
+    entities: Sequence[Mapping[str, Any]],
+    index: PatternIndex,
+) -> tuple[list[Mapping[str, Any]], list[DroppedEntity]]:
+    """Split an IOC's entities into those to keep and those to drop.
+
+    An entity of a beamline module is kept when the module's pattern has its model
+    and takes it. Any other is dropped: the module has no pattern, the pattern has
+    no model for it, or the pattern rejects it, when each of the module's entities
+    is checked in order along with those accepted before it.
+
+    So is every entity, of any module, that refers to a dropped one: one whose
+    known model (the pattern model of a beamline module, else the generic model
+    in ibek-support*) has an ``object`` parameter naming the id of a dropped
+    entity. That id is the value of an ``id`` parameter of the dropped entity's
+    known model or, with no known model, its ``name``. An entity with no known
+    model refers to nothing here; generate2 reports any reference it holds.
+
+    Returns the entities kept and those dropped, each in the order given.
+    """
+    by_module: dict[str, list[int]] = {}
+    for i, entity in enumerate(entities):
+        if is_beamline_module(module_of(entity)):
+            by_module.setdefault(module_of(entity), []).append(i)
+    if not by_module:
+        return list(entities), []
+
+    def types_of(entity: Mapping[str, Any]) -> dict[str, str] | None:
+        if is_beamline_module(module_of(entity)):
+            return index.param_types(str(entity["type"]))
+        return generic_param_types(str(entity["type"]))
+
+    def ids_of(entity: Mapping[str, Any]) -> set[str]:
+        types = types_of(entity)
+        if types is not None:
+            return params_of_type(entity, types, "id")
+        name = entity.get("name")
+        return {name} if isinstance(name, str) else set()
+
+    reasons: dict[int, str] = {}
+    for module, positions in by_module.items():
+        pattern = index.patterns.get(module)
+        if pattern is None:
+            version = index.libraries.get(SUPPORT_LIBRARY, "?")
+            reasons.update(
+                (i, f"no runtime pattern for {module} in {SUPPORT_LIBRARY}@{version}")
+                for i in positions
+            )
+            continue
+        modelled = []
+        for i in positions:
+            model = str(entities[i]["type"]).partition(".")[2]
+            if model in pattern.models:
+                modelled.append(entities[i])
+            else:
+                reasons[i] = f"no model {module}.{model} in {pattern.ref}"
+        foreign = index.foreign_ids(modelled)
+        for i in reasons.keys() & set(positions):
+            foreign -= ids_of(entities[i])
+        if not index.rejects(pattern, modelled, foreign):
+            continue
+        accepted: list[Mapping[str, Any]] = []
+        for i in positions:
+            if i in reasons:
+                continue
+            reason = index.rejects(pattern, [*accepted, entities[i]], foreign)
+            if reason:
+                reasons[i] = reason
+            else:
+                accepted.append(entities[i])
+
+    # entities that refer to a dropped one go too, and so on
+    defined_by = {
+        id: str(entities[i]["type"]) for i in reasons for id in ids_of(entities[i])
+    }
+    found = True
+    while found:
+        found = False
+        for i, entity in enumerate(entities):
+            if i in reasons:
+                continue
+            refs = params_of_type(entity, types_of(entity), "object")
+            hits = sorted(r for r in refs if r in defined_by)
+            if hits:
+                reasons[i] = f"refers to {hits[0]}, a dropped {defined_by[hits[0]]}"
+                defined_by.update(dict.fromkeys(ids_of(entity), str(entity["type"])))
+                found = True
+
+    kept = [e for i, e in enumerate(entities) if i not in reasons]
+    dropped = [DroppedEntity(entities[i], reasons[i]) for i in sorted(reasons)]
+    return kept, dropped
 
 
 @cache
@@ -389,8 +637,9 @@ def generic_modules(root: Path = _project_root) -> frozenset[str]:
     return frozenset(found)
 
 
-def clone_index(library: str, url: str, tag_env: str) -> PatternIndex:
-    """Index the release of a library named by $tag_env, else its latest one."""
+def _index_library(library: str, tag_env: str) -> PatternIndex:
+    """Clone one library at its release and index it."""
+    url = DEFAULT_LIBRARIES[library]
     tag = os.environ.get(tag_env) or latest_tag(url)
     # removed at exit: the index reads support YAMLs as it needs them
     clone = tempfile.mkdtemp(prefix=f"{library}-")
@@ -398,24 +647,46 @@ def clone_index(library: str, url: str, tag_env: str) -> PatternIndex:
     result = git("clone", "--quiet", "--depth", "1", "--branch", tag, url, cwd=clone)
     if result.returncode != 0:
         raise PatternIndexError(f"cannot clone {url} at {tag}: {result.stderr.strip()}")
-    return PatternIndex(Path(clone) / library, tag, library)
+    # ibek-runtime-support also holds patterns of modules that are not beamline
+    # modules; builder2ibek routes only beamline modules to it
+    only = is_beamline_module if library == SUPPORT_LIBRARY else None
+    return PatternIndex(Path(clone) / library, tag, library, only)
 
 
 @cache_outcome
 def pattern_index() -> PatternIndex:
-    """The index of the StreamDevice library release to convert with, cloned
-    once per process.
+    """The index of the library releases to convert with, cloned once per process.
 
-    The release is $BUILDER2IBEK_PATTERN_TAG, or else the latest one.
+    Each library's release is the one its variable in :data:`LIBRARIES` names, or
+    else its latest one. A library that cannot be indexed is left out, and
+    :attr:`PatternIndex.failures` says why; when none can be, this raises
+    PatternIndexError. A beamline module with a pattern in both libraries is
+    left out of ibek-runtime-support, with a warning on stderr, and
+    :attr:`PatternIndex.module_failures` says why: an IOC that uses it fails.
     """
-    return clone_index(LIBRARY, LIBRARY_URL, LIBRARY_TAG_ENV)
-
-
-@cache_outcome
-def support_pattern_index() -> PatternIndex:
-    """The index of the ibek-runtime-support release to convert with, cloned
-    once per process.
-
-    The release is $BUILDER2IBEK_SUPPORT_PATTERN_TAG, or else the latest one.
-    """
-    return clone_index(SUPPORT_LIBRARY, SUPPORT_LIBRARY_URL, SUPPORT_LIBRARY_TAG_ENV)
+    index: PatternIndex | None = None
+    failures: dict[str, str] = {}
+    for library, tag_env in LIBRARIES.items():
+        try:
+            library_index = _index_library(library, tag_env)
+        except Exception as e:  # noqa: BLE001 -- any failure leaves the library out
+            failures[library] = str(e) or type(e).__name__
+            continue
+        if index is None:
+            index = library_index
+            continue
+        clashes: dict[str, str] = {}
+        for module in sorted(index.patterns.keys() & library_index.patterns.keys()):
+            clashes[module] = (
+                f"{module} has a pattern in both {index.patterns[module].ref} and "
+                f"{library_index.patterns.pop(module).ref}"
+            )
+            print(f"warning: {clashes[module]}", file=sys.stderr)
+        index.add(library_index)
+        index.module_failures.update(clashes)
+    if index is None:
+        raise PatternIndexError(
+            "; ".join(f"{library}: {error}" for library, error in failures.items())
+        )
+    index.failures = failures
+    return index

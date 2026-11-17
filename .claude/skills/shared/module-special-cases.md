@@ -97,8 +97,19 @@ generation when `values.yaml` has no published image pinned — expected on a
 freshly-created instance, not an error. See
 [ibek-pattern-vendoring](../ibek-pattern-vendoring/SKILL.md).
 
-`BL19I`/`BL11I` predate this rule and are still build-time modules in
-`ibek-support-dls/` — leave them unless you are converting an IOC that needs them.
+xml2yaml routes every `BL<nn><x>` module (`is_beamline_module` in
+`src/builder2ibek/support_defaults.py`) to its `ibek-runtime-support` pattern, whatever
+`ibek-support-dls/` holds for it, and drops each entity the pattern does not
+take, or that refers to one it drops: a warning per entity, and a
+`DROPPED FOR MANUAL REVIEW` comment at the top of the `ioc.yaml` with the
+entity's converted YAML. A module with no pattern (`BL20J`) has all its entities
+dropped that way. When ibek-runtime-support cannot be indexed, an IOC with
+beamline entities fails to convert instead. The pattern is always added with
+`ibek pattern add`, even to an image that has the module compiled in: beamline
+modules are deployed per instance. Only the beamline modules of
+`ibek-runtime-support` are indexed: `BL<nn><x>-BUILDER` modules and
+`detectorPlugins` get no pattern from it. A kept entity drops only the
+parameters equal to its pattern model's defaults, never the generic model's.
 
 ## `positioner.motorpositioner` — `motor` is a suffix, not a PV
 
