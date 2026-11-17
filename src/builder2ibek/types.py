@@ -41,6 +41,11 @@ class Entity(dict[str, Any]):
         if attr in self:
             self[new] = self[attr]
             del self[attr]
+        # the XML attribute follows, so that an empty one is still known to
+        # be empty under its new name (see support_defaults.fill_empty_attributes)
+        xml = self.__dict__.get("_xml_attributes")
+        if xml is not None and attr in xml:
+            xml[new] = xml.pop(attr)
 
     def xml_attributes(self) -> dict[str, str]:
         """

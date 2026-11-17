@@ -1,6 +1,6 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import is_jinja
+from builder2ibek.utils import has_value, is_jinja
 
 xml_component = "BLGui"
 
@@ -20,7 +20,7 @@ def _coerce(entity: Entity, str_params: list[str], int_params: list[str]):
     for p in int_params:
         # a cross-reference such as $(NTEMP) arrives as a Jinja string that
         # ibek renders; leave it for ibek to resolve
-        if entity.get(p) is not None and not is_jinja(entity[p]):
+        if has_value(entity.get(p)) and not is_jinja(entity[p]):
             entity[p] = int(entity[p])
 
 
@@ -50,11 +50,12 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     elif entity_type == "auto_BLGui_device":
         entity.type = "BLGui.device"
-        # some XMLs omit BL_SECTION / BL_ORDER; the model requires both, and
-        # they only feed a gda comment tag in BLGui-device.template.
-        if entity.get("BL_SECTION") is None:
+        # some XMLs omit BL_SECTION / BL_ORDER or leave them empty; the model
+        # requires both, and they only feed a gda comment tag in
+        # BLGui-device.template.
+        if not has_value(entity.get("BL_SECTION")):
             entity.BL_SECTION = ""
-        if entity.get("BL_ORDER") is None:
+        if not has_value(entity.get("BL_ORDER")):
             entity.BL_ORDER = 0
         _coerce(entity, DEVICE_STR, DEVICE_INT)
 

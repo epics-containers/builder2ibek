@@ -55,6 +55,7 @@ entities:
     VMAX: 3
 
   - type: pmac.autohome
+    GRP1: ''
     GRP2: QBPM1
     P: BL03I-DI-QBPM-01
     PLC: 12

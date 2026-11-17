@@ -3,19 +3,25 @@ General utility functions to assist conversion
 """
 
 import re
-from typing import Any
+from typing import Any, TypeGuard
 
 from builder2ibek.types import Entity
 
 
 def str_or_empty(value: Any) -> str:
     """
-    value as a string, for a str-typed parameter the XML gives as a number.
-    The global handler turns an empty XML attribute into None; the builder
-    passed it on as "", so None becomes "" here, where str(None) would write
-    the text "None".
+    value as a string, or "" for an attribute the XML does not give, where
+    str(None) would write the text "None".
     """
     return "" if value is None else str(value)
+
+
+def has_value(value: Any) -> TypeGuard[Any]:
+    """
+    True unless value is absent (None) or an empty XML attribute (""), which
+    convert.py gives the builder's value for the parameter's type.
+    """
+    return value is not None and value != ""
 
 
 def make_bool(value: Any):

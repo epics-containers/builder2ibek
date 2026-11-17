@@ -70,12 +70,96 @@ def test_empty_optional_str_param_stays_empty():
     """An optional parameter left empty is "" too, as the builder passed it."""
     entities = convert(
         '<zebra.zebra PREC="" M1MULT="0.25" P="BL01C-EA-ZEBRA-01" PORT="z" name="Z"/>'
-        '\n<bronkhorstFlowBus.coriFlow NODE="" P="BL01C-EA-FLOW-01" PORT="f"/>'
     )
     (zebra,) = of_type(entities, "zebra.zebra")
     assert zebra["PREC"] == "" and zebra["M1MULT"] == "0.25"
-    (cori,) = of_type(entities, "bronkhorstFlowBus.coriFlow")
-    assert cori["NODE"] == ""
+
+
+def test_empty_str_param_of_a_pattern_entity_stays_empty():
+    """A runtime pattern's model, with no generic one, types the parameter:
+    a required str left empty is "" rather than missing, and an empty
+    enzLoCuM4 address is not zero-padded into "00"."""
+    entities = convert(
+        '<enzLoCuM4.enzLoCuM4 adr="" device="BL01C-DI-ENZ-01" port="ty_40_1"/>\n'
+        '<ETLdetector.ETLdetector P="BL01C-DI-ETL-01" Q=":D1" addr="" port="p"/>'
+    )
+    (enz,) = of_type(entities, "enzLoCuM4.enzLoCuM4")
+    assert enz["adr"] == ""
+    (etl,) = of_type(entities, "ETLdetector.ETLdetector")
+    assert etl["addr"] == ""
+
+
+def test_empty_attribute_no_converter_handles():
+    """A str parameter no converter touches is "" too, overriding a model
+    default the builder never used; an empty float, which the builder could not
+    have converted, takes the model default."""
+    entities = convert(
+        '<mks937b.mks937bRelays GAUGE="IMG01" relay_desc="MPS I/L 1"'
+        ' relay_off_desc="" relay_number="2" relay_off_level=""/>'
+    )
+    (relays,) = of_type(entities, "mks937b.mks937bRelays")
+    assert relays["relay_off_desc"] == ""
+    assert "relay_off_level" not in relays
+
+
+@pytest.mark.parametrize(
+    "spec,value",
+    [
+        ({"type": "str", "default": "x"}, ""),
+        ({"type": "bool", "default": True}, False),
+        ({"type": "int", "default": 1}, None),
+        ({"type": "float"}, None),
+        ({"type": "object"}, None),
+        ({"type": "enum", "values": {"A": None, "B": None}}, None),
+        ({"type": "enum", "values": {"": None, "B": None}}, ""),
+    ],
+)
+def test_empty_attribute_by_type(monkeypatch, spec: dict, value: Any):
+    """As the builder read an empty attribute: str "", bool False; it could not
+    convert an int or float, so those take the model default (None)"""
+    from builder2ibek import support_defaults
+
+    monkeypatch.setitem(support_defaults._param_specs, "m.e", {"p": spec})
+    assert support_defaults.empty_attribute("m.e", "p") == value
+    assert support_defaults.empty_attribute("m.e", "unknown") is None
+    assert support_defaults.empty_attribute("m.none", "p") is None
+
+
+def test_fill_reaches_only_empty_xml_attributes():
+    """A "" the converter set for a missing attribute is left alone, even
+    where no model types it; an empty XML attribute with no model is dropped.
+    An extra entity, with no XML attributes, has every "" filled."""
+    from builder2ibek.support_defaults import fill_empty_attributes
+    from builder2ibek.types import Entity
+
+    entity = Entity(type="nomodel.e", A="", B="")
+    entity.set_xml_attributes({"A": ""})
+    fill_empty_attributes(entity)
+    assert entity == {"type": "nomodel.e", "A": None, "B": ""}
+
+    extra = {"type": "nomodel.e", "A": ""}
+    fill_empty_attributes(extra)
+    assert extra == {"type": "nomodel.e", "A": None}
+
+
+def test_empty_attribute_is_filled_under_its_new_name():
+    """A converter's rename carries the empty XML attribute with it: Hy8401
+    sampleSize becomes triggered, an int, so an empty one takes the default."""
+    entities = convert(
+        '<Hy8401ip.Hy8401 carrier="CARRIER" ipslot="0" name="ADC" sampleSize=""/>'
+    )
+    (adc,) = of_type(entities, "Hy8401ip.Hy8401")
+    assert "triggered" not in adc and "sampleSize" not in adc
+
+
+def test_rename_moves_the_xml_attribute():
+    from builder2ibek.types import Entity
+
+    entity = Entity(old="")
+    entity.set_xml_attributes({"old": "", "other": "x"})
+    entity.rename("old", "new")
+    assert entity == {"new": ""}
+    assert entity.xml_attributes() == {"new": "", "other": "x"}
 
 
 @pytest.mark.parametrize(

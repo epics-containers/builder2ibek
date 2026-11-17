@@ -4,6 +4,7 @@ The convertor handler module for pmac support module
 
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import has_value
 
 # The prefix for Builder XML Tags that this support module uses
 xml_component = "pmac"
@@ -81,7 +82,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
                 entity[field] = float(val)
         # convert NTM to enum
         ntm = entity.get("NTM")
-        if ntm is not None:
+        if has_value(ntm):
             entity.NTM = "YES" if ntm == 1 else "NO"
 
     elif entity_type == "auto_translated_motor":

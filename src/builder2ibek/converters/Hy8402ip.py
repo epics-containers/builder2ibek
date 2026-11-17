@@ -1,6 +1,7 @@
 from builder2ibek.converters.epics_base import add_interrupt_vector
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import has_value
 
 xml_component = "Hy8402ip"
 
@@ -34,7 +35,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # Keep name - it is used for initHy8402ipAsyn port creation
 
         # Convert numeric clockRate to enum string
-        if hasattr(entity, "clockRate") and entity.clockRate is not None:
+        if has_value(entity.clockRate):
             rate = int(entity.clockRate)
             if rate in clockrate_map:
                 entity.clockRate = clockrate_map[rate]

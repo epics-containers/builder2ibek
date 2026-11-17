@@ -14,7 +14,7 @@ from ruamel.yaml import YAML, CommentedMap
 from builder2ibek.builder import Builder, Element
 from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_fastcs
 from builder2ibek.moduleinfos import finalizers, module_infos
-from builder2ibek.support_defaults import strip_defaults
+from builder2ibek.support_defaults import fill_empty_attributes, strip_defaults
 from builder2ibek.types import Entity, Generic_IOC
 from builder2ibek.vendor_patterns import add_patterns
 
@@ -246,6 +246,8 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
     extras = entity.get_extra_entities()
     if extras:
         for extra_entity in extras:
+            fill_empty_attributes(extra_entity)
+            drop_none_values(extra_entity)
             ioc.entities.append(extra_entity)
         # move the new entity to after these extras at it is likely to depend on them
         ioc.entities.remove(entity)
@@ -263,12 +265,17 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
     else:
         add_defaults(entity, info.defaults)
 
-    # remove fields that have None value
+    fill_empty_attributes(entity)
+    drop_none_values(entity)
+
+    strip_defaults(entity)
+
+
+def drop_none_values(entity: dict[str, Any]):
+    """Remove the parameters set to None, leaving them to the model default"""
     for key in list(entity.keys()):
         if entity[key] is None:
             del entity[key]
-
-    strip_defaults(entity)
 
 
 def add_defaults(entity: dict[str, Any], defaults: dict[str, dict[str, Any]]):

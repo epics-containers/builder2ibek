@@ -764,18 +764,21 @@ entities:
     relay_desc: MPS I/L 1
     relay_level: 1e-07
     relay_number: 2
+    relay_off_desc: ''
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: MPS I/L 2
     relay_level: 1e-07
     relay_number: 3
+    relay_off_desc: ''
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG01
     relay_desc: RGA I/L
     relay_level: 0.0001
     relay_number: 4
+    relay_off_desc: ''
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
@@ -790,18 +793,21 @@ entities:
     relay_desc: MPS I/L 1
     relay_level: 1e-07
     relay_number: 6
+    relay_off_desc: ''
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     relay_desc: MPS I/L 2
     relay_level: 1e-07
     relay_number: 7
+    relay_off_desc: ''
 
   - type: mks937b.mks937bRelays
     GAUGE: IMG02
     relay_desc: RGA I/L
     relay_level: 0.0001
     relay_number: 8
+    relay_off_desc: ''
 
   - type: mks937b.mks937bRelays
     GAUGE: PIRG01
