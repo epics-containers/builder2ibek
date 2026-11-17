@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>After a Beamline Auto-Conversion &#8212; builder2ibek 2.5.1.dev50+ga2a55148f documentation</title>
+    <title>After a Beamline Auto-Conversion &#8212; builder2ibek 2.5.1.dev55+g5252eb551 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=053f34ec"></script>
+    <script src="../_static/documentation_options.js?v=c186d288"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -649,6 +649,11 @@ through the <code class="docutils literal notranslate"><span class="pre">ibek-ru
 services repo for use across multiple IOCs on that beamline.</p>
 <p>See <a class="reference internal" href="runtime-support.html"><span class="std std-doc">Runtime Support</span></a> for full setup instructions,
 worked examples, and tips.</p>
+<p>Raw <code class="docutils literal notranslate"><span class="pre">records.*</span></code> components in the builder XML have no entity model. builder2ibek
+writes them, as builder did, to <code class="docutils literal notranslate"><span class="pre">config/records.db</span></code> beside the <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> and
+lists it in the ioc.yaml’s <code class="docutils literal notranslate"><span class="pre">post_db_files</span></code>, which ibek 4.12.0 and later loads
+after <code class="docutils literal notranslate"><span class="pre">ioc.db</span></code>, as builder loaded them. A set of these records that
+several IOCs share is a candidate for a template of its own.</p>
 </section>
 <section id="test-in-a-devcontainer">
 <h2>7. Test in a devcontainer<a class="headerlink" href="#test-in-a-devcontainer" title="Link to this heading">#</a></h2>
