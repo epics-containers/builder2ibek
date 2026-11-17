@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from builder2ibek.patterns import LIBRARY
+from builder2ibek.patterns import LIBRARY, SUPPORT_LIBRARY
 from tests.conftest import COMMUNITY_SUPPORT, DLS_SUPPORT
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -24,6 +24,7 @@ SUBMODULES = (
     COMMUNITY_SUPPORT,
     DLS_SUPPORT,
     REPO_ROOT / LIBRARY,
+    REPO_ROOT / SUPPORT_LIBRARY,
 )
 
 

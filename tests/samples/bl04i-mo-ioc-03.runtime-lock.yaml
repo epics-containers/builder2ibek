@@ -1,0 +1,11 @@
+version: 1
+patterns:
+  BL04I:
+    version: 0.4.0
+    source: github.com/epics-containers/ibek-runtime-support
+    files:
+      config/BL04I.ibek.support.yaml: sha256:4b3a983812087e990cd7eeaa2ceb50ead35ff6a5227c9ac4c6dfb13999022d85
+      config/BL04I_flux.template: sha256:82d435e0fddcf0648e1e5640a467cb7220567b8149145fedf7345fa9d78c2d06
+      config/Detector_Z_Status.db: sha256:4913c8c8b67e3fe79a259bca827b199292d0503dd17bfa6397160b3714c945ea
+      config/GonioReady.template: sha256:d00ef100cedb0e3247626b3d175571fede123d6fb6dc3d4987262e7bc392879e
+      config/asynMotorAlias.template: sha256:d7c0fabc1d4bc3418591c0955b37aabd2937a776cdfa0d9ed07510b3c56db3dd

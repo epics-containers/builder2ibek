@@ -1,5 +1,6 @@
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
+from builder2ibek.utils import str_or_empty
 
 xml_component = "lakeshore336"
 
@@ -16,4 +17,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         # SCAN and TEMPSCAN are EPICS scan rate strings but XML has bare integers
         for field in ["SCAN", "TEMPSCAN"]:
             if field in entity:
-                entity[field] = str(entity[field])
+                entity[field] = str_or_empty(entity[field])

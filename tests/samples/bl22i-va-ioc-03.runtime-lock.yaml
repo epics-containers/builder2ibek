@@ -1,0 +1,10 @@
+version: 1
+patterns:
+  EdwardsRangeGauge:
+    version: 0.8.2
+    source: github.com/epics-containers/ibek-runtime-streamdevice
+    files:
+      config/EdGauge.proto: sha256:c69e85f877fa45357498329e2d0c6be998342e72a387db154185847696c1fe8e
+      config/EdwardsGauge.template: sha256:28af01637bc5c47e906126ea69fb933145d39d86fed6a596e387e03c900ba8b3
+      config/EdwardsRangeGauge.ibek.support.yaml: sha256:b5d00bbf534faa649d24ca375ec4b4a2f8648c51ce212cda71f9f7e96bea86f6
+      config/EdwardsRangeGauge.pvi.device.yaml: sha256:f1d740744374c26685d4b770d4116d818039e5d0e08d05babd2e3945860032fd

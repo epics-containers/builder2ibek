@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<devIocStats.devIocStatsHelper ioc="BL22I-VA-IOC-03" name="IOCS.VA3"/>
+	<EPICS_BASE.StartupCommand command="asynSetTraceIOMask(&quot;gauge&quot;, -1, 0x2)" name="IO"/>
+	<EPICS_BASE.StartupCommand command="asynSetTraceMask(&quot;gauge&quot;, -1, 0x9) " name="Trace"/>
+	<asyn.AsynIP name="gauge" port="172.23.122.6:7005"/>
+	<pvlogging.PvLogging/>
+	<EdwardsRangeGauge.EdwardsRangeGauge P="BL22I-VA-GAUGE-15" name="PMP" port="gauge"/>
+</components>

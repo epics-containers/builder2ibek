@@ -4,18 +4,31 @@ Index of the runtime patterns builder2ibek can use in place of compiled support.
 A runtime pattern is a support module whose files (``*.ibek.support.yaml``, protocol,
 template) are vendored into an IOC instance with ``ibek pattern add``, so the IOC
 runs on a stock image instead of one with the module compiled in. The patterns come
-from the ibek-runtime-streamdevice library, at its latest release tag unless
-:data:`LIBRARY_TAG_ENV` names one. :func:`pattern_index` shallow-clones the library
-at that tag into a temporary folder and indexes it: every library folder holding
-``<folder>/<folder>.ibek.support.yaml`` is a pattern for the module of that name,
-and the support YAML lists its entity models.
+from two libraries, each at its latest release tag unless an environment variable
+names one:
+
+- ibek-runtime-streamdevice (:data:`LIBRARY`, :data:`LIBRARY_TAG_ENV`): StreamDevice
+  device support, indexed by :func:`pattern_index`;
+- ibek-runtime-support (:data:`SUPPORT_LIBRARY`, :data:`SUPPORT_LIBRARY_TAG_ENV`):
+  beamline modules and other soft-record support, indexed by
+  :func:`support_pattern_index`.
+
+Each index shallow-clones its library at that tag into a temporary folder: every
+library folder holding ``<folder>/<folder>.ibek.support.yaml`` is a pattern for the
+module of that name, and the support YAML lists its entity models.
 
 :meth:`PatternIndex.plan` decides, for one converted IOC, which modules could come
 from a pattern. A module goes to its pattern when:
 
-- it is not listed in :data:`GENERIC_DIFFERS`. Those modules also have a generic
-  model in ``ibek-support*`` that their pattern does not match, so an entity valid
-  for one is not the same device for the other;
+- for ibek-runtime-streamdevice, it is not listed in :data:`GENERIC_DIFFERS`, and it
+  either has no generic model in ``ibek-support*`` or is listed in :data:`ALIGNED`.
+  A module in GENERIC_DIFFERS has a pattern that does not match its generic model,
+  so an entity valid for one is not the same device for the other;
+- for ibek-runtime-support, whose modules are not built into generic IOCs, the
+  pattern is used even where ``ibek-support*`` has a generic model;
+- no parameter the IOC's entities leave to the generic model's default has a
+  different default in the pattern: builder2ibek drops a value equal to the
+  generic default, so the pattern would fill in its own;
 - every one of the IOC's entities of that module validates against the pattern
   model. A module is vendored whole or not at all, so one entity the pattern
   rejects keeps the whole module build-time.
@@ -49,12 +62,21 @@ from pydantic import ValidationError
 from pydantic.warnings import PydanticDeprecatedSince211
 from ruamel.yaml import YAML
 
-# The pattern library, named as ibek names it in its library registry
+from builder2ibek.support_defaults import entity_defaults, values_match
+
+# The StreamDevice pattern library, named as ibek names it in its library registry
 LIBRARY = "ibek-runtime-streamdevice"
 LIBRARY_URL = DEFAULT_LIBRARIES[LIBRARY]
 
 # Fixes the library release to index and vendor, in place of the latest one
 LIBRARY_TAG_ENV = "BUILDER2IBEK_PATTERN_TAG"
+
+# The library of beamline modules and other support made only of soft records
+SUPPORT_LIBRARY = "ibek-runtime-support"
+SUPPORT_LIBRARY_URL = DEFAULT_LIBRARIES[SUPPORT_LIBRARY]
+
+# Fixes the release of SUPPORT_LIBRARY, in place of the latest one
+SUPPORT_LIBRARY_TAG_ENV = "BUILDER2IBEK_SUPPORT_PATTERN_TAG"
 
 _project_root = Path(__file__).parent.parent.parent
 
@@ -199,12 +221,14 @@ def latest_tag(url: str) -> str:
 
 
 class PatternIndex:
-    """The patterns in one checkout of the library, keyed by module."""
+    """The patterns in one checkout of a library, keyed by module."""
 
-    def __init__(self, root: Path, version: str):
+    def __init__(self, root: Path, version: str, library: str = LIBRARY):
         self.root = root
+        self.library = library
         self.patterns: dict[str, Pattern] = {}
         self._ioc_models: dict[str, Any] = {}
+        self._parameters: dict[str, dict[str, dict[str, Any]]] = {}
         yml = YAML(typ="safe", pure=True)
 
         if not any(root.glob("*/*.ibek.support.yaml")):
@@ -220,13 +244,17 @@ class PatternIndex:
                     f"{support_yaml} declares module {module!r}; a pattern "
                     f"folder is vendored by its folder name, so the two must match"
                 )
+            models = data.get("entity_models") or []
             self.patterns[module] = Pattern(
-                library=LIBRARY,
+                library=library,
                 module=module,
                 version=version,
-                models=frozenset(m["name"] for m in data.get("entity_models") or []),
+                models=frozenset(m["name"] for m in models),
                 support_yaml=support_yaml,
             )
+            self._parameters[module] = {
+                m["name"]: m.get("parameters") or {} for m in models
+            }
 
     def pattern_for_module(self, module: str) -> Pattern | None:
         """The pattern builder2ibek may use for a module, or None.
@@ -234,9 +262,35 @@ class PatternIndex:
         None when there is no pattern, or when its pattern differs from the
         module's generic model.
         """
-        if module in GENERIC_DIFFERS:
+        if self.library == LIBRARY and module in GENERIC_DIFFERS:
             return None
         return self.patterns.get(module)
+
+    def default_conflicts(
+        self, pattern: Pattern, entities: list[Mapping[str, Any]]
+    ) -> str:
+        """A parameter these entities leave to a generic default the pattern
+        does not share, or "" if there is none.
+
+        builder2ibek drops a value equal to the default of the module's generic
+        model, so the pattern's own default would take its place.
+        """
+        for entity in entities:
+            entity_type = str(entity["type"])
+            parameters = self._parameters[pattern.module].get(
+                entity_type.partition(".")[2], {}
+            )
+            for name, default in entity_defaults(entity_type).items():
+                if name in entity or name not in parameters:
+                    continue
+                spec = parameters[name]
+                if "default" not in spec or not values_match(spec["default"], default):
+                    return (
+                        f"{pattern.ref}: {entity_type}.{name} defaults to "
+                        f"{spec.get('default')!r}, not {default!r} as in the "
+                        f"generic model"
+                    )
+        return ""
 
     def _ioc_model(self, pattern: Pattern) -> Any:
         model = self._ioc_models.get(pattern.module)
@@ -293,13 +347,19 @@ class PatternIndex:
                     f"of {module}"
                 )
                 continue
-            if module not in ALIGNED and module in generic_modules():
+            if (
+                self.library == LIBRARY
+                and module not in ALIGNED
+                and module in generic_modules()
+            ):
                 plan.build_time[module] = (
                     f"{pattern.ref}: pattern not yet aligned with the generic "
                     f"model of {module}"
                 )
                 continue
-            reason = self.rejects(pattern, module_entities)
+            reason = self.default_conflicts(pattern, module_entities) or self.rejects(
+                pattern, module_entities
+            )
             if reason:
                 plan.build_time[module] = reason
                 continue
@@ -329,21 +389,33 @@ def generic_modules(root: Path = _project_root) -> frozenset[str]:
     return frozenset(found)
 
 
+def clone_index(library: str, url: str, tag_env: str) -> PatternIndex:
+    """Index the release of a library named by $tag_env, else its latest one."""
+    tag = os.environ.get(tag_env) or latest_tag(url)
+    # removed at exit: the index reads support YAMLs as it needs them
+    clone = tempfile.mkdtemp(prefix=f"{library}-")
+    atexit.register(shutil.rmtree, clone, ignore_errors=True)
+    result = git("clone", "--quiet", "--depth", "1", "--branch", tag, url, cwd=clone)
+    if result.returncode != 0:
+        raise PatternIndexError(f"cannot clone {url} at {tag}: {result.stderr.strip()}")
+    return PatternIndex(Path(clone) / library, tag, library)
+
+
 @cache_outcome
 def pattern_index() -> PatternIndex:
-    """The index of the library release to convert with, cloned once per process.
+    """The index of the StreamDevice library release to convert with, cloned
+    once per process.
 
     The release is $BUILDER2IBEK_PATTERN_TAG, or else the latest one.
     """
-    tag = os.environ.get(LIBRARY_TAG_ENV) or latest_tag(LIBRARY_URL)
-    # removed at exit: the index reads support YAMLs as it needs them
-    clone = tempfile.mkdtemp(prefix=f"{LIBRARY}-")
-    atexit.register(shutil.rmtree, clone, ignore_errors=True)
-    result = git(
-        "clone", "--quiet", "--depth", "1", "--branch", tag, LIBRARY_URL, cwd=clone
-    )
-    if result.returncode != 0:
-        raise PatternIndexError(
-            f"cannot clone {LIBRARY_URL} at {tag}: {result.stderr.strip()}"
-        )
-    return PatternIndex(Path(clone) / LIBRARY, tag)
+    return clone_index(LIBRARY, LIBRARY_URL, LIBRARY_TAG_ENV)
+
+
+@cache_outcome
+def support_pattern_index() -> PatternIndex:
+    """The index of the ibek-runtime-support release to convert with, cloned
+    once per process.
+
+    The release is $BUILDER2IBEK_SUPPORT_PATTERN_TAG, or else the latest one.
+    """
+    return clone_index(SUPPORT_LIBRARY, SUPPORT_LIBRARY_URL, SUPPORT_LIBRARY_TAG_ENV)
