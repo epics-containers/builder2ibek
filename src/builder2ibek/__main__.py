@@ -52,6 +52,11 @@ def xml2yaml(
         "Only for generic IOCs whose binary includes the BLGui module; "
         "otherwise BLGui entities are dropped.",
     ),
+    image: str | None = typer.Option(
+        None,
+        help="Generic IOC image to plan against, in place of the one values.yaml "
+        "names; set in a values.yaml that still has the placeholder",
+    ),
 ):
     """
     Convert a builder XML IOC to an ibek ioc.yaml.
@@ -72,6 +77,12 @@ def xml2yaml(
     review. An IOC with beamline entities fails to convert when the pattern
     libraries cannot be indexed, e.g. with no network.
 
+    --image names the generic IOC image to plan against in place of the one in
+    values.yaml: patterns it installs are left out, and a values.yaml that
+    still has the placeholder gets it. Each module the IOC uses is reported as
+    a pattern, build-time (compiled into the image) or unresolved: a module no
+    image here builds and no runtime pattern takes, so nothing can run it.
+
     ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
     that holds only PandAs and boilerplate becomes one fastcs instance in place
     of the ioc.yaml: given services/<ioc>/config/ioc.yaml, it writes
@@ -82,7 +93,9 @@ def xml2yaml(
     with a warning, and an existing instance is never overwritten.
     """
     try:
-        result = convert_file(xml, yaml, schema, description=description, blgui=blgui)
+        result = convert_file(
+            xml, yaml, schema, description=description, blgui=blgui, image=image
+        )
     except (FileExistsError, BeamlinePatternError) as e:
         typer.echo(f"error: {e}", err=True)
         raise typer.Exit(1) from e

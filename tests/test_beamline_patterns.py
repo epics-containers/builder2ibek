@@ -129,7 +129,10 @@ def test_unindexed_pattern_module_is_a_warning(
     assert report.warnings == [
         f"detectorPlugins has a pattern in {index.unindexed['detectorPlugins']} "
         "that builder2ibek does not use: its entities are kept, so they need "
-        "an image that builds detectorPlugins"
+        "an image that builds detectorPlugins",
+        # and the module report says so too, with no generic model for it
+        "unresolved module detectorPlugins, nothing can run it: no generic model "
+        "and no runtime pattern",
     ]
 
 
@@ -393,7 +396,7 @@ def test_plan_keeps_a_rejected_beamline_module_build_time(
     index: PatternIndex, tmp_path: Path, monkeypatch
 ):
     """Only when plan() is given entities drop_beamline_entities has not seen;
-    add_patterns then warns rather than skip the module silently."""
+    add_patterns then reports it unresolved rather than skip it silently."""
     entity = {"type": "BL21I.TTHBumpstripMonitor", "P": "A", "R": ":1"}
     plan = index.plan([entity])
     assert plan.patterns == []
@@ -402,7 +405,8 @@ def test_plan_keeps_a_rejected_beamline_module_build_time(
     monkeypatch.setattr(vendor_patterns, "pattern_index", lambda: index)
     report = vendor_patterns.add_patterns([entity], tmp_path / "ioc.yaml")
     assert report.warnings == [
-        f"beamline module BL21I gets no runtime pattern: {plan.build_time['BL21I']}"
+        "unresolved module BL21I, nothing can run it: beamline modules come "
+        f"only from runtime patterns: {plan.build_time['BL21I']}"
     ]
 
 
