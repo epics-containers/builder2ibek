@@ -202,12 +202,14 @@ def add_patterns(
         if library != SUPPORT_LIBRARY
     ]
     plan = index.plan(entities)
-    # a pattern builder2ibek does not use may still be what the IOC needs
+    # never keep silently the entities of a pattern builder2ibek does not use;
+    # a builder repo's (BL15I-BUILDER) were dropped before the ioc.yaml was
+    # written (see builder2ibek.patterns.drop_beamline_entities)
     used_modules = sorted({str(e["type"]).partition(".")[0] for e in entities})
     report.warnings += [
         f"{module} has a pattern in {index.unindexed[module]} that builder2ibek "
-        f"does not use: its entities are kept, so add the pattern by hand or "
-        f"use an image that builds {module}"
+        f"does not use: its entities are kept, so they need an image that "
+        f"builds {module}"
         for module in used_modules
         if module in index.unindexed
     ]

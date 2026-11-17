@@ -64,6 +64,7 @@ from pydantic.warnings import PydanticDeprecatedSince211
 from ruamel.yaml import YAML
 
 from builder2ibek.support_defaults import (
+    builder_module_target,
     entity_defaults,
     generic_param_types,
     is_beamline_module,
@@ -531,7 +532,7 @@ class DroppedEntity:
 
 def drop_beamline_entities(
     entities: Sequence[Mapping[str, Any]],
-    index: PatternIndex,
+    index: PatternIndex | None,
 ) -> tuple[list[Mapping[str, Any]], list[DroppedEntity]]:
     """Split an IOC's entities into those to keep and those to drop.
 
@@ -547,17 +548,33 @@ def drop_beamline_entities(
     known model or, with no known model, its ``name``. An entity with no known
     model refers to nothing here; generate2 reports any reference it holds.
 
+    Every entity of a beamline builder repo (:func:`builder_module_target`),
+    such as BL15I-BUILDER, is dropped too: a builder repo is never a pattern,
+    and its templates are to be migrated into the beamline module.
+
+    ``index`` may be None only when no entity is of a beamline module.
+
     Returns the entities kept and those dropped, each in the order given.
     """
+    reasons: dict[int, str] = {}
     by_module: dict[str, list[int]] = {}
     for i, entity in enumerate(entities):
-        if is_beamline_module(module_of(entity)):
-            by_module.setdefault(module_of(entity), []).append(i)
-    if not by_module:
+        module = module_of(entity)
+        target = builder_module_target(module)
+        if target is not None:
+            reasons[i] = (
+                f"{module} is not a runtime pattern: its templates need "
+                f"migrating into the {target} module"
+            )
+        elif is_beamline_module(module):
+            by_module.setdefault(module, []).append(i)
+    if not by_module and not reasons:
         return list(entities), []
+    if by_module and index is None:
+        raise ValueError("beamline entities need the pattern index")
 
     def types_of(entity: Mapping[str, Any]) -> dict[str, str] | None:
-        if is_beamline_module(module_of(entity)):
+        if index is not None and is_beamline_module(module_of(entity)):
             return index.param_types(str(entity["type"]))
         return generic_param_types(str(entity["type"]))
 
@@ -568,8 +585,8 @@ def drop_beamline_entities(
         name = entity.get("name")
         return {name} if isinstance(name, str) else set()
 
-    reasons: dict[int, str] = {}
     for module, positions in by_module.items():
+        assert index is not None
         pattern = index.patterns.get(module)
         if pattern is None:
             version = index.libraries.get(SUPPORT_LIBRARY, "?")

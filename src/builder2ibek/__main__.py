@@ -65,13 +65,12 @@ def xml2yaml(
     BUILDER2IBEK_SUPPORT_PATTERN_TAG and BUILDER2IBEK_RUNTIME_TAG fix the
     ibek-runtime-streamdevice, ibek-runtime-support and image tags.
 
-    A beamline module (BL<nn><x> or BL<nn><x>-BUILDER, e.g. BL21I) comes
-    only from its ibek-runtime-support pattern. Each of its entities the
-    pattern does not take, and each entity that refers to one, is left out of
-    the ioc.yaml with a warning, and listed in a comment at the top of the
-    ioc.yaml for manual review. An IOC with beamline entities fails to
-    convert when the pattern libraries cannot be indexed, e.g. with no
-    network.
+    A beamline module (BL<nn><x>, e.g. BL21I) comes only from its
+    ibek-runtime-support pattern. Each of its entities the pattern does not
+    take, and each entity that refers to one, is left out of the ioc.yaml with
+    a warning, and listed in a comment at the top of the ioc.yaml for manual
+    review. An IOC with beamline entities fails to convert when the pattern
+    libraries cannot be indexed, e.g. with no network.
 
     ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
     that holds only PandAs and boilerplate becomes one fastcs instance in place

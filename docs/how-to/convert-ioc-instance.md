@@ -142,8 +142,8 @@ with `ibek pattern add <library>:<module>@<tag> services/<ioc>`,
 which writes the pattern files under `config/`, `runtime-lock.yaml`,
 `ioc.schema.json` and the `ioc.yaml` schema header.
 
-A beamline module, one named `BL<nn><x>` or `BL<nn><x>-BUILDER` such as `BL21I`
-or `BL15I-BUILDER` (not `I19Server`), is never compiled into a generic IOC, so it comes only from
+A beamline module, one named `BL<nn><x>` such as `BL21I` (not `BL15I-BUILDER`
+or `I19Server`), is never compiled into a generic IOC, so it comes only from
 its pattern in ibek-runtime-support, whatever generic model `ibek-support-dls`
 has for it. xml2yaml keeps each of its entities the pattern has a model for and
 accepts. It leaves out of the `ioc.yaml` every other entity of the module, every
@@ -155,8 +155,11 @@ reason and its YAML as builder2ibek converted it, commented out, so that it can
 be found in the services repo, added to the pattern, and restored.
 
 Only the beamline modules of ibek-runtime-support are routed to it; its other
-patterns, such as `detectorPlugins`, are not used, and an IOC that uses one
-gets a warning. A kept
+patterns are not used. An IOC that uses one of them, such as `detectorPlugins`,
+keeps its entities with a warning. A builder repo such as `BL15I-BUILDER` is
+never a pattern: its templates are to be migrated into the beamline module
+(`BL15I`), so every one of its entities is left out and listed for review in
+the same way, with one warning per entity type. A kept
 entity leaves out each parameter whose value is its pattern model's default. An
 entity is taken to refer to a dropped one only through an `object` parameter of
 its pattern or generic model.

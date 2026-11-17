@@ -21,12 +21,17 @@ from builder2ibek.patterns import (
     SUPPORT_LIBRARY,
     BeamlinePatternError,
     DroppedEntity,
+    PatternIndex,
     drop_beamline_entities,
     is_beamline_module,
     module_of,
     pattern_index,
 )
-from builder2ibek.support_defaults import fill_empty_attributes, strip_defaults
+from builder2ibek.support_defaults import (
+    builder_module_target,
+    fill_empty_attributes,
+    strip_defaults,
+)
 from builder2ibek.types import Entity, Generic_IOC
 from builder2ibek.vendor_patterns import add_patterns
 
@@ -158,29 +163,33 @@ def describe(entity: dict[str, Any]) -> str:
 def drop_unpatterned_entities(ioc: Generic_IOC) -> list[DroppedEntity]:
     """Take out of the IOC the beamline entities no runtime pattern takes.
 
-    Warns once per distinct entity dropped, with a count of identical ones,
-    and returns them for the ioc.yaml comment.
+    So too every entity of a beamline builder repo such as BL15I-BUILDER, which
+    is never a pattern. Warns once for the dropped entities that share a type,
+    identifying parameters and reason, with a count when there is more than
+    one; a builder repo's entities are grouped by type alone. Returns the
+    dropped entities for the ioc.yaml comment.
     Strips from each beamline entity kept the parameters its pattern model
     defaults to the same value. Raises BeamlinePatternError when the IOC has
     beamline entities and ibek-runtime-support cannot be indexed: nothing is
     written then.
     """
-    beamline = sorted(
-        {module_of(e) for e in ioc.entities if is_beamline_module(module_of(e))}
-    )
-    if not beamline:
+    modules = {module_of(e) for e in ioc.entities}
+    beamline = sorted(filter(is_beamline_module, modules))
+    if not beamline and not any(map(builder_module_target, modules)):
         return []
     errors: list[str] = []
-    try:
-        index = pattern_index()
-    except Exception as e:  # noqa: BLE001 -- raised below
-        errors.append(str(e) or type(e).__name__)
-    else:
-        if SUPPORT_LIBRARY in index.failures:
-            errors.append(index.failures[SUPPORT_LIBRARY] or "unknown error")
-        errors += [
-            index.module_failures[m] for m in beamline if m in index.module_failures
-        ]
+    index: PatternIndex | None = None
+    if beamline:
+        try:
+            index = pattern_index()
+        except Exception as e:  # noqa: BLE001 -- raised below
+            errors.append(str(e) or type(e).__name__)
+        else:
+            if SUPPORT_LIBRARY in index.failures:
+                errors.append(index.failures[SUPPORT_LIBRARY] or "unknown error")
+            errors += [
+                index.module_failures[m] for m in beamline if m in index.module_failures
+            ]
     if errors:
         error = "; ".join(errors)
         raise BeamlinePatternError(
@@ -190,13 +199,20 @@ def drop_unpatterned_entities(ioc: Generic_IOC) -> list[DroppedEntity]:
         )
     kept, dropped = drop_beamline_entities(ioc.entities, index)
     for entity in kept:
-        if is_beamline_module(module_of(entity)):
+        if index is not None and is_beamline_module(module_of(entity)):
             index.strip_defaults(entity)  # type: ignore[arg-type]
     ioc.entities = list(kept)  # type: ignore[arg-type]
     stem = Path(ioc.source_file).stem
-    # identical entities, e.g. one template loaded many times, warn once
+
+    def what(entity: dict[str, Any]) -> str:
+        # a builder repo's content migrates by template, not by instance
+        if builder_module_target(module_of(entity)):
+            return str(entity["type"])
+        return describe(entity)
+
+    # entities alike, e.g. one template loaded many times, warn once
     counts = Counter(
-        f"{stem}: dropped {describe(dict(d.entity))} from the ioc.yaml for "
+        f"{stem}: dropped {what(dict(d.entity))} from the ioc.yaml for "
         f"manual review: {d.reason}"
         for d in dropped
     )
@@ -214,8 +230,10 @@ def dropped_comment(dropped: list[DroppedEntity]) -> str:
     lines = [
         "# DROPPED FOR MANUAL REVIEW by builder2ibek. A beamline module comes only",
         "# from its runtime pattern (ibek-runtime-support), which does not take the",
-        "# entities below, nor those that refer to them. Each is shown, commented",
-        "# out, as builder2ibek converted it, after the reason it was dropped.",
+        "# entities below, nor those that refer to them. A builder repo such as",
+        "# BL15I-BUILDER is never a pattern: its templates migrate into BL15I.",
+        "# Each is shown, commented out, as builder2ibek converted it, after the",
+        "# reason it was dropped.",
     ]
     for d in dropped:
         lines += ["#", f"# Dropped: {d.reason}"]

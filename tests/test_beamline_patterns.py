@@ -41,7 +41,7 @@ BASE_RECORDS = {
 CALC_RECORDS = {"scalcout", "acalcout", "sseq", "transform", "swait"}
 STD_RECORDS = {"epid", "throttle", "timestamp"}
 RUNTIME_IMAGE_RECORDS = BASE_RECORDS | CALC_RECORDS | STD_RECORDS | {"busy", "asyn"}
-BEAMLINE_PATTERNS = ["BL04I", "BL11I", "BL15I-BUILDER", "BL19I", "BL21I"]
+BEAMLINE_PATTERNS = ["BL04I", "BL11I", "BL19I", "BL21I"]
 
 
 @pytest.fixture(scope="module")
@@ -105,24 +105,7 @@ def test_convert_drops_what_the_pattern_does_not_take(tmp_path: Path):
     assert f"would add runtime pattern {BL21I}" in result.notes
 
 
-def test_beamline_builder_module_goes_to_its_pattern(tmp_path: Path):
-    """A BL<nn><x>-BUILDER module is a beamline module like BL21I."""
-    xml = _write_xml(
-        tmp_path,
-        '<BL15I-BUILDER.auto_BL15I_SumTheDiode DIODE="BL15I-DI-FEMTO-01:OUTPUT" '
-        'P="BL15I-DI-FEMTO-01" SHUTTER="BL15I-EA-FSHTR-01:STATE" '
-        'gda_name="d1.sum" name="D1.Sum"/>',
-    )
-    out = tmp_path / "ioc.yaml"
-    result = convert_file(xml, out, "/epics/ibek-defs/ioc.schema.json")
-    entities = YAML(typ="safe").load(out.read_text())["entities"]
-    assert "BL15I-BUILDER.auto_BL15I_SumTheDiode" in [e["type"] for e in entities]
-    assert not [w for w in result.warnings if "dropped" in w]
-    ref = f"{SUPPORT_LIBRARY}:BL15I-BUILDER@{SUPPORT_PATTERN_TAG}"
-    assert f"would add runtime pattern {ref}" in result.notes
-
-
-def test_identical_drops_warn_once_with_a_count(tmp_path: Path):
+def test_drops_alike_warn_once_with_a_count(tmp_path: Path):
     xml = _write_xml(tmp_path, KEPT, NO_MODEL, NO_MODEL, NO_MODEL)
     out = tmp_path / "ioc.yaml"
     result = convert_file(xml, out, "/epics/ibek-defs/ioc.schema.json")
@@ -136,17 +119,77 @@ def test_identical_drops_warn_once_with_a_count(tmp_path: Path):
 def test_unindexed_pattern_module_is_a_warning(
     index: PatternIndex, tmp_path: Path, monkeypatch
 ):
-    """A module whose ibek-runtime-support pattern is not indexed keeps its
+    """A module whose ibek-runtime-support folder is not indexed keeps its
     entities, with a warning rather than silently."""
-    assert "detectorPlugins" in index.unindexed
     monkeypatch.setattr(vendor_patterns, "pattern_index", lambda: index)
     entity = {"type": "detectorPlugins.detectorPlugins", "PREFIX": "X"}
     report = vendor_patterns.add_patterns([entity], tmp_path / "ioc.yaml")
     assert report.warnings == [
         f"detectorPlugins has a pattern in {index.unindexed['detectorPlugins']} "
-        "that builder2ibek does not use: its entities are kept, so add the "
-        "pattern by hand or use an image that builds detectorPlugins"
+        "that builder2ibek does not use: its entities are kept, so they need "
+        "an image that builds detectorPlugins"
     ]
+
+
+BL15I_REASON = (
+    "BL15I-BUILDER is not a runtime pattern: its templates need migrating "
+    "into the BL15I module"
+)
+
+
+def _builder_warning(stem: str, entity_type: str) -> str:
+    return (
+        f"{stem}: dropped BL15I-BUILDER.{entity_type} from the ioc.yaml for "
+        f"manual review: {BL15I_REASON}"
+    )
+
+
+def _sum_the_diode(n: int) -> str:
+    return (
+        f'<BL15I-BUILDER.auto_BL15I_SumTheDiode DIODE="BL15I-DI-FEMTO-0{n}:OUTPUT" '
+        f'P="BL15I-DI-FEMTO-0{n}" SHUTTER="BL15I-EA-FSHTR-01:STATE" '
+        f'gda_name="d{n}.sum" name="D{n}.Sum"/>'
+    )
+
+
+def test_builder_module_entities_are_dropped_by_type(tmp_path: Path):
+    """A BL<nn><x>-BUILDER module is never a pattern: each of its entities is
+    dropped for review, with one warning per type, as its templates migrate
+    into BL<nn><x>."""
+    xml = _write_xml(
+        tmp_path,
+        _sum_the_diode(1),
+        _sum_the_diode(2),
+        _sum_the_diode(3),
+        '<BL15I-BUILDER.cryocooler_fill P="BL15I-CG-CJET-01" name="FILL"/>',
+    )
+    out = tmp_path / "ioc.yaml"
+    result = convert_file(xml, out, "/epics/ibek-defs/ioc.schema.json")
+    text = out.read_text()
+    entities = YAML(typ="safe").load(text)["entities"] or []
+    assert not [e for e in entities if e["type"].startswith("BL15I-BUILDER.")]
+    assert [w for w in result.warnings if "BL15I-BUILDER" in w] == [
+        _builder_warning(xml.stem, "auto_BL15I_SumTheDiode") + " (x3)",
+        _builder_warning(xml.stem, "cryocooler_fill"),
+    ]
+    assert text.count(f"# Dropped: {BL15I_REASON}") == 4
+    assert "#   - type: BL15I-BUILDER.cryocooler_fill" in text.splitlines()
+    assert not [n for n in result.notes if "BL15I-BUILDER@" in n]
+
+
+BL15I_IOCS = Path("/dls_sw/work/R3.14.12.7/support/BL15I-BUILDER/etc/makeIocs")
+
+
+@pytest.mark.skipif(not BL15I_IOCS.is_dir(), reason="needs /dls_sw")
+def test_bl15i_va_ioc_02_gets_the_migration_warning(tmp_path: Path):
+    xml = BL15I_IOCS / "BL15I-VA-IOC-02.xml"
+    result = convert_file(
+        xml, tmp_path / "ioc.yaml", "/epics/ibek-defs/ioc.schema.json"
+    )
+    assert (
+        _builder_warning(xml.stem, "auto_BL15I_SumTheDiode") + " (x5)"
+        in result.warnings
+    )
 
 
 def test_convert_without_beamline_modules_has_no_comment(tmp_path: Path):

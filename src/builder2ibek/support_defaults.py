@@ -35,13 +35,26 @@ _param_specs: dict[str, dict[str, dict[str, Any]]] = {}
 _STREAMDEVICE_PATTERNS = "ibek-runtime-streamdevice"
 _SUPPORT_PATTERNS = "ibek-runtime-support"
 
-# A beamline module holds the templates of one beamline, e.g. BL21I, or the
-# beamline's builder repo, e.g. BL15I-BUILDER
-BEAMLINE_MODULE = re.compile(r"BL\d\d[A-Z](-BUILDER)?")
+# A beamline module holds the templates of one beamline, e.g. BL21I
+BEAMLINE_MODULE = re.compile(r"BL\d\d[A-Z]")
+
+
+# A beamline's builder repo, e.g. BL15I-BUILDER. It is never a runtime
+# pattern: its templates migrate into the beamline module, e.g. BL15I
+BUILDER_MODULE = re.compile(r"(BL\d\d[A-Z])-BUILDER")
+
+
+def builder_module_target(module: str) -> str | None:
+    """The beamline module a builder repo's templates migrate into, or None.
+
+    BL15I for BL15I-BUILDER; None for a module that is not a builder repo.
+    """
+    match = BUILDER_MODULE.fullmatch(module)
+    return match.group(1) if match else None
 
 
 def is_beamline_module(module: str) -> bool:
-    """True for a beamline module, such as BL21I or BL15I-BUILDER."""
+    """True for a beamline module, such as BL21I; BL15I-BUILDER is not one."""
     return BEAMLINE_MODULE.fullmatch(module) is not None
 
 
