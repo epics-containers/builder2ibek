@@ -75,8 +75,10 @@ grep -l 'DTYP' $B/db/*.template          # device support => needs a built modul
 - **No hits → vendor it.** Add a pattern folder to `ibek-runtime-support`
   (`<Module>/<Module>.ibek.support.yaml` + a pristine copy of each `.template`
   needed). Once the pattern is in a release, xml2yaml adds it to every
-  services-repo instance that uses the module (`ibek pattern add
-  ibek-runtime-support:<Module>@<tag> <instance>`).
+  services-repo instance that uses a `BL<nn><x>` module (`ibek pattern add
+  ibek-runtime-support:<Module>@<tag> <instance>`). xml2yaml does not index
+  any other module there (`BL<nn><x>-BUILDER`, `detectorPlugins`): for one of
+  those, run that `ibek pattern add` by hand after converting.
   Two things differ from a build-time support YAML:
   - `databases[].file` is a **bare filename** (`BL15I-SumTheDiode.template`), not
     `$(MODULE)/db/…` — `ibek runtime place-files` puts it beside the support YAML.
