@@ -491,6 +491,114 @@ entity_models:
         channel: 6
         device: "{{ dom }}-VA-PIRG-{{ id_b }}"
         name: "PIR_{{ q }}{{ id_b }}"
+      # Twelve 937b relays. Each relay takes its device from its gauge plus the
+      # next free :RLYn on that gauge, so the order here gives RLY1-4 on IMG
+      # id_a and on IMG id_b, and RLY1-2 on PIRG id_a and on PIRG id_b.
+      # relay_number is the controller's own relay number, 1-12.
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_a }}"
+        relay_number: 1
+        relay_desc: "Valve I/L On"
+        relay_off_desc: "Valve I/L Off"
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_a }}"
+        relay_number: 2
+        relay_desc: "MPS I/L 1"
+        relay_level: 1.0e-7
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_a }}"
+        relay_number: 3
+        relay_desc: "MPS I/L 2"
+        relay_level: 1.0e-7
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_a }}"
+        relay_number: 4
+        relay_desc: "RGA I/L"
+        relay_level: 1.0e-4
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_b }}"
+        relay_number: 5
+        relay_desc: "Valve I/L On"
+        relay_off_desc: "Valve I/L Off"
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_b }}"
+        relay_number: 6
+        relay_desc: "MPS I/L 1"
+        relay_level: 1.0e-7
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_b }}"
+        relay_number: 7
+        relay_desc: "MPS I/L 2"
+        relay_level: 1.0e-7
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "IMG_{{ q }}{{ id_b }}"
+        relay_number: 8
+        relay_desc: "RGA I/L"
+        relay_level: 1.0e-4
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bRelays
+        GAUGE: "PIR_{{ q }}{{ id_a }}"
+        relay_number: 9
+        relay_desc: "Ion Pump I/L On"
+        relay_off_desc: "Ion Pump I/L"
+        relay_level: 1.0e-2
+        relay_drvh: 950
+        relay_drvl: 2.7e-3
+        relay_hopr: 950
+        relay_lopr: 2.7e-3
+        relay_hihi: 119
+        relay_high: 1.1e-2
+        relay_low: 2.0e-3
+        relay_lolo: 2.6e-3
+      - type: mks937b.mks937bRelays
+        GAUGE: "PIR_{{ q }}{{ id_a }}"
+        relay_number: 10
+        relay_desc: "MPS I/L 1"
+        relay_off_desc: "MPS I/L"
+        relay_level: 1.0e-2
+        relay_drvh: 950
+        relay_hopr: 950
+        relay_hihi: 119
+        relay_high: 950
+      - type: mks937b.mks937bRelays
+        GAUGE: "PIR_{{ q }}{{ id_b }}"
+        relay_number: 11
+        relay_desc: "Ion Pump I/L On"
+        relay_off_desc: "Ion Pump I/L"
+        relay_level: 1.0e-2
+        relay_drvh: 950
+        relay_drvl: 2.7e-3
+        relay_hopr: 950
+        relay_lopr: 2.7e-3
+        relay_hihi: 119
+        relay_high: 1.1e-2
+        relay_low: 2.0e-3
+        relay_lolo: 2.6e-3
+      - type: mks937b.mks937bRelays
+        GAUGE: "PIR_{{ q }}{{ id_b }}"
+        relay_number: 12
+        relay_desc: "MPS I/L 1"
+        relay_off_desc: "MPS I/L"
+        relay_level: 1.0e-2
+        relay_drvh: 950
+        relay_hopr: 950
+        relay_hihi: 119
+        relay_high: 950
+      - type: mks937b.mks937bFastRelay
+        GAUGE: "IMG_{{ q }}{{ id_a }}"
+        frcsp_lopr: 1.0e-5
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_a }}:ILKSETSP:NOWRITE"
+      - type: mks937b.mks937bFastRelay
+        GAUGE: "IMG_{{ q }}{{ id_b }}"
+        frcsp_lopr: 1.0e-5
+        ilk_write_access_pv: "{{ dom }}-VA-GAUGE-{{ id_b }}:ILKSETSP:NOWRITE"
       - type: dlsPLC.NX102_digitalIn
         device: "{{ dom }}-VA-GCTLR-{{ gc_no }}:DIG01"
         name: "GCTLR_{{ q }}_{{ gc_no }}.DIG01"
@@ -508,6 +616,15 @@ entity_models:
         gc_no: "{{ gc_no }}"
         id_a: "{{ id_a }}"
         id_b: "{{ id_b }}"
+
+    databases:
+      # $(dom)-VA-GCTLR-$(gc_no):RLY_STAT, a sel record over the twelve relay
+      # modes. The template lives in this folder: SR-VA.install.yml copies it
+      # into the module's db/ after the build.
+      - file: $(SR_VA)/db/gaugeSetRelayStatus.template
+        args:
+          dom:
+          gc_no:
 
   - name: gaugeSetA
     description: |-

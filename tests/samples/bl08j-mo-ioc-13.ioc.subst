@@ -8,12 +8,6 @@ pattern
 	{ ""    }
 }
 
-file "$(IOCSTATS)/db/iocAdminScanMon.db" {
-pattern 
-	{ "IOC" }
-	{ ""    }
-}
-
 file "ids3010.template" {
 pattern 
 	{ "type",                   "entity_enabled", "P",               "Q",  "PORT",     "PREC1", "SCAN",     "EGU1", "SCALE1", "OFF1", "PREC2", "EGU2", "SCALE2", "OFF2", "PREC3", "EGU3", "SCALE3", "OFF3" }

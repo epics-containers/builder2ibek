@@ -1160,32 +1160,136 @@ entity_models:
 
     databases:
 
+      # a PLIM and an NLIM interlock for each of the 8 axes, 20 words apart,
+      # as dlsPLC's builder.py motionInterlockPLC creates them
       - file: $(DLSPLC)/db/dlsPLC_interlock.template
         args:
           device:
           port:
-          interlock:
-          desc:
-          addr:
-          name:
-          timeout:
-          ilk0:
-          ilk1:
-          ilk2:
-          ilk3:
-          ilk4:
-          ilk5:
-          ilk6:
-          ilk7:
-          ilk8:
-          ilk9:
-          ilk10:
-          ilk11:
-          ilk12:
-          ilk13:
-          ilk14:
-          ilk15:
-          auto_reset:
+          interlock: ":PLIM1"
+          desc: "{{axis1Description}}"
+          addr: "{{addr + 0}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM1"
+          desc: "{{axis1Description}}"
+          addr: "{{addr + 10}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":PLIM2"
+          desc: "{{axis2Description}}"
+          addr: "{{addr + 20}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM2"
+          desc: "{{axis2Description}}"
+          addr: "{{addr + 30}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":PLIM3"
+          desc: "{{axis3Description}}"
+          addr: "{{addr + 40}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM3"
+          desc: "{{axis3Description}}"
+          addr: "{{addr + 50}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":PLIM4"
+          desc: "{{axis4Description}}"
+          addr: "{{addr + 60}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM4"
+          desc: "{{axis4Description}}"
+          addr: "{{addr + 70}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":PLIM5"
+          desc: "{{axis5Description}}"
+          addr: "{{addr + 80}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM5"
+          desc: "{{axis5Description}}"
+          addr: "{{addr + 90}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":PLIM6"
+          desc: "{{axis6Description}}"
+          addr: "{{addr + 100}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM6"
+          desc: "{{axis6Description}}"
+          addr: "{{addr + 110}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":PLIM7"
+          desc: "{{axis7Description}}"
+          addr: "{{addr + 120}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM7"
+          desc: "{{axis7Description}}"
+          addr: "{{addr + 130}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":PLIM8"
+          desc: "{{axis8Description}}"
+          addr: "{{addr + 140}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_interlock.template
+        args:
+          device:
+          port:
+          interlock: ":NLIM8"
+          desc: "{{axis8Description}}"
+          addr: "{{addr + 150}}"
+
 
   - name: NX102_robotDX200_RW
     description: |-
@@ -1315,55 +1419,8 @@ entity_models:
           port:
           tag:
           tagidx:
-          ILKNUM:
-          allowpv:
-          whylocked:
-          con_label0:
-          con_label1:
-          con_label2:
-          con_label3:
-          con_label4:
-          con_label5:
-          con_label6:
-          con_label7:
-          sta_label0:
-          sta_label1:
-          sta_label2:
-          sta_label3:
-          sta_label4:
-          sta_label5:
-          sta_label6:
-          sta_label7:
-          sta_sv0:
-          sta_sv1:
-          sta_sv2:
-          sta_sv3:
-          sta_sv4:
-          sta_sv5:
-          sta_sv6:
-          sta_sv7:
-          ilksta_label0:
-          ilksta_label1:
-          ilksta_label2:
-          ilksta_label3:
-          ilksta_label4:
-          ilksta_label5:
-          ilksta_label6:
-          ilksta_label7:
-          ilksta_sv0:
-          ilksta_sv1:
-          ilksta_sv2:
-          ilksta_sv3:
-          ilksta_sv4:
-          ilksta_sv5:
-          ilksta_sv6:
-          ilksta_sv7:
-          mode1:
-          mode2:
-          DIRILK1:
-          showilk:
           extended_interface:
-          name:
+          ILKNUM:
 
   - name: dummyValve
     description: |-
@@ -1619,79 +1676,147 @@ entity_models:
 
     databases:
 
-      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
-        args:
-          P:
-          Q:
-          vlvcc:
-          addr:
-          name:
-          VAL0:
-          VAL1:
-          VAL2:
-          VAL3:
-          VAL4:
-          VAL5:
-          VAL6:
-          VAL7:
-          STR0:
-          STR1:
-          STR2:
-          STR3:
-          STR4:
-          STR5:
-          STR6:
-          STR7:
-
+      # one row per record set that dlsPLC's builder.py DCMHeater creates:
+      # the GUI calc records, then the demand, status and PID register reads and writes
       - file: $(DLSPLC)/db/dlsPLC_DCMHeater.template
         args:
           P:
           Q:
-          name:
+          name: "{{P}}{{Q}}"
           desc:
-
-      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
-        args:
-          P:
-          Q:
-          port:
-          addr:
-          timeout:
-          name:
-
-      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
-        args:
-          P:
-          Q:
-          vlvcc:
-          addr:
-          name:
-          ftvl:
 
       - file: $(DLSPLC)/db/dlsPLC_writeEnum.template
         args:
-          P:
-          Q:
+          P: "{{P}}{{Q}}"
+          Q: ":C"
           port:
-          addr:
-          name:
-          timeout:
-          VAL0:
-          VAL1:
-          VAL2:
-          VAL3:
-          VAL4:
-          VAL5:
-          VAL6:
-          VAL7:
-          STR0:
-          STR1:
-          STR2:
-          STR3:
-          STR4:
-          STR5:
-          STR6:
-          STR7:
+          addr: "{{C_addr}}"
+          STR0: Start Heating Loop
+          STR1: Stop Heating Loop
+          STR2: Reset Interlocks Request
+          STR3: PID Autotune Request
+          STR4: Stop Autotune Request
+          VAL0: "0"
+          VAL1: "1"
+          VAL2: "2"
+          VAL3: "3"
+          VAL4: "4"
+
+      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":C:RBV"
+          vlvcc:
+          addr: "{{C_addr + 1}}"
+          STR0: Start Heating Loop
+          STR1: Stop Heating Loop
+          STR2: Reset Interlocks Request
+          STR3: PID Autotune Request
+          STR4: Stop Autotune Request
+          VAL0: "0"
+          VAL1: "1"
+          VAL2: "2"
+          VAL3: "3"
+          VAL4: "4"
+
+      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":OIR"
+          vlvcc:
+          addr: "{{C_addr + 2}}"
+          STR0: Loop Disabled
+          STR1: PID Loop Off
+          STR2: PID Loop On
+          VAL0: "0"
+          VAL1: "1"
+          VAL2: "2"
+
+      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":FAIL"
+          vlvcc:
+          addr: "{{C_addr + 3}}"
+          STR0: Status OK
+          STR1: Heater Under Temperature
+          STR2: N/A
+          STR3: Sensor Failed
+          VAL0: "0"
+          VAL1: "1"
+          VAL2: "2"
+          VAL3: "3"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":TTEMP"
+          vlvcc:
+          addr: "{{PID_offset + 103}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":PG:RBV"
+          vlvcc:
+          addr: "{{PID_offset + 200}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":IG:RBV"
+          vlvcc:
+          addr: "{{PID_offset + 201}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":DG:RBV"
+          vlvcc:
+          addr: "{{PID_offset + 202}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":OUTP"
+          vlvcc:
+          addr: "{{PID_output_addr}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":SP"
+          port:
+          addr: "{{C_addr + 4}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":UTSP"
+          port:
+          addr: "{{UTSP_addr}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":PG"
+          port:
+          addr: "{{PID_offset + 100}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":IG"
+          port:
+          addr: "{{PID_offset + 101}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":DG"
+          port:
+          addr: "{{PID_offset + 102}}"
+
 
   - name: NX102_vacValve
     description: |-
@@ -2013,81 +2138,110 @@ entity_models:
 
     databases:
 
-      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
-        args:
-          P:
-          Q:
-          vlvcc:
-          addr:
-          name:
-          VAL0:
-          VAL1:
-          VAL2:
-          VAL3:
-          VAL4:
-          VAL5:
-          VAL6:
-          VAL7:
-          STR0:
-          STR1:
-          STR2:
-          STR3:
-          STR4:
-          STR5:
-          STR6:
-          STR7:
-
-      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
-        args:
-          P:
-          Q:
-          port:
-          addr:
-          timeout:
-          name:
-
-      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
-        args:
-          P:
-          Q:
-          vlvcc:
-          addr:
-          name:
-          ftvl:
-
-      - file: $(DLSPLC)/db/dlsPLC_writeEnum.template
-        args:
-          P:
-          Q:
-          port:
-          addr:
-          name:
-          timeout:
-          VAL0:
-          VAL1:
-          VAL2:
-          VAL3:
-          VAL4:
-          VAL5:
-          VAL6:
-          VAL7:
-          STR0:
-          STR1:
-          STR2:
-          STR3:
-          STR4:
-          STR5:
-          STR6:
-          STR7:
-
+      # one row per record set that dlsPLC's builder.py PIDControl creates:
+      # the GUI calc records, then the demand and PID register reads and writes
       - file: $(DLSPLC)/db/dlsPLC_PIDControl.template
         args:
           P:
           Q:
-          UNITS:
-          PREC:
-          name:
+          name: "{{P}}{{Q}}"
           desc:
+          UNITS: "{{units}}"
+          PREC: "{{precision}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeEnum.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":CTRL"
+          port:
+          addr: "{{Control_addr}}"
+          STR0: Start PID Loop
+          STR1: Stop PID Loop
+          STR2: Reset Interlocks Request
+          VAL0: "0"
+          VAL1: "1"
+          VAL2: "2"
+
+      - file: $(DLSPLC)/db/dlsPLC_readEnum.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":CTRL:RBV"
+          vlvcc:
+          addr: "{{Control_addr + 1}}"
+          STR0: Start PID Loop
+          STR1: Stop PID Loop
+          STR2: Reset Interlocks Request
+          STR3: PID Autotune Start
+          STR4: PID Autotune Stop
+          VAL0: "0"
+          VAL1: "1"
+          VAL2: "2"
+          VAL3: "3"
+          VAL4: "4"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":SP:RBV:RAW"
+          vlvcc:
+          addr: "{{SetValue_addr}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":PG:RBV:RAW"
+          vlvcc:
+          addr: "{{PID_addr}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":IG:RBV"
+          vlvcc:
+          addr: "{{PID_addr + 1}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":DG:RBV"
+          vlvcc:
+          addr: "{{PID_addr + 2}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_readInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":OUTP:RAW"
+          vlvcc:
+          addr: "{{PID_output_addr}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":SP:RAW"
+          port:
+          addr: "{{SetValue_addr}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":PG:RAW"
+          port:
+          addr: "{{PIDwrite_addr}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":IG"
+          port:
+          addr: "{{PIDwrite_addr + 1}}"
+
+      - file: $(DLSPLC)/db/dlsPLC_writeInt16.template
+        args:
+          P: "{{P}}{{Q}}"
+          Q: ":DG"
+          port:
+          addr: "{{PIDwrite_addr + 2}}"
+
 
   - name: writeFloat32
     description: |-
@@ -5047,6 +5201,11 @@ entity_models:
         description: |-
           NX PLC tag string e.g. PSU (from PSU.Voltage[1])
         default: PSU
+      device_suffix:
+        type: str
+        description: |-
+          Device suffix added to every PV name, for several power supplies under one device prefix, e.g. ":PSU" gives $(device):PSU:VOLTAGE
+        default: ""
       name:
         type: str
         description: |-
@@ -5055,7 +5214,15 @@ entity_models:
 
     databases:
 
+      # with no suffix, device_suffix is left out of the substitution row and
+      # the template's own empty default applies
       - file: $(DLSPLC)/db/NX102_powerSupply.template
+        enabled: '{{ device_suffix == "" }}'
+        args:
+          ^(?!device_suffix$).*:
+
+      - file: $(DLSPLC)/db/NX102_powerSupply.template
+        enabled: '{{ device_suffix != "" }}'
         args:
           .*:
 
@@ -5063,7 +5230,7 @@ entity_models:
       yaml_path: NX102_powerSupply.pvi.device.yaml
       ui_macros:
         device:
-        device_suffix: ""
+        device_suffix:
       pv_prefix: "$(device)$(device_suffix):"
 
   - name: feTemperature
