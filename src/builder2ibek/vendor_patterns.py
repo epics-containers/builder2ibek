@@ -202,6 +202,15 @@ def add_patterns(
         if library != SUPPORT_LIBRARY
     ]
     plan = index.plan(entities)
+    # a pattern builder2ibek does not use may still be what the IOC needs
+    used = sorted({str(e["type"]).partition(".")[0] for e in entities})
+    report.warnings += [
+        f"{module} has a pattern in {index.unindexed[module]} that builder2ibek "
+        f"does not use: its entities are kept, so add the pattern by hand or "
+        f"use an image that builds {module}"
+        for module in used
+        if module in index.unindexed
+    ]
     # a beamline module has no build-time route: never skip one silently
     report.warnings += [
         f"beamline module {module} gets no runtime pattern: {reason}"

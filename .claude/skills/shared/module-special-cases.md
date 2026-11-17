@@ -75,10 +75,10 @@ grep -l 'DTYP' $B/db/*.template          # device support => needs a built modul
 - **No hits → vendor it.** Add a pattern folder to `ibek-runtime-support`
   (`<Module>/<Module>.ibek.support.yaml` + a pristine copy of each `.template`
   needed). Once the pattern is in a release, xml2yaml adds it to every
-  services-repo instance that uses a `BL<nn><x>` module (`ibek pattern add
-  ibek-runtime-support:<Module>@<tag> <instance>`). xml2yaml does not index
-  any other module there (`BL<nn><x>-BUILDER`, `detectorPlugins`): for one of
-  those, run that `ibek pattern add` by hand after converting.
+  services-repo instance that uses a `BL<nn><x>` or `BL<nn><x>-BUILDER` module
+  (`ibek pattern add ibek-runtime-support:<Module>@<tag> <instance>`). xml2yaml
+  does not index any other module there (`detectorPlugins`): an IOC that uses
+  one gets a warning, and needs that `ibek pattern add` run by hand.
   Two things differ from a build-time support YAML:
   - `databases[].file` is a **bare filename** (`BL15I-SumTheDiode.template`), not
     `$(MODULE)/db/…` — `ibek runtime place-files` puts it beside the support YAML.
@@ -99,7 +99,7 @@ generation when `values.yaml` has no published image pinned — expected on a
 freshly-created instance, not an error. See
 [ibek-pattern-vendoring](../ibek-pattern-vendoring/SKILL.md).
 
-xml2yaml routes every `BL<nn><x>` module (`is_beamline_module` in
+xml2yaml routes every `BL<nn><x>` and `BL<nn><x>-BUILDER` module (`is_beamline_module` in
 `src/builder2ibek/support_defaults.py`) to its `ibek-runtime-support` pattern, whatever
 `ibek-support-dls/` holds for it, and drops each entity the pattern does not
 take, or that refers to one it drops: a warning per entity, and a
@@ -109,8 +109,8 @@ dropped that way. When ibek-runtime-support cannot be indexed, an IOC with
 beamline entities fails to convert instead. The pattern is always added with
 `ibek pattern add`, even to an image that has the module compiled in: beamline
 modules are deployed per instance. Only the beamline modules of
-`ibek-runtime-support` are indexed: `BL<nn><x>-BUILDER` modules and
-`detectorPlugins` get no pattern from it. A kept entity drops only the
+`ibek-runtime-support` are indexed: `detectorPlugins` gets no pattern from
+it, and an IOC that uses it gets a warning. A kept entity drops only the
 parameters equal to its pattern model's defaults, never the generic model's.
 
 ## `positioner.motorpositioner` — `motor` is a suffix, not a PV

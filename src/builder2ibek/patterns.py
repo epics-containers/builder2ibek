@@ -10,7 +10,8 @@ variable :data:`LIBRARIES` names for that library is set. :func:`pattern_index`
 shallow-clones each library at its tag into a temporary folder and indexes it:
 every library folder holding ``<folder>/<folder>.ibek.support.yaml`` is a pattern
 for the module of that name, and the support YAML lists its entity models. Only
-the beamline modules of ibek-runtime-support are indexed. A module may have a
+the beamline modules of ibek-runtime-support are indexed; an IOC that uses one of
+its other modules gets a warning (see builder2ibek.vendor_patterns). A module may have a
 pattern in only one library. A library that cannot be indexed is left out, so
 that the other's patterns are still used.
 
@@ -283,6 +284,8 @@ class PatternIndex:
         # why each beamline module ibek-runtime-support cannot serve does not
         self.module_failures: dict[str, str] = {}
         self.patterns: dict[str, Pattern] = {}
+        # the library and release of each pattern folder ``only`` left out
+        self.unindexed: dict[str, str] = {}
         self._ioc_models: dict[str, Any] = {}
         self._specs: dict[str, dict[str, dict[str, Any]]] = {}
         yml = YAML(typ="safe", pure=True)
@@ -291,7 +294,10 @@ class PatternIndex:
             raise PatternIndexError(f"no patterns found in {root}")
         for folder in sorted(p for p in root.iterdir() if p.is_dir()):
             support_yaml = folder / f"{folder.name}.ibek.support.yaml"
-            if not support_yaml.is_file() or (only and not only(folder.name)):
+            if not support_yaml.is_file():
+                continue
+            if only and not only(folder.name):
+                self.unindexed[folder.name] = f"{library}@{version}"
                 continue
             data = yml.load(support_yaml.read_text())
             module = data.get("module")
@@ -324,6 +330,7 @@ class PatternIndex:
             )
         self.libraries.update(other.libraries)
         self.patterns.update(other.patterns)
+        self.unindexed.update(other.unindexed)
 
     def pattern_for_module(self, module: str) -> Pattern | None:
         """The pattern builder2ibek may use for a module, or None.

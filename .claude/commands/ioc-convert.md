@@ -133,7 +133,7 @@ with just parameters and a `databases` section — no `pre_init` or `post_init`.
 
 **Beamline modules (`BL<nn><x>-BUILDER`, `BL<nn><x>`)** — these get **vendored
 as runtime patterns** from `ibek-runtime-support`, never built into the image.
-xml2yaml routes a `BL<nn><x>` module (`BL21I`, `BL19I`, …) to its pattern and
+xml2yaml routes a beamline module (`BL21I`, `BL15I-BUILDER`, …) to its pattern and
 drops each entity the pattern does not take, with a warning and a
 `DROPPED FOR MANUAL REVIEW` comment at the top of the `ioc.yaml`. Report those
 to the user; to restore one, add its entity model to the pattern folder rather

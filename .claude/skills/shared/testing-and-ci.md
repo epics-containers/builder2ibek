@@ -55,7 +55,7 @@ Because conversions may use a newer release than the tests check, `plan()`
 keeps a module that has a generic model but is in neither `ALIGNED` nor
 `GENERIC_DIFFERS` build-time ("pattern not yet aligned with the generic
 model"). Taking the release into the pin is what decides it. A beamline module
-(`BL<nn><x>`) is outside both tables: it always goes to its pattern. Any other
+(`BL<nn><x>`, `BL<nn><x>-BUILDER`) is outside both tables: it always goes to its pattern. Any other
 module also stays build-time when an entity leaves a parameter to a generic
 default (which builder2ibek drops) that the pattern does not share.
 

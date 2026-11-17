@@ -5,6 +5,7 @@ Generic XML to YAML conversion functions
 import io
 import logging
 import re
+from collections import Counter
 from dataclasses import dataclass
 from dataclasses import field as dc_field
 from pathlib import Path
@@ -157,7 +158,8 @@ def describe(entity: dict[str, Any]) -> str:
 def drop_unpatterned_entities(ioc: Generic_IOC) -> list[DroppedEntity]:
     """Take out of the IOC the beamline entities no runtime pattern takes.
 
-    Warns once per entity dropped, and returns them for the ioc.yaml comment.
+    Warns once per distinct entity dropped, with a count of identical ones,
+    and returns them for the ioc.yaml comment.
     Strips from each beamline entity kept the parameters its pattern model
     defaults to the same value. Raises BeamlinePatternError when the IOC has
     beamline entities and ibek-runtime-support cannot be indexed: nothing is
@@ -192,10 +194,14 @@ def drop_unpatterned_entities(ioc: Generic_IOC) -> list[DroppedEntity]:
             index.strip_defaults(entity)  # type: ignore[arg-type]
     ioc.entities = list(kept)  # type: ignore[arg-type]
     stem = Path(ioc.source_file).stem
-    ioc.extra_warnings += [
+    # identical entities, e.g. one template loaded many times, warn once
+    counts = Counter(
         f"{stem}: dropped {describe(dict(d.entity))} from the ioc.yaml for "
         f"manual review: {d.reason}"
         for d in dropped
+    )
+    ioc.extra_warnings += [
+        warning if n == 1 else f"{warning} (x{n})" for warning, n in counts.items()
     ]
     return dropped
 

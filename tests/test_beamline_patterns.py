@@ -41,7 +41,7 @@ BASE_RECORDS = {
 CALC_RECORDS = {"scalcout", "acalcout", "sseq", "transform", "swait"}
 STD_RECORDS = {"epid", "throttle", "timestamp"}
 RUNTIME_IMAGE_RECORDS = BASE_RECORDS | CALC_RECORDS | STD_RECORDS | {"busy", "asyn"}
-BEAMLINE_PATTERNS = ["BL04I", "BL11I", "BL19I", "BL21I"]
+BEAMLINE_PATTERNS = ["BL04I", "BL11I", "BL15I-BUILDER", "BL19I", "BL21I"]
 
 
 @pytest.fixture(scope="module")
@@ -103,6 +103,50 @@ def test_convert_drops_what_the_pattern_does_not_take(tmp_path: Path):
     assert "dropped BL20J.someTemplate (name=X, P=BL20J-MO-X-01)" in warnings
     # the pattern is listed, outside a services repo
     assert f"would add runtime pattern {BL21I}" in result.notes
+
+
+def test_beamline_builder_module_goes_to_its_pattern(tmp_path: Path):
+    """A BL<nn><x>-BUILDER module is a beamline module like BL21I."""
+    xml = _write_xml(
+        tmp_path,
+        '<BL15I-BUILDER.auto_BL15I_SumTheDiode DIODE="BL15I-DI-FEMTO-01:OUTPUT" '
+        'P="BL15I-DI-FEMTO-01" SHUTTER="BL15I-EA-FSHTR-01:STATE" '
+        'gda_name="d1.sum" name="D1.Sum"/>',
+    )
+    out = tmp_path / "ioc.yaml"
+    result = convert_file(xml, out, "/epics/ibek-defs/ioc.schema.json")
+    entities = YAML(typ="safe").load(out.read_text())["entities"]
+    assert "BL15I-BUILDER.auto_BL15I_SumTheDiode" in [e["type"] for e in entities]
+    assert not [w for w in result.warnings if "dropped" in w]
+    ref = f"{SUPPORT_LIBRARY}:BL15I-BUILDER@{SUPPORT_PATTERN_TAG}"
+    assert f"would add runtime pattern {ref}" in result.notes
+
+
+def test_identical_drops_warn_once_with_a_count(tmp_path: Path):
+    xml = _write_xml(tmp_path, KEPT, NO_MODEL, NO_MODEL, NO_MODEL)
+    out = tmp_path / "ioc.yaml"
+    result = convert_file(xml, out, "/epics/ibek-defs/ioc.schema.json")
+    drops = [w for w in result.warnings if "dropped" in w]
+    assert len(drops) == 1
+    assert drops[0].endswith(f"no model BL21I.FS1Control in {BL21I} (x3)")
+    # the comment still lists each one
+    assert out.read_text().count("#   - type: BL21I.FS1Control") == 3
+
+
+def test_unindexed_pattern_module_is_a_warning(
+    index: PatternIndex, tmp_path: Path, monkeypatch
+):
+    """A module whose ibek-runtime-support pattern is not indexed keeps its
+    entities, with a warning rather than silently."""
+    assert "detectorPlugins" in index.unindexed
+    monkeypatch.setattr(vendor_patterns, "pattern_index", lambda: index)
+    entity = {"type": "detectorPlugins.detectorPlugins", "PREFIX": "X"}
+    report = vendor_patterns.add_patterns([entity], tmp_path / "ioc.yaml")
+    assert report.warnings == [
+        f"detectorPlugins has a pattern in {index.unindexed['detectorPlugins']} "
+        "that builder2ibek does not use: its entities are kept, so add the "
+        "pattern by hand or use an image that builds detectorPlugins"
+    ]
 
 
 def test_convert_without_beamline_modules_has_no_comment(tmp_path: Path):

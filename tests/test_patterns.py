@@ -95,34 +95,43 @@ def test_every_pattern_folder_is_indexed(index: PatternIndex):
 
 
 def test_support_library_routes_only_beamline_modules(index: PatternIndex):
-    """BL15I-BUILDER and detectorPlugins get no pattern from ibek-runtime-support.
+    """BL15I-BUILDER is routed to its pattern; detectorPlugins is not indexed.
 
     A detectorPlugins-only IOC is then never moved onto the streamdevice
     runtime image, which has no areaDetector.
     """
     folders = {p.name for p in (REPO_ROOT / SUPPORT_LIBRARY).iterdir()}
     assert {"BL15I-BUILDER", "detectorPlugins"} <= folders
-    assert "BL15I-BUILDER" not in index.patterns
+    assert index.patterns["BL15I-BUILDER"].library == SUPPORT_LIBRARY
     assert "detectorPlugins" not in index.patterns
+    assert index.unindexed["detectorPlugins"].startswith(f"{SUPPORT_LIBRARY}@")
     plan = index.plan(
         [
             {"type": "detectorPlugins.detectorPlugins", "PREFIX": "X"},
-            {"type": "BL15I-BUILDER.auto_BL15I_SumTheDiode", "P": "X"},
+            {
+                "type": "BL15I-BUILDER.auto_BL15I_SumTheDiode",
+                "P": "X",
+                "SHUTTER": "S",
+                "DIODE": "D",
+            },
         ]
     )
-    assert plan.patterns == [] and plan.build_time == {}
+    assert plan.refs == [index.patterns["BL15I-BUILDER"].ref]
+    assert plan.build_time == {}
 
 
 def test_beamline_modules():
-    beamline = ["BL04I", "BL11I", "BL19I", "BL21I", "BL20J"]
-    other = ["BL15I-BUILDER", "BL46P-BUILDER", "I19Server", "BLGui"]
+    beamline = [
+        "BL04I", "BL11I", "BL19I", "BL21I", "BL20J", "BL15I-BUILDER", "BL46P-BUILDER"
+    ]  # fmt: skip
+    other = ["I19Server", "BLGui", "BL15I-BUILDERX", "BL15-BUILDER", "detectorPlugins"]
     assert all(map(is_beamline_module, beamline))
     assert not any(map(is_beamline_module, other))
 
 
 def test_beamline_patterns_are_in_ibek_runtime_support(index: PatternIndex):
     beamline = {m: p for m, p in index.patterns.items() if is_beamline_module(m)}
-    assert {"BL04I", "BL11I", "BL19I", "BL21I"} <= beamline.keys()
+    assert {"BL04I", "BL11I", "BL15I-BUILDER", "BL19I", "BL21I"} <= beamline.keys()
     assert {p.library for p in beamline.values()} == {SUPPORT_LIBRARY}
 
 

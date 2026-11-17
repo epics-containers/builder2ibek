@@ -69,6 +69,7 @@ def _schema(types: frozenset[str]) -> dict:
 
 class FakeIndex:
     failures: dict[str, str] = {}
+    unindexed: dict[str, str] = {}
 
     def plan(self, entities):
         return PatternPlan(patterns=[ATTO, SCROLL])
@@ -206,6 +207,7 @@ def test_beamline_pattern_is_added_even_when_the_image_has_it(
 
     class Index:
         failures: dict[str, str] = {}
+        unindexed: dict[str, str] = {}
 
         def plan(self, entities):
             return PatternPlan(patterns=[SCROLL, BL21I])
