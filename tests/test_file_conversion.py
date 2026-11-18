@@ -101,8 +101,9 @@ def test_dls_models_available():
 
 @requires_support
 def test_converting_twice_in_one_process_gives_the_same_yaml(tmp_path: Path):
-    """beamline2yaml and reconvert convert many XMLs in one process; this
-    sample numbers interrupt vectors and looks its valves' crates up."""
+    """beamline2yaml and reconvert convert many XMLs in one process. This
+    sample numbers its interrupt vectors from a converter's counter, so a
+    counter carried over from the first conversion changes the second YAML."""
     sample_xml = SAMPLES / "BL19I-VA-IOC-01.xml"
     outputs = []
     for run in ("first", "second"):
