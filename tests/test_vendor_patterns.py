@@ -342,8 +342,10 @@ def test_set_image_replaces_only_the_image_line(tmp_path: Path):
     )
 
 
-def test_set_image_never_downgrades(tmp_path: Path, ibek):
+def test_set_image_never_downgrades(tmp_path: Path, ibek, monkeypatch):
     newer = f"{RUNTIME_IMAGE}:2.0ec3"
+    # the module report reads the kept image's schema: no such tag is published
+    monkeypatch.setitem(SCHEMAS, newer, SCHEMAS[RUNTIME])
     instance = _instance(tmp_path, newer)
 
     report = add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml")
