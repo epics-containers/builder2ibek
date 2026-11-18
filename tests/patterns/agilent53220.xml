@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<agilent53220.agilent53220 P="BL19I-EA-FTIM-01" PORT="ftim" Q="" gda_desc="Chopper Freq Ana" name="FANA"/>
+</components>

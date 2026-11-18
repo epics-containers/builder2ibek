@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<SycosH-Hot.SycosH_Hot P="BL11I-EA-HUMC-01" PORT="TS_6" Q="" name="BL11I-EA-HUMC-01"/>
+</components>

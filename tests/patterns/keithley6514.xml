@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<keithley6514.keithley6514 A="10" P="BL11I-EA-K65-01" PORT="k6514" R=":IAMP:" name="K6514"/>
+</components>

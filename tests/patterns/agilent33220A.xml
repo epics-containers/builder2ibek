@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<agilent33220A.agilent33220A P="BL11I-EA-FGEN-01" PORT="FGEN" Q="" gda_desc="Function generator" name="BL11I-EA-FGEN-01"/>
+</components>

@@ -497,17 +497,21 @@ def test_aligned_module_with_a_default_conflict_stays_build_time(
 ):
     """An ALIGNED module whose entity leaves a parameter to a generic default
     the pattern does not share stays build-time."""
-    module = "laudaRE2xx"
+    module = "oxCryo"
     assert module in ALIGNED
     entities = _convert(FIXTURES / f"{module}.xml")
     assert index.plan(entities).patterns == [index.patterns[module]]
 
-    (entity,) = [e for e in entities if str(e["type"]).startswith(f"{module}.")]
-    params = index.param_specs(str(entity["type"]))
-    assert params is not None
-    # a parameter the pattern defaults, which builder2ibek would leave out of
-    # the entity if its value were the generic default
-    left_out = sorted(p for p in params if "default" in params[p])[0]
+    # the first entity with a parameter the pattern defaults, which
+    # builder2ibek would leave out of the entity if its value were the generic
+    # default
+    entity, left_out = next(
+        (e, sorted(p for p in params if "default" in params[p])[0])
+        for e in entities
+        if str(e["type"]).startswith(f"{module}.")
+        and (params := index.param_specs(str(e["type"])))
+        and any("default" in spec for spec in params.values())
+    )
     entities = [
         {k: v for k, v in e.items() if e is not entity or k != left_out}
         for e in entities
