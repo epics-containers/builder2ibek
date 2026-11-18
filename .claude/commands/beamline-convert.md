@@ -99,10 +99,12 @@ It writes the planned folders from `.ioc_template`, runs xml2yaml with the
 chosen image (which adds the runtime patterns and sets the image in
 `values.yaml`), and schema-checks each `ioc.yaml` with `ibek runtime
 generate2` in a temporary EPICS_ROOT, with the support YAMLs of the patterns
-the image installs. Nothing that fails stays written: if its conversion fails,
-a pattern cannot be added, or the schema check fails, an IOC's new folder and
-the fastcs instances it created are removed and a replaced legacy folder is
-put back; its status is `error`. An interrupt undoes the whole run.
+the image installs. If an IOC's conversion fails or a pattern cannot be added,
+its status is `error`: its new folder is removed and a replaced legacy folder
+is put back. An IOC that fails the schema check keeps its folder, with the
+`ioc.yaml` to fix, and the validator's output is in the report (`schema_error`
+with `--json`). The services repo is a git repo: `git status` shows what a run
+wrote, and `git checkout`/`git clean` revert it.
 Exit codes: 0 clean, 1 a failed plan step (nothing written), 2 conversion
 errors, 3 schema check failures. `schema ok` means the `ioc.yaml` matches the
 schema, not that the IOC can be deployed.

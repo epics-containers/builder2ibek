@@ -45,11 +45,12 @@ ioc.yaml with ``ibek runtime generate2`` in a temporary EPICS_ROOT, against
 this checkout's support YAMLs, those the IOC vendors, and those of the
 patterns its image installs. No IOC is started. It writes nothing when a step
 of the plan failed: a pattern library that could not be indexed, a GitHub or
-GitLab lookup, or no generic IOC schema at all. Nothing that fails stays
-written: a legacy folder is moved aside before it is replaced and put back,
-and a new folder, with the fastcs-pandablocks instances its conversion
-created, is removed, when the conversion or the schema check fails; an
-interrupt undoes the whole run.
+GitLab lookup, or no generic IOC schema at all. A legacy folder is moved aside
+while its replacement is converted: when the conversion fails, the folder made
+for it is removed and the legacy one put back. An IOC whose ioc.yaml fails the
+schema check keeps its folder, and the validator's output is reported. The
+services repo is a git repo: ``git status`` shows, and ``git checkout`` and
+``git clean`` revert, what a run wrote.
 """
 
 from __future__ import annotations
@@ -240,10 +241,7 @@ def support_models() -> dict[str, frozenset[str]]:
     models: dict[str, frozenset[str]] = {}
     yaml = YAML(typ="safe")
     for path in sorted(REPO_ROOT.glob("ibek-support*/*/*.ibek.support.yaml")):
-        try:
-            data = yaml.load(path.read_text()) or {}
-        except Exception:  # noqa: BLE001 -- a broken support YAML matches nothing
-            continue
+        data = yaml.load(path.read_text()) or {}
         module = str(data.get("module") or path.parent.name)
         names = {
             f"{module}.{e['name']}"
@@ -779,100 +777,24 @@ def _failures(plan: Plan) -> list[str]:
 
 
 def backup_path(services: Path, folder: str) -> Path:
-    """Where --apply keeps an IOC's existing folder until its new one is
-    converted and validated."""
+    """Where --apply keeps a legacy folder while its replacement is converted."""
     return services / f".{folder}.beamline2yaml-backup"
 
 
-@dataclass
-class _Written:
-    """What --apply wrote for one IOC, so that it can be undone."""
-
-    folder: Path
-    #: where its previous folder is kept aside, None if there was none
-    backup: Path | None = None
-    #: the folder did not exist before: undoing it removes it
-    new: bool = False
-    #: the folders beside it this run created, e.g. fastcs-pandablocks instances
-    siblings: list[Path] = field(default_factory=list)
-
-
-def _undo(written: _Written) -> list[str]:
-    """Remove what was written for an IOC and put back its previous folder.
-
-    Every step is attempted, whatever an earlier one raised; returns what
-    could not be done.
-    """
-    errors: list[str] = []
-    for sibling in written.siblings:
-        try:
-            shutil.rmtree(sibling)
-        except FileNotFoundError:
-            pass
-        except OSError as e:
-            errors.append(f"cannot remove {sibling}: {e}")
-    if written.new or written.backup is not None:
-        try:
-            if written.folder.is_symlink():
-                written.folder.unlink()
-            elif os.path.lexists(written.folder):
-                shutil.rmtree(written.folder)
-        except OSError as e:
-            errors.append(f"cannot remove {written.folder}: {e}")
-    if written.backup is not None:
-        try:
-            written.backup.rename(written.folder)
-        except OSError as e:
-            errors.append(f"cannot put {written.backup} back to {written.folder}: {e}")
-    return errors
-
-
-def _undo_all(written: Iterable[_Written]) -> list[str]:
-    """Undo every IOC's writes, the last written first, each one whatever the
-    others raised."""
-    return [error for w in reversed(list(written)) for error in _undo(w)]
-
-
-def _make_folder(services: Path, entry: Entry) -> Path | None:
-    """(Re)make an IOC's folder from .ioc_template with its values.yaml header.
-
-    A dev-c7 legacy folder is moved aside first; returns where, so that it can
-    be put back (see :func:`_undo`). After a failure nothing it wrote is left.
-    """
+def _make_folder(services: Path, entry: Entry) -> None:
+    """Make an IOC's folder from .ioc_template with its values.yaml header."""
     folder = services / entry.folder
-    backup = None
-    if entry.action == "replace":
-        if _folder_kind(folder) != "dev-c7 legacy" or folder.is_symlink():
-            raise FileExistsError(f"{folder} is no longer a dev-c7 legacy folder")
-        backup = _move_aside(services, entry.folder)
-    elif os.path.lexists(folder):
-        raise FileExistsError(f"{folder} appeared since the plan was made")
-    try:
-        shutil.copytree(services / TEMPLATE, folder, symlinks=True)
-        values = folder / "values.yaml"
-        values.write_text(add_header(values.read_text(), entry.header))
-    except BaseException as e:
-        for error in _undo(_Written(folder, backup, new=backup is None)):
-            e.add_note(error)
-        raise
-    return backup
+    shutil.copytree(services / TEMPLATE, folder, symlinks=True)
+    values = folder / "values.yaml"
+    values.write_text(add_header(values.read_text(), entry.header))
 
 
-def _move_aside(services: Path, name: str, copy: bool = False) -> Path:
-    """Move, or copy, an IOC's folder to its backup path."""
-    folder = services / name
-    backup = backup_path(services, name)
-    if os.path.lexists(backup):
-        raise FileExistsError(f"{backup} is in the way: move it back or remove it")
-    if copy:
-        try:
-            shutil.copytree(folder, backup, symlinks=True)
-        except BaseException:
-            shutil.rmtree(backup, ignore_errors=True)
-            raise
-    else:
-        folder.rename(backup)
-    return backup
+def _restore(folder: Path, backup: Path | None) -> None:
+    """Remove a folder written for a conversion, and put back the legacy
+    folder it replaced."""
+    shutil.rmtree(folder, ignore_errors=True)
+    if backup is not None:
+        backup.rename(folder)
 
 
 def _conversion_problem(entry: Entry, result: ConvertResult) -> str:
@@ -902,12 +824,9 @@ def _installed_support_yamls(entry: Entry, config: Path) -> list[Path]:
     cand = _image_candidate(entry.image)
     if cand is None or not cand.installed:
         return []
-    vendored: set[str | None] = set()
-    for path in config.rglob("*.ibek.support.yaml"):
-        try:
-            vendored.add(support_yaml_module(path))
-        except Exception:  # noqa: BLE001 -- generate2 reports a broken one
-            continue
+    vendored = {
+        support_yaml_module(path) for path in config.rglob("*.ibek.support.yaml")
+    }
     return [p.support_yaml for p in cand.installed if p.module not in vendored]
 
 
@@ -917,11 +836,10 @@ def apply_plan(
     """Write and convert the planned folders. Raises PlanFailedError, writing
     nothing, when a step of the plan failed.
 
-    Nothing that failed stays written: an IOC whose conversion fails, or, with
-    ``validate``, whose ioc.yaml fails the schema check, has its new folder
-    and the fastcs-pandablocks instances it created removed, and its previous
-    folder put back; its status is "error". An interrupt undoes every IOC this
-    run wrote. Every undo is attempted, whatever another one raised.
+    An IOC whose conversion fails has status "error": the folder made for it
+    is removed and the legacy folder it replaced is put back. With
+    ``validate``, an IOC whose ioc.yaml fails the schema check keeps its
+    folder, and entry.schema_error says why.
     """
     if plan.failures:
         raise PlanFailedError(
@@ -933,68 +851,27 @@ def apply_plan(
     descriptions = descriptions or {}
     by_name = {e.ioc: e for e in plan.entries}
     configs: dict[str, Path] = {}
-    # what each IOC wrote, until it is validated
-    written: dict[str, _Written] = {}
-    try:
-        for entry in plan.entries:
-            if entry.action in ("add", "replace", "fastcs"):
-                done = _apply_entry(services, entry, descriptions)
-                if done is not None:
-                    written[entry.ioc] = done
-                if entry.status == "ok":
-                    configs[entry.ioc] = services / entry.folder / "config"
-        if validate and configs:
-            support_yamls = {
-                ioc: _installed_support_yamls(by_name[ioc], config)
-                for ioc, config in configs.items()
-            }
-            for v in validate_configs(configs, support_yamls):
-                entry = by_name[v["ioc_name"]]
-                entry.schema = v["status"]
-                entry.schema_error = v.get("stderr", "")
-                if entry.schema == "ok":
-                    continue
-                entry.status = "error"
-                done = written.pop(entry.ioc)
-                errors = _undo(done)
-                undone = (
-                    "the previous folder is put back"
-                    if done.backup is not None
-                    else "its folder is removed"
-                )
-                entry.warnings.append(
-                    f"schema validation failed: {undone}"
-                    + "".join(f"; {error}" for error in errors)
-                )
-    except BaseException as e:
-        for error in _undo_all(written.values()):
-            e.add_note(error)
-            print(f"error: {error}", file=sys.stderr)
-        raise
-    for ioc, done in written.items():
-        if done.backup is not None:
-            try:
-                shutil.rmtree(done.backup)
-            except OSError as e:
-                by_name[ioc].warnings.append(f"cannot remove {done.backup}: {e}")
+    for entry in plan.entries:
+        if entry.action in ("add", "replace", "fastcs"):
+            _apply_entry(services, entry, descriptions)
+            if entry.status == "ok":
+                configs[entry.ioc] = services / entry.folder / "config"
+    if validate and configs:
+        support_yamls = {
+            ioc: _installed_support_yamls(by_name[ioc], config)
+            for ioc, config in configs.items()
+        }
+        for v in validate_configs(configs, support_yamls):
+            entry = by_name[v["ioc_name"]]
+            entry.schema = v["status"]
+            entry.schema_error = v.get("stderr", "")
 
 
-def _created(services: Path, before: set[str], *keep: str) -> list[Path]:
-    """The folders in ``services`` that are not in ``before`` nor ``keep``."""
-    try:
-        now = set(os.listdir(services))
-    except OSError:
-        return []
-    return [services / name for name in sorted(now - before - set(keep))]
-
-
-def _apply_entry(
-    services: Path, entry: Entry, descriptions: Mapping[str, str]
-) -> _Written | None:
-    """Write and convert one IOC's folder. Returns what it wrote, or None
-    after a failure: then nothing it wrote is left, the previous folder is
-    back in place and entry.status is "error"; an interrupt re-raises after
-    that."""
+def _apply_entry(services: Path, entry: Entry, descriptions: Mapping[str, str]) -> None:
+    """Write and convert one IOC's folder, and set entry.status. After a
+    failed conversion the folder made for it is removed and the legacy folder
+    it replaced is back in place; xml2yaml alone writes a fastcs instance, so
+    nothing is put back for one."""
     folder = services / entry.folder
     yaml = folder / "config" / "ioc.yaml"
     image, image_types = None, None
@@ -1002,18 +879,14 @@ def _apply_entry(
         image = entry.image
         cand = _image_candidate(entry.image)
         image_types = cand.types if cand is not None else None
-    before = set(os.listdir(services))
-    done = _Written(folder, new=not os.path.lexists(folder))
-    backup_name = backup_path(services, entry.folder).name
-    made = False
+    made, backup = False, None
     try:
-        if entry.action == "fastcs":
-            # converted in place, so a copy is kept
-            if not done.new:
-                done.backup = _move_aside(services, entry.folder, copy=True)
-        else:
-            done.backup = _make_folder(services, entry)
-        made = True
+        if entry.action != "fastcs":
+            if entry.action == "replace":
+                backup = backup_path(services, entry.folder)
+                folder.rename(backup)
+            made = True
+            _make_folder(services, entry)
         with contextlib.redirect_stdout(sys.stderr):
             result = convert_file(
                 Path(entry.xml),
@@ -1023,27 +896,18 @@ def _apply_entry(
                 image=image,
                 image_types=image_types,
             )
-        # sibling fastcs-pandablocks instances, written before the patterns
-        done.siblings = _created(services, before, entry.folder, backup_name)
         problem = _conversion_problem(entry, result)
         if problem:
             raise ConversionFailedError(problem)
-    except BaseException as e:
-        errors: list[str] = []
+    except Exception as e:  # noqa: BLE001 -- report any converter error
         if made:
-            done.siblings = _created(services, before, entry.folder, backup_name)
-            errors = _undo(done)
-        if not isinstance(e, Exception):
-            for error in errors:
-                e.add_note(error)
-            raise
+            _restore(folder, backup)
         entry.status = "error"
-        put_back = "; the previous folder is put back" if done.backup else ""
-        entry.warnings.append(
-            f"conversion failed: {type(e).__name__}: {e}{put_back}"
-            + "".join(f"; {error}" for error in errors)
-        )
-        return None
+        put_back = "; the dev-c7 legacy folder is put back" if backup else ""
+        entry.warnings.append(f"conversion failed: {type(e).__name__}: {e}{put_back}")
+        return
+    if backup is not None:
+        shutil.rmtree(backup)
     # the conversion's module report replaces the plan's: its notes are
     # rendered from entry.modules, its unresolved modules are warnings
     old_warnings = module_report(entry.modules)[1]
@@ -1063,7 +927,6 @@ def _apply_entry(
             text = values.read_text()
             if entry.header.split(".")[0] not in text.replace("\n# ", " "):
                 values.write_text(add_header(text, entry.header))
-    return done
 
 
 def _status(e: Entry) -> str:
@@ -1121,7 +984,7 @@ def render_plan(plan: Plan, applied: bool) -> str:
         out += ["", "schema validation failures:"]
         for e in failed:
             out.append(f"  {e.ioc}:")
-            out += [f"      {line}" for line in e.schema_error.splitlines()[-5:]]
+            out += [f"      {line}" for line in e.schema_error.splitlines()]
     if plan.images:
         out += ["", "generic IOCs not matched:"]
         out += [f"  {i['image']}: {i['problem']}" for i in plan.images]
