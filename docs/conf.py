@@ -118,8 +118,9 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3/", None)}
 # A dictionary of graphviz graph attributes for inheritance diagrams.
 inheritance_graph_attrs = {"rankdir": "TB"}
 
-# Ignore localhost links for periodic check that links in docs are valid
-linkcheck_ignore = [r"http://localhost:\d+/"]
+# Ignore links the periodic link check cannot reach: localhost, and Diamond's
+# internal GitLab
+linkcheck_ignore = [r"http://localhost:\d+/", r"https://gitlab\.diamond\.ac\.uk/"]
 
 # Set copy-button to ignore python and bash prompts
 # https://sphinx-copybutton.readthedocs.io/en/latest/use.html#using-regexp-prompt-identifiers

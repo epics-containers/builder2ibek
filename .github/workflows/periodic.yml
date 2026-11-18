@@ -18,6 +18,6 @@ jobs:
   pin-freshness:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Check submodule pins against remote main or the newest release tag
         run: python3 tests/check_pin_freshness.py

@@ -356,6 +356,31 @@ def test_dedicated_refuses_a_prefix_served_by_a_0_1_0_instance(tmp_path: Path):
     assert not (instance / "config" / "controller.yaml").exists()
 
 
+def test_refuses_a_panda_served_by_a_hand_made_fastcs_yaml(tmp_path: Path):
+    # hand-made fastcs-pandablocks instances name the file config/fastcs.yaml
+    services = _services_repo(tmp_path)
+    existing = services / "bl01c-ea-panda-01" / "config"
+    existing.mkdir(parents=True)
+    (existing / "fastcs.yaml").write_text(
+        "controllers:\n"
+        "  - id: BL01C-MO-PANDA-01\n"
+        "    type: fastcs_pandablocks.PandaController\n"
+        "    address: bl01c-ea-panda-01\n"
+        "transport:\n"
+        "  - epicspva: {}\n"
+        "    gui:\n"
+        '      title: "PandABox"\n'
+        "      output_dir: /epics/opi\n"
+    )
+    yaml = services / IOC.lower() / "config" / "ioc.yaml"
+    result = convert_file(_xml(tmp_path), yaml, SCHEMA)
+
+    assert result.fastcs_instances == []
+    assert result.refused == ["BL01C-MO-PANDA-01"]
+    (refusal,) = [w for w in result.warnings if "refused" in w]
+    assert str(services / "bl01c-ea-panda-01") in refusal
+
+
 def test_mixed_refuses_an_address_already_served(tmp_path: Path):
     services = _services_repo(tmp_path)
     existing = services / "some-other-panda" / "config"

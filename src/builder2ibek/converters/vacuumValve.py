@@ -10,6 +10,11 @@ read100Objects: dict[str, dict[str, str]] = {}
 vacValveDevices: set[str] = set()
 
 
+def reset():
+    read100Objects.clear()
+    vacValveDevices.clear()
+
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """

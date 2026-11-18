@@ -519,6 +519,8 @@ def _vendor(
     if image == runtime and current != runtime:
         done, message = _set_image(instance, runtime)
         (report.notes if done or current else report.warnings).append(message)
+        if not done and current:
+            image = current  # values.yaml still names it
 
     lock = RuntimeLock(instance / RUNTIME_LOCK_NAME)
     added = False

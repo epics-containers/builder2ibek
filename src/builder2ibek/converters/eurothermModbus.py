@@ -6,6 +6,11 @@ xml_component = "eurothermModbus"
 _modbus_prefix_index = 1
 
 
+def reset():
+    global _modbus_prefix_index
+    _modbus_prefix_index = 1
+
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """

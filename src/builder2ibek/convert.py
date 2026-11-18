@@ -16,7 +16,7 @@ from ruamel.yaml import YAML, CommentedMap
 from builder2ibek.builder import Builder, Element
 from builder2ibek.converters.records import RECORDS_DB, generated, keep_own_records_db
 from builder2ibek.fastcs_panda import record_wont_convert, split_pandas, write_fastcs
-from builder2ibek.moduleinfos import finalizers, module_infos
+from builder2ibek.moduleinfos import finalizers, module_infos, resetters
 from builder2ibek.patterns import (
     SUPPORT_LIBRARY,
     BeamlinePatternError,
@@ -313,6 +313,10 @@ def dispatch(
 
     # PandAs become fastcs-pandablocks instances, not ioc.yaml entities
     ioc.panda_split = split_pandas(builder, ioc)
+
+    # no converter carries state over from the IOC converted before this one
+    for reset in resetters:
+        reset()
 
     do_dispatch(builder, ioc)
 
