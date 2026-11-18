@@ -10,6 +10,11 @@ xml_component = "pmacCoord"
 _cs_ref_counter = 0
 
 
+def reset():
+    global _cs_ref_counter
+    _cs_ref_counter = 0
+
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """

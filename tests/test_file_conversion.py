@@ -6,13 +6,11 @@ Tests to validate the full conversion pipeline:
 
 import subprocess
 import tempfile
-from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
 
 from builder2ibek.convert import convert_file
-from builder2ibek.converters.epics_base import InterruptVector
 from builder2ibek.vendor_patterns import (
     IMAGE_PLACEHOLDER,
     RUNTIME_IMAGE,
@@ -101,13 +99,19 @@ def test_dls_models_available():
     )
 
 
-@pytest.fixture(autouse=True)
-def _reset_interrupt_vectors() -> Iterator[None]:
-    """Each sample numbers its interrupt vectors from the start, whatever the
-    test before it on this worker did, failed or not."""
-    InterruptVector.reset()
-    yield
-    InterruptVector.reset()
+@requires_support
+def test_converting_twice_in_one_process_gives_the_same_yaml(tmp_path: Path):
+    """beamline2yaml and reconvert convert many XMLs in one process; this
+    sample numbers interrupt vectors and looks its valves' crates up."""
+    sample_xml = SAMPLES / "BL19I-VA-IOC-01.xml"
+    outputs = []
+    for run in ("first", "second"):
+        out_yaml = tmp_path / run / "ioc.yaml"
+        out_yaml.parent.mkdir()
+        convert_file(sample_xml, out_yaml, "/epics/ibek-defs/ioc.schema.json")
+        outputs.append(out_yaml.read_text())
+
+    assert outputs[0] == outputs[1]
 
 
 @requires_support

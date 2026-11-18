@@ -25,6 +25,10 @@ class InterruptVector:
         cls._interrupt_vector = 1
 
 
+def reset():
+    InterruptVector.reset()
+
+
 # a decorator that will be used to add an interrupt vector to the entity
 def add_interrupt_vector():
     vec = Entity(asdict(InterruptVector()))

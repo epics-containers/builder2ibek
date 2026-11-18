@@ -24,6 +24,11 @@ module_infos: dict[str, ModuleInfo] = {}
 # converted, allowing cross-entity fix-ups that need the complete entity list.
 finalizers: list[Callable] = []
 
+# optional per-IOC state resets. A converter module that keeps state while it
+# converts an IOC (a counter, a lookup of earlier entities) defines a `reset()`
+# function, which runs before each IOC is converted.
+resetters: list[Callable] = []
+
 
 # automatically load all of the convert handlers in ./converters into the
 # module_infos list using importlib
@@ -35,6 +40,9 @@ for converter in converters:
             finalize = getattr(module, "finalize", None)
             if callable(finalize):
                 finalizers.append(finalize)
+            reset = getattr(module, "reset", None)
+            if callable(reset):
+                resetters.append(reset)
 
             xml_component = module.xml_component
             info = ModuleInfo(

@@ -7,6 +7,10 @@ xml_component = "temperature"
 read100Objects: dict[str, dict[str, str]] = {}
 
 
+def reset():
+    read100Objects.clear()
+
+
 @globalHandler
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
