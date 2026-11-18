@@ -352,6 +352,19 @@ def test_set_image_never_downgrades(tmp_path: Path, ibek):
     assert f"values.yaml keeps {newer}, not older {RUNTIME}" in report.notes
 
 
+def test_modules_are_reported_against_the_image_values_yaml_keeps(
+    tmp_path: Path, ibek, monkeypatch
+):
+    newer = f"{RUNTIME_IMAGE}:2.0ec3"
+    monkeypatch.setitem(SCHEMAS, newer, frozenset({"epics.EpicsEnvSet"}))
+    instance = _instance(tmp_path, newer)
+
+    report = add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml")
+
+    # the kept image, unlike the latest release, does not build asyn
+    assert {s.module: s.kind for s in report.modules}["asyn"] == "unresolved"
+
+
 def test_only_ioc_yaml_is_an_instance(tmp_path: Path):
     instance = _instance(tmp_path, RUNTIME)
     assert vendor_patterns.instance_folder(instance / "config" / "ioc.yaml")
