@@ -20,6 +20,8 @@ XML = """<?xml version="1.0" ?>
   <slsDetector.slsDetector ADDR="0" P="BL01C-EA-DET-02" PORT="MYTHEN.DET"
     R=":DET:" TIMEOUT="10" configFile="/m.config" detectorIndex="0"
     name="MYTHEN.DET" useReceiver="0"/>
+  <ADCore.NDROI ADDR="0" NDARRAY_PORT="MYTHEN.DET" P="BL01C-EA-DET-02"
+    PORT="MYTHEN.ROI" R=":ROI:" TIMEOUT="1"/>
 </components>
 """
 
@@ -60,3 +62,4 @@ def test_slsdetector(tmp_path: Path):
     (warning,) = result.warnings
     assert "won't convert 1 slsDetector.slsDetector" in warning
     assert "useReceiver" in warning
+    assert "port MYTHEN.DET is still referenced by: ADCore.NDROI" in warning

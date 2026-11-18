@@ -1,3 +1,4 @@
+from builder2ibek.converters.adPython import downstream_note
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
@@ -22,7 +23,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "slsDetector":
         if "useReceiver" in entity:
-            ioc.wont_convert(entity, OLD_API)
+            ioc.wont_convert(entity, OLD_API, note=downstream_note(entity, ioc))
             return
         entity.type = "slsDetector.slsDetectorConfigure"
         entity.remove("name")
