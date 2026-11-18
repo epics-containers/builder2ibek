@@ -124,14 +124,14 @@ def test_unindexed_pattern_module_is_a_warning(
     """A module whose ibek-runtime-support folder is not indexed keeps its
     entities, with a warning rather than silently."""
     monkeypatch.setattr(vendor_patterns, "pattern_index", lambda: index)
-    entity = {"type": "detectorPlugins.detectorPlugins", "PREFIX": "X"}
+    entity = {"type": "BL15I-BUILDER.auto_BL15I_SumTheDiode", "P": "X"}
     report = vendor_patterns.add_patterns([entity], tmp_path / "ioc.yaml")
     assert report.warnings == [
-        f"detectorPlugins has a pattern in {index.unindexed['detectorPlugins']} "
+        f"BL15I-BUILDER has a pattern in {index.unindexed['BL15I-BUILDER']} "
         "that builder2ibek does not use: its entities are kept, so they need "
-        "an image that builds detectorPlugins",
+        "an image that builds BL15I-BUILDER",
         # and the module report says so too, with no generic model for it
-        "unresolved module detectorPlugins, nothing can run it: no generic model "
+        "unresolved module BL15I-BUILDER, nothing can run it: no generic model "
         "and no runtime pattern",
     ]
 

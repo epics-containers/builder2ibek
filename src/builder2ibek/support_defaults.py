@@ -5,7 +5,8 @@ that decide what an empty XML attribute becomes (see empty_attribute).
 
 The models are read from the submodules of a source checkout: ibek-support*
 for the generic models, and the pinned runtime pattern libraries
-(ibek-runtime-streamdevice, and the beamline modules of ibek-runtime-support)
+(ibek-runtime-streamdevice, and the modules of ibek-runtime-support that
+routes_to_support_pattern names)
 for the parameter types of pattern entities. An installed builder2ibek has
 none of them, so it finds no models and drops every empty attribute, leaving
 each to its model default.
@@ -38,6 +39,12 @@ _SUPPORT_PATTERNS = "ibek-runtime-support"
 # A beamline module holds the templates of one beamline, e.g. BL21I
 BEAMLINE_MODULE = re.compile(r"BL\d\d[A-Z]")
 
+# The modules of ibek-runtime-support other than beamline modules that
+# builder2ibek routes to their pattern. They have no generic model, and their
+# patterns load AreaDetector plugins, so an IOC that uses one needs an
+# AreaDetector generic IOC: never ioc-streamdevice-runtime.
+AREADETECTOR_PATTERNS = frozenset({"detectorPlugins"})
+
 
 # A beamline's builder repo, e.g. BL15I-BUILDER. It is never a runtime
 # pattern: its templates migrate into the beamline module, e.g. BL15I
@@ -56,6 +63,12 @@ def builder_module_target(module: str) -> str | None:
 def is_beamline_module(module: str) -> bool:
     """True for a beamline module, such as BL21I; BL15I-BUILDER is not one."""
     return BEAMLINE_MODULE.fullmatch(module) is not None
+
+
+def routes_to_support_pattern(module: str) -> bool:
+    """True for a module builder2ibek takes from its ibek-runtime-support
+    pattern: a beamline module, or one of :data:`AREADETECTOR_PATTERNS`."""
+    return is_beamline_module(module) or module in AREADETECTOR_PATTERNS
 
 
 def _models(base_dir: Path):
@@ -87,9 +100,10 @@ def _load_pattern_specs():
     for entity_type, params in _models(_project_root / _STREAMDEVICE_PATTERNS):
         _param_specs.setdefault(entity_type, _specs(params))
     # a beamline module never uses a generic model, so its pattern model
-    # replaces any; ibek-runtime-support's other modules are not used
+    # replaces any; ibek-runtime-support's other modules are used only when
+    # routes_to_support_pattern says so
     for entity_type, params in _models(_project_root / _SUPPORT_PATTERNS):
-        if is_beamline_module(entity_type.partition(".")[0]):
+        if routes_to_support_pattern(entity_type.partition(".")[0]):
             _param_specs[entity_type] = _specs(params)
 
 

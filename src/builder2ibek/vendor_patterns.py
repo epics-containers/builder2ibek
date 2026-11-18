@@ -78,6 +78,7 @@ from builder2ibek.patterns import (
     pattern_index,
     version_key,
 )
+from builder2ibek.support_defaults import AREADETECTOR_PATTERNS
 
 RUNTIME_IMAGE = "ghcr.io/epics-containers/ioc-streamdevice-runtime"
 # Fixes the ioc-streamdevice-runtime tag to use, in place of the latest release
@@ -276,8 +277,12 @@ def is_pattern_only(
     runtime_types: frozenset[str],
 ) -> bool:
     """True if every entity is from a planned pattern or one the
-    ioc-streamdevice-runtime image, of entity types ``runtime_types``, builds."""
-    modules = {p.module for p in plan.patterns}
+    ioc-streamdevice-runtime image, of entity types ``runtime_types``, builds.
+
+    An AreaDetector pattern's entities count for neither: the image has no
+    AreaDetector.
+    """
+    modules = {p.module for p in plan.patterns} - AREADETECTOR_PATTERNS
     return bool(modules) and all(
         module_of(e) in modules or e["type"] in runtime_types for e in entities
     )

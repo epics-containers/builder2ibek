@@ -40,15 +40,39 @@ pilatusDetectorConfig("PILATUS.cam", "PILATUS.camip", 1475, 195, 20000, 0, 0, 0,
 # NDFileNullConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr)
 NDFileNullConfigure("PILATUS.null.null", 1000, 0, "PILATUS.cam", 0)
 # NDROIConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
-NDROIConfigure("PILATUS.roi", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 1)
+NDROIConfigure("PILATUS.roi", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
+# NDROIConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
+NDROIConfigure("PILATUS.rois.roi1", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
+# NDROIConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
+NDROIConfigure("PILATUS.rois.roi2", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
+# NDROIConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
+NDROIConfigure("PILATUS.rois.roi3", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
+# NDROIConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
+NDROIConfigure("PILATUS.rois.roi4", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
+# NDROIConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
+NDROIConfigure("PILATUS.rois.roi5", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
+# NDROIConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
+NDROIConfigure("PILATUS.rois.roi6", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
 # ADCore path for manual NDTimeSeries.template to find base plugin template
 epicsEnvSet "EPICS_DB_INCLUDE_PATH", "$(ADCORE)/db"
 
 # NDStatsConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
-NDStatsConfigure("PILATUS.stat", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 1)
+NDStatsConfigure("PILATUS.stat", 15000, 0, "PILATUS.cam", 0, 0, 0, 0, 0, 16)
 
 # NDTimeSeriesConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxSignals, maxBuffers, maxMemory, priority, stackSize)
 NDTimeSeriesConfigure("PILATUS.stat_TS", 15000, 0, "PILATUS.stat", 1, 23, 0, 0, 0, 0)
+NDStatsConfigure("PILATUS.stats.stat1", 15000, 0, "PILATUS.rois.roi1", 0, 0, 0, 0, 0, 16)
+NDTimeSeriesConfigure("PILATUS.stats.stat1_TS", 15000, 0, "PILATUS.stats.stat1", 1, 23, 0, 0, 0, 0)
+NDStatsConfigure("PILATUS.stats.stat2", 15000, 0, "PILATUS.rois.roi2", 0, 0, 0, 0, 0, 16)
+NDTimeSeriesConfigure("PILATUS.stats.stat2_TS", 15000, 0, "PILATUS.stats.stat2", 1, 23, 0, 0, 0, 0)
+NDStatsConfigure("PILATUS.stats.stat3", 15000, 0, "PILATUS.rois.roi3", 0, 0, 0, 0, 0, 16)
+NDTimeSeriesConfigure("PILATUS.stats.stat3_TS", 15000, 0, "PILATUS.stats.stat3", 1, 23, 0, 0, 0, 0)
+NDStatsConfigure("PILATUS.stats.stat4", 15000, 0, "PILATUS.rois.roi4", 0, 0, 0, 0, 0, 16)
+NDTimeSeriesConfigure("PILATUS.stats.stat4_TS", 15000, 0, "PILATUS.stats.stat4", 1, 23, 0, 0, 0, 0)
+NDStatsConfigure("PILATUS.stats.stat5", 15000, 0, "PILATUS.rois.roi5", 0, 0, 0, 0, 0, 16)
+NDTimeSeriesConfigure("PILATUS.stats.stat5_TS", 15000, 0, "PILATUS.stats.stat5", 1, 23, 0, 0, 0, 0)
+NDStatsConfigure("PILATUS.stats.stat6", 15000, 0, "PILATUS.rois.roi6", 0, 0, 0, 0, 0, 16)
+NDTimeSeriesConfigure("PILATUS.stats.stat6_TS", 15000, 0, "PILATUS.stats.stat6", 1, 23, 0, 0, 0, 0)
 
 # NDStdArraysConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize, maxThreads)
 NDStdArraysConfigure("PILATUS.arr", 1000, 0, "PILATUS.roi", 0, 0, 0, 0, 0, 1)
@@ -56,10 +80,17 @@ NDStdArraysConfigure("PILATUS.arr", 1000, 0, "PILATUS.roi", 0, 0, 0, 0, 0, 1)
 NDProcessConfigure("PILATUS.proc", 15000, 0, "PILATUS.cam", 0)
 # NDOverlayConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, NOverlays, maxBuffers, maxMemory, priority, stackSize, maxThreads)
 NDOverlayConfigure("PILATUS.over", 15000, 0, "PILATUS.proc", 0, 8, 0, 0, 0, 0, 1)
+# ffmpegFileConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, priority, stackSize)
+ffmpegFileConfigure("PILATUS.fimg", 15000, 0, "PILATUS.cam", 0, 0, 0)
 # NDFileTIFFConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr)
 NDFileTIFFConfigure("PILATUS.tiff", 15000, 0, "PILATUS.cam", 0)
 # NDFileHDF5Configure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr)
 NDFileHDF5Configure("PILATUS.hdf", 15000, 0, "PILATUS.cam", 0)
+ffmpegServerConfigure(8081)
+# ffmpegStreamConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize)
+ffmpegStreamConfigure("PILATUS.mjpg", 1000, 0, "PILATUS.over", 0, 50, 0, 0, 0)
+# NDPvxsConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, pvName, maxBuffers, maxMemory, priority, stackSize)
+NDPvxsConfigure("PILATUS.pva", 15000, 0, "PILATUS.cam", 0, BL18B-EA-PILAT-01:PVA:ARRAY, 0, 0, 0, 0)
 
 dbLoadRecords /ioc.db
 iocInit
@@ -70,6 +101,78 @@ create_monitor_set autosave_settings.req, 30, ""
 
 
 dbpf "BL18B-EA-PILAT-01:CAM:NDAttributesFile", '/epics/ioc/config/PILATUS.cam.xml'
+dbpf "BL18B-EA-PILAT-01:FIMG:FileTemplate", "%s/%s_%d.avi"
+dbpf "BL18B-EA-PILAT-01:HDF5:FileTemplate", "%s/%s_%d.h5"
+dbpf "BL18B-EA-PILAT-01:STAT:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:STAT1:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:STAT2:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:STAT3:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:STAT4:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:STAT5:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:STAT6:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:STAT:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:STAT1:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:STAT2:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:STAT3:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:STAT4:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:STAT5:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:STAT6:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:STAT:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:STAT1:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:STAT2:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:STAT3:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:STAT4:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:STAT5:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:STAT6:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:STAT:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:STAT1:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:STAT2:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:STAT3:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:STAT4:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:STAT5:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:STAT6:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:ROI:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:ROI1:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:ROI2:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:ROI3:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:ROI4:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:ROI5:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:ROI6:NumThreads", "4"
+dbpf "BL18B-EA-PILAT-01:ROI:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:ROI1:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:ROI2:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:ROI3:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:ROI4:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:ROI5:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:ROI6:SortMode", "1"
+dbpf "BL18B-EA-PILAT-01:ROI:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:ROI1:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:ROI2:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:ROI3:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:ROI4:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:ROI5:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:ROI6:SortTime", "1.0"
+dbpf "BL18B-EA-PILAT-01:ROI:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:ROI1:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:ROI2:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:ROI3:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:ROI4:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:ROI5:SortSize", "1000"
+dbpf "BL18B-EA-PILAT-01:ROI6:SortSize", "1000"
+
+dbpf "BL18B-EA-PILAT-01:STAT:NDAttributesFile", '/epics/ioc/config/gdaPluginsStats.xml'
+
+dbpf "BL18B-EA-PILAT-01:STAT1:NDAttributesFile", '/epics/ioc/config/gdaPluginsStats.xml'
+
+dbpf "BL18B-EA-PILAT-01:STAT2:NDAttributesFile", '/epics/ioc/config/gdaPluginsStats.xml'
+
+dbpf "BL18B-EA-PILAT-01:STAT3:NDAttributesFile", '/epics/ioc/config/gdaPluginsStats.xml'
+
+dbpf "BL18B-EA-PILAT-01:STAT4:NDAttributesFile", '/epics/ioc/config/gdaPluginsStats.xml'
+
+dbpf "BL18B-EA-PILAT-01:STAT5:NDAttributesFile", '/epics/ioc/config/gdaPluginsStats.xml'
+
+dbpf "BL18B-EA-PILAT-01:STAT6:NDAttributesFile", '/epics/ioc/config/gdaPluginsStats.xml'
 dbpf "BL18B-EA-PILAT-01:CAM:FilePath" "/ramdisk"
 dbpf "BL18B-EA-PILAT-01:CAM:FileName" "frame"
 dbpf "BL18B-EA-PILAT-01:CAM:FileTemplate" "%s%s_%05d.tif"

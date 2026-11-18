@@ -46,82 +46,19 @@ entities:
     QUEUE: 1000
     R: ':NULL:'
 
-  - type: ADCore.NDROI
-    ADDR: 0
-    NDARRAY_ADDR: 0
-    NDARRAY_PORT: PILATUS.cam
-    P: BL18B-EA-PILAT-01
-    PORT: PILATUS.roi
-    QUEUE: 15000
-    R: ':ROI:'
-    TIMEOUT: 1
-
-  - type: ADCore.NDStats
-    ADDR: 0
-    HIST_SIZE: 256
-    NCHANS: 20000
-    NDARRAY_ADDR: 0
-    NDARRAY_PORT: PILATUS.cam
-    P: BL18B-EA-PILAT-01
-    PORT: PILATUS.stat
-    QUEUE: 15000
-    R: ':STAT:'
-    TIMEOUT: 1
-    XSIZE: 1475
-    YSIZE: 195
-
-  - type: ADCore.NDStdArrays
-    ADDR: 0
-    FTVL: LONG
-    NDARRAY_ADDR: 0
-    NDARRAY_PORT: PILATUS.roi
+  - type: detectorPlugins.gdaPlugins
+    ARRFTVL: LONG
+    ARRTYPE: Int32
+    CAM: PILATUS.cam
+    DISPLAYQUEUE: 1000
+    HTTP_PORT: 8081
     NELEMENTS: 287625
     P: BL18B-EA-PILAT-01
-    PORT: PILATUS.arr
-    QUEUE: 1000
-    R: ':ARR:'
-    TIMEOUT: 1
-    TYPE: Int32
-
-  - type: ADCore.NDProcess
-    ADDR: 0
-    NDARRAY_ADDR: 0
-    NDARRAY_PORT: PILATUS.cam
-    P: BL18B-EA-PILAT-01
-    PORT: PILATUS.proc
-    QUEUE: 15000
-    R: ':PROC:'
-    TIMEOUT: 1
-
-  - type: ADCore.NDOverlay
-    ADDR: 0
-    NDARRAY_ADDR: 0
-    NDARRAY_PORT: PILATUS.proc
-    P: BL18B-EA-PILAT-01
-    PORT: PILATUS.over
-    QUEUE: 15000
-    R: ':OVER:'
-    TIMEOUT: 1
-
-  - type: ADCore.NDFileTIFF
-    ADDR: 0
-    NDARRAY_ADDR: 0
-    NDARRAY_PORT: PILATUS.cam
-    P: BL18B-EA-PILAT-01
-    PORT: PILATUS.tiff
-    QUEUE: 15000
-    R: ':TIFF:'
-    TIMEOUT: 1
-
-  - type: ADCore.NDFileHDF5
-    ADDR: 0
-    NDARRAY_ADDR: 0
-    NDARRAY_PORT: PILATUS.cam
-    P: BL18B-EA-PILAT-01
-    PORT: PILATUS.hdf
-    QUEUE: 15000
-    R: ':HDF5:'
-    TIMEOUT: 1
+    PLUGINQUEUE: 15000
+    PORTPREFIX: PILATUS
+    XSIZE: 1475
+    YSIZE: 195
+    threads: 4
 
   - type: epics.dbpf
     pv: BL18B-EA-PILAT-01:CAM:FilePath

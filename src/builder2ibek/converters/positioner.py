@@ -1,13 +1,9 @@
-from pathlib import Path
-
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "positioner"
 
 schema = ""
-
-GDA_PLUGINS = Path(__file__).parent / "gdaPlugins.yaml"
 
 # the types XMLbuilder registers with their multipositioner via addPositioner
 SLOT_TYPES = ("positioner.positioner", "positioner.motorpositioner")

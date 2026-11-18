@@ -10,8 +10,10 @@ variable :data:`LIBRARIES` names for that library is set. :func:`pattern_index`
 shallow-clones each library at its tag into a temporary folder and indexes it:
 every library folder holding ``<folder>/<folder>.ibek.support.yaml`` is a pattern
 for the module of that name, and the support YAML lists its entity models. Only
-the beamline modules of ibek-runtime-support are indexed; an IOC that uses one of
-its other modules gets a warning (see builder2ibek.vendor_patterns). A module may have a
+the beamline modules of ibek-runtime-support and its AreaDetector patterns
+(:data:`~builder2ibek.support_defaults.AREADETECTOR_PATTERNS`) are indexed; an
+IOC that uses one of its other modules gets a warning (see
+builder2ibek.vendor_patterns). A module may have a
 pattern in only one library. A library that cannot be indexed is left out, so
 that the other's patterns are still used.
 
@@ -68,6 +70,7 @@ from builder2ibek.support_defaults import (
     entity_defaults,
     generic_param_types,
     is_beamline_module,
+    routes_to_support_pattern,
     values_match,
 )
 
@@ -665,9 +668,9 @@ def _clone(library: str, tag: str) -> Path:
 def _index_library(library: str, tag_env: str) -> PatternIndex:
     """Clone one library at its release and index it."""
     tag = os.environ.get(tag_env) or latest_tag(DEFAULT_LIBRARIES[library])
-    # ibek-runtime-support also holds patterns of modules that are not beamline
-    # modules; builder2ibek routes only beamline modules to it
-    only = is_beamline_module if library == SUPPORT_LIBRARY else None
+    # ibek-runtime-support also holds patterns of other modules, which
+    # builder2ibek does not route to it
+    only = routes_to_support_pattern if library == SUPPORT_LIBRARY else None
     return PatternIndex(_clone(library, tag), tag, library, only)
 
 
