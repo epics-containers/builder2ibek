@@ -13,10 +13,9 @@ After completing this tutorial you should understand:
 repository.**  If your module could be useful to other facilities, it is
 strongly recommended to open-source it and contribute the support YAML to the
 community `ibek-support` repository on GitHub instead.  The epics-containers
-project provides a full tutorial for this approach, using the Lakeshore 340
-temperature controller as an example:
+project provides a full tutorial for this approach:
 
-[epics-containers: Creating a Generic IOC — Lakeshore 340](https://epics-containers.github.io/main/tutorials/generic_ioc.html#lakeshore-340-temperature-controller)
+[epics-containers: Create a Generic IOC](https://epics-containers.github.io/main/tutorials/generic_ioc.html)
 
 For a tutorial covering a more complex module and the full open-source
 contribution workflow, see

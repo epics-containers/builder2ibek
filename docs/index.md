@@ -9,7 +9,7 @@ html_theme.sidebar_secondary.remove: true
 ## What is builder2ibek for?
 
 DLS has hundreds of EPICS IOCs defined using the
-[XMLbuilder](https://github.com/dls-controls/iocbuilder) format — XML files
+XMLbuilder format — XML files
 that describe which support modules to load and how to configure them.
 `builder2ibek` is the bridge between that legacy world and
 [epics-containers](https://epics-containers.github.io), the modern approach
