@@ -241,7 +241,7 @@ def support_models() -> dict[str, frozenset[str]]:
     models: dict[str, frozenset[str]] = {}
     yaml = YAML(typ="safe")
     for path in sorted(REPO_ROOT.glob("ibek-support*/*/*.ibek.support.yaml")):
-        data = yaml.load(path.read_text()) or {}
+        data = yaml.load(path) or {}
         module = str(data.get("module") or path.parent.name)
         names = {
             f"{module}.{e['name']}"

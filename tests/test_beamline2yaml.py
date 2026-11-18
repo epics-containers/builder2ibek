@@ -274,7 +274,7 @@ def _fake_convert(converted: list | None = None, result: ConvertResult | None = 
     def convert(xml, yaml, schema, description="", image=None, image_types=None):
         if converted is not None:
             converted.append((xml, yaml, description, image))
-        yaml.write_text("entities: []\n")
+        yaml.write_text("entities: []  # converted\n")
         return result or ConvertResult()
 
     return convert
@@ -742,7 +742,7 @@ def test_schema_failure_leaves_the_folder_and_is_reported(
     assert "[ok; schema fail]" in out
     assert all(f"      line {n}" in out for n in range(8))
     folder = repo / "services" / XML.stem.lower()
-    assert (folder / "config" / "ioc.yaml").read_text() == "entities: []\n"
+    assert (folder / "config" / "ioc.yaml").read_text() == "entities: []  # converted\n"
     assert not list((repo / "services").glob(".*backup"))
 
 
