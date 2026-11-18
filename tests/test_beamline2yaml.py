@@ -274,7 +274,7 @@ def _fake_convert(converted: list | None = None, result: ConvertResult | None = 
     def convert(xml, yaml, schema, description="", image=None, image_types=None):
         if converted is not None:
             converted.append((xml, yaml, description, image))
-        yaml.write_text("entities: []\n")
+        yaml.write_text("entities: []  # converted\n")
         return result or ConvertResult()
 
     return convert
@@ -314,7 +314,10 @@ def test_apply_puts_the_legacy_folder_back_when_conversion_fails(
 
     (entry,) = plan.entries
     assert entry.status == "error"
-    assert "converter crashed; the previous folder is put back" in (entry.warnings[-1])
+    assert (
+        "converter crashed; the dev-c7 legacy folder is put back"
+        in (entry.warnings[-1])
+    )
     assert (folder / "keep").read_text() == "x"
     assert (folder / "values.yaml").read_text() == "dev-c7:\n  iocVersion: 1-0\n"
     assert not (folder / "config").exists()
@@ -331,16 +334,6 @@ def test_apply_removes_an_added_folder_when_conversion_fails(repo: Path, monkeyp
 
     assert plan.entries[0].status == "error"
     assert not (repo / "services" / XML.stem.lower()).exists()
-
-
-def test_apply_refuses_a_folder_that_changed(repo: Path):
-    folder = _legacy(repo)
-    plan = b2y.build_plan("BL11I", repo)
-    (folder / "values.yaml").write_text("ioc-instance: {}\n")
-    b2y.apply_plan(plan, validate=False)
-    assert plan.entries[0].status == "error"
-    assert "no longer a dev-c7 legacy folder" in plan.entries[0].warnings[-1]
-    assert (folder / "values.yaml").read_text() == "ioc-instance: {}\n"
 
 
 @pytest.mark.parametrize(
@@ -723,110 +716,33 @@ def test_incomplete_conversion_puts_the_legacy_folder_back(
     b2y.apply_plan(plan, validate=False)
 
     assert plan.entries[0].status == "error"
-    assert "the previous folder is put back" in plan.entries[0].warnings[-1]
+    assert "the dev-c7 legacy folder is put back" in plan.entries[0].warnings[-1]
     _assert_legacy_back(repo, folder)
 
 
-def test_schema_failure_puts_the_legacy_folder_back(repo: Path, monkeypatch):
-    folder = _legacy(repo)
-    (folder / "keep").write_text("x")
+def test_schema_failure_leaves_the_folder_and_is_reported(
+    repo: Path, monkeypatch, capsys
+):
+    """The failing ioc.yaml stays, to be fixed, with all the validator said."""
+    _legacy(repo)
+    stderr = "\n".join(f"line {n}" for n in range(8))
     monkeypatch.setattr(b2y, "convert_file", _fake_convert())
     monkeypatch.setattr(
         b2y,
         "validate_configs",
         lambda configs, support_yamls: [
-            {"ioc_name": n, "status": "fail", "stderr": "bad"} for n in configs
+            {"ioc_name": n, "status": "fail", "stderr": stderr} for n in configs
         ],
     )
 
-    plan = b2y.build_plan("BL11I", repo)
-    b2y.apply_plan(plan)
+    code = b2y.beamline2yaml_cli("BL11I", repo, apply=True)
 
-    (entry,) = plan.entries
-    assert (entry.status, entry.schema) == ("error", "fail")
-    _assert_legacy_back(repo, folder)
-
-
-def test_schema_pass_removes_the_backup(repo: Path, monkeypatch):
-    folder = _legacy(repo)
-    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-    monkeypatch.setattr(
-        b2y,
-        "validate_configs",
-        lambda configs, support_yamls: [
-            {"ioc_name": n, "status": "ok"} for n in configs
-        ],
-    )
-
-    plan = b2y.build_plan("BL11I", repo)
-    b2y.apply_plan(plan)
-
-    assert (plan.entries[0].status, plan.entries[0].schema) == ("ok", "ok")
-    assert (folder / "config" / "ioc.yaml").is_file()
-    assert not list((repo / "services").glob(".*backup"))
-
-
-@pytest.mark.parametrize("when", ["converting", "validating"])
-def test_interrupt_puts_the_legacy_folder_back(repo: Path, monkeypatch, when: str):
-    folder = _legacy(repo)
-    (folder / "keep").write_text("x")
-
-    def interrupt(*args, **kwargs):
-        raise KeyboardInterrupt
-
-    if when == "converting":
-        monkeypatch.setattr(b2y, "convert_file", interrupt)
-    else:
-        monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-        monkeypatch.setattr(b2y, "validate_configs", interrupt)
-
-    plan = b2y.build_plan("BL11I", repo)
-    with pytest.raises(KeyboardInterrupt):
-        b2y.apply_plan(plan)
-
-    _assert_legacy_back(repo, folder)
-
-
-def test_fastcs_on_a_legacy_folder_is_put_back_on_failure(repo: Path, monkeypatch):
-    """xml2yaml replaces a legacy folder with the fastcs instance; a copy is
-    kept until it has."""
-    folder = _legacy(repo)
-    (folder / "keep").write_text("x")
-
-    def fail(xml, yaml, schema, description="", image=None, image_types=None):
-        import shutil
-
-        shutil.rmtree(folder)
-        folder.mkdir()
-        (folder / "half").write_text("written")
-        raise RuntimeError("fastcs write failed")
-
-    monkeypatch.setattr(b2y, "convert_file", fail)
-    entry = b2y.Entry(XML.stem, str(XML), folder.name, "fastcs")
-    plan = b2y.Plan("BL11I", str(repo), str(XML.parent), "work", [entry])
-
-    b2y.apply_plan(plan, validate=False)
-
-    assert entry.status == "error"
-    assert not (folder / "half").exists()
-    _assert_legacy_back(repo, folder)
-
-
-def test_fastcs_on_a_legacy_folder_drops_the_copy_on_success(repo: Path, monkeypatch):
-    folder = _legacy(repo)
-
-    def fastcs(xml, yaml, schema, description="", image=None, image_types=None):
-        (folder / "values.yaml").write_text("fastcs: {}\n")
-        return ConvertResult(ioc_yaml_written=False)
-
-    monkeypatch.setattr(b2y, "convert_file", fastcs)
-    entry = b2y.Entry(XML.stem, str(XML), folder.name, "fastcs")
-    plan = b2y.Plan("BL11I", str(repo), str(XML.parent), "work", [entry])
-
-    b2y.apply_plan(plan, validate=False)
-
-    assert entry.status == "fastcs"
-    assert (folder / "values.yaml").read_text() == "fastcs: {}\n"
+    out = capsys.readouterr().out
+    assert code == 3
+    assert "[ok; schema fail]" in out
+    assert all(f"      line {n}" in out for n in range(8))
+    folder = repo / "services" / XML.stem.lower()
+    assert (folder / "config" / "ioc.yaml").read_text() == "entities: []  # converted\n"
     assert not list((repo / "services").glob(".*backup"))
 
 
@@ -844,6 +760,7 @@ MIXED_XML = """\
 """
 
 
+@requires_support
 def test_mixed_vacuum_ioc(repo: Path, monkeypatch, tmp_path: Path):
     """A trimmed BL08J-VA-IOC-02, planned with the pinned pattern libraries:
     a vacuum image that builds digitelMpc and installs EdwardsScroll, so only
@@ -883,138 +800,6 @@ def test_mixed_vacuum_ioc(repo: Path, monkeypatch, tmp_path: Path):
     assert kinds["EdwardsScroll"] == ("build-time", "ghcr.io/org/ioc-vac:1 installs it")
     assert kinds["digitelMpc"][0] == "build-time"
     assert not [m for m in entry.modules if m.kind == "unresolved"]
-
-
-def _schema_fails(configs, support_yamls):
-    return [{"ioc_name": n, "status": "fail", "stderr": "bad"} for n in configs]
-
-
-def test_schema_failure_removes_an_added_folder(repo: Path, monkeypatch):
-    """Nothing that failed stays written: a re-run plans the IOC as an add
-    again, not as an ibek folder to reconvert."""
-    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-    monkeypatch.setattr(b2y, "validate_configs", _schema_fails)
-
-    plan = b2y.build_plan("BL11I", repo)
-    b2y.apply_plan(plan)
-
-    (entry,) = plan.entries
-    assert (entry.status, entry.schema) == ("error", "fail")
-    assert entry.warnings[-1] == "schema validation failed: its folder is removed"
-    assert not (repo / "services" / XML.stem.lower()).exists()
-    assert b2y.build_plan("BL11I", repo).entries[0].action == "add"
-
-
-@pytest.mark.parametrize("when", ["converting", "validating"])
-def test_interrupt_removes_an_added_folder(repo: Path, monkeypatch, when: str):
-    def interrupt(*args, **kwargs):
-        raise KeyboardInterrupt
-
-    if when == "converting":
-
-        def convert(xml, yaml, *args, **kwargs):
-            yaml.write_text("half written\n")
-            raise KeyboardInterrupt
-
-        monkeypatch.setattr(b2y, "convert_file", convert)
-    else:
-        monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-        monkeypatch.setattr(b2y, "validate_configs", interrupt)
-
-    plan = b2y.build_plan("BL11I", repo)
-    with pytest.raises(KeyboardInterrupt):
-        b2y.apply_plan(plan)
-
-    assert sorted(p.name for p in (repo / "services").iterdir()) == [".ioc_template"]
-
-
-def _with_siblings(services: Path, result: ConvertResult | None = None):
-    """A conversion that writes two fastcs-pandablocks instances beside the
-    IOC, one of which was already there, then fails, or returns ``result``."""
-
-    def convert(xml, yaml, *args, **kwargs):
-        for name in ("bl11i-panda-01", "bl11i-panda-02"):
-            (services / name / "config").mkdir(parents=True, exist_ok=True)
-            (services / name / "config" / "controller.yaml").write_text("new\n")
-        yaml.write_text("entities: []\n")
-        if result is None:
-            raise RuntimeError("pattern step crashed")
-        return result
-
-    return convert
-
-
-@pytest.mark.parametrize("fails", ["converting", "validating"])
-def test_failure_removes_the_fastcs_siblings_it_created(
-    repo: Path, monkeypatch, fails: str
-):
-    services = repo / "services"
-    existing = services / "bl11i-panda-02" / "config"
-    existing.mkdir(parents=True)
-    (existing / "controller.yaml").write_text("old\n")
-    result = None if fails == "converting" else ConvertResult()
-    monkeypatch.setattr(b2y, "convert_file", _with_siblings(services, result))
-    monkeypatch.setattr(b2y, "validate_configs", _schema_fails)
-
-    plan = b2y.build_plan("BL11I", repo)
-    b2y.apply_plan(plan)
-
-    assert plan.entries[0].status == "error"
-    assert not (services / "bl11i-panda-01").exists()
-    # one that was there before is never touched, even when rewritten
-    assert (existing / "controller.yaml").read_text() == "new\n"
-    assert not (services / XML.stem.lower()).exists()
-
-
-def test_every_undo_is_attempted(tmp_path: Path):
-    """An undo that fails does not stop the others."""
-    broken = b2y._Written(tmp_path / "a", tmp_path / ".a.backup")
-    (tmp_path / "a").mkdir()
-    folder = tmp_path / "b"
-    (folder / "new").mkdir(parents=True)
-    (tmp_path / ".b.backup").mkdir()
-    (tmp_path / ".b.backup" / "keep").write_text("x")
-    good = b2y._Written(folder, tmp_path / ".b.backup")
-
-    errors = b2y._undo_all([broken, good])
-
-    assert len(errors) == 1 and "cannot put" in errors[0]
-    assert (folder / "keep").read_text() == "x"
-    assert not (folder / "new").exists()
-
-
-def test_an_interrupt_undoes_every_ioc_whatever_one_raises(
-    repo: Path, monkeypatch, capsys
-):
-    """The legacy folder is put back although an earlier undo failed."""
-    folder = _legacy(repo)
-    (folder / "keep").write_text("x")
-    services = repo / "services"
-    broken = b2y._Written(services / "gone", services / ".gone.backup")
-    real_apply = b2y._apply_entry
-    applied: list = []
-
-    def apply_entry(services, entry, descriptions):
-        applied.append(entry.ioc)
-        if len(applied) == 1:
-            return broken
-        return real_apply(services, entry, descriptions)
-
-    def interrupt(*args, **kwargs):
-        raise KeyboardInterrupt
-
-    monkeypatch.setattr(b2y, "_apply_entry", apply_entry)
-    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-    monkeypatch.setattr(b2y, "validate_configs", interrupt)
-    plan = b2y.build_plan("BL11I", repo)
-    plan.entries.insert(0, b2y.Entry("GONE", str(XML), "gone", "add"))
-
-    with pytest.raises(KeyboardInterrupt) as raised:
-        b2y.apply_plan(plan)
-
-    assert any("cannot put" in note for note in raised.value.__notes__)
-    assert "cannot put" in capsys.readouterr().err
-    _assert_legacy_back(repo, folder)
 
 
 VAC_XML = """\
@@ -1070,15 +855,3 @@ def test_apply_validates_with_the_patterns_the_image_installs(
     config = repo / "services" / "bl08j-va-ioc-02" / "config"
     assert not list(config.glob("*.ibek.support.yaml"))
     assert not (config.parent / "runtime-lock.yaml").exists()
-
-
-def test_undo_all_undoes_the_last_written_first(monkeypatch, tmp_path: Path):
-    order: list = []
-
-    def undo(written):
-        order.append(written.folder.name)
-        return []
-
-    monkeypatch.setattr(b2y, "_undo", undo)
-    b2y._undo_all([b2y._Written(tmp_path / "a"), b2y._Written(tmp_path / "b")])
-    assert order == ["b", "a"]

@@ -177,8 +177,8 @@ def beamline2yaml(
     runtime patterns) and schema-validates each ioc.yaml with ibek generate2;
     no IOC is started. It writes nothing when a pattern library, GitHub or
     GitLab lookup failed, and puts a replaced legacy folder back when its
-    conversion, a runtime pattern or its schema check fails, or on an
-    interrupt. GitLab generic IOCs need GITLAB_TOKEN.
+    conversion or a runtime pattern fails. An IOC that fails the schema check
+    keeps its folder and is reported. GitLab generic IOCs need GITLAB_TOKEN.
     """
     code = beamline2yaml_cli(
         beamline,
