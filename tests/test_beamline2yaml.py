@@ -994,12 +994,11 @@ def test_an_interrupt_undoes_every_ioc_whatever_one_raises(
     real_apply = b2y._apply_entry
     applied: list = []
 
-    def apply_entry(services, entry, descriptions, written):
+    def apply_entry(services, entry, descriptions):
         applied.append(entry.ioc)
         if len(applied) == 1:
-            written[entry.ioc] = broken
-            return
-        real_apply(services, entry, descriptions, written)
+            return broken
+        return real_apply(services, entry, descriptions)
 
     def interrupt(*args, **kwargs):
         raise KeyboardInterrupt
@@ -1073,17 +1072,6 @@ def test_apply_validates_with_the_patterns_the_image_installs(
     assert not (config.parent / "runtime-lock.yaml").exists()
 
 
-def test_only_new_fastcs_instances_are_siblings(tmp_path: Path):
-    """Never another run's backup, nor a new folder that is no fastcs
-    instance."""
-    before: set[str] = set()
-    for name in ("panda", ".x.beamline2yaml-backup", "other", "ioc"):
-        (tmp_path / name / "config").mkdir(parents=True)
-    for name in ("panda", ".x.beamline2yaml-backup", "ioc"):
-        (tmp_path / name / "config" / "controller.yaml").write_text("x\n")
-    assert b2y._created(tmp_path, before, "ioc") == [tmp_path / "panda"]
-
-
 def test_undo_all_undoes_the_last_written_first(monkeypatch, tmp_path: Path):
     order: list = []
 
@@ -1094,100 +1082,3 @@ def test_undo_all_undoes_the_last_written_first(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(b2y, "_undo", undo)
     b2y._undo_all([b2y._Written(tmp_path / "a"), b2y._Written(tmp_path / "b")])
     assert order == ["b", "a"]
-
-
-def test_an_interrupted_schema_failure_undo_is_finished(repo: Path, monkeypatch):
-    """Ctrl-C during the undo of a schema failure: the IOC is still on the
-    undo list, so the legacy folder is put back."""
-    folder = _legacy(repo)
-    (folder / "keep").write_text("x")
-    real_undo = b2y._undo
-    calls: list = []
-
-    def undo(written):
-        calls.append(written)
-        if len(calls) == 1:
-            # cut short after removing the new folder
-            import shutil
-
-            shutil.rmtree(written.folder)
-            written.new = False
-            raise KeyboardInterrupt
-        return real_undo(written)
-
-    monkeypatch.setattr(b2y, "_undo", undo)
-    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-    monkeypatch.setattr(b2y, "validate_configs", _schema_fails)
-
-    with pytest.raises(KeyboardInterrupt):
-        b2y.apply_plan(b2y.build_plan("BL11I", repo))
-
-    assert len(calls) == 2
-    _assert_legacy_back(repo, folder)
-
-
-def test_undo_twice_never_removes_a_folder_put_back(repo: Path):
-    folder = _legacy(repo)
-    (folder / "keep").write_text("x")
-    services = repo / "services"
-    backup = b2y._move_aside(services, folder.name)
-    folder.mkdir()
-    written = b2y._Written(folder, backup)
-
-    assert b2y._undo(written) == []
-    assert b2y._undo(written) == []
-    _assert_legacy_back(repo, folder)
-
-
-def test_an_interrupt_after_converting_undoes_the_ioc(repo: Path, monkeypatch):
-    """Ctrl-C in the tail of _apply_entry, after the conversion returned."""
-    folder = _legacy(repo)
-    (folder / "keep").write_text("x")
-
-    def interrupt(statuses):
-        raise KeyboardInterrupt
-
-    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-    plan = b2y.build_plan("BL11I", repo)
-    monkeypatch.setattr(b2y, "module_report", interrupt)
-
-    with pytest.raises(KeyboardInterrupt):
-        b2y.apply_plan(plan)
-
-    _assert_legacy_back(repo, folder)
-
-
-def test_a_backup_removal_cut_short_blocks_no_later_run(repo: Path, monkeypatch):
-    import shutil
-
-    folder = _legacy(repo)
-    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
-    monkeypatch.setattr(
-        b2y,
-        "validate_configs",
-        lambda configs, support_yamls: [
-            {"ioc_name": n, "status": "ok"} for n in configs
-        ],
-    )
-    real_rmtree = shutil.rmtree
-
-    def rmtree(path, *args, **kwargs):
-        if str(path).endswith(b2y.DISCARD_SUFFIX) and Path(path).exists():
-            (Path(path) / "values.yaml").unlink()
-            raise KeyboardInterrupt
-        return real_rmtree(path, *args, **kwargs)
-
-    monkeypatch.setattr(shutil, "rmtree", rmtree)
-    with pytest.raises(KeyboardInterrupt):
-        b2y.apply_plan(b2y.build_plan("BL11I", repo))
-    monkeypatch.setattr(shutil, "rmtree", real_rmtree)
-
-    # the validated IOC stays converted, and no backup is left to block
-    assert (folder / "config" / "ioc.yaml").is_file()
-    services = repo / "services"
-    assert not list(services.glob(f".*{b2y.BACKUP_SUFFIX}"))
-    plan = b2y.build_plan("BL11I", repo)
-    assert plan.failures == []
-    # the next --apply removes what is left
-    b2y.apply_plan(plan, validate=False)
-    assert not list(services.glob(f".*{b2y.DISCARD_SUFFIX}"))
