@@ -10,9 +10,9 @@ variable :data:`LIBRARIES` names for that library is set. :func:`pattern_index`
 shallow-clones each library at its tag into a temporary folder and indexes it:
 every library folder holding ``<folder>/<folder>.ibek.support.yaml`` is a pattern
 for the module of that name, and the support YAML lists its entity models. Only
-the beamline modules of ibek-runtime-support and its AreaDetector patterns
-(:data:`~builder2ibek.support_defaults.AREADETECTOR_PATTERNS`) are indexed; an
-IOC that uses one of its other modules gets a warning (see
+the beamline modules of ibek-runtime-support and those in
+:data:`~builder2ibek.support_defaults.SUPPORT_PATTERN_MODULES` are indexed; an
+IOC that uses any other of its modules gets a warning (see
 builder2ibek.vendor_patterns). A module may have a
 pattern in only one library. A library that cannot be indexed is left out, so
 that the other's patterns are still used.
@@ -138,6 +138,8 @@ class Pattern:
     version: str
     models: frozenset[str]
     support_yaml: Path
+    #: (model, entity type, arguments) for each sub-entity of each model
+    sub_entities: tuple[tuple[str, str, frozenset[str]], ...] = ()
 
     @property
     def ref(self) -> str:
@@ -299,12 +301,18 @@ class PatternIndex:
                     f"{support_yaml} declares module {module!r}; a pattern "
                     f"folder is vendored by its folder name, so the two must match"
                 )
+            models = data.get("entity_models") or []
             self.patterns[module] = Pattern(
                 library=library,
                 module=module,
                 version=version,
-                models=frozenset(m["name"] for m in data.get("entity_models") or []),
+                models=frozenset(m["name"] for m in models),
                 support_yaml=support_yaml,
+                sub_entities=tuple(
+                    (m["name"], str(sub["type"]), frozenset(sub) - {"type"})
+                    for m in models
+                    for sub in m.get("sub_entities") or []
+                ),
             )
 
     def add(self, other: PatternIndex) -> None:

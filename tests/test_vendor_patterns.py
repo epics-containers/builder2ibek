@@ -179,13 +179,10 @@ BL21I = Pattern(
 
 
 @pytest.mark.parametrize(
-    ("failing", "warned"),
-    [("ibek-runtime-streamdevice", True), ("ibek-runtime-support", False)],
+    "failing", ["ibek-runtime-streamdevice", "ibek-runtime-support"]
 )
-def test_library_failure_warns_only_for_streamdevice(
-    tmp_path: Path, ibek, monkeypatch, failing: str, warned: bool
-):
-    """The other library's patterns are still added."""
+def test_library_failure_warns(tmp_path: Path, ibek, monkeypatch, failing: str):
+    """Either library: the other library's patterns are still added."""
 
     class Index(FakeIndex):
         failures = {failing: "unreachable"}
@@ -194,8 +191,9 @@ def test_library_failure_warns_only_for_streamdevice(
     instance = _instance(tmp_path, VAC)
     report = add_patterns(ENTITIES, instance / "config" / "ioc.yaml")
     assert _adds(ibek) == [ATTO.ref]
-    expected = [f"{failing} patterns not added: unreachable"] if warned else []
-    assert [w for w in report.warnings if "not added" in w] == expected
+    assert [w for w in report.warnings if "not added" in w] == [
+        f"{failing} patterns not added: unreachable"
+    ]
 
 
 def test_beamline_pattern_is_added_even_when_the_image_has_it(

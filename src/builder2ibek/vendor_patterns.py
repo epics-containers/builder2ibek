@@ -67,7 +67,6 @@ from ibek.pattern_cmds.schema import fetch_base_schema as _fetch_base_schema
 from ibek.pattern_cmds.sources import PatternError
 
 from builder2ibek.patterns import (
-    SUPPORT_LIBRARY,
     Pattern,
     PatternPlan,
     cache_outcome,
@@ -78,7 +77,6 @@ from builder2ibek.patterns import (
     pattern_index,
     version_key,
 )
-from builder2ibek.support_defaults import AREADETECTOR_PATTERNS
 
 RUNTIME_IMAGE = "ghcr.io/epics-containers/ioc-streamdevice-runtime"
 # Fixes the ioc-streamdevice-runtime tag to use, in place of the latest release
@@ -167,12 +165,35 @@ def fetch_entity_types(image: str) -> frozenset[str] | None:
         # not published, or not JSON
         return None
     try:
-        items = schema["properties"]["entities"]["items"]
-        if "$ref" in items:
-            items = schema["$defs"][items["$ref"].split("/")[-1]]
-        return frozenset(items["discriminator"]["mapping"])
+        return frozenset(_entity_mapping(schema))
     except (KeyError, TypeError):
         # not an ibek IOC schema
+        return None
+
+
+def _entity_mapping(schema: Mapping[str, Any]) -> Mapping[str, str]:
+    """Each entity type of an ibek IOC schema, with the reference to its
+    definition. Raises KeyError or TypeError for any other schema."""
+    items = schema["properties"]["entities"]["items"]
+    if "$ref" in items:
+        items = schema["$defs"][items["$ref"].split("/")[-1]]
+    return items["discriminator"]["mapping"]
+
+
+@cache
+def image_entity_params(image: str) -> dict[str, frozenset[str]] | None:
+    """The parameters each entity type of an image's published ioc schema
+    takes, None if the schema is unavailable for any reason. A type whose
+    definition allows parameters it does not list is left out."""
+    try:
+        schema = _fetch_base_schema(image)
+        params: dict[str, frozenset[str]] = {}
+        for entity_type, ref in _entity_mapping(schema).items():
+            definition = schema["$defs"][ref.split("/")[-1]]
+            if definition.get("additionalProperties") is False:
+                params[entity_type] = frozenset(definition.get("properties", {}))
+        return params
+    except Exception:  # noqa: BLE001 -- any failure leaves the arguments unchecked
         return None
 
 
@@ -250,12 +271,9 @@ def plan_patterns(
     builder2ibek does not use. Raises PatternIndexError when no library can be
     indexed."""
     index = pattern_index()
-    # an IOC with beamline entities has already failed when ibek-runtime-support
-    # could not be indexed, and no other IOC uses it
     report.warnings += [
         f"{library} patterns not added: {error}"
         for library, error in index.failures.items()
-        if library != SUPPORT_LIBRARY
     ]
     # never keep silently the entities of a pattern builder2ibek does not use;
     # a builder repo's (BL15I-BUILDER) were dropped before the ioc.yaml was
@@ -271,20 +289,84 @@ def plan_patterns(
     return index.plan(entities)
 
 
+def sub_entity_args(
+    pattern: Pattern, models: Iterable[str]
+) -> dict[str, frozenset[str]]:
+    """The entity types of other modules that the pattern's ``models`` create
+    as sub-entities, each with the arguments they pass it. A sub-entity of the
+    pattern's own module is followed into its model."""
+    found: dict[str, set[str]] = {}
+    todo, seen = list(models), set()
+    while todo:
+        name = todo.pop()
+        if name in seen:
+            continue
+        seen.add(name)
+        for model, entity_type, args in pattern.sub_entities:
+            if model != name:
+                continue
+            module, _, sub_model = entity_type.partition(".")
+            if module == pattern.module:
+                todo.append(sub_model)
+            else:
+                found.setdefault(entity_type, set()).update(args)
+    return {t: frozenset(args) for t, args in found.items()}
+
+
+def pattern_gaps(
+    entities: Sequence[Mapping[str, Any]],
+    patterns: Iterable[Pattern],
+    image: str,
+    image_types: frozenset[str],
+) -> dict[str, str]:
+    """Why an image of entity types ``image_types`` cannot run each of these
+    patterns, by module; a pattern it can run is not listed.
+
+    It cannot when a sub-entity of a model the IOC uses is of a type the image
+    does not build, or passes an argument the image's model of that type does
+    not take, as the image's published schema says. With no ``image``, or no
+    schema, the arguments are not checked.
+    """
+    gaps: dict[str, str] = {}
+    for pattern in patterns:
+        used = {
+            str(e["type"]).partition(".")[2]
+            for e in entities
+            if module_of(e) == pattern.module
+        }
+        needs = sub_entity_args(pattern, used)
+        missing = sorted(needs.keys() - image_types)
+        if missing:
+            gaps[pattern.module] = (
+                f"{image or 'the image'} does not build {', '.join(missing)}, "
+                f"which {pattern.ref} needs"
+            )
+            continue
+        takes = (image_entity_params(image) if image and needs else None) or {}
+        for entity_type, args in sorted(needs.items()):
+            extra = sorted(args - takes[entity_type]) if entity_type in takes else []
+            if extra:
+                gaps[pattern.module] = (
+                    f"{image} {entity_type} takes no {', '.join(extra)}, "
+                    f"which {pattern.ref} passes"
+                )
+                break
+    return gaps
+
+
 def is_pattern_only(
     entities: Sequence[Mapping[str, Any]],
     plan: PatternPlan,
     runtime_types: frozenset[str],
 ) -> bool:
     """True if every entity is from a planned pattern or one the
-    ioc-streamdevice-runtime image, of entity types ``runtime_types``, builds.
-
-    An AreaDetector pattern's entities count for neither: the image has no
-    AreaDetector.
-    """
-    modules = {p.module for p in plan.patterns} - AREADETECTOR_PATTERNS
-    return bool(modules) and all(
-        module_of(e) in modules or e["type"] in runtime_types for e in entities
+    ioc-streamdevice-runtime image, of entity types ``runtime_types``, builds,
+    and the image builds every type the patterns' sub-entities need."""
+    modules = {p.module for p in plan.patterns}
+    return (
+        bool(modules)
+        and all(module_of(e) in modules or e["type"] in runtime_types for e in entities)
+        and not pattern_gaps(entities, plan.patterns, "", runtime_types)
     )
 
 
@@ -322,7 +404,8 @@ def classify_modules(
     unresolved, so that nothing can run it.
 
     ``image_types`` are the entity types ``image`` builds, None when unknown.
-    A module of :func:`patterns_to_add` is a pattern. Any other module whose
+    A module of :func:`patterns_to_add` is a pattern, unless the image cannot
+    run it (:func:`pattern_gaps`): then it is unresolved. Any other module whose
     every type the image builds is build-time, a pattern module the image
     installs included, except a beamline module: those are never compiled into
     a generic IOC, so one that is not a pattern is unresolved. With the
@@ -333,12 +416,20 @@ def classify_modules(
     used: dict[str, set[str]] = {}
     for entity in entities:
         used.setdefault(module_of(entity), set()).add(str(entity["type"]))
-    added = {p.module for p in patterns_to_add(entities, plan, image_types)}
+    to_add = patterns_to_add(entities, plan, image_types)
+    added = {p.module for p in to_add}
+    gaps = (
+        pattern_gaps(entities, to_add, image or "", image_types)
+        if image_types is not None
+        else {}
+    )
     planned = {p.module for p in plan.patterns}
     statuses: list[ModuleStatus] = []
     for module, types in used.items():
         why = plan.build_time.get(module, "")
-        if module in added:
+        if module in gaps:
+            statuses.append(ModuleStatus(module, "unresolved", gaps[module]))
+        elif module in added:
             statuses.append(ModuleStatus(module, "pattern"))
         elif is_beamline_module(module):
             reason = "beamline modules come only from runtime patterns" + (

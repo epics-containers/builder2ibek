@@ -40,10 +40,8 @@ _SUPPORT_PATTERNS = "ibek-runtime-support"
 BEAMLINE_MODULE = re.compile(r"BL\d\d[A-Z]")
 
 # The modules of ibek-runtime-support other than beamline modules that
-# builder2ibek routes to their pattern. They have no generic model, and their
-# patterns load AreaDetector plugins, so an IOC that uses one needs an
-# AreaDetector generic IOC: never ioc-streamdevice-runtime.
-AREADETECTOR_PATTERNS = frozenset({"detectorPlugins"})
+# builder2ibek routes to their pattern. They have no generic model.
+SUPPORT_PATTERN_MODULES = frozenset({"detectorPlugins"})
 
 
 # A beamline's builder repo, e.g. BL15I-BUILDER. It is never a runtime
@@ -67,8 +65,8 @@ def is_beamline_module(module: str) -> bool:
 
 def routes_to_support_pattern(module: str) -> bool:
     """True for a module builder2ibek takes from its ibek-runtime-support
-    pattern: a beamline module, or one of :data:`AREADETECTOR_PATTERNS`."""
-    return is_beamline_module(module) or module in AREADETECTOR_PATTERNS
+    pattern: a beamline module, or one of :data:`SUPPORT_PATTERN_MODULES`."""
+    return is_beamline_module(module) or module in SUPPORT_PATTERN_MODULES
 
 
 def _models(base_dir: Path):

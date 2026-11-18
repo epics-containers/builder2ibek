@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from builder2ibek import beamline2yaml as b2y
+from builder2ibek import vendor_patterns
 from builder2ibek.convert import ConvertResult
 from builder2ibek.patterns import (
     STREAMDEVICE_LIBRARY,
@@ -108,6 +109,71 @@ def test_no_image_reports_missing_types():
     assert not choice.image
     assert choice.missing == ["opto22.opto22"]
     assert "ioc-pmac" in choice.detail
+
+
+# a pattern whose model creates sub-entities of other modules, as
+# detectorPlugins.gdaPlugins does
+GDA = Pattern(
+    SUPPORT_LIBRARY,
+    "detectorPlugins",
+    "0.5.0",
+    frozenset({"gdaPlugins"}),
+    XML,
+    sub_entities=(
+        ("gdaPlugins", "ADCore.NDStats", frozenset({"P", "ATTRIBUTES_FILE"})),
+        ("gdaPlugins", "ffmpegServer.ffmpegStream", frozenset({"P"})),
+    ),
+)
+CAMERA = {"ADAndor3.andor3", "ADCore.NDStats"}
+NO_FFMPEG = cand("ioc-noffmpeg", CAMERA)
+OLD_STATS = cand("ioc-oldstats", CAMERA | {"ffmpegServer.ffmpegStream"})
+GOOD = cand("ioc-good", CAMERA | {"ffmpegServer.ffmpegStream"})
+STATS_PARAMS = {
+    OLD_STATS.ref: {"ADCore.NDStats": frozenset({"type", "P"})},
+    GOOD.ref: {"ADCore.NDStats": frozenset({"type", "P", "ATTRIBUTES_FILE"})},
+}
+
+
+@pytest.fixture
+def stats_params(monkeypatch):
+    monkeypatch.setattr(
+        vendor_patterns, "image_entity_params", lambda image: STATS_PARAMS.get(image)
+    )
+
+
+def test_pattern_sub_entities_need_the_image(stats_params):
+    """A gdaPlugins IOC needs an image that builds every type the pattern's
+    sub-entities create, and takes every argument they pass."""
+    entities = ents("ADAndor3.andor3", "detectorPlugins.gdaPlugins")
+    plan = PatternPlan([GDA])
+    choice = b2y.choose_image(entities, plan, BASE, [OLD_STATS, NO_FFMPEG])
+    assert not choice.image
+    statuses = vendor_patterns.classify_modules(
+        entities, plan, choice.closest, choice.closest_types
+    )
+    (gda,) = [s for s in statuses if s.module == "detectorPlugins"]
+    assert gda.kind == "unresolved"
+    assert gda.reason == (
+        f"{OLD_STATS.ref} ADCore.NDStats takes no ATTRIBUTES_FILE, which "
+        f"{GDA.ref} passes"
+    )
+    gaps = vendor_patterns.pattern_gaps(entities, [GDA], NO_FFMPEG.ref, NO_FFMPEG.types)
+    assert gaps == {
+        "detectorPlugins": f"{NO_FFMPEG.ref} does not build "
+        f"ffmpegServer.ffmpegStream, which {GDA.ref} needs"
+    }
+
+    choice = b2y.choose_image(entities, plan, BASE, [NO_FFMPEG, OLD_STATS, GOOD])
+    assert choice.image == GOOD.ref
+
+
+def test_pattern_sub_entities_keep_an_ioc_off_the_runtime_image(stats_params):
+    """The runtime image builds no AreaDetector, so a gdaPlugins-only IOC is
+    never pattern-only."""
+    entities = [{"type": "detectorPlugins.gdaPlugins"}]
+    choice = b2y.choose_image(entities, PatternPlan([GDA]), BASE, [GOOD])
+    assert not choice.pattern_only
+    assert choice.image == GOOD.ref
 
 
 def test_dockerfile_modules_after_and_and_continuations():

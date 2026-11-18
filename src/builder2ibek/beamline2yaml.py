@@ -119,6 +119,7 @@ from builder2ibek.vendor_patterns import (
     image_entity_types,
     is_pattern_only,
     module_report,
+    pattern_gaps,
     patterns_to_add,
     plan_patterns,
     runtime_image,
@@ -474,8 +475,9 @@ def choose_image(
     ``runtime_types`` are the ioc-streamdevice-runtime image's entity types,
     None if unknown. Decides as xml2yaml does (see builder2ibek.vendor_patterns):
     a pattern-only IOC runs on the runtime image; on any other image, the
-    patterns the image installs are left out, and every other StreamDevice
-    pattern needs StreamDevice in the image.
+    patterns the image installs are left out, every other StreamDevice
+    pattern needs StreamDevice in the image, and every other pattern needs the
+    image to run its sub-entities (see vendor_patterns.pattern_gaps).
     """
     if runtime_types is not None and is_pattern_only(entities, plan, runtime_types):
         return ImageChoice(
@@ -489,10 +491,21 @@ def choose_image(
         if pattern_modules.get(t.partition(".")[0]) == STREAMDEVICE_LIBRARY:
             streamdevice.setdefault(t.partition(".")[0], set()).add(t)
 
+    def gaps(c: Candidate) -> dict[str, str]:
+        assert c.types is not None
+        return pattern_gaps(
+            entities, patterns_to_add(entities, plan, c.types), c.ref, c.types
+        )
+
     def fits(c: Candidate) -> bool:
         assert c.types is not None
-        return needed <= c.types and all(
-            c.generic.streamdevice or used <= c.types for used in streamdevice.values()
+        return (
+            needed <= c.types
+            and all(
+                c.generic.streamdevice or used <= c.types
+                for used in streamdevice.values()
+            )
+            and not gaps(c)
         )
 
     usable = [c for c in cands if c.types is not None and c.ref]
@@ -504,7 +517,10 @@ def choose_image(
         return ImageChoice(detail="no generic IOC schema available", missing=[])
     closest = min(
         usable,
-        key=lambda c: (len(needed - (c.types or frozenset())), usable.index(c)),
+        key=lambda c: (
+            len(needed - (c.types or frozenset())) + len(gaps(c)),
+            usable.index(c),
+        ),
     )
     missing = sorted(needed - (closest.types or frozenset()))
     detail = f"no generic IOC builds every type; closest {closest.ref}"
