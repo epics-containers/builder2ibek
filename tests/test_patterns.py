@@ -111,6 +111,20 @@ def test_support_library_routes_beamline_and_areadetector_modules(
     assert {"BL15I-BUILDER", "detectorPlugins"} <= folders
     assert "BL15I-BUILDER" not in index.patterns
     assert index.patterns["detectorPlugins"].library == SUPPORT_LIBRARY
+    # the sub-entities an image must run, as the index loads them
+    gda_subs = {
+        (t, args)
+        for model, t, args in index.patterns["detectorPlugins"].sub_entities
+        if model == "gdaPlugins"
+    }
+    assert any(
+        t == "ADCore.NDStats" and "ATTRIBUTES_FILE" in args for t, args in gda_subs
+    )
+    assert {t for t, _ in gda_subs} >= {
+        "ffmpegServer.ffmpegFile",
+        "ffmpegServer.ffmpegStream",
+        "detectorPlugins._gdaPluginsRecords",
+    }
     # skipped, but recorded so that an IOC using one gets a warning
     assert "BL15I-BUILDER" in index.unindexed
     assert "detectorPlugins" not in index.unindexed

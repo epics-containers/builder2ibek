@@ -518,7 +518,8 @@ def choose_image(
     closest = min(
         usable,
         key=lambda c: (
-            len(needed - (c.types or frozenset())) + len(gaps(c)),
+            len(needed - (c.types or frozenset())),
+            len(gaps(c)),
             usable.index(c),
         ),
     )

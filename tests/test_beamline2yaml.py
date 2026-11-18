@@ -167,6 +167,31 @@ def test_pattern_sub_entities_need_the_image(stats_params):
     assert choice.image == GOOD.ref
 
 
+def test_closest_image_prefers_one_with_the_types_over_one_with_no_gaps(
+    stats_params,
+):
+    """An image that builds every type but cannot run the pattern is closer
+    than one, listed first, that runs the pattern but lacks the camera; its
+    gap is then the reason reported."""
+    entities = ents("ADAndor3.andor3", "detectorPlugins.gdaPlugins")
+    plan = PatternPlan([GDA])
+    no_camera = cand("ioc-nocamera", {"ADCore.NDStats", "ffmpegServer.ffmpegStream"})
+    choice = b2y.choose_image(entities, plan, BASE, [no_camera, OLD_STATS])
+    assert not choice.image
+    assert choice.closest == OLD_STATS.ref
+    assert choice.missing == []
+    statuses = vendor_patterns.classify_modules(
+        entities, plan, choice.closest, choice.closest_types
+    )
+    assert [(s.kind, s.reason) for s in statuses if s.module == "detectorPlugins"] == [
+        (
+            "unresolved",
+            f"{OLD_STATS.ref} ADCore.NDStats takes no ATTRIBUTES_FILE, which "
+            f"{GDA.ref} passes",
+        )
+    ]
+
+
 def test_pattern_sub_entities_keep_an_ioc_off_the_runtime_image(stats_params):
     """The runtime image builds no AreaDetector, so a gdaPlugins-only IOC is
     never pattern-only."""
