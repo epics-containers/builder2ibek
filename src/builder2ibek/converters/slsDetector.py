@@ -1,9 +1,18 @@
+from builder2ibek.converters.adPython import downstream_note
 from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.utils import make_bool
 
 xml_component = "slsDetector"
-yaml_component = "slsDetector_dls"
+yaml_component = "slsDetector"
+
+# builder defaults of the attributes the ibek-support model requires
+REQUIRED_DEFAULTS = {"detectorIndex": 0, "numModules": 1, "BUFFERS": 50, "MEMORY": 0}
+
+OLD_API = (
+    "this slsDetector takes useReceiver, the API of slsDetector 2-0dls1; "
+    "ibek-support builds a slsDetectorPackage whose slsDetectorConfig takes "
+    "numModules instead"
+)
 
 
 @globalHandler
@@ -13,6 +22,17 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
 
     if entity_type == "slsDetector":
+        if "useReceiver" in entity:
+            ioc.wont_convert(entity, OLD_API, note=downstream_note(entity, ioc))
+            return
+        entity.type = "slsDetector.slsDetectorConfigure"
         entity.remove("name")
-        if "cacheConfigFile" in entity:
-            entity["cacheConfigFile"] = make_bool(entity["cacheConfigFile"])
+        # some builder versions spell these differently
+        entity.rename("configFileName", "configFile")
+        entity.rename("detectorId", "detectorIndex")
+        # the ibek-support model reads configFile as given: no cached copy
+        entity.remove("cacheConfigFile")
+        entity.remove("iocName")
+        for attr, default in REQUIRED_DEFAULTS.items():
+            if entity.get(attr) in (None, ""):
+                entity[attr] = default

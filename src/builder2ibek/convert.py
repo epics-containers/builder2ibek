@@ -30,6 +30,7 @@ from builder2ibek.patterns import (
 from builder2ibek.support_defaults import (
     builder_module_target,
     fill_empty_attributes,
+    keep_text_attributes,
     strip_defaults,
 )
 from builder2ibek.types import Entity, Generic_IOC
@@ -425,6 +426,7 @@ def do_one_element(element: Element, entity: Entity, ioc: Generic_IOC):
         add_defaults(entity, info.defaults)
 
     fill_empty_attributes(entity)
+    keep_text_attributes(entity)
     drop_none_values(entity)
 
     # a beamline module's defaults are its pattern model's, which only

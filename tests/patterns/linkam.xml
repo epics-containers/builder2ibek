@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<linkam.linkam P="BL11I-EA-TEMPC-01" PORT="TS_7" Q="" gda_desc="Linkam stage" gda_name="ENV.LINKAM" name="BL11I-EA-TEMPC-01"/>
+</components>

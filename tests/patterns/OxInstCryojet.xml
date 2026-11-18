@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<OxInstCryojet.cryojet P="BL11I-CG-CJET-01" PORT="TS_12" Q="" gda_desc="Cryojet" gda_name="OXINSTCRYOJET" name="ENV.CJET"/>
+	<OxInstCryojet.MercuryiTC_SCPI_system P="BL11I-EA-MERC-01" PORT="ITC_CTLR" Q=":SYS" name="MERC.SYS"/>
+	<OxInstCryojet.MercuryiTC_SCPI_heater P="BL11I-EA-MERC-01" PORT="ITC_CTLR" Q=":HEAT1" UID="DB1.H1" name="MERC.DH1"/>
+	<OxInstCryojet.MercuryiTC_SCPI_tempSensor P="BL11I-EA-MERC-01" PORT="ITC_CTLR" Q=":TEMP1" UID="DB6.T1" name="MERC.DT1"/>
+	<OxInstCryojet.MercuryiTC_SCPI_loop P="BL11I-EA-MERC-01" PORT="ITC_CTLR" Q=":LOOP" UID="DB6.T1" name="MERC.LOOP"/>
+	<OxInstCryojet.cryojetITC503S P="BL16I-EA-TEMPC-01" PORT="p2" Q="" gda_desc="Oxford Inst ITC503S" gda_name="OXITCb" name="cryojet"/>
+	<OxInstCryojet.MercuryiTC_SCPI P="BL18B-EA-TEMPC-08" PORT="MERC1" Q=""/>
+	<OxInstCryojet.ILM201 P="BL22I-CG-CJET-01:ILM" PORT="cryoILM" alh="None" gda_desc="Oxford Cryo Level" gda_name="CRYOLEVEL" name="ENV.CLEVEL"/>
+</components>

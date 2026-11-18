@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<fw102.fw102 FILTER2="Al" FILTER4="Au" FILTER6="Fe" P="BL19I-MO-FILT-01" PORT="FW102Port" R="" name="FW102"/>
+</components>

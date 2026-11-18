@@ -152,6 +152,40 @@ def test_fill_reaches_only_empty_xml_attributes():
     assert extra == {"type": "nomodel.e", "A": None}
 
 
+def test_numeric_text_of_a_str_param_stays_text():
+    """A numeric-looking attribute of a str parameter keeps its text, as
+    written, while an int parameter of the same entity is still a number. A
+    runtime pattern's model types the parameter of a module with no generic
+    model: keithley6514 A is text there."""
+    entities = convert(
+        '<keithley6514.keithley6514 A="10" P="BL01C-EA-K65-01" PORT="k" R=":I:"/>\n'
+        '<laudaRE2xx.lRE2xx ADDR="0" P="BL01C-OP-CHILL-01" PORT="p" '
+        'TEMPDESC="10.00" name="CHILL"/>'
+    )
+    (keithley,) = of_type(entities, "keithley6514.keithley6514")
+    assert keithley["A"] == "10"
+    (lauda,) = of_type(entities, "laudaRE2xx.lRE2xx")
+    assert lauda["TEMPDESC"] == "10.00"
+    assert lauda["ADDR"] == 0
+
+
+def test_text_kept_only_for_str_params_holding_the_xml_number(monkeypatch):
+    """A value a converter set, or a parameter no model types as str, keeps
+    its number."""
+    from builder2ibek import support_defaults
+    from builder2ibek.types import Entity
+
+    monkeypatch.setitem(
+        support_defaults._param_specs,
+        "m.e",
+        {"A": {"type": "str"}, "B": {"type": "str"}, "C": {"type": "int"}},
+    )
+    entity = Entity(type="m.e", A=1.5, B=7, C=3, D=4)
+    entity.set_xml_attributes({"A": "1.50", "B": "3", "C": "3", "D": "4"})
+    support_defaults.keep_text_attributes(entity)
+    assert entity == {"type": "m.e", "A": "1.50", "B": 7, "C": 3, "D": 4}
+
+
 def test_empty_attribute_is_filled_under_its_new_name():
     """A converter's rename carries the empty XML attribute with it: Hy8401
     sampleSize becomes triggered, an int, so an empty one takes the default."""

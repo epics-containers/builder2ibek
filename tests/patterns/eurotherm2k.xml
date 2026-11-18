@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<eurotherm2k.eurotherm2k GAD="0" LAD="1" P="BL05I-EA-TCTRL-01" PORT="vts_EBHC1" Q="" desc="EBHC internal Eurotherm 2408" gda_desc="$(desc)" gda_name="EBHC-TCTRL" name="EA3.TCTRL1"/>
+</components>

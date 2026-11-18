@@ -183,6 +183,41 @@ def fill_empty_attributes(entity: dict[str, Any]):
         entity[key] = empty_attribute(entity_type, key)
 
 
+def _as_number(text: str) -> int | float | None:
+    """The number make_entity reads from an XML attribute, or None."""
+    try:
+        f = float(text)
+    except ValueError:
+        return None
+    return int(f) if f.is_integer() else f
+
+
+def keep_text_attributes(entity: dict[str, Any]):
+    """
+    Give a str parameter its XML attribute as written, not as a number.
+
+    make_entity reads every numeric-looking attribute as a number, so that the
+    YAML does not quote it; a str parameter would then reject it ("10" for a
+    description, "5" for a timeout a pattern takes as text). This puts back the
+    attribute's text for each parameter the entity model types as str, when
+    the entity still holds the number make_entity read from it: a value a
+    converter set is its own choice. A parameter with no model to say keeps
+    its number.
+    """
+    if not isinstance(entity, Entity):
+        return
+    specs = _param_specs.get(str(entity.get("type", "")), {})
+    for key, text in entity.xml_attributes().items():
+        value = entity.get(key)
+        if (
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and specs.get(key, {}).get("type") == "str"
+            and _as_number(text) == value
+        ):
+            entity[key] = text
+
+
 def values_match(entity_val: Any, default_val: Any) -> bool:
     """Compare entity value to default, with numeric type tolerance."""
     if entity_val == default_val:

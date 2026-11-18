@@ -723,7 +723,7 @@ entity_models:
           img:
           fins_port: "{{master.fins_port}}"
           eip_port: "{{master.eip_port}}"
-          tagidx: "{{ (id | string).strip('0') }}"
+          tagidx: "{{ id | string | int }}"
           id: "{{id}}"
           em:
           waveform_nelm: "{{master.waveform_nelm}}"

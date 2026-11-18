@@ -11,20 +11,22 @@ REASON = (
 )
 
 
-def _downstream_note(entity: Entity, ioc: Generic_IOC) -> str:
+def downstream_note(entity: Entity, ioc: Generic_IOC) -> str:
     """
-    Name the entities that take their input from the dropped plugin's port.
+    Name the entities that take their input from the dropped entity's port.
 
-    adPython plugins sit in an areaDetector plugin chain; a downstream plugin
-    with NDARRAY_PORT set to the dropped port fails ioc.yaml validation
-    ("object ... not found") until it is rewired or the IOC is ported.
+    Only entities of other modules are searched. A dropped driver or plugin
+    sits in an areaDetector chain; a downstream plugin with NDARRAY_PORT set
+    to the dropped port fails ioc.yaml validation ("object ... not found")
+    until it is rewired or the IOC is ported.
     """
     port = entity.get("PORT")
     if not port:
         return ""
+    module = str(entity.type).split(".")[0]
     users: Counter[str] = Counter()
     for raw in ioc.raw_entities:
-        if str(raw.get("type", "")).startswith(f"{xml_component}."):
+        if str(raw.get("type", "")).startswith(f"{module}."):
             continue
         for key, value in raw.items():
             if key != "type" and value == port:
@@ -47,4 +49,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     (adPythonPlugin) is left out with a warning naming its port and the
     entities that reference that port.
     """
-    ioc.wont_convert(entity, REASON, note=_downstream_note(entity, ioc))
+    ioc.wont_convert(entity, REASON, note=downstream_note(entity, ioc))
