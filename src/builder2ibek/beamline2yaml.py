@@ -778,10 +778,25 @@ def _failures(plan: Plan) -> list[str]:
     return failures
 
 
+BACKUP_SUFFIX = ".beamline2yaml-backup"
+# a backup renamed to this is being removed: a partial one blocks nothing
+DISCARD_SUFFIX = ".beamline2yaml-discard"
+
+
 def backup_path(services: Path, folder: str) -> Path:
     """Where --apply keeps an IOC's existing folder until its new one is
     converted and validated."""
-    return services / f".{folder}.beamline2yaml-backup"
+    return services / f".{folder}{BACKUP_SUFFIX}"
+
+
+def _discard(backup: Path) -> None:
+    """Remove a backup that is no longer needed: renamed first, so that a
+    removal cut short leaves no backup to block the next run (which removes
+    what is left)."""
+    discard = backup.with_name(backup.name.removesuffix(BACKUP_SUFFIX) + DISCARD_SUFFIX)
+    shutil.rmtree(discard, ignore_errors=True)
+    backup.rename(discard)
+    shutil.rmtree(discard)
 
 
 @dataclass
@@ -801,16 +816,20 @@ def _undo(written: _Written) -> list[str]:
     """Remove what was written for an IOC and put back its previous folder.
 
     Every step is attempted, whatever an earlier one raised; returns what
-    could not be done.
+    could not be done. Each step done is recorded in ``written``, so that
+    undoing again, after an interrupt cut an undo short, repeats none: a
+    folder put back is never removed.
     """
     errors: list[str] = []
-    for sibling in written.siblings:
+    for sibling in list(written.siblings):
         try:
             shutil.rmtree(sibling)
         except FileNotFoundError:
             pass
         except OSError as e:
             errors.append(f"cannot remove {sibling}: {e}")
+            continue
+        written.siblings.remove(sibling)
     if written.new or written.backup is not None:
         try:
             if written.folder.is_symlink():
@@ -819,17 +838,22 @@ def _undo(written: _Written) -> list[str]:
                 shutil.rmtree(written.folder)
         except OSError as e:
             errors.append(f"cannot remove {written.folder}: {e}")
+            return errors
+        written.new = False
     if written.backup is not None:
         try:
             written.backup.rename(written.folder)
         except OSError as e:
             errors.append(f"cannot put {written.backup} back to {written.folder}: {e}")
+            return errors
+        written.backup = None
     return errors
 
 
 def _undo_all(written: Iterable[_Written]) -> list[str]:
-    """Undo every IOC's writes, each one whatever the others raised."""
-    return [error for w in written for error in _undo(w)]
+    """Undo every IOC's writes, the last written first, each one whatever the
+    others raised."""
+    return [error for w in reversed(list(written)) for error in _undo(w)]
 
 
 def _make_folder(services: Path, entry: Entry) -> Path | None:
@@ -931,15 +955,15 @@ def apply_plan(
         raise FileNotFoundError(f"{services / TEMPLATE}/values.yaml not found")
     descriptions = descriptions or {}
     by_name = {e.ioc: e for e in plan.entries}
+    for leftover in services.glob(f".*{DISCARD_SUFFIX}"):
+        shutil.rmtree(leftover, ignore_errors=True)
     configs: dict[str, Path] = {}
-    # what each IOC wrote, until it is validated
+    # what each IOC wrote, until it is validated, in the order written
     written: dict[str, _Written] = {}
     try:
         for entry in plan.entries:
             if entry.action in ("add", "replace", "fastcs"):
-                done = _apply_entry(services, entry, descriptions)
-                if done is not None:
-                    written[entry.ioc] = done
+                _apply_entry(services, entry, descriptions, written)
                 if entry.status == "ok":
                     configs[entry.ioc] = services / entry.folder / "config"
         if validate and configs:
@@ -954,46 +978,61 @@ def apply_plan(
                 if entry.schema == "ok":
                     continue
                 entry.status = "error"
-                done = written.pop(entry.ioc)
-                errors = _undo(done)
+                done = written[entry.ioc]
                 undone = (
                     "the previous folder is put back"
                     if done.backup is not None
                     else "its folder is removed"
                 )
+                errors = _undo(done)
+                # only now: an interrupt during the undo still undoes it
+                del written[entry.ioc]
                 entry.warnings.append(
                     f"schema validation failed: {undone}"
                     + "".join(f"; {error}" for error in errors)
                 )
+        # each IOC left is done: off the undo list, then its backup removed
+        for ioc in list(written):
+            done = written.pop(ioc)
+            if done.backup is not None:
+                try:
+                    _discard(done.backup)
+                except OSError as e:
+                    by_name[ioc].warnings.append(f"cannot remove {done.backup}: {e}")
     except BaseException as e:
         for error in _undo_all(written.values()):
             e.add_note(error)
             print(f"error: {error}", file=sys.stderr)
         raise
-    for ioc, done in written.items():
-        if done.backup is not None:
-            try:
-                shutil.rmtree(done.backup)
-            except OSError as e:
-                by_name[ioc].warnings.append(f"cannot remove {done.backup}: {e}")
 
 
 def _created(services: Path, before: set[str], *keep: str) -> list[Path]:
-    """The folders in ``services`` that are not in ``before`` nor ``keep``."""
+    """The fastcs-pandablocks instances in ``services`` that are not in
+    ``before`` nor ``keep``: new folders that hold config/controller.yaml, as
+    write_fastcs makes them, never another run's backup."""
     try:
         now = set(os.listdir(services))
     except OSError:
         return []
-    return [services / name for name in sorted(now - before - set(keep))]
+    return [
+        services / name
+        for name in sorted(now - before - set(keep))
+        if not name.endswith((BACKUP_SUFFIX, DISCARD_SUFFIX))
+        and not (services / name).is_symlink()
+        and (services / name / "config" / CONTROLLER_YAML).is_file()
+    ]
 
 
 def _apply_entry(
-    services: Path, entry: Entry, descriptions: Mapping[str, str]
-) -> _Written | None:
-    """Write and convert one IOC's folder. Returns what it wrote, or None
-    after a failure: then nothing it wrote is left, the previous folder is
-    back in place and entry.status is "error"; an interrupt re-raises after
-    that."""
+    services: Path,
+    entry: Entry,
+    descriptions: Mapping[str, str],
+    written: dict[str, _Written],
+) -> None:
+    """Write and convert one IOC's folder, recording in ``written`` what it
+    wrote from the moment it writes. After a failure nothing it wrote is left,
+    the previous folder is back in place, it is off ``written`` and
+    entry.status is "error"; an interrupt re-raises after that."""
     folder = services / entry.folder
     yaml = folder / "config" / "ioc.yaml"
     image, image_types = None, None
@@ -1013,6 +1052,7 @@ def _apply_entry(
         else:
             done.backup = _make_folder(services, entry)
         made = True
+        written[entry.ioc] = done
         with contextlib.redirect_stdout(sys.stderr):
             result = convert_file(
                 Path(entry.xml),
@@ -1029,20 +1069,22 @@ def _apply_entry(
             raise ConversionFailedError(problem)
     except BaseException as e:
         errors: list[str] = []
+        put_back = "; the previous folder is put back" if done.backup else ""
         if made:
             done.siblings = _created(services, before, entry.folder, backup_name)
             errors = _undo(done)
+            # only now: an interrupt during the undo still undoes it
+            del written[entry.ioc]
         if not isinstance(e, Exception):
             for error in errors:
                 e.add_note(error)
             raise
         entry.status = "error"
-        put_back = "; the previous folder is put back" if done.backup else ""
         entry.warnings.append(
             f"conversion failed: {type(e).__name__}: {e}{put_back}"
             + "".join(f"; {error}" for error in errors)
         )
-        return None
+        return
     # the conversion's module report replaces the plan's: its notes are
     # rendered from entry.modules, its unresolved modules are warnings
     old_warnings = module_report(entry.modules)[1]
@@ -1062,7 +1104,6 @@ def _apply_entry(
             text = values.read_text()
             if entry.header.split(".")[0] not in text.replace("\n# ", " "):
                 values.write_text(add_header(text, entry.header))
-    return done
 
 
 def _status(e: Entry) -> str:
