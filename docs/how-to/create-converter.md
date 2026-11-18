@@ -3,8 +3,8 @@
 When `builder2ibek xml2yaml` converts a builder XML file it applies a
 **converter** — a small Python module — for each XML component prefix it
 encounters.  If no converter exists, the entity keeps the XML module name and
-the attributes the XML had, except for `name` and the GDA attributes, which
-are removed.
+the attributes the XML had, except that `name` and the GDA attributes are
+removed and the values "True" and "False" become booleans.
 
 This how-to explains when and how to write a new converter.
 

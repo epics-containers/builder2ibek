@@ -258,10 +258,11 @@ Auto-conversion is a best-effort translation; review the output for:
   one now.
 - **Default values**: some converters inject sensible defaults (e.g. autosave
   `debug: false`).  Verify these are appropriate.
-- **Module coverage**: if a module has no converter, its entities will just have
-  identical parameters to the XML attributes in the original. For some entities this
-  will be perfectly OK as we try to make the `xxx.ibek.support.yaml` as compatible
-  with the original XML as possible.
+- **Module coverage**: if a module has no converter, its entities keep the XML
+  attributes of the original, except that `name` and the `gda_*` attributes are
+  removed and the values "True" and "False" become booleans. For many entities
+  this is all that is needed, as we try to make the `xxx.ibek.support.yaml` as
+  compatible with the original XML as possible.
 - **Schema validation**: open the YAML in VSCode with the Red Hat YAML extension;
   the `$schema` line at the top will highlight any type mismatches.
 
@@ -344,5 +345,5 @@ Both commands update the ioc instance schema in `/epics/ibek-defs/ioc.schema.jso
 | `EPICS_BASE.EpicsEnvSet` | `epics.EpicsEnvSet` | renamed by converter |
 
 The converter modules in `src/builder2ibek/converters/` handle the non-trivial
-mappings. Each file corresponds to one support module. See `src/builder2ibek/converters/`
-for the full list.
+mappings. There is one file per support module that needs more than the default.
+See `src/builder2ibek/converters/` for the full list.

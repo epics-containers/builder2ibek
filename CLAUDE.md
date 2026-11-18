@@ -42,7 +42,7 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 | `ibek-support/<module>/` | Community entity models |
 | `ibek-runtime-streamdevice/` | Runtime pattern library at the release the tests use; conversions clone the latest release (`src/builder2ibek/patterns.py`) |
 | `ibek-runtime-support/` | Runtime pattern library of the beamline modules (`BL\d\d[A-Z]`), pinned and cloned the same way |
-| `src/builder2ibek/converters/` | XML converters (one per module) |
+| `src/builder2ibek/converters/` | XML converters (one per module that needs one) |
 | `tools/pvi-from-edm/` | Separate tool: PVI from EDM screens, see its README |
 
 Find IOC XMLs using a module:
