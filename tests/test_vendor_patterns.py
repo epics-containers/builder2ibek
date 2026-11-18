@@ -166,7 +166,7 @@ def test_mixed_skips_patterns_the_image_installs(tmp_path: Path, ibek):
 
     assert VAC in (instance / "values.yaml").read_text()
     assert _adds(ibek) == [ATTO.ref]
-    assert f"EdwardsScroll: {VAC} installs it" in report.notes
+    assert f"EdwardsScroll is build-time: {VAC} installs it" in report.notes
 
 
 BL21I = Pattern(
@@ -219,8 +219,8 @@ def test_beamline_pattern_is_added_even_when_the_image_has_it(
     report = add_patterns(entities, instance / "config" / "ioc.yaml")
 
     assert _adds(ibek) == [BL21I.ref]
-    assert f"EdwardsScroll: {VAC} installs it" in report.notes
-    assert not [n for n in report.notes if n.startswith("BL21I:")]
+    assert f"EdwardsScroll is build-time: {VAC} installs it" in report.notes
+    assert not [n for n in report.notes if n.startswith("BL21I is")]
 
 
 def test_mixed_without_image_schema_adds_all(tmp_path: Path, ibek):
@@ -232,7 +232,9 @@ def test_mixed_without_image_schema_adds_all(tmp_path: Path, ibek):
 
     assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
     assert report.warnings == [
-        f"cannot fetch the ioc schema of {GITLAB}; adding every pattern"
+        f"cannot fetch the ioc schema of {GITLAB}; adding every pattern",
+        "unresolved module other, nothing can run it: no generic model and no "
+        "runtime pattern",
     ]
     assert GITLAB in (instance / "values.yaml").read_text()
 
@@ -284,6 +286,8 @@ def test_no_instance_only_reports(tmp_path: Path, ibek):
         f"would add runtime pattern {ATTO.ref}",
         f"would add runtime pattern {SCROLL.ref}",
         f"image: {RUNTIME}",
+        "pattern modules: attocubeInterf",
+        "build-time modules: asyn",
     ]
 
 
@@ -314,7 +318,7 @@ def test_all_locked_regenerates_the_schema(tmp_path: Path, ibek, monkeypatch):
 def test_any_failure_is_a_conversion_warning(tmp_path: Path, monkeypatch):
     """Whatever adding patterns raises, the ioc.yaml is written."""
 
-    def fail(entities, ioc_yaml):
+    def fail(entities, ioc_yaml, image, image_types):
         raise OSError("read-only file system")
 
     monkeypatch.setattr(convert, "add_patterns", fail)
@@ -366,3 +370,223 @@ def test_image_must_install_every_type_the_ioc_uses(tmp_path: Path, ibek):
     add_patterns(entities, instance / "config" / "ioc.yaml")
 
     assert _adds(ibek) == [ATTO.ref, SCROLL.ref]
+
+
+# A mixed IOC: build-time modules, StreamDevice patterns (VAC installs one of
+# them, EdwardsScroll) and a module with no generic model or pattern
+LEYBOLD = {"type": "LeyboldTurbo.LeyboldPortDriver", "name": "t"}
+MIXED = [*ENTITIES, {"type": "digitelMpc.digitelMpc", "name": "m"}, LEYBOLD]
+
+
+@pytest.fixture
+def generic(monkeypatch):
+    """The modules with a generic model, as ibek-support* would give them."""
+    modules = frozenset({"asyn", "digitelMpc", "EdwardsScroll"})
+    monkeypatch.setattr(vendor_patterns, "generic_modules", lambda: modules)
+
+
+def _kinds(report) -> dict[str, str]:
+    return {s.module: s.kind for s in report.modules}
+
+
+def test_mixed_ioc_module_report_with_image(tmp_path: Path, ibek, generic):
+    """Outside a services repo, --image decides which patterns are left out."""
+    report = add_patterns(MIXED, tmp_path / "ioc.yaml", image=VAC)
+
+    assert ibek == []
+    assert _kinds(report) == {
+        "asyn": "build-time",
+        "attocubeInterf": "pattern",
+        "EdwardsScroll": "build-time",
+        "digitelMpc": "build-time",
+        "LeyboldTurbo": "unresolved",
+    }
+    assert report.notes == [
+        f"would add runtime pattern {ATTO.ref}",
+        f"image: {VAC}",
+        "pattern modules: attocubeInterf",
+        "build-time modules: asyn, EdwardsScroll, digitelMpc",
+        f"EdwardsScroll is build-time: {VAC} installs it",
+    ]
+    assert report.warnings == [
+        "unresolved module LeyboldTurbo, nothing can run it: "
+        f"{VAC} does not build LeyboldTurbo.LeyboldPortDriver"
+    ]
+
+
+def test_mixed_ioc_module_report_without_image(tmp_path: Path, ibek, generic):
+    """With no image, the generic models decide build-time or unresolved."""
+    report = add_patterns(MIXED, tmp_path / "ioc.yaml")
+
+    assert _kinds(report) == {
+        "asyn": "build-time",
+        "attocubeInterf": "pattern",
+        "EdwardsScroll": "pattern",
+        "digitelMpc": "build-time",
+        "LeyboldTurbo": "unresolved",
+    }
+    assert report.warnings == [
+        "unresolved module LeyboldTurbo, nothing can run it: no generic model "
+        "and no runtime pattern"
+    ]
+
+
+def test_pattern_rejected_without_generic_model_is_unresolved(
+    tmp_path: Path, ibek, generic, monkeypatch
+):
+    reason = f"{ATTO.ref} rejects 0.Q: Field required"
+    monkeypatch.setattr(
+        FakeIndex,
+        "plan",
+        lambda self, e: PatternPlan([SCROLL], {"attocubeInterf": reason}),
+    )
+    report = add_patterns(ENTITIES, tmp_path / "ioc.yaml")
+
+    assert _kinds(report)["attocubeInterf"] == "unresolved"
+    assert (
+        "unresolved module attocubeInterf, nothing can run it: no generic model, "
+        f"and {reason}"
+    ) in report.warnings
+
+
+def test_pattern_rejected_with_generic_model_is_build_time(
+    tmp_path: Path, ibek, generic, monkeypatch
+):
+    reason = f"{SCROLL.ref}: pattern not yet aligned with the generic model"
+    monkeypatch.setattr(
+        FakeIndex,
+        "plan",
+        lambda self, e: PatternPlan([ATTO], {"EdwardsScroll": reason}),
+    )
+    report = add_patterns(ENTITIES, tmp_path / "ioc.yaml")
+
+    assert _kinds(report)["EdwardsScroll"] == "build-time"
+    assert f"EdwardsScroll is build-time: {reason}" in report.notes
+
+
+def test_image_option_sets_the_placeholder(tmp_path: Path, ibek, generic):
+    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
+
+    report = add_patterns(MIXED, instance / "config" / "ioc.yaml", image=VAC)
+
+    assert f"image: {VAC}" in (instance / "values.yaml").read_text()
+    assert f"image set to {VAC}" in report.notes
+    assert _adds(ibek) == [ATTO.ref]
+    assert _kinds(report)["EdwardsScroll"] == "build-time"
+
+
+def test_image_option_on_a_pattern_only_ioc_is_kept(tmp_path: Path, ibek):
+    """A given image is planned against, never swapped for the runtime image."""
+    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
+
+    add_patterns(ENTITIES[:2], instance / "config" / "ioc.yaml", image=VAC)
+
+    assert f"image: {VAC}" in (instance / "values.yaml").read_text()
+    assert _adds(ibek) == [ATTO.ref]
+
+
+def test_image_option_never_replaces_a_set_image(tmp_path: Path, ibek, generic):
+    instance = _instance(tmp_path, RUNTIME)
+
+    report = add_patterns(MIXED, instance / "config" / "ioc.yaml", image=VAC)
+
+    assert f"image: {RUNTIME}" in (instance / "values.yaml").read_text()
+    assert (
+        f"values.yaml names {RUNTIME}, not {VAC}: planned against {VAC}; set it "
+        "in values.yaml"
+    ) in report.warnings
+    # planned against VAC, which installs EdwardsScroll
+    assert _adds(ibek) == [ATTO.ref]
+
+
+def test_no_patterns_still_reports_modules(tmp_path: Path, ibek, generic, monkeypatch):
+    monkeypatch.setattr(FakeIndex, "plan", lambda self, e: PatternPlan())
+    instance = _instance(tmp_path, "REPLACE_WITH_IMAGE_URI")
+
+    report = add_patterns(
+        [ENTITIES[0], LEYBOLD], instance / "config" / "ioc.yaml", image=VAC
+    )
+
+    assert ibek == []
+    assert f"image: {VAC}" in (instance / "values.yaml").read_text()
+    assert _kinds(report) == {"asyn": "build-time", "LeyboldTurbo": "unresolved"}
+
+
+def test_xml2yaml_prints_the_module_report(tmp_path: Path, ibek, monkeypatch):
+    from typer.testing import CliRunner
+
+    from builder2ibek.__main__ import cli
+
+    seen = []
+
+    def fake(entities, ioc_yaml, image, image_types):
+        seen.append(image)
+        return vendor_patterns.PatternReport(
+            notes=["pattern modules: x"], warnings=["unresolved module y, ..."]
+        )
+
+    monkeypatch.setattr(convert, "add_patterns", fake)
+    result = CliRunner().invoke(
+        cli,
+        ["xml2yaml", str(SAMPLE), "--yaml", str(tmp_path / "ioc.yaml"), "--image", VAC],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert seen == [VAC]
+    assert "pattern modules: x" in result.output
+    assert "warning: unresolved module y" in result.output
+
+
+def test_fetch_entity_types_tells_unfetchable_from_unpublished(monkeypatch):
+    from ibek.pattern_cmds.schema import SchemaFetchError, SchemaNotFoundError
+
+    def raises(error):
+        def fetch(image):
+            raise error
+
+        return fetch
+
+    monkeypatch.setattr(
+        vendor_patterns, "_fetch_base_schema", raises(SchemaNotFoundError("404"))
+    )
+    assert vendor_patterns.fetch_entity_types(VAC) is None
+
+    for error in (SchemaFetchError("timed out"), OSError("unreachable")):
+        monkeypatch.setattr(vendor_patterns, "_fetch_base_schema", raises(error))
+        with pytest.raises(vendor_patterns.SchemaUnavailableError, match=VAC):
+            vendor_patterns.fetch_entity_types(VAC)
+
+    monkeypatch.setattr(
+        vendor_patterns, "_fetch_base_schema", lambda image: _schema(SCHEMAS[VAC])
+    )
+    assert vendor_patterns.fetch_entity_types(VAC) == SCHEMAS[VAC]
+
+
+def test_failed_pattern_add_is_an_error(tmp_path: Path, ibek, monkeypatch):
+    def run(*args: str):
+        return subprocess.CompletedProcess(args, 1, "", "network down")
+
+    monkeypatch.setattr(vendor_patterns, "_ibek", run)
+    instance = _instance(tmp_path, VAC)
+
+    report = add_patterns(ENTITIES, instance / "config" / "ioc.yaml")
+
+    error = f"ibek pattern add {ATTO.ref} failed: network down"
+    assert report.errors == [error]
+    assert error in report.warnings
+
+
+def test_pattern_errors_reach_the_conversion_result(tmp_path: Path, monkeypatch):
+    def failing(entities, ioc_yaml, image, image_types):
+        return vendor_patterns.PatternReport(warnings=["e"], errors=["e"])
+
+    monkeypatch.setattr(convert, "add_patterns", failing)
+    result = convert.convert_file(SAMPLE, tmp_path / "ioc.yaml", "schema")
+    assert result.pattern_errors == ["e"]
+
+    def crash(entities, ioc_yaml, image, image_types):
+        raise OSError("read-only")
+
+    monkeypatch.setattr(convert, "add_patterns", crash)
+    result = convert.convert_file(SAMPLE, tmp_path / "ioc.yaml", "schema")
+    assert result.pattern_errors == ["runtime patterns not added: read-only"]

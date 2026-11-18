@@ -127,8 +127,12 @@ def test_no_model_and_no_prefix_is_dropped_with_a_warning(tmp_path: Path):
 
     assert not [e for e in entities if e["type"] == "ADCore.NDAttributesConfig"]
     assert not (tmp_path / "ADC.xml").exists()
-    assert len(warnings) == 1
     assert "dropped 1 ADCore.NDAttributes for port ADC" in warnings[0]
+    # and the module report: no image can run dtacq_adc
+    assert warnings[1:] == [
+        "unresolved module dtacq_adc, nothing can run it: no generic model and "
+        "no runtime pattern"
+    ]
 
 
 @requires_support
@@ -165,8 +169,12 @@ def test_type_without_a_model_gets_a_config_file(tmp_path: Path):
         "P": "BL99P-EA-ADC-01",
         "R": ":ADC:",
     } in entities
-    assert len(warnings) == 1
     assert "dtacq_adc.dtacq_adc has no entity model" in warnings[0]
+    # and the module report: no image can run dtacq_adc
+    assert warnings[1:] == [
+        "unresolved module dtacq_adc, nothing can run it: no generic model and "
+        "no runtime pattern"
+    ]
 
 
 @requires_support

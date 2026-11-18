@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -30,6 +31,9 @@ BUILDER_PROD = Path("/dls_sw/prod/R3.14.12.7/support")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 UPDATE_SCHEMA = REPO_ROOT / "update-schema"
 IOC_SCHEMA = "/epics/ibek-defs/ioc.schema.json"
+# the folder of a validated config copy that holds the support YAMLs its image
+# has besides this checkout's (see validate_configs)
+IMAGE_DEFS = "image-ibek-defs"
 
 _SHORT_BL_RE = re.compile(r"^([A-Za-z])([0-9]{1,2})([A-Za-z])?$")
 
@@ -238,13 +242,33 @@ def run_reconvert(
 
 
 def _run_validation(result: ReconvertResult) -> None:
-    """Validate each reconverted ioc.yaml with `ibek runtime generate2`.
+    """Validate each reconverted ioc.yaml with `ibek runtime generate2`."""
+    by_name = {c["ioc_name"]: c for c in result.ioc_candidates}
+    configs = {
+        item["ioc_name"]: Path(by_name[item["ioc_name"]]["ioc_yaml"]).parent
+        for item in result.reconverted
+        if item["status"] == "ok" and item["ioc_name"] in by_name
+    }
+    result.validation.extend(validate_configs(configs))
 
-    One EPICS_ROOT tempdir and one config tempdir are created per
-    `reconvert` invocation; the generate2 calls run sequentially inside
-    them. CLAUDE.md hard rule 6 (EPICS_ROOT isolation) is satisfied per
-    invocation — parallelism is out of scope for this command.
+
+def validate_configs(
+    configs: Mapping[str, Path],
+    support_yamls: Mapping[str, Sequence[Path]] | None = None,
+) -> list[dict]:
+    """Validate the ioc.yaml of each config folder with `ibek runtime generate2`.
+
+    One EPICS_ROOT tempdir and one config tempdir are created per call; the
+    generate2 calls run sequentially inside them, so no IOC is started and
+    nothing outside the tempdirs is written. The schema is this checkout's
+    ibek-support*, as ``./update-schema`` builds it, plus the support YAMLs the
+    config vendors. ``support_yamls`` adds, per IOC, those its image has
+    besides: the runtime patterns it installs with ``ibek pattern install``.
+    They go into the copy of the config, in :data:`IMAGE_DEFS`. Returns one
+    ``{"ioc_name", "status": "ok" | "fail", "stderr"?}`` per config.
     """
+    support_yamls = support_yamls or {}
+    validation: list[dict] = []
     with (
         tempfile.TemporaryDirectory(prefix="epics-reconvert-") as epics_root,
         tempfile.TemporaryDirectory(prefix="reconvert-config-") as tmp_config,
@@ -260,32 +284,23 @@ def _run_validation(result: ReconvertResult) -> None:
             text=True,
         )
         if schema_proc.returncode != 0:
-            for item in result.reconverted:
-                result.validation.append(
-                    {
-                        "ioc_name": item["ioc_name"],
-                        "status": "fail",
-                        "stderr": (
-                            "update-schema failed: "
-                            + (schema_proc.stderr or schema_proc.stdout).strip()
-                        ),
-                    }
-                )
-            return
+            stderr = "update-schema failed: " + (
+                (schema_proc.stderr or schema_proc.stdout).strip()
+            )
+            return [
+                {"ioc_name": name, "status": "fail", "stderr": stderr}
+                for name in configs
+            ]
 
-        by_name = {c["ioc_name"]: c for c in result.ioc_candidates}
-        for item in result.reconverted:
-            ioc_name = item["ioc_name"]
-            cand = by_name.get(ioc_name)
-            if cand is None or item["status"] != "ok":
-                continue
-            # the ioc.yaml and the support YAMLs of the runtime patterns added
-            # next to it, which generate2 reads from the config folder
-            config = Path(cand["ioc_yaml"]).parent
+        for ioc_name, config in configs.items():
+            # the whole config folder: generate2 reads the ioc.yaml, the support
+            # YAMLs of runtime patterns and post_db_files such as records.db
             cfg = Path(tmp_config) / ioc_name
-            cfg.mkdir()
-            for f in [config / "ioc.yaml", *config.glob("*.ibek.support.yaml")]:
-                shutil.copy(f, cfg / f.name)
+            shutil.copytree(config, cfg)
+            if support_yamls.get(ioc_name):
+                (cfg / IMAGE_DEFS).mkdir(exist_ok=True)
+                for path in support_yamls[ioc_name]:
+                    shutil.copy(path, cfg / IMAGE_DEFS / path.name)
             proc = subprocess.run(
                 ["ibek", "runtime", "generate2", "--no-pvi", str(cfg)],
                 env=env,
@@ -293,15 +308,16 @@ def _run_validation(result: ReconvertResult) -> None:
                 text=True,
             )
             if proc.returncode == 0:
-                result.validation.append({"ioc_name": ioc_name, "status": "ok"})
+                validation.append({"ioc_name": ioc_name, "status": "ok"})
             else:
-                result.validation.append(
+                validation.append(
                     {
                         "ioc_name": ioc_name,
                         "status": "fail",
                         "stderr": (proc.stderr or proc.stdout).strip(),
                     }
                 )
+    return validation
 
 
 def _render_human(result: ReconvertResult) -> str:

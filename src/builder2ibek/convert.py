@@ -33,7 +33,7 @@ from builder2ibek.support_defaults import (
     strip_defaults,
 )
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.vendor_patterns import add_patterns
+from builder2ibek.vendor_patterns import ModuleStatus, add_patterns
 
 log = logging.getLogger(__name__)
 
@@ -51,10 +51,20 @@ class ConvertResult:
     fastcs_instances: list[Path] = dc_field(default_factory=list)
     # PandA prefixes refused because another instance already serves them
     refused: list[str] = dc_field(default_factory=list)
+    # how each module of the ioc.yaml runs: pattern, build-time or unresolved
+    modules: list[ModuleStatus] = dc_field(default_factory=list)
+    # runtime patterns that were to be added and were not (also warnings)
+    pattern_errors: list[str] = dc_field(default_factory=list)
 
 
 def convert_file(
-    xml: Path, yaml: Path, schema: str, description: str = "", blgui: bool = False
+    xml: Path,
+    yaml: Path,
+    schema: str,
+    description: str = "",
+    blgui: bool = False,
+    image: str | None = None,
+    image_types: frozenset[str] | None = None,
 ) -> ConvertResult:
     def tidy_up(yaml):
         # add blank lines between major fields
@@ -85,7 +95,12 @@ def convert_file(
     out, with a warning and a comment in the ioc.yaml that lists it for manual
     review (see builder2ibek.patterns.drop_beamline_entities). Raises
     BeamlinePatternError, writing nothing, when the IOC has beamline entities
-    and ibek-runtime-support cannot be indexed.
+    and ibek-runtime-support cannot be indexed. Each module the IOC uses is
+    reported as pattern, build-time or unresolved (see
+    builder2ibek.vendor_patterns). ``image`` is the generic IOC image to plan
+    against in place of the one the instance's values.yaml names, and
+    ``image_types`` its entity types when its published schema cannot be
+    fetched (a GitLab image matched on its Dockerfile).
 
     Returns what was written and the IOC's warnings, one per dropped entity
     type plus any others; the caller reports them to the user.
@@ -141,12 +156,17 @@ def convert_file(
         ruamel.dump(yaml_map, stream, transform=tidy_up)
 
     try:
-        patterns = add_patterns([dict(e) for e in ioc.entities], yaml)
+        patterns = add_patterns(
+            [dict(e) for e in ioc.entities], yaml, image, image_types
+        )
         result.notes += patterns.notes
         result.warnings += patterns.warnings
+        result.modules = patterns.modules
+        result.pattern_errors = patterns.errors
     except Exception as e:  # noqa: BLE001 -- the ioc.yaml is written; never fail
         log.debug("adding runtime patterns failed", exc_info=True)
         result.warnings.append(f"runtime patterns not added: {e}")
+        result.pattern_errors.append(f"runtime patterns not added: {e}")
 
     return result
 

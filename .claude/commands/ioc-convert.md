@@ -83,7 +83,11 @@ pattern-only IOC gets the latest `ioc-streamdevice-runtime` image in
 patterns that image already installs, except beamline patterns, which are
 always added. Patterns already in `runtime-lock.yaml` stay at their locked version. If it warns that a
 mixed IOC has no image set, set the generic IOC image in `values.yaml` and
-re-run xml2yaml. Report the patterns, the image and any warnings; see
+re-run xml2yaml, or pass it as `--image <ref>`, which fills in a placeholder
+image. xml2yaml then lists the pattern and build-time modules and warns for
+each unresolved module: one no image builds and no pattern takes, so the IOC
+cannot run until it has a home. Report the patterns, the image, the
+unresolved modules and any warnings; see
 [convert-ioc-instance.md](../../docs/how-to/convert-ioc-instance.md#runtime-patterns).
 
 **PandA IOCs (ADPandABlocks).** xml2yaml writes fastcs-pandablocks instances
