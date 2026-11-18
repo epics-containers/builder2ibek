@@ -17,6 +17,7 @@ from builder2ibek.patterns import (
     PatternPlan,
 )
 from builder2ibek.vendor_patterns import ModuleStatus, SchemaUnavailableError
+from tests.conftest import requires_support
 
 SAMPLES = Path(__file__).parent / "samples"
 XML = SAMPLES / "BL11I-CS-IOC-09.xml"
@@ -535,19 +536,39 @@ def test_apply_takes_the_conversion_module_report(repo: Path, monkeypatch):
     assert entry.warnings == [warning]
 
 
+class Release:
+    """A library release faked for library_release."""
+
+    def __init__(self, library: str, tag: str):
+        models = {
+            # a model added after 0.8.1 is not installed by an image pinning it
+            "EdwardsScroll": {"Scroll"} if tag == "0.8.1" else {"Scroll", "New"},
+            "QPC": {"QPC"},
+        }
+        self.patterns = {
+            m: Pattern(library, m, tag, frozenset(names), XML)
+            for m, names in models.items()
+        }
+
+
 def test_gitlab_candidate_adds_the_patterns_it_installs(monkeypatch):
     """ibek pattern install in the Dockerfile, from a --list file or on the
-    line, installs patterns whose types the image then has."""
+    line, also across line continuations, installs patterns whose types, at the
+    release each pins, the image then has."""
     dockerfile = (
         "RUN ansible.sh asyn\n"
         "COPY runtime-patterns.txt runtime-patterns.txt\n"
-        "RUN ibek pattern install --list runtime-patterns.txt\n"
-        "RUN ibek pattern install ibek-runtime-streamdevice:QPC@0.8.1\n"
+        "RUN ibek pattern install --list=runtime-patterns.txt\n"
+        "RUN ibek pattern install \\\n"
+        "    ibek-runtime-streamdevice:QPC@0.8.1 --frobnicate \\\n"
+        "    && echo done\n"
     )
     listed = (
         "# patterns this image installs\n"
         "ibek-runtime-streamdevice:EdwardsScroll@0.8.1\n"
         "ibek-runtime-streamdevice:NotIndexed@0.8.1  # no such pattern\n"
+        "QPC@0.8.1\n"
+        "elsewhere:QPC@0.8.1\n"
     )
 
     def get(host, path):
@@ -558,32 +579,42 @@ def test_gitlab_candidate_adds_the_patterns_it_installs(monkeypatch):
             return listed.encode()
         return dockerfile.encode()
 
-    class Index:
-        patterns = {
-            "EdwardsScroll": Pattern(
-                STREAMDEVICE_LIBRARY,
-                "EdwardsScroll",
-                "0.8.3",
-                frozenset({"Scroll"}),
-                XML,
-            ),
-            "QPC": Pattern(
-                STREAMDEVICE_LIBRARY, "QPC", "0.8.3", frozenset({"QPC"}), XML
-            ),
-        }
-
     monkeypatch.setattr(b2y, "_gitlab_get", get)
-    monkeypatch.setattr(b2y, "pattern_index", Index)
+    monkeypatch.setattr(b2y, "library_release", Release)
     monkeypatch.setattr(b2y, "support_models", lambda: {})
     generic = b2y.GenericImage("g/ioc-vac", "reg/ioc-vac", gitlab="gitlab.example")
 
     got = b2y._gitlab_candidate(generic, BASE)
 
     assert got.types == BASE | {"EdwardsScroll.Scroll", "QPC.QPC"}
+    assert [(p.module, p.version) for p in got.installed] == [
+        ("EdwardsScroll", "0.8.1"),
+        ("QPC", "0.8.1"),
+    ]
     assert not got.failed
+    assert got.warnings == [
+        "ibek pattern install: unknown option --frobnicate",
+        "installed pattern ibek-runtime-streamdevice:NotIndexed@0.8.1: "
+        "ibek-runtime-streamdevice 0.8.1 has no pattern NotIndexed, not matched",
+        "installed pattern 'QPC@0.8.1' is not library:module@version: not matched",
+        "installed pattern elsewhere:QPC@0.8.1: unknown library elsewhere, not matched",
+    ]
 
 
-def test_gitlab_candidate_fails_without_the_pattern_index(monkeypatch):
+def test_plan_lists_the_image_warnings(repo: Path, monkeypatch, capsys):
+    cand = b2y.Candidate(
+        b2y.GenericImage("org/ioc-all", "ghcr.io/org/ioc-all"),
+        ALL,
+        frozenset(),
+        warnings=["installed pattern x: not matched"],
+    )
+    monkeypatch.setattr(b2y, "candidates", lambda: (cand,))
+    b2y.beamline2yaml_cli("BL11I", repo)
+    out = capsys.readouterr().out
+    assert f"generic IOC warnings:\n  {ALL}: installed pattern x: not matched" in out
+
+
+def test_gitlab_candidate_fails_without_the_pattern_library(monkeypatch):
     def get(host, path):
         if "releases" in path:
             return json.dumps({"tag_name": "1"}).encode()
@@ -591,11 +622,11 @@ def test_gitlab_candidate_fails_without_the_pattern_index(monkeypatch):
             return b"RUN ibek pattern install ibek-runtime-streamdevice:QPC@0.8.1\n"
         raise AssertionError(path)
 
-    def no_index():
+    def no_clone(library, tag):
         raise OSError("clone timed out")
 
     monkeypatch.setattr(b2y, "_gitlab_get", get)
-    monkeypatch.setattr(b2y, "pattern_index", no_index)
+    monkeypatch.setattr(b2y, "library_release", no_clone)
     generic = b2y.GenericImage("g/ioc-vac", "reg/ioc-vac", gitlab="gitlab.example")
 
     got = b2y._gitlab_candidate(generic, BASE)
@@ -703,7 +734,7 @@ def test_schema_failure_puts_the_legacy_folder_back(repo: Path, monkeypatch):
     monkeypatch.setattr(
         b2y,
         "validate_configs",
-        lambda configs: [
+        lambda configs, support_yamls: [
             {"ioc_name": n, "status": "fail", "stderr": "bad"} for n in configs
         ],
     )
@@ -722,7 +753,9 @@ def test_schema_pass_removes_the_backup(repo: Path, monkeypatch):
     monkeypatch.setattr(
         b2y,
         "validate_configs",
-        lambda configs: [{"ioc_name": n, "status": "ok"} for n in configs],
+        lambda configs, support_yamls: [
+            {"ioc_name": n, "status": "ok"} for n in configs
+        ],
     )
 
     plan = b2y.build_plan("BL11I", repo)
@@ -850,3 +883,190 @@ def test_mixed_vacuum_ioc(repo: Path, monkeypatch, tmp_path: Path):
     assert kinds["EdwardsScroll"] == ("build-time", "ghcr.io/org/ioc-vac:1 installs it")
     assert kinds["digitelMpc"][0] == "build-time"
     assert not [m for m in entry.modules if m.kind == "unresolved"]
+
+
+def _schema_fails(configs, support_yamls):
+    return [{"ioc_name": n, "status": "fail", "stderr": "bad"} for n in configs]
+
+
+def test_schema_failure_removes_an_added_folder(repo: Path, monkeypatch):
+    """Nothing that failed stays written: a re-run plans the IOC as an add
+    again, not as an ibek folder to reconvert."""
+    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
+    monkeypatch.setattr(b2y, "validate_configs", _schema_fails)
+
+    plan = b2y.build_plan("BL11I", repo)
+    b2y.apply_plan(plan)
+
+    (entry,) = plan.entries
+    assert (entry.status, entry.schema) == ("error", "fail")
+    assert entry.warnings[-1] == "schema validation failed: its folder is removed"
+    assert not (repo / "services" / XML.stem.lower()).exists()
+    assert b2y.build_plan("BL11I", repo).entries[0].action == "add"
+
+
+@pytest.mark.parametrize("when", ["converting", "validating"])
+def test_interrupt_removes_an_added_folder(repo: Path, monkeypatch, when: str):
+    def interrupt(*args, **kwargs):
+        raise KeyboardInterrupt
+
+    if when == "converting":
+
+        def convert(xml, yaml, *args, **kwargs):
+            yaml.write_text("half written\n")
+            raise KeyboardInterrupt
+
+        monkeypatch.setattr(b2y, "convert_file", convert)
+    else:
+        monkeypatch.setattr(b2y, "convert_file", _fake_convert())
+        monkeypatch.setattr(b2y, "validate_configs", interrupt)
+
+    plan = b2y.build_plan("BL11I", repo)
+    with pytest.raises(KeyboardInterrupt):
+        b2y.apply_plan(plan)
+
+    assert sorted(p.name for p in (repo / "services").iterdir()) == [".ioc_template"]
+
+
+def _with_siblings(services: Path, result: ConvertResult | None = None):
+    """A conversion that writes two fastcs-pandablocks instances beside the
+    IOC, one of which was already there, then fails, or returns ``result``."""
+
+    def convert(xml, yaml, *args, **kwargs):
+        for name in ("bl11i-panda-01", "bl11i-panda-02"):
+            (services / name / "config").mkdir(parents=True, exist_ok=True)
+            (services / name / "config" / "controller.yaml").write_text("new\n")
+        yaml.write_text("entities: []\n")
+        if result is None:
+            raise RuntimeError("pattern step crashed")
+        return result
+
+    return convert
+
+
+@pytest.mark.parametrize("fails", ["converting", "validating"])
+def test_failure_removes_the_fastcs_siblings_it_created(
+    repo: Path, monkeypatch, fails: str
+):
+    services = repo / "services"
+    existing = services / "bl11i-panda-02" / "config"
+    existing.mkdir(parents=True)
+    (existing / "controller.yaml").write_text("old\n")
+    result = None if fails == "converting" else ConvertResult()
+    monkeypatch.setattr(b2y, "convert_file", _with_siblings(services, result))
+    monkeypatch.setattr(b2y, "validate_configs", _schema_fails)
+
+    plan = b2y.build_plan("BL11I", repo)
+    b2y.apply_plan(plan)
+
+    assert plan.entries[0].status == "error"
+    assert not (services / "bl11i-panda-01").exists()
+    # one that was there before is never touched, even when rewritten
+    assert (existing / "controller.yaml").read_text() == "new\n"
+    assert not (services / XML.stem.lower()).exists()
+
+
+def test_every_undo_is_attempted(tmp_path: Path):
+    """An undo that fails does not stop the others."""
+    broken = b2y._Written(tmp_path / "a", tmp_path / ".a.backup")
+    (tmp_path / "a").mkdir()
+    folder = tmp_path / "b"
+    (folder / "new").mkdir(parents=True)
+    (tmp_path / ".b.backup").mkdir()
+    (tmp_path / ".b.backup" / "keep").write_text("x")
+    good = b2y._Written(folder, tmp_path / ".b.backup")
+
+    errors = b2y._undo_all([broken, good])
+
+    assert len(errors) == 1 and "cannot put" in errors[0]
+    assert (folder / "keep").read_text() == "x"
+    assert not (folder / "new").exists()
+
+
+def test_an_interrupt_undoes_every_ioc_whatever_one_raises(
+    repo: Path, monkeypatch, capsys
+):
+    """The legacy folder is put back although an earlier undo failed."""
+    folder = _legacy(repo)
+    (folder / "keep").write_text("x")
+    services = repo / "services"
+    broken = b2y._Written(services / "gone", services / ".gone.backup")
+    real_apply = b2y._apply_entry
+    applied: list = []
+
+    def apply_entry(services, entry, descriptions):
+        applied.append(entry.ioc)
+        if len(applied) == 1:
+            return broken
+        return real_apply(services, entry, descriptions)
+
+    def interrupt(*args, **kwargs):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(b2y, "_apply_entry", apply_entry)
+    monkeypatch.setattr(b2y, "convert_file", _fake_convert())
+    monkeypatch.setattr(b2y, "validate_configs", interrupt)
+    plan = b2y.build_plan("BL11I", repo)
+    plan.entries.insert(0, b2y.Entry("GONE", str(XML), "gone", "add"))
+
+    with pytest.raises(KeyboardInterrupt) as raised:
+        b2y.apply_plan(plan)
+
+    assert any("cannot put" in note for note in raised.value.__notes__)
+    assert "cannot put" in capsys.readouterr().err
+    _assert_legacy_back(repo, folder)
+
+
+VAC_XML = """\
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+\t<asyn.AsynIP name="VA_TSERV1_8" port="127.0.0.1:4008"/>
+\t<asyn.AsynIP name="VA_TSERV1_12" port="127.0.0.1:4012"/>
+\t<EdwardsScroll.EdwardsScroll P="BL08J-VA-SCROL-01" name="SCROLL1" port="VA_TSERV1_8"/>
+\t<EdwardsNextTurbo.EdwardsNextTurbo P="BL08J-VA-TURBO-01" name="TURBO1"
+\t\tport="VA_TSERV1_12"/>
+</components>
+"""
+
+
+@requires_support
+def test_apply_validates_with_the_patterns_the_image_installs(
+    repo: Path, monkeypatch, tmp_path: Path
+):
+    """A vacuum IOC on an image that installs its Edwards patterns: nothing is
+    vendored, and the schema check has the image's support YAMLs, at the
+    release it pins, besides this checkout's."""
+    from builder2ibek import vendor_patterns
+    from tests.pattern_pins import PATTERN_TAG
+
+    xml = tmp_path / "BL08J-VA-IOC-02.xml"
+    xml.write_text(VAC_XML)
+    monkeypatch.setattr(b2y, "discover_xmls", lambda _b: ([xml], xml.parent, "work"))
+    monkeypatch.setattr(b2y, "plan_patterns", vendor_patterns.plan_patterns)
+    monkeypatch.setattr(b2y, "pattern_index", vendor_patterns.pattern_index)
+    # not pattern-only: the runtime image builds no asyn
+    monkeypatch.setattr(b2y, "image_entity_types", lambda image: frozenset())
+    release = b2y.library_release(STREAMDEVICE_LIBRARY, PATTERN_TAG)
+    installed = tuple(
+        release.patterns[m] for m in ("EdwardsNextTurbo", "EdwardsScroll")
+    )
+    builder = b2y.Builder()
+    builder.load(xml)
+    types = {str(e["type"]) for e in b2y.dispatch(builder, xml).entities}
+    vac = b2y.Candidate(
+        b2y.GenericImage("org/ioc-vac", "ghcr.io/org/ioc-vac", streamdevice=True),
+        "ghcr.io/org/ioc-vac:1",
+        frozenset(types) | b2y._pattern_types(installed),
+        installed=installed,
+    )
+    monkeypatch.setattr(b2y, "candidates", lambda: (vac,))
+
+    plan = b2y.build_plan("BL08J", repo)
+    b2y.apply_plan(plan)
+
+    (entry,) = plan.entries
+    assert (entry.status, entry.schema) == ("ok", "ok"), entry.schema_error
+    assert entry.patterns == []
+    config = repo / "services" / "bl08j-va-ioc-02" / "config"
+    assert not list(config.glob("*.ibek.support.yaml"))
+    assert not (config.parent / "runtime-lock.yaml").exists()

@@ -28,8 +28,10 @@ cover every entity that is not a runtime pattern, and that builds StreamDevice
 for each StreamDevice pattern it does not install. The entity types come from
 the image's published ioc schema, or, for a GitLab image that publishes none,
 from the support YAMLs in this checkout of the modules its Dockerfile builds,
-plus ioc-generic's. Each IOC's modules are reported as pattern, build-time or
-unresolved (:func:`~builder2ibek.vendor_patterns.classify_modules`) against
+the models of the runtime patterns it installs with ``ibek pattern install``,
+at the library release each pins, and ioc-generic's. Each IOC's modules are
+reported as pattern, build-time or unresolved
+(:func:`~builder2ibek.vendor_patterns.classify_modules`) against
 the chosen image, and only the patterns that image does not install are
 listed, as xml2yaml decides them.
 
@@ -39,11 +41,15 @@ dev-c7 warning to stop it on its server before deploying.
 
 ``--apply`` writes the folders, converts each IOC with xml2yaml, giving it the
 chosen image (xml2yaml adds the runtime patterns), and schema-validates every
-ioc.yaml with ``ibek runtime generate2`` in a temporary EPICS_ROOT. No IOC is
-started. It writes nothing when a step of the plan failed: a pattern library
-that could not be indexed, a GitHub or GitLab lookup, or no generic IOC schema
-at all. A legacy folder is moved aside before it is replaced, and put back if
-the conversion fails.
+ioc.yaml with ``ibek runtime generate2`` in a temporary EPICS_ROOT, against
+this checkout's support YAMLs, those the IOC vendors, and those of the
+patterns its image installs. No IOC is started. It writes nothing when a step
+of the plan failed: a pattern library that could not be indexed, a GitHub or
+GitLab lookup, or no generic IOC schema at all. Nothing that fails stays
+written: a legacy folder is moved aside before it is replaced and put back,
+and a new folder, with the fastcs-pandablocks instances its conversion
+created, is removed, when the conversion or the schema check fails; an
+interrupt undoes the whole run.
 """
 
 from __future__ import annotations
@@ -64,6 +70,8 @@ from pathlib import Path
 from typing import Any
 
 import truststore
+from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES, PatternError, parse_ref
+from ibek.support import support_yaml_module
 from ruamel.yaml import YAML
 
 from builder2ibek.builder import Builder
@@ -87,8 +95,10 @@ from builder2ibek.devc7 import (
 from builder2ibek.fastcs_panda import CONTROLLER_YAML, plan_fastcs
 from builder2ibek.patterns import (
     STREAMDEVICE_LIBRARY,
+    Pattern,
     PatternPlan,
     latest_tag,
+    library_release,
     pattern_index,
 )
 from builder2ibek.reconvert import (
@@ -121,10 +131,9 @@ LINUX_ARCH = "linux-x86_64"
 ANSIBLE_RE = re.compile(
     r"(?:^\s*RUN\s+|&&\s*(?:\\\s*)?)ansible\.sh\s+([^\s&\\]+)([^\n&]*)", re.M
 )
-# the arguments of an ``ibek pattern install`` in a Dockerfile
-INSTALL_RE = re.compile(r"\bibek\s+pattern\s+install\b([^\n&]*)")
-# a pattern reference, library:module@version
-PATTERN_REF_RE = re.compile(r"[\w.-]+:[\w.-]+@[\w.-]+")
+# the arguments of an ``ibek pattern install`` in a Dockerfile whose line
+# continuations are joined (see :func:`_join_continuations`)
+INSTALL_RE = re.compile(r"\bibek\s+pattern\s+install\b([^\n&;|]*)")
 
 
 class PlanFailedError(Exception):
@@ -192,6 +201,10 @@ class Candidate:
     types: frozenset[str] | None = None
     problem: str = ""  # why it cannot be matched, or what was guessed
     failed: bool = False  # a GitHub or GitLab lookup failed: --apply stops
+    #: the runtime patterns the image installs, at the releases it pins
+    installed: tuple[Pattern, ...] = ()
+    #: install lines or references that could not be matched
+    warnings: list[str] = field(default_factory=list)
 
 
 def _gitlab_get(host: str, path: str) -> bytes:
@@ -250,36 +263,80 @@ def _gitlab_file(generic: GenericImage, path: str, tag: str) -> str:
     ).decode()
 
 
-def _installed_patterns(generic: GenericImage, dockerfile: str, tag: str) -> list[str]:
+def _join_continuations(dockerfile: str) -> str:
+    """A Dockerfile with each ``\\`` line continuation joined to its line."""
+    return re.sub(r"\\[ \t]*\r?\n", " ", dockerfile)
+
+
+def _installed_patterns(
+    generic: GenericImage, dockerfile: str, tag: str
+) -> tuple[list[str], list[str]]:
     """The pattern references the Dockerfile's ``ibek pattern install`` lines
-    install: those given on the line, and those in each ``--list`` file, read
-    from the repository at ``tag``."""
+    install, those given on the line and those in each ``--list`` file, read
+    from the repository at ``tag``; and a warning for each argument that is
+    not understood."""
     refs: list[str] = []
-    for args in INSTALL_RE.findall(dockerfile):
-        listed = re.findall(r"--list[=\s]+(\S+)", args)
-        for word in args.split():
-            if PATTERN_REF_RE.fullmatch(word):
+    warnings: list[str] = []
+    for args in INSTALL_RE.findall(_join_continuations(dockerfile)):
+        words = iter(args.split())
+        for word in words:
+            option, eq, value = word.partition("=")
+            if option in ("--list", "-l", "--source", "-s"):
+                value = value if eq else next(words, "")
+                if option in ("--source", "-s"):
+                    warnings.append(
+                        f"ibek pattern install --source {value}: its patterns "
+                        f"are matched against the libraries they name"
+                    )
+                    continue
+                for line in _gitlab_file(generic, value, tag).splitlines():
+                    line = line.partition("#")[0].strip()
+                    if line:
+                        refs.append(line)
+            elif word.startswith("-"):
+                warnings.append(f"ibek pattern install: unknown option {word}")
+            else:
                 refs.append(word)
-        for path in listed:
-            for line in _gitlab_file(generic, path, tag).splitlines():
-                line = line.split("#", 1)[0].strip()
-                if line:
-                    refs.append(line)
-    return refs
+    return refs, warnings
 
 
-def _pattern_types(refs: Iterable[str]) -> frozenset[str]:
-    """The entity types of the patterns ``refs`` name, from the models of the
-    pattern index; raises when the index cannot be built, and a module the
-    index does not hold adds nothing."""
-    index = pattern_index()
-    types: set[str] = set()
-    for ref in refs:
-        module = ref.partition(":")[2].partition("@")[0]
-        pattern = index.patterns.get(module)
-        if pattern is not None:
-            types |= {f"{module}.{model}" for model in pattern.models}
-    return frozenset(types)
+def _resolve_installed(refs: Iterable[str]) -> tuple[list[Pattern], list[str]]:
+    """The patterns ``refs`` name, each from its library at the release the
+    reference pins, and a warning for each reference that names none.
+
+    Raises PatternIndexError when a library release cannot be cloned.
+    """
+    patterns: list[Pattern] = []
+    warnings: list[str] = []
+    for text in refs:
+        try:
+            ref = parse_ref(text)
+        except PatternError:
+            ref = None
+        if ref is None or not ref.library or not ref.version:
+            warnings.append(
+                f"installed pattern {text!r} is not library:module@version: not matched"
+            )
+            continue
+        if ref.library not in DEFAULT_LIBRARIES:
+            warnings.append(
+                f"installed pattern {text}: unknown library {ref.library}, not matched"
+            )
+            continue
+        pattern = library_release(ref.library, ref.version).patterns.get(ref.name)
+        if pattern is None:
+            warnings.append(
+                f"installed pattern {text}: {ref.library} {ref.version} has no "
+                f"pattern {ref.name}, not matched"
+            )
+            continue
+        patterns.append(pattern)
+    return patterns, warnings
+
+
+def _pattern_types(patterns: Iterable[Pattern]) -> frozenset[str]:
+    """The entity types of ``patterns``, from their models."""
+    return frozenset(f"{p.module}.{model}" for p in patterns for model in p.models)
 
 
 def _gitlab_candidate(
@@ -307,7 +364,7 @@ def _gitlab_candidate(
             )
             tag = str(latest["tag_name"])
         dockerfile = _gitlab_file(generic, "Dockerfile", tag)
-        installed = _installed_patterns(generic, dockerfile, tag)
+        installed, cand.warnings = _installed_patterns(generic, dockerfile, tag)
     except Exception as e:  # noqa: BLE001 -- unreachable, no token, no release
         cand.problem = (
             f"cannot read its release, Dockerfile and pattern lists from "
@@ -323,11 +380,14 @@ def _gitlab_candidate(
             types |= models.get(name, frozenset())
     if installed:
         try:
-            types |= _pattern_types(installed)
-        except Exception as e:  # noqa: BLE001 -- the pattern index failed
+            patterns, warnings = _resolve_installed(installed)
+        except Exception as e:  # noqa: BLE001 -- a library release not cloned
             cand.problem = f"the patterns it installs are not known: {e}"
             cand.failed = True
             return cand
+        cand.installed = tuple(patterns)
+        cand.warnings += warnings
+        types |= _pattern_types(patterns)
     cand.types = frozenset(types)
     return cand
 
@@ -390,7 +450,7 @@ def gitlab_image_types(image: str) -> tuple[frozenset[str] | None, str]:
         return None, ""
     base_image = next(g for g in GENERIC_IMAGES if g.repo.endswith("/ioc-generic"))
     cand = _gitlab_candidate(generic, _base_types([_github_candidate(base_image)]), tag)
-    return cand.types, cand.problem
+    return cand.types, "; ".join(filter(None, [cand.problem, *cand.warnings]))
 
 
 @dataclass
@@ -491,6 +551,8 @@ class Plan:
     source: str
     entries: list[Entry] = field(default_factory=list)
     images: list[dict[str, str]] = field(default_factory=list)
+    #: what could not be matched of the generic IOCs' pattern installs
+    image_warnings: list[str] = field(default_factory=list)
     #: steps that failed, so --apply writes nothing
     failures: list[str] = field(default_factory=list)
 
@@ -698,6 +760,9 @@ def _failures(plan: Plan) -> list[str]:
             for c in cands
             if c.problem
         ]
+        plan.image_warnings = [
+            f"{c.ref or c.generic.image}: {w}" for c in cands for w in c.warnings
+        ]
         failures += [
             f"{c.ref or c.generic.image}: {c.problem}" for c in cands if c.failed
         ]
@@ -719,11 +784,59 @@ def backup_path(services: Path, folder: str) -> Path:
     return services / f".{folder}.beamline2yaml-backup"
 
 
+@dataclass
+class _Written:
+    """What --apply wrote for one IOC, so that it can be undone."""
+
+    folder: Path
+    #: where its previous folder is kept aside, None if there was none
+    backup: Path | None = None
+    #: the folder did not exist before: undoing it removes it
+    new: bool = False
+    #: the folders beside it this run created, e.g. fastcs-pandablocks instances
+    siblings: list[Path] = field(default_factory=list)
+
+
+def _undo(written: _Written) -> list[str]:
+    """Remove what was written for an IOC and put back its previous folder.
+
+    Every step is attempted, whatever an earlier one raised; returns what
+    could not be done.
+    """
+    errors: list[str] = []
+    for sibling in written.siblings:
+        try:
+            shutil.rmtree(sibling)
+        except FileNotFoundError:
+            pass
+        except OSError as e:
+            errors.append(f"cannot remove {sibling}: {e}")
+    if written.new or written.backup is not None:
+        try:
+            if written.folder.is_symlink():
+                written.folder.unlink()
+            elif os.path.lexists(written.folder):
+                shutil.rmtree(written.folder)
+        except OSError as e:
+            errors.append(f"cannot remove {written.folder}: {e}")
+    if written.backup is not None:
+        try:
+            written.backup.rename(written.folder)
+        except OSError as e:
+            errors.append(f"cannot put {written.backup} back to {written.folder}: {e}")
+    return errors
+
+
+def _undo_all(written: Iterable[_Written]) -> list[str]:
+    """Undo every IOC's writes, each one whatever the others raised."""
+    return [error for w in written for error in _undo(w)]
+
+
 def _make_folder(services: Path, entry: Entry) -> Path | None:
     """(Re)make an IOC's folder from .ioc_template with its values.yaml header.
 
     A dev-c7 legacy folder is moved aside first; returns where, so that it can
-    be put back (see :func:`_restore`).
+    be put back (see :func:`_undo`). After a failure nothing it wrote is left.
     """
     folder = services / entry.folder
     backup = None
@@ -737,8 +850,9 @@ def _make_folder(services: Path, entry: Entry) -> Path | None:
         shutil.copytree(services / TEMPLATE, folder, symlinks=True)
         values = folder / "values.yaml"
         values.write_text(add_header(values.read_text(), entry.header))
-    except BaseException:
-        _restore(folder, backup)
+    except BaseException as e:
+        for error in _undo(_Written(folder, backup, new=backup is None)):
+            e.add_note(error)
         raise
     return backup
 
@@ -750,18 +864,14 @@ def _move_aside(services: Path, name: str, copy: bool = False) -> Path:
     if os.path.lexists(backup):
         raise FileExistsError(f"{backup} is in the way: move it back or remove it")
     if copy:
-        shutil.copytree(folder, backup, symlinks=True)
+        try:
+            shutil.copytree(folder, backup, symlinks=True)
+        except BaseException:
+            shutil.rmtree(backup, ignore_errors=True)
+            raise
     else:
         folder.rename(backup)
     return backup
-
-
-def _restore(folder: Path, backup: Path | None) -> None:
-    """Remove a folder written for a conversion, and put back the folder it
-    replaced."""
-    shutil.rmtree(folder, ignore_errors=True)
-    if backup is not None:
-        backup.rename(folder)
 
 
 def _conversion_problem(entry: Entry, result: ConvertResult) -> str:
@@ -778,15 +888,39 @@ class ConversionFailedError(Exception):
     """A conversion that returned, but did not do all it had to."""
 
 
+def _image_candidate(image: str) -> Candidate | None:
+    return next((c for c in candidates() if c.ref == image), None)
+
+
+def _installed_support_yamls(entry: Entry, config: Path) -> list[Path]:
+    """The support YAMLs of the patterns an IOC's image installs, at the
+    releases it pins, for the modules its config does not vendor: the image
+    has them in its ibek-defs, which this checkout's schema does not."""
+    if not entry.image or entry.pattern_only:
+        return []
+    cand = _image_candidate(entry.image)
+    if cand is None or not cand.installed:
+        return []
+    vendored: set[str | None] = set()
+    for path in config.rglob("*.ibek.support.yaml"):
+        try:
+            vendored.add(support_yaml_module(path))
+        except Exception:  # noqa: BLE001 -- generate2 reports a broken one
+            continue
+    return [p.support_yaml for p in cand.installed if p.module not in vendored]
+
+
 def apply_plan(
     plan: Plan, descriptions: Mapping[str, str] | None = None, validate: bool = True
 ) -> None:
     """Write and convert the planned folders. Raises PlanFailedError, writing
     nothing, when a step of the plan failed.
 
-    An IOC's existing folder is kept aside until its new one is converted and,
-    with ``validate``, its ioc.yaml passes the schema check; after any failure,
-    or an interrupt, the folder is put back as it was.
+    Nothing that failed stays written: an IOC whose conversion fails, or, with
+    ``validate``, whose ioc.yaml fails the schema check, has its new folder
+    and the fastcs-pandablocks instances it created removed, and its previous
+    folder put back; its status is "error". An interrupt undoes every IOC this
+    run wrote. Every undo is attempted, whatever another one raised.
     """
     if plan.failures:
         raise PlanFailedError(
@@ -796,61 +930,88 @@ def apply_plan(
     if not (services / TEMPLATE / "values.yaml").is_file():
         raise FileNotFoundError(f"{services / TEMPLATE}/values.yaml not found")
     descriptions = descriptions or {}
+    by_name = {e.ioc: e for e in plan.entries}
     configs: dict[str, Path] = {}
-    # the folders kept aside, by IOC, until their new ones are validated
-    kept: dict[str, tuple[Path, Path]] = {}
+    # what each IOC wrote, until it is validated
+    written: dict[str, _Written] = {}
     try:
         for entry in plan.entries:
             if entry.action in ("add", "replace", "fastcs"):
-                backup = _apply_entry(services, entry, descriptions)
+                done = _apply_entry(services, entry, descriptions)
+                if done is not None:
+                    written[entry.ioc] = done
                 if entry.status == "ok":
                     configs[entry.ioc] = services / entry.folder / "config"
-                if backup is not None:
-                    kept[entry.ioc] = (services / entry.folder, backup)
         if validate and configs:
-            by_name = {e.ioc: e for e in plan.entries}
-            for v in validate_configs(configs):
+            support_yamls = {
+                ioc: _installed_support_yamls(by_name[ioc], config)
+                for ioc, config in configs.items()
+            }
+            for v in validate_configs(configs, support_yamls):
                 entry = by_name[v["ioc_name"]]
                 entry.schema = v["status"]
                 entry.schema_error = v.get("stderr", "")
-                if entry.schema != "ok" and entry.ioc in kept:
-                    _restore(*kept.pop(entry.ioc))
-                    entry.status = "error"
-                    entry.warnings.append(
-                        "schema validation failed: the previous folder is put back"
-                    )
-    except BaseException:
-        for folder, backup in kept.values():
-            _restore(folder, backup)
+                if entry.schema == "ok":
+                    continue
+                entry.status = "error"
+                done = written.pop(entry.ioc)
+                errors = _undo(done)
+                undone = (
+                    "the previous folder is put back"
+                    if done.backup is not None
+                    else "its folder is removed"
+                )
+                entry.warnings.append(
+                    f"schema validation failed: {undone}"
+                    + "".join(f"; {error}" for error in errors)
+                )
+    except BaseException as e:
+        for error in _undo_all(written.values()):
+            e.add_note(error)
+            print(f"error: {error}", file=sys.stderr)
         raise
-    for _, backup in kept.values():
-        shutil.rmtree(backup)
+    for ioc, done in written.items():
+        if done.backup is not None:
+            try:
+                shutil.rmtree(done.backup)
+            except OSError as e:
+                by_name[ioc].warnings.append(f"cannot remove {done.backup}: {e}")
+
+
+def _created(services: Path, before: set[str], *keep: str) -> list[Path]:
+    """The folders in ``services`` that are not in ``before`` nor ``keep``."""
+    try:
+        now = set(os.listdir(services))
+    except OSError:
+        return []
+    return [services / name for name in sorted(now - before - set(keep))]
 
 
 def _apply_entry(
     services: Path, entry: Entry, descriptions: Mapping[str, str]
-) -> Path | None:
-    """Write and convert one IOC's folder. Returns where its previous folder
-    is kept, or None. After a failure the previous folder is back in place,
-    and entry.status is "error"; an interrupt re-raises after that."""
+) -> _Written | None:
+    """Write and convert one IOC's folder. Returns what it wrote, or None
+    after a failure: then nothing it wrote is left, the previous folder is
+    back in place and entry.status is "error"; an interrupt re-raises after
+    that."""
     folder = services / entry.folder
     yaml = folder / "config" / "ioc.yaml"
     image, image_types = None, None
     if entry.image and not entry.pattern_only:
         image = entry.image
-        image_types = next(
-            (c.types for c in candidates() if c.ref == entry.image), None
-        )
-    existed = os.path.lexists(folder)
-    backup: Path | None = None
+        cand = _image_candidate(entry.image)
+        image_types = cand.types if cand is not None else None
+    before = set(os.listdir(services))
+    done = _Written(folder, new=not os.path.lexists(folder))
+    backup_name = backup_path(services, entry.folder).name
     made = False
     try:
         if entry.action == "fastcs":
             # converted in place, so a copy is kept
-            if existed:
-                backup = _move_aside(services, entry.folder, copy=True)
+            if not done.new:
+                done.backup = _move_aside(services, entry.folder, copy=True)
         else:
-            backup = _make_folder(services, entry)
+            done.backup = _make_folder(services, entry)
         made = True
         with contextlib.redirect_stdout(sys.stderr):
             result = convert_file(
@@ -861,17 +1022,26 @@ def _apply_entry(
                 image=image,
                 image_types=image_types,
             )
+        # sibling fastcs-pandablocks instances, written before the patterns
+        done.siblings = _created(services, before, entry.folder, backup_name)
         problem = _conversion_problem(entry, result)
         if problem:
             raise ConversionFailedError(problem)
     except BaseException as e:
-        if made and (backup is not None or not existed):
-            _restore(folder, backup)
+        errors: list[str] = []
+        if made:
+            done.siblings = _created(services, before, entry.folder, backup_name)
+            errors = _undo(done)
         if not isinstance(e, Exception):
+            for error in errors:
+                e.add_note(error)
             raise
         entry.status = "error"
-        put_back = "; the previous folder is put back" if backup else ""
-        entry.warnings.append(f"conversion failed: {type(e).__name__}: {e}{put_back}")
+        put_back = "; the previous folder is put back" if done.backup else ""
+        entry.warnings.append(
+            f"conversion failed: {type(e).__name__}: {e}{put_back}"
+            + "".join(f"; {error}" for error in errors)
+        )
         return None
     # the conversion's module report replaces the plan's: its notes are
     # rendered from entry.modules, its unresolved modules are warnings
@@ -892,7 +1062,7 @@ def _apply_entry(
             text = values.read_text()
             if entry.header.split(".")[0] not in text.replace("\n# ", " "):
                 values.write_text(add_header(text, entry.header))
-    return backup
+    return done
 
 
 def _status(e: Entry) -> str:
@@ -954,6 +1124,9 @@ def render_plan(plan: Plan, applied: bool) -> str:
     if plan.images:
         out += ["", "generic IOCs not matched:"]
         out += [f"  {i['image']}: {i['problem']}" for i in plan.images]
+    if plan.image_warnings:
+        out += ["", "generic IOC warnings:"]
+        out += [f"  {w}" for w in plan.image_warnings]
     if plan.failures:
         out += ["", "failed steps (--apply writes nothing until they succeed):"]
         out += [f"  {f}" for f in plan.failures]

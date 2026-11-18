@@ -661,20 +661,34 @@ def generic_modules(root: Path = _project_root) -> frozenset[str]:
     return frozenset(found)
 
 
-def _index_library(library: str, tag_env: str) -> PatternIndex:
-    """Clone one library at its release and index it."""
+def _clone(library: str, tag: str) -> Path:
+    """Shallow-clone one library at a tag; returns its checkout, removed at
+    exit (an index reads support YAMLs as it needs them)."""
     url = DEFAULT_LIBRARIES[library]
-    tag = os.environ.get(tag_env) or latest_tag(url)
-    # removed at exit: the index reads support YAMLs as it needs them
     clone = tempfile.mkdtemp(prefix=f"{library}-")
     atexit.register(shutil.rmtree, clone, ignore_errors=True)
     result = git("clone", "--quiet", "--depth", "1", "--branch", tag, url, cwd=clone)
     if result.returncode != 0:
         raise PatternIndexError(f"cannot clone {url} at {tag}: {result.stderr.strip()}")
+    return Path(clone) / library
+
+
+def _index_library(library: str, tag_env: str) -> PatternIndex:
+    """Clone one library at its release and index it."""
+    tag = os.environ.get(tag_env) or latest_tag(DEFAULT_LIBRARIES[library])
     # ibek-runtime-support also holds patterns of modules that are not beamline
     # modules; builder2ibek routes only beamline modules to it
     only = is_beamline_module if library == SUPPORT_LIBRARY else None
-    return PatternIndex(Path(clone) / library, tag, library, only)
+    return PatternIndex(_clone(library, tag), tag, library, only)
+
+
+@cache
+def library_release(library: str, tag: str) -> PatternIndex:
+    """Every pattern of one release of a library, cloned once per process:
+    what an image whose ``ibek pattern install`` pins that release installs.
+    Raises PatternIndexError when it cannot be cloned or read, and KeyError
+    for a library ibek does not know."""
+    return PatternIndex(_clone(library, tag), tag, library)
 
 
 @cache_outcome

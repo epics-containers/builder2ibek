@@ -176,9 +176,10 @@ its pattern or generic model.
   image and is not added, except a beamline module's pattern, which is always
   added: beamline modules are deployed per instance. When that schema cannot
   be fetched (for example an image on a GitLab registry ibek has no token for)
-  every pattern is added, with a warning. When `values.yaml` still holds `REPLACE_WITH_IMAGE_URI`, every
-  pattern is added with a warning: set the generic IOC image and re-run
-  xml2yaml to drop the patterns that image already installs.
+  every pattern is added, with a warning. When `values.yaml` still holds
+  `REPLACE_WITH_IMAGE_URI`, every pattern is added with a warning: set the
+  generic IOC image and re-run xml2yaml to drop the patterns that image
+  already installs.
 - **`--image <ref>`** names the generic IOC image to plan against in place of
   the one `values.yaml` names. Patterns whose entity types its published schema
   has are left out, as for any other IOC, and the IOC is never moved to
@@ -188,8 +189,10 @@ its pattern or generic model.
   only listed. For a GitLab generic IOC that `beamline2yaml` knows
   (ioc-dlslinuxvac), which publishes no schema, the entity types are those of
   the modules its Dockerfile builds with `ansible.sh` and of the patterns it
-  installs with `ibek pattern install`, read from GitLab at the tag given
-  (`GITLAB_TOKEN`).
+  installs with `ibek pattern install`, each at the library release the
+  install pins, read from GitLab at the tag given (`GITLAB_TOKEN`). A pattern
+  reference that names no pattern of its release is a warning, and adds no
+  types.
 
 After the patterns, xml2yaml reports each module the IOC uses as one of:
 

@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -30,6 +31,9 @@ BUILDER_PROD = Path("/dls_sw/prod/R3.14.12.7/support")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 UPDATE_SCHEMA = REPO_ROOT / "update-schema"
 IOC_SCHEMA = "/epics/ibek-defs/ioc.schema.json"
+# the folder of a validated config copy that holds the support YAMLs its image
+# has besides this checkout's (see validate_configs)
+IMAGE_DEFS = "image-ibek-defs"
 
 _SHORT_BL_RE = re.compile(r"^([A-Za-z])([0-9]{1,2})([A-Za-z])?$")
 
@@ -248,14 +252,22 @@ def _run_validation(result: ReconvertResult) -> None:
     result.validation.extend(validate_configs(configs))
 
 
-def validate_configs(configs: dict[str, Path]) -> list[dict]:
+def validate_configs(
+    configs: Mapping[str, Path],
+    support_yamls: Mapping[str, Sequence[Path]] | None = None,
+) -> list[dict]:
     """Validate the ioc.yaml of each config folder with `ibek runtime generate2`.
 
     One EPICS_ROOT tempdir and one config tempdir are created per call; the
     generate2 calls run sequentially inside them, so no IOC is started and
-    nothing outside the tempdirs is written. Returns one
+    nothing outside the tempdirs is written. The schema is this checkout's
+    ibek-support*, as ``./update-schema`` builds it, plus the support YAMLs the
+    config vendors. ``support_yamls`` adds, per IOC, those its image has
+    besides: the runtime patterns it installs with ``ibek pattern install``.
+    They go into the copy of the config, in :data:`IMAGE_DEFS`. Returns one
     ``{"ioc_name", "status": "ok" | "fail", "stderr"?}`` per config.
     """
+    support_yamls = support_yamls or {}
     validation: list[dict] = []
     with (
         tempfile.TemporaryDirectory(prefix="epics-reconvert-") as epics_root,
@@ -285,6 +297,10 @@ def validate_configs(configs: dict[str, Path]) -> list[dict]:
             # YAMLs of runtime patterns and post_db_files such as records.db
             cfg = Path(tmp_config) / ioc_name
             shutil.copytree(config, cfg)
+            if support_yamls.get(ioc_name):
+                (cfg / IMAGE_DEFS).mkdir(exist_ok=True)
+                for path in support_yamls[ioc_name]:
+                    shutil.copy(path, cfg / IMAGE_DEFS / path.name)
             proc = subprocess.run(
                 ["ibek", "runtime", "generate2", "--no-pvi", str(cfg)],
                 env=env,

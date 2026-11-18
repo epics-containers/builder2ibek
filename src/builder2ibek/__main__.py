@@ -82,8 +82,9 @@ def xml2yaml(
     values.yaml: patterns it installs are left out, and a values.yaml that
     still has the placeholder gets it. A GitLab generic IOC that beamline2yaml
     knows, which publishes no schema, is matched on the modules its Dockerfile
-    builds and the patterns it installs, as beamline2yaml matches it. Each module the IOC uses is reported as
-    a pattern, build-time (compiled into the image) or unresolved: a module no
+    builds and the patterns it installs, at the releases it pins, as
+    beamline2yaml matches it. Each module the IOC uses is reported as a
+    pattern, build-time (compiled into the image) or unresolved: a module no
     image here builds and no runtime pattern takes, so nothing can run it.
 
     ADPandABlocks PandAs become fastcs-pandablocks instances instead. An IOC
