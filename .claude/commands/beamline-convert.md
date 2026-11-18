@@ -101,9 +101,9 @@ chosen image (which adds the runtime patterns and sets the image in
 generate2` in a temporary EPICS_ROOT, with the support YAMLs of the patterns
 the image installs. If an IOC's conversion fails or a pattern cannot be added,
 its status is `error`: its new folder is removed and a replaced legacy folder
-is put back. An IOC that fails the schema check keeps its folder, with the
-`ioc.yaml` to fix, and the validator's output is in the report (`schema_error`
-with `--json`). The services repo is a git repo: `git status` shows what a run
+is put back, while a fastcs instance is left as written. An IOC that fails the
+schema check keeps its folder, with the `ioc.yaml` to fix, and the validator's
+output is in the report (`schema_error` with `--json`). The services repo is a git repo: `git status` shows what a run
 wrote, and `git checkout`/`git clean` revert it.
 Exit codes: 0 clean, 1 a failed plan step (nothing written), 2 conversion
 errors, 3 schema check failures. `schema ok` means the `ioc.yaml` matches the
