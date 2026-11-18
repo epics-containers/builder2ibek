@@ -113,8 +113,10 @@ Scan quickly for converter issues that must be fixed before support YAML work:
 
 **Spurious `name:` fields** — follow the `name` parameter rules in
 [support-yaml-rules.md](../skills/shared/support-yaml-rules.md). When in doubt,
-**keep `name: type: id`**. If a converter is needed, create
-`src/builder2ibek/converters/<module>.py` (auto-discovered, no registration).
+**keep `name: type: id`**. A module with no converter file loses `name` from
+every entity; one whose model takes `name` as `type: id` needs
+`src/builder2ibek/converters/<module>.py` (auto-discovered, no registration)
+to keep it.
 
 **Attributes needing transformation** — values that need renaming, numeric
 transformation, or removal before ibek sees them. Add or update the converter

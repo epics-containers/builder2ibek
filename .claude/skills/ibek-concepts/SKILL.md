@@ -78,8 +78,10 @@ Carry `name` through as `type: id` **only** when another entity cross-references
 this one. The classic case is an asyn port creator (`asyn.AsynIP`) whose `name`
 is the port identifier.
 
-For leaf objects, **drop `name`** — the converter must call
-`entity.remove("name")`. See `src/builder2ibek/converters/cmsIon.py`.
+For leaf objects, **drop `name`**. A module with no converter file loses
+`name` from every entity, so a module of leaf entities needs no converter. A
+module with a converter file calls `entity.remove("name")` for its leaf entity
+types: see `src/builder2ibek/converters/cmsIon.py`.
 
 ---
 

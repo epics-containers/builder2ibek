@@ -15,7 +15,7 @@ are provided by ibek itself. They do **not** live in `ibek-support/` or
 
 ## `IOCInfo` — case-sensitive naming
 
-The converter and support YAML use the casing **`IOCInfo`** (capital I at the
+The support YAML folder uses the casing **`IOCInfo`** (capital I at the
 end), not `IOCinfo`.
 
 Do NOT create a duplicate `IOCinfo/` folder — always use `IOCInfo/`.

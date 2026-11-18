@@ -136,12 +136,12 @@ In builder XML, `hidenRGA_qga` appeared like this:
 ```
 
 The XML attributes become ibek parameter names.  `name` is dropped (the entity
-has no cross-references and creates no asyn port) and handled by a converter.
+has no cross-references and creates no asyn port): `xml2yaml` leaves it out.
 `PORT` references the companion `asyn.AsynIP` entity by name.
 
 | XML attribute | ibek parameter | type | notes |
 |---|---|---|---|
-| `name` | — | — | dropped; converter discards it from XML |
+| `name` | — | — | dropped; `xml2yaml` discards it from XML |
 | `P` | `P` | `str` | PV prefix |
 | `Q` | `Q` | `str` | PV suffix, default `""` |
 | `PORT` | `PORT` | `object` | name of the companion `asyn.AsynIP` entity |
@@ -233,15 +233,15 @@ If you see a `drvAsynIPPortConfigure` or `drvAsynSerialPortConfigure` call in
 `pre_init`, keep `name` as `type: id`.
 
 If neither condition applies and this is a true *leaf* object, you can drop
-`name` entirely — but then you need a converter to discard it when reading the
-XML, so that `xml2yaml` does not try to pass an unrecognised attribute to the
-entity model.  `src/builder2ibek/converters/cmsIon.py` is the simplest example:
-it does nothing except call `entity.remove("name")` for its entity types.
+`name` entirely.  `xml2yaml` removes `name` from every entity of a module that
+has no converter in `src/builder2ibek/converters/`, so a module of leaf
+objects needs none.  A module that has a converter removes `name` from its
+leaf entity types there: `src/builder2ibek/converters/cmsIon.py` is the
+simplest example.
 
 For `hidenRGA_qga`, neither condition applies: the asyn port is created by the
 companion `asyn.AsynIP` entity (not by this one), and nothing in `ioc.yaml`
-cross-references `hidenRGA_qga` by name.  We therefore **drop** `name` and add
-a converter that discards it when reading the XML.
+cross-references `hidenRGA_qga` by name.  We therefore **drop** `name`.
 
 ---
 
@@ -438,25 +438,11 @@ identical parameters.  Add them as additional `entity_models` entries, changing
 only the `name`, `description`, and the `databases[].file` path to the
 appropriate `.db` file.
 
-Because `name` was dropped from the entity model, a converter is needed to
-discard it when reading the XML.  Create
-`src/builder2ibek/converters/hidenRGA.py` following the pattern of
-`src/builder2ibek/converters/cmsIon.py`:
-
-```python
-from builder2ibek.converters.globalHandler import globalHandler
-from builder2ibek.types import Entity, Generic_IOC
-
-xml_component = "hidenRGA"
-
-
-@globalHandler
-def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
-    entity.remove("name")
-```
-
-`moduleinfos.py` discovers all `.py` files in the `converters/` directory
-automatically — no manual registration step is needed.
+`name` was dropped from the entity model, and `xml2yaml` removes it from
+every entity of a module that has no converter, so `hidenRGA` needs no file in
+`src/builder2ibek/converters/`.  A module needs a converter only when one of
+its models takes `name` as `type: id`, or an attribute or type has to change:
+see [](../how-to/create-converter.md).
 
 ---
 
