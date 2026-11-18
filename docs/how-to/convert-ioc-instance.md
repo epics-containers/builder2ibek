@@ -259,10 +259,10 @@ Auto-conversion is a best-effort translation; review the output for:
 - **Default values**: some converters inject sensible defaults (e.g. autosave
   `debug: false`).  Verify these are appropriate.
 - **Module coverage**: if a module has no converter, its entities keep the XML
-  attributes of the original, except that `name` and the `gda_*` attributes are
-  removed and the values "True" and "False" become booleans. For many entities
-  this is all that is needed, as we try to make the `xxx.ibek.support.yaml` as
-  compatible with the original XML as possible.
+  attributes of the original, except that `name`, `gda_name`, `gda_desc` and
+  `gda_curr_name` are removed and the values "True" and "False" become
+  booleans. For many entities this is all that is needed, as we try to make the
+  `xxx.ibek.support.yaml` as compatible with the original XML as possible.
 - **Schema validation**: open the YAML in VSCode with the Red Hat YAML extension;
   the `$schema` line at the top will highlight any type mismatches.
 

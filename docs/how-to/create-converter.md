@@ -3,8 +3,8 @@
 When `builder2ibek xml2yaml` converts a builder XML file it applies a
 **converter** — a small Python module — for each XML component prefix it
 encounters.  If no converter exists, the entity keeps the XML module name and
-the attributes the XML had, except that `name` and the GDA attributes are
-removed and the values "True" and "False" become booleans.
+the attributes the XML had, except that `name`, `gda_name`, `gda_desc` and
+`gda_curr_name` are removed and the values "True" and "False" become booleans.
 
 This how-to explains when and how to write a new converter.
 
@@ -100,7 +100,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 `@globalHandler` wraps your `handler` function so that the global
 pre-processing runs first.  The global handler:
 
-- Removes `gda_name` and `gda_desc` from every entity
+- Removes `gda_name`, `gda_desc` and `gda_curr_name` from every entity
 - Converts string values `"True"` / `"False"` / `""` to Python
   `True` / `False` / `None`
 
