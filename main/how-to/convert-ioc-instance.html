@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.5.1.dev69+gda16cecac documentation</title>
+    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.5.1.dev77+gf9592b74e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=45095a8a"></script>
+    <script src="../_static/documentation_options.js?v=067d3d5c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -646,12 +646,46 @@ pattern.</p></li>
 <li><p><strong>Any other IOC</strong> keeps the image its <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code> names. A pattern whose
 entity types that image’s published schema already has is installed by the
 image and is not added, except a beamline module’s pattern, which is always
-added: beamline modules are deployed per instance. When that schema cannot be fetched (for example an
-image on a GitLab registry ibek has no token for) every pattern is added, with
-a warning. When <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code> still holds <code class="docutils literal notranslate"><span class="pre">REPLACE_WITH_IMAGE_URI</span></code>, every
-pattern is added with a warning: set the generic IOC image and re-run
-xml2yaml to drop the patterns that image already installs.</p></li>
+added: beamline modules are deployed per instance. When that schema cannot
+be fetched (for example an image on a GitLab registry ibek has no token for)
+every pattern is added, with a warning. When <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code> still holds
+<code class="docutils literal notranslate"><span class="pre">REPLACE_WITH_IMAGE_URI</span></code>, every pattern is added with a warning: set the
+generic IOC image and re-run xml2yaml to drop the patterns that image
+already installs.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">--image</span> <span class="pre">&lt;ref&gt;</span></code></strong> names the generic IOC image to plan against in place of
+the one <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code> names. Patterns whose entity types its published schema
+has are left out, as for any other IOC, and the IOC is never moved to
+<code class="docutils literal notranslate"><span class="pre">ioc-streamdevice-runtime</span></code>. A <code class="docutils literal notranslate"><span class="pre">values.yaml</span></code> that still holds
+<code class="docutils literal notranslate"><span class="pre">REPLACE_WITH_IMAGE_URI</span></code> gets the image; one that names another image is left
+alone, with a warning. With any other <code class="docutils literal notranslate"><span class="pre">--yaml</span></code> path the patterns left out are
+only listed. For a GitLab generic IOC that <code class="docutils literal notranslate"><span class="pre">beamline2yaml</span></code> knows
+(ioc-dlslinuxvac), which publishes no schema, the entity types are those of
+the modules its Dockerfile builds with <code class="docutils literal notranslate"><span class="pre">ansible.sh</span></code> and of the patterns it
+installs with <code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">pattern</span> <span class="pre">install</span></code>, each at the library release the
+install pins, read from GitLab at the tag given (<code class="docutils literal notranslate"><span class="pre">GITLAB_TOKEN</span></code>). A pattern
+reference that names no pattern of its release is a warning, and adds no
+types.</p></li>
 </ul>
+<p>After the patterns, xml2yaml reports each module the IOC uses as one of:</p>
+<ul class="simple">
+<li><p><strong>pattern</strong>: added from its runtime pattern, a beamline module’s always;</p></li>
+<li><p><strong>build-time</strong>: compiled into the image. A module whose every entity type
+the image’s schema has is build-time, a pattern module included (a note says
+the image installs it). With no image schema to go on, a module with a
+generic model in <code class="docutils literal notranslate"><span class="pre">ibek-support*</span></code> is build-time; a note gives the reason when
+its pattern was not used;</p></li>
+<li><p><strong>unresolved</strong>: nothing can run it, a warning with the reason. That is a
+beamline module with no pattern taken (one never compiled into a generic
+IOC), and, with an image schema, any module the image does not build and no
+pattern takes; with none, a module with no generic model whose pattern
+rejects its entities or that has no pattern.</p></li>
+</ul>
+<p>Two notes list the pattern and build-time modules, and each unresolved module
+is a warning. <code class="docutils literal notranslate"><span class="pre">beamline2yaml</span></code> shows the same report per IOC, planned on the
+entities xml2yaml writes against the generic IOC image it picks, under
+<code class="docutils literal notranslate"><span class="pre">modules:</span></code> and in its <code class="docutils literal notranslate"><span class="pre">--json</span></code> output. It blocks an IOC with an unresolved
+module, with no generic IOC image, or that targets another OS: the IOC is
+reported, but no folder is written and a dev-c7 legacy folder is kept.</p>
 <p>For a mixed IOC on a generic IOC image hosted on a GitLab registry, builder2ibek
 and <code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">pattern</span> <span class="pre">add</span></code> can fetch the image’s published schema only when that
 GitLab server is listed in <code class="docutils literal notranslate"><span class="pre">IBEK_GITLAB_HOSTS</span></code>, a comma-separated list of

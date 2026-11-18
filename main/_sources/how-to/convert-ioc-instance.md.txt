@@ -174,11 +174,46 @@ its pattern or generic model.
 - **Any other IOC** keeps the image its `values.yaml` names. A pattern whose
   entity types that image's published schema already has is installed by the
   image and is not added, except a beamline module's pattern, which is always
-  added: beamline modules are deployed per instance. When that schema cannot be fetched (for example an
-  image on a GitLab registry ibek has no token for) every pattern is added, with
-  a warning. When `values.yaml` still holds `REPLACE_WITH_IMAGE_URI`, every
-  pattern is added with a warning: set the generic IOC image and re-run
-  xml2yaml to drop the patterns that image already installs.
+  added: beamline modules are deployed per instance. When that schema cannot
+  be fetched (for example an image on a GitLab registry ibek has no token for)
+  every pattern is added, with a warning. When `values.yaml` still holds
+  `REPLACE_WITH_IMAGE_URI`, every pattern is added with a warning: set the
+  generic IOC image and re-run xml2yaml to drop the patterns that image
+  already installs.
+- **`--image <ref>`** names the generic IOC image to plan against in place of
+  the one `values.yaml` names. Patterns whose entity types its published schema
+  has are left out, as for any other IOC, and the IOC is never moved to
+  `ioc-streamdevice-runtime`. A `values.yaml` that still holds
+  `REPLACE_WITH_IMAGE_URI` gets the image; one that names another image is left
+  alone, with a warning. With any other `--yaml` path the patterns left out are
+  only listed. For a GitLab generic IOC that `beamline2yaml` knows
+  (ioc-dlslinuxvac), which publishes no schema, the entity types are those of
+  the modules its Dockerfile builds with `ansible.sh` and of the patterns it
+  installs with `ibek pattern install`, each at the library release the
+  install pins, read from GitLab at the tag given (`GITLAB_TOKEN`). A pattern
+  reference that names no pattern of its release is a warning, and adds no
+  types.
+
+After the patterns, xml2yaml reports each module the IOC uses as one of:
+
+- **pattern**: added from its runtime pattern, a beamline module's always;
+- **build-time**: compiled into the image. A module whose every entity type
+  the image's schema has is build-time, a pattern module included (a note says
+  the image installs it). With no image schema to go on, a module with a
+  generic model in `ibek-support*` is build-time; a note gives the reason when
+  its pattern was not used;
+- **unresolved**: nothing can run it, a warning with the reason. That is a
+  beamline module with no pattern taken (one never compiled into a generic
+  IOC), and, with an image schema, any module the image does not build and no
+  pattern takes; with none, a module with no generic model whose pattern
+  rejects its entities or that has no pattern.
+
+Two notes list the pattern and build-time modules, and each unresolved module
+is a warning. `beamline2yaml` shows the same report per IOC, planned on the
+entities xml2yaml writes against the generic IOC image it picks, under
+`modules:` and in its `--json` output. It blocks an IOC with an unresolved
+module, with no generic IOC image, or that targets another OS: the IOC is
+reported, but no folder is written and a dev-c7 legacy folder is kept.
 
 For a mixed IOC on a generic IOC image hosted on a GitLab registry, builder2ibek
 and `ibek pattern add` can fetch the image's published schema only when that
