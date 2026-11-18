@@ -52,6 +52,8 @@ FASTCS_IOC_TEMPLATE = ".fastcs_ioc_template"
 
 #: The config file the instance's args point fastcs-pandablocks at
 CONTROLLER_YAML = "controller.yaml"
+# the name hand-made fastcs instances give the same file
+HAND_MADE_CONTROLLER_YAML = "fastcs.yaml"
 
 ADPANDABLOCKS = "ADPandABlocks"
 
@@ -426,13 +428,19 @@ def read_controllers(controller: Path) -> list[tuple[str, str]] | None:
 def served_controllers(services: Path) -> tuple[list[Served], list[Path]]:
     """
     Every PandA controller served by an instance folder in services, and the
-    controller.yaml files that cannot be read (they may hide a duplicate)
+    controller.yaml or fastcs.yaml files that cannot be read (they may hide a
+    duplicate)
     """
     served: list[Served] = []
     unreadable: list[Path] = []
     if not services.is_dir():
         return served, unreadable
-    for controller in sorted(services.glob(f"*/config/{CONTROLLER_YAML}")):
+    controllers = [
+        path
+        for name in (CONTROLLER_YAML, HAND_MADE_CONTROLLER_YAML)
+        for path in services.glob(f"*/config/{name}")
+    ]
+    for controller in sorted(controllers):
         folder = controller.parent.parent
         if folder.name.startswith("."):
             continue  # .fastcs_ioc_template and friends
