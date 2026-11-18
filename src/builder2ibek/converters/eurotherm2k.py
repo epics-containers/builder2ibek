@@ -8,7 +8,8 @@ xml_component = "eurotherm2k"
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     XML to YAML specialist convertor function for the eurotherm2k support module
-    """
 
-    if entity_type in ["eurotherm2k"]:
-        entity.remove("name")
+    No entity of this module is referenced by another, and no model takes
+    name (a GUI label), so it is dropped from all of them.
+    """
+    entity.remove("name")
