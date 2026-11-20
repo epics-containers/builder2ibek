@@ -21,5 +21,4 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     if entity_type == "ffmpegStream":
         # remove unecessary parameters
         entity.remove("ADDR")
-        entity.remove("ENABLED")
         entity.remove("TIMEOUT")

@@ -18,6 +18,10 @@ Converts DLS XMLbuilder EPICS IOC definitions to ibek YAML.
 - **Do searches the user asks for in a background subagent**, so the conversation can continue and the main context stays clean. That covers usage counts, sweeps of `/dls_sw`, and code or web searches. The subagent returns the conclusion and its limits, not the raw output.
 - **No duplicate modules** across `ibek-support/` and `ibek-support-dls/` — each module lives in exactly one. Always check both before creating a new folder. Sole exception: a forked module (e.g. `ether_ip` / `ether_ip_dls`) may appear in both when the two `*.ibek.support.yaml` are byte-identical and only `install.yml` differs — an IOC builds exactly one of them.
 - **Never compile a beamline module into a generic IOC.** Beamline modules (`BL04I`, `BL11I`, `BL19I`, `BL21I`, `I19Server` and the like) are moving out of `ibek-support-dls` into `ibek-runtime-support`, so an IOC instance pulls in their entities with `ibek pattern add`. Adding one to a generic IOC's Dockerfile (e.g. ioc-dlslinuxvac) makes that IOC beamline-specific, which defeats the point of a generic IOC. An IOC that needs one waits for its runtime pattern.
+- **Before releasing a generic IOC, update its submodules.** In the IOC's main clone, run `git pull` and
+  `git submodule update`, then check that each submodule's pin is at the head of its `origin/main`. Bump any
+  pin that lags in the release MR. Doing it there means the release builds and tests the newest ibek-support
+  and ibek-support-dls, and leaves the clone with no stale submodule checkouts.
 - **Ask the user before creating any new module folder** in `ibek-support-dls/` or `ibek-support/`; subagents report back instead. See [new-module-folder.md](.claude/skills/shared/new-module-folder.md).
 
 ## Services Repo

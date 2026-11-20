@@ -20,6 +20,19 @@ pattern
 	{ "100",      "",     "",     "",     "",     "",     "",     "",     "",     "BL04I-MO-MAPT-01", "4",       "8",     "GeoBrick_2" }
 }
 
+file "pmacStatusAxis.template" {
+pattern 
+	{ "type",             "entity_enabled", "PMAC",             "PORT",       "AXIS" }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "1"    }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "2"    }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "3"    }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "4"    }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "5"    }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "6"    }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "7"    }
+	{ "pmac._axisStatus", "True",           "BL04I-MO-MAPT-01", "GeoBrick_2", "8"    }
+}
+
 file "dls_pmac_asyn_motor.template" {
 pattern 
 	{ "P",                "M",  "PORT",       "SPORT",   "CS", "PMAC",             "VELO", "ACCL", "SCALE", "BACC", "alh",  "DHLM", "HOMEVIS", "EGU", "FEHSV",    "VBAS", "VMAX", "HOME",               "BDST", "DIR", "DTYP",      "FEHIGH", "DLLM",  "INIT", "ALLOW_HOMED_SET", "RDBL", "SREV", "LLM", "ADEL", "RDBD",   "URIP", "ADDR", "RTRY", "OFF", "ERES",   "FEHIHI", "FEHHSV",   "JAR", "DESC",                  "BVEL", "MRES",   "DLY", "HLSV",  "UEIP", "RRES", "PREC", "RLNK", "FOFF", "HLM", "NTM", "TWV", "HOMEVISSTR"               }

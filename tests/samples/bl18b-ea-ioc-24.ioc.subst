@@ -28,26 +28,50 @@ pattern
 
 file "$(ADCORE)/db/NDROI.template" {
 pattern 
-	{ "P",                 "R",     "PORT",        "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE" }
-	{ "BL18B-EA-PILAT-01", ":ROI:", "PILATUS.roi", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "P",                 "R",      "PORT",              "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE" }
+	{ "BL18B-EA-PILAT-01", ":ROI:",  "PILATUS.roi",       "PILATUS.cam",  "1",       "0",    "0",            "1",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":ROI1:", "PILATUS.rois.roi1", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":ROI2:", "PILATUS.rois.roi2", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":ROI3:", "PILATUS.rois.roi3", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":ROI4:", "PILATUS.rois.roi4", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":ROI5:", "PILATUS.rois.roi5", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":ROI6:", "PILATUS.rois.roi6", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
 }
 
 file "$(ADCORE)/db/NDStats.template" {
 pattern 
-	{ "P",                 "R",      "PORT",         "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE", "XSIZE", "NCHANS", "YSIZE", "HIST_SIZE", "TS_PORT"    }
-	{ "BL18B-EA-PILAT-01", ":STAT:", "PILATUS.stat", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256",     "1475",  "20000",  "195",   "256",       "$(PORT)_TS" }
+	{ "P",                 "R",       "PORT",                "NDARRAY_PORT",      "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE", "XSIZE", "NCHANS", "YSIZE", "HIST_SIZE", "TS_PORT"    }
+	{ "BL18B-EA-PILAT-01", ":STAT:",  "PILATUS.stat",        "PILATUS.cam",       "1",       "0",    "0",            "1",       "I/O Intr", "15000", "0",     "256",     "1475",  "1024",   "195",   "256",       "$(PORT)_TS" }
+	{ "BL18B-EA-PILAT-01", ":STAT1:", "PILATUS.stats.stat1", "PILATUS.rois.roi1", "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256",     "1475",  "1024",   "195",   "256",       "$(PORT)_TS" }
+	{ "BL18B-EA-PILAT-01", ":STAT2:", "PILATUS.stats.stat2", "PILATUS.rois.roi2", "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256",     "1475",  "1024",   "195",   "256",       "$(PORT)_TS" }
+	{ "BL18B-EA-PILAT-01", ":STAT3:", "PILATUS.stats.stat3", "PILATUS.rois.roi3", "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256",     "1475",  "1024",   "195",   "256",       "$(PORT)_TS" }
+	{ "BL18B-EA-PILAT-01", ":STAT4:", "PILATUS.stats.stat4", "PILATUS.rois.roi4", "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256",     "1475",  "1024",   "195",   "256",       "$(PORT)_TS" }
+	{ "BL18B-EA-PILAT-01", ":STAT5:", "PILATUS.stats.stat5", "PILATUS.rois.roi5", "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256",     "1475",  "1024",   "195",   "256",       "$(PORT)_TS" }
+	{ "BL18B-EA-PILAT-01", ":STAT6:", "PILATUS.stats.stat6", "PILATUS.rois.roi6", "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256",     "1475",  "1024",   "195",   "256",       "$(PORT)_TS" }
 }
 
 file "$(ADCORE)/db/NDTimeSeries.template" {
 pattern 
-	{ "P",                 "R",         "PORT",            "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE", "TIME_LINK", "NCHANS" }
-	{ "BL18B-EA-PILAT-01", ":STAT:TS:", "PILATUS.stat_TS", "PILATUS.stat", "1",       "0",    "1",            "0",       "I/O Intr", "15000", "0",     "256",     "0.1",       "20000"  }
+	{ "P",                 "R",          "PORT",                   "NDARRAY_PORT",        "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE", "TIME_LINK", "NCHANS" }
+	{ "BL18B-EA-PILAT-01", ":STAT:TS:",  "PILATUS.stat_TS",        "PILATUS.stat",        "1",       "0",    "1",            "1",       "I/O Intr", "15000", "0",     "256",     "0.1",       "1024"   }
+	{ "BL18B-EA-PILAT-01", ":STAT1:TS:", "PILATUS.stats.stat1_TS", "PILATUS.stats.stat1", "1",       "0",    "1",            "0",       "I/O Intr", "15000", "0",     "256",     "0.1",       "1024"   }
+	{ "BL18B-EA-PILAT-01", ":STAT2:TS:", "PILATUS.stats.stat2_TS", "PILATUS.stats.stat2", "1",       "0",    "1",            "0",       "I/O Intr", "15000", "0",     "256",     "0.1",       "1024"   }
+	{ "BL18B-EA-PILAT-01", ":STAT3:TS:", "PILATUS.stats.stat3_TS", "PILATUS.stats.stat3", "1",       "0",    "1",            "0",       "I/O Intr", "15000", "0",     "256",     "0.1",       "1024"   }
+	{ "BL18B-EA-PILAT-01", ":STAT4:TS:", "PILATUS.stats.stat4_TS", "PILATUS.stats.stat4", "1",       "0",    "1",            "0",       "I/O Intr", "15000", "0",     "256",     "0.1",       "1024"   }
+	{ "BL18B-EA-PILAT-01", ":STAT5:TS:", "PILATUS.stats.stat5_TS", "PILATUS.stats.stat5", "1",       "0",    "1",            "0",       "I/O Intr", "15000", "0",     "256",     "0.1",       "1024"   }
+	{ "BL18B-EA-PILAT-01", ":STAT6:TS:", "PILATUS.stats.stat6_TS", "PILATUS.stats.stat6", "1",       "0",    "1",            "0",       "I/O Intr", "15000", "0",     "256",     "0.1",       "1024"   }
 }
 
 file "$(ADCORE)/db/NDTimeSeriesN.template" {
 pattern 
-	{ "NAME",            "P",                 "R",         "PORT",            "ADDR", "TIMEOUT", "NCHANS" }
-	{ "PILATUS.stat_TS", "BL18B-EA-PILAT-01", ":STAT:TS:", "PILATUS.stat_TS", "0",    "1",       "20000"  }
+	{ "NAME",                   "P",                 "R",          "PORT",                   "ADDR", "TIMEOUT", "NCHANS" }
+	{ "PILATUS.stat_TS",        "BL18B-EA-PILAT-01", ":STAT:TS:",  "PILATUS.stat_TS",        "0",    "1",       "1024"   }
+	{ "PILATUS.stats.stat1_TS", "BL18B-EA-PILAT-01", ":STAT1:TS:", "PILATUS.stats.stat1_TS", "0",    "1",       "1024"   }
+	{ "PILATUS.stats.stat2_TS", "BL18B-EA-PILAT-01", ":STAT2:TS:", "PILATUS.stats.stat2_TS", "0",    "1",       "1024"   }
+	{ "PILATUS.stats.stat3_TS", "BL18B-EA-PILAT-01", ":STAT3:TS:", "PILATUS.stats.stat3_TS", "0",    "1",       "1024"   }
+	{ "PILATUS.stats.stat4_TS", "BL18B-EA-PILAT-01", ":STAT4:TS:", "PILATUS.stats.stat4_TS", "0",    "1",       "1024"   }
+	{ "PILATUS.stats.stat5_TS", "BL18B-EA-PILAT-01", ":STAT5:TS:", "PILATUS.stats.stat5_TS", "0",    "1",       "1024"   }
+	{ "PILATUS.stats.stat6_TS", "BL18B-EA-PILAT-01", ":STAT6:TS:", "PILATUS.stats.stat6_TS", "0",    "1",       "1024"   }
 }
 
 file "$(ADCORE)/db/NDStdArrays.template" {
@@ -59,13 +83,13 @@ pattern
 file "$(ADCORE)/db/NDProcess.template" {
 pattern 
 	{ "P",                 "R",      "PORT",         "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE" }
-	{ "BL18B-EA-PILAT-01", ":PROC:", "PILATUS.proc", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":PROC:", "PILATUS.proc", "PILATUS.cam",  "1",       "0",    "0",            "1",       "I/O Intr", "15000", "0",     "256"     }
 }
 
 file "$(ADCORE)/db/NDOverlay.template" {
 pattern 
 	{ "P",                 "R",      "PORT",         "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE" }
-	{ "BL18B-EA-PILAT-01", ":OVER:", "PILATUS.over", "PILATUS.proc", "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "256"     }
+	{ "BL18B-EA-PILAT-01", ":OVER:", "PILATUS.over", "PILATUS.proc", "1",       "0",    "0",            "1",       "I/O Intr", "15000", "0",     "256"     }
 }
 
 file "$(ADCORE)/db/NDOverlayN.template" {
@@ -81,14 +105,38 @@ pattern
 	{ "BL18B-EA-PILAT-01", ":OVER:8:", ":OVER:", "Overlay 8", "PILATUS.over", "7",    "1",       "1",     "0",    "0",    "0",     "0",     "0",      "0"      }
 }
 
+file "$(FFMPEGSERVER)/db/ffmpegFile.template" {
+pattern 
+	{ "XMLSIZE", "PORT",         "P",                 "R",      "NDARRAY_PORT" }
+	{ "256",     "PILATUS.fimg", "BL18B-EA-PILAT-01", ":FIMG:", "PILATUS.cam"  }
+}
+
 file "$(ADCORE)/db/NDFileTIFF.template" {
 pattern 
 	{ "NDARRAY_PORT", "ADDR", "SCANRATE", "NDARRAY_ADDR", "ENABLED", "P",                 "R",      "PORT",         "TIMEOUT", "XMLSIZE" }
-	{ "PILATUS.cam",  "0",    "I/O Intr", "0",            "0",       "BL18B-EA-PILAT-01", ":TIFF:", "PILATUS.tiff", "1",       "256"     }
+	{ "PILATUS.cam",  "0",    "I/O Intr", "0",            "1",       "BL18B-EA-PILAT-01", ":TIFF:", "PILATUS.tiff", "1",       "256"     }
 }
 
 file "$(ADCORE)/db/NDFileHDF5.template" {
 pattern 
 	{ "P",                 "R",      "PORT",        "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE" }
-	{ "BL18B-EA-PILAT-01", ":HDF5:", "PILATUS.hdf", "PILATUS.cam",  "1",       "0",    "0",            "0",       "I/O Intr", "15000", "0",     "2048"    }
+	{ "BL18B-EA-PILAT-01", ":HDF5:", "PILATUS.hdf", "PILATUS.cam",  "1",       "0",    "0",            "1",       "I/O Intr", "15000", "0",     "2048"    }
+}
+
+file "$(FFMPEGSERVER)/db/ffmpegStream.template" {
+pattern 
+	{ "XMLSIZE", "PORT",         "P",                 "R",      "NDARRAY_PORT", "ENABLED", "MAXW", "MAXH", "QUALITY", "SETW", "SETH" }
+	{ "256",     "PILATUS.mjpg", "BL18B-EA-PILAT-01", ":MJPG:", "PILATUS.over", "1",       "1600", "1200", "100",     "0",    "0"    }
+}
+
+file "$(ADCORE)/db/NDPva.template" {
+pattern 
+	{ "P",                 "R",     "PORT",        "NDARRAY_PORT", "TIMEOUT", "ADDR", "NDARRAY_ADDR", "ENABLED", "SCANRATE", "QUEUE", "BLOCK", "XMLSIZE" }
+	{ "BL18B-EA-PILAT-01", ":PVA:", "PILATUS.pva", "PILATUS.cam",  "1",       "0",    "0",            "1",       "I/O Intr", "15000", "0",     "256"     }
+}
+
+file "gdaPlugins.template" {
+pattern 
+	{ "P",                 "CentroidThreshold", "ComputeProfiles", "ComputeStatistics", "ComputeCentroid" }
+	{ "BL18B-EA-PILAT-01", "50",                "1",               "0",                 "0"               }
 }

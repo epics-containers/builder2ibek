@@ -10,14 +10,8 @@ pattern
 
 file "$(ADANDOR)/db/andorCCD.template" {
 pattern 
-	{ "P",               "R",     "PORT",     "TIMEOUT", "ADDR", "SCANRATE" }
-	{ "BL99P-EA-DET-03", ":CAM:", "DET3.cam", "1",       "0",    "I/O Intr" }
-}
-
-file "$(ADANDOR)/db/andorCCD-DLSGui.template" {
-pattern 
-	{ "P",               "R",     "PORT"     }
-	{ "BL99P-EA-DET-03", ":CAM:", "DET3.cam" }
+	{ "XMLSIZE", "P",               "R",     "PORT",     "TIMEOUT", "ADDR", "SCANRATE" }
+	{ "256",     "BL99P-EA-DET-03", ":CAM:", "DET3.cam", "1",       "0",    "I/O Intr" }
 }
 
 file "$(ADCORE)/db/NDPosPlugin.template" {
@@ -28,6 +22,6 @@ pattern
 
 file "$(FFMPEGSERVER)/db/ffmpegStream.template" {
 pattern 
-	{ "XMLSIZE", "PORT",      "P",               "R",      "NDARRAY_PORT", "MAXW", "MAXH", "QUALITY", "SETW", "SETH" }
-	{ "256",     "DET3.MJPG", "BL99P-EA-DET-03", ":MJPG:", "DET3.cam",     "1600", "1200", "100",     "0",    "0"    }
+	{ "XMLSIZE", "PORT",      "P",               "R",      "NDARRAY_PORT", "ENABLED", "MAXW", "MAXH", "QUALITY", "SETW", "SETH" }
+	{ "256",     "DET3.MJPG", "BL99P-EA-DET-03", ":MJPG:", "DET3.cam",     "1",       "1600", "1200", "100",     "0",    "0"    }
 }

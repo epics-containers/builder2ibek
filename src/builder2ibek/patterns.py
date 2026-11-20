@@ -10,8 +10,10 @@ variable :data:`LIBRARIES` names for that library is set. :func:`pattern_index`
 shallow-clones each library at its tag into a temporary folder and indexes it:
 every library folder holding ``<folder>/<folder>.ibek.support.yaml`` is a pattern
 for the module of that name, and the support YAML lists its entity models. Only
-the beamline modules of ibek-runtime-support are indexed; an IOC that uses one of
-its other modules gets a warning (see builder2ibek.vendor_patterns). A module may have a
+the beamline modules of ibek-runtime-support and those in
+:data:`~builder2ibek.support_defaults.SUPPORT_PATTERN_MODULES` are indexed; an
+IOC that uses any other of its modules gets a warning (see
+builder2ibek.vendor_patterns). A module may have a
 pattern in only one library. A library that cannot be indexed is left out, so
 that the other's patterns are still used.
 
@@ -68,6 +70,7 @@ from builder2ibek.support_defaults import (
     entity_defaults,
     generic_param_types,
     is_beamline_module,
+    routes_to_support_pattern,
     values_match,
 )
 
@@ -135,6 +138,8 @@ class Pattern:
     version: str
     models: frozenset[str]
     support_yaml: Path
+    #: (model, entity type, arguments) for each sub-entity of each model
+    sub_entities: tuple[tuple[str, str, frozenset[str]], ...] = ()
 
     @property
     def ref(self) -> str:
@@ -296,12 +301,18 @@ class PatternIndex:
                     f"{support_yaml} declares module {module!r}; a pattern "
                     f"folder is vendored by its folder name, so the two must match"
                 )
+            models = data.get("entity_models") or []
             self.patterns[module] = Pattern(
                 library=library,
                 module=module,
                 version=version,
-                models=frozenset(m["name"] for m in data.get("entity_models") or []),
+                models=frozenset(m["name"] for m in models),
                 support_yaml=support_yaml,
+                sub_entities=tuple(
+                    (m["name"], str(sub["type"]), frozenset(sub) - {"type"})
+                    for m in models
+                    for sub in m.get("sub_entities") or []
+                ),
             )
 
     def add(self, other: PatternIndex) -> None:
@@ -665,9 +676,9 @@ def _clone(library: str, tag: str) -> Path:
 def _index_library(library: str, tag_env: str) -> PatternIndex:
     """Clone one library at its release and index it."""
     tag = os.environ.get(tag_env) or latest_tag(DEFAULT_LIBRARIES[library])
-    # ibek-runtime-support also holds patterns of modules that are not beamline
-    # modules; builder2ibek routes only beamline modules to it
-    only = is_beamline_module if library == SUPPORT_LIBRARY else None
+    # ibek-runtime-support also holds patterns of other modules, which
+    # builder2ibek does not route to it
+    only = routes_to_support_pattern if library == SUPPORT_LIBRARY else None
     return PatternIndex(_clone(library, tag), tag, library, only)
 
 

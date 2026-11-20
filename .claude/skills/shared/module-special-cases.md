@@ -115,9 +115,10 @@ entity's converted YAML. A module with no pattern (`BL20J`) has all its entities
 dropped that way. When ibek-runtime-support cannot be indexed, an IOC with
 beamline entities fails to convert instead. The pattern is always added with
 `ibek pattern add`, even to an image that has the module compiled in: beamline
-modules are deployed per instance. Only the beamline modules of
-`ibek-runtime-support` are indexed. An IOC that uses another module there,
-such as `detectorPlugins`, keeps its entities with a warning. Every entity of a
+modules are deployed per instance. Of the other modules of
+`ibek-runtime-support`, only `detectorPlugins` is indexed
+(`SUPPORT_PATTERN_MODULES` in `support_defaults.py`); an IOC that uses any
+other keeps its entities with a warning. Every entity of a
 `BL<nn><x>-BUILDER` module is dropped the same way as an unpatterned beamline
 entity, with one warning per entity type, since its templates are to be
 migrated into `BL<nn><x>`. A kept entity drops only the parameters equal to its
@@ -235,7 +236,7 @@ support YAML to `ibek-support` or `ibek-support-dls`.
 There is no `ADCore.NDAttributes` entity. The ADCore converter collects the
 builder elements by `port` and writes the NDAttributes XML, as XMLbuilder wrote
 it, inline into the `ATTRIBUTES_FILE` of the driver or plugin with that `PORT`.
-A model without `ATTRIBUTES_FILE` (ADPilatus, ADAndor_dls and the other
+A model without `ATTRIBUTES_FILE` (ADPilatus and the other
 ibek-support-dls areaDetector drivers) gets `<port>.xml` next to the ioc.yaml
 instead, set by an `ADCore.NDAttributesConfig` entity. Give such a model
 `ATTRIBUTES_FILE` and `XMLSIZE` as ibek-support's ADCore drivers have them, and
@@ -255,11 +256,19 @@ hand in a converted ioc.yaml.
 To drop another module the same way, call `ioc.wont_convert(entity, reason)`
 from its converter (`Generic_IOC.wont_convert` in `types.py`).
 
-## `gdaPlugins` — expanded by the converter; no support folder
+## `gdaPlugins` — the `detectorPlugins` runtime pattern; no support folder
 
-`converters/gdaPlugins.py` expands the gdaPlugins element into `ADCore`
-entities from `gdaPlugins.yaml`. The `detectorPlugins` runtime pattern in
-`ibek-runtime-support` also provides a `gdaPlugins` entity model. Don't create
+`converters/adUtil.py` and `converters/gdaPlugins.py` turn the builder objects
+`adUtil.gdaPlugins` and `gdaPlugins.gdaPlugins` into one
+`detectorPlugins.gdaPlugins` entity, which xml2yaml vendors from
+`ibek-runtime-support` with `ibek pattern add`. The XML attributes are its
+parameters and `name` is dropped. The pattern's defaults are adUtil's, so for
+`gdaPlugins.gdaPlugins` the converter writes that module's template defaults
+`NCHANS=20000` and `YSIZE=768` when the XML leaves them out. The IOC's image
+must build ADCore and ffmpegServer, with every argument the pattern's
+sub-entities pass (an NDStats without `ATTRIBUTES_FILE` cannot run it), and an
+`ARRTYPE` outside the pattern's enum, such as `UInt16`, fails its validation;
+either way `detectorPlugins` is reported as an unresolved module. Don't create
 a gdaPlugins folder in either support repo.
 
 ## `OXCryo` — use `ibek-support/oxCryo`
