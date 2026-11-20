@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 2.6.1.dev10+g6d0c560fe documentation</title>
+    <title>Creating ibek support YAML from a builder.py module &#8212; builder2ibek 2.6.1.dev17+ga082f0594 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=3f1f9de1"></script>
+    <script src="../_static/documentation_options.js?v=164345b6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -636,7 +636,7 @@ of a generic IOC container build.</p>
 </pre></div>
 </div>
 <p>The XML attributes become ibek parameter names.  <code class="docutils literal notranslate"><span class="pre">name</span></code> is dropped (the entity
-has no cross-references and creates no asyn port) and handled by a converter.
+has no cross-references and creates no asyn port): <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> leaves it out.
 <code class="docutils literal notranslate"><span class="pre">PORT</span></code> references the companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity by name.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
@@ -650,7 +650,7 @@ has no cross-references and creates no asyn port) and handled by a converter.
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
 <td><p>—</p></td>
 <td><p>—</p></td>
-<td><p>dropped; converter discards it from XML</p></td>
+<td><p>dropped; <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> discards it from XML</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
@@ -746,14 +746,14 @@ name — so <code class="docutils literal notranslate"><span class="pre">name</s
 If you see a <code class="docutils literal notranslate"><span class="pre">drvAsynIPPortConfigure</span></code> or <code class="docutils literal notranslate"><span class="pre">drvAsynSerialPortConfigure</span></code> call in
 <code class="docutils literal notranslate"><span class="pre">pre_init</span></code>, keep <code class="docutils literal notranslate"><span class="pre">name</span></code> as <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code>.</p>
 <p>If neither condition applies and this is a true <em>leaf</em> object, you can drop
-<code class="docutils literal notranslate"><span class="pre">name</span></code> entirely — but then you need a converter to discard it when reading the
-XML, so that <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> does not try to pass an unrecognised attribute to the
-entity model.  <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code> is the simplest example:
-it does nothing except call <code class="docutils literal notranslate"><span class="pre">entity.remove(&quot;name&quot;)</span></code> for its entity types.</p>
+<code class="docutils literal notranslate"><span class="pre">name</span></code> entirely.  <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> removes <code class="docutils literal notranslate"><span class="pre">name</span></code> from every entity of a module that
+has no converter in <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/</span></code>, so a module of leaf
+objects needs none.  A module that has a converter removes <code class="docutils literal notranslate"><span class="pre">name</span></code> from its
+leaf entity types there: <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code> is the
+simplest example.</p>
 <p>For <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code>, neither condition applies: the asyn port is created by the
 companion <code class="docutils literal notranslate"><span class="pre">asyn.AsynIP</span></code> entity (not by this one), and nothing in <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>
-cross-references <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> by name.  We therefore <strong>drop</strong> <code class="docutils literal notranslate"><span class="pre">name</span></code> and add
-a converter that discards it when reading the XML.</p>
+cross-references <code class="docutils literal notranslate"><span class="pre">hidenRGA_qga</span></code> by name.  We therefore <strong>drop</strong> <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
 </section>
 <hr class="docutils" />
 <section id="p-type-str">
@@ -919,23 +919,11 @@ maps directly to a database macro.</p>
 identical parameters.  Add them as additional <code class="docutils literal notranslate"><span class="pre">entity_models</span></code> entries, changing
 only the <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>, and the <code class="docutils literal notranslate"><span class="pre">databases[].file</span></code> path to the
 appropriate <code class="docutils literal notranslate"><span class="pre">.db</span></code> file.</p>
-<p>Because <code class="docutils literal notranslate"><span class="pre">name</span></code> was dropped from the entity model, a converter is needed to
-discard it when reading the XML.  Create
-<code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/hidenRGA.py</span></code> following the pattern of
-<code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/cmsIon.py</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.converters.globalHandler</span><span class="w"> </span><span class="kn">import</span> <span class="n">globalHandler</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">builder2ibek.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">Generic_IOC</span>
-
-<span class="n">xml_component</span> <span class="o">=</span> <span class="s2">"hidenRGA"</span>
-
-
-<span class="nd">@globalHandler</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">handler</span><span class="p">(</span><span class="n">entity</span><span class="p">:</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ioc</span><span class="p">:</span> <span class="n">Generic_IOC</span><span class="p">):</span>
-    <span class="n">entity</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">moduleinfos.py</span></code> discovers all <code class="docutils literal notranslate"><span class="pre">.py</span></code> files in the <code class="docutils literal notranslate"><span class="pre">converters/</span></code> directory
-automatically — no manual registration step is needed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">name</span></code> was dropped from the entity model, and <code class="docutils literal notranslate"><span class="pre">xml2yaml</span></code> removes it from
+every entity of a module that has no converter, so <code class="docutils literal notranslate"><span class="pre">hidenRGA</span></code> needs no file in
+<code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/</span></code>.  A module needs a converter only when one of
+its models takes <code class="docutils literal notranslate"><span class="pre">name</span></code> as <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code>, or an attribute or type has to change:
+see <a class="reference internal" href="../how-to/create-converter.html"><span class="std std-doc">Create a builder2ibek converter for a support module</span></a>.</p>
 </section>
 </section>
 <hr class="docutils" />

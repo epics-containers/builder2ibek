@@ -2,8 +2,9 @@
 
 When `builder2ibek xml2yaml` converts a builder XML file it applies a
 **converter** — a small Python module — for each XML component prefix it
-encounters.  If no converter exists, the entity is passed through unchanged
-with whatever attributes the XML had.
+encounters.  If no converter exists, the entity keeps the XML module name and
+the attributes the XML had, except that `name`, `gda_name`, `gda_desc` and
+`gda_curr_name` are removed and the values "True" and "False" become booleans.
 
 This how-to explains when and how to write a new converter.
 
@@ -35,12 +36,15 @@ converter instead.
 ## When a converter is needed
 
 A converter is needed when the ibek entity requires different field names,
-values, or structure from the raw XML attributes.  Common cases:
+values, or structure from the raw XML attributes.  A module whose entities
+only need `name` removed needs no converter: that is what happens without
+one.  Common cases:
 
 | Situation | Converter action |
 |---|---|
 | An XML attribute has been renamed in ibek | `entity.rename("old", "new")` |
 | An XML attribute is GUI-only or builder-only and absent from ibek | `entity.remove("attr")` |
+| The entity model takes `name` as `type: id` | An empty `handler` keeps `name`; remove it from the module's other entity types with `entity.remove("name")` |
 | An XML string `"True"` / `"False"` should be a YAML boolean | Already handled by `@globalHandler`; check first |
 | A numeric value must be transformed (e.g. `valve × 10 = addr`) | Arithmetic on `entity.addr` |
 | The entity type itself must change (module renamed in ibek) | `entity.type = "newModule.NewClass"` |
@@ -96,7 +100,7 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 `@globalHandler` wraps your `handler` function so that the global
 pre-processing runs first.  The global handler:
 
-- Removes `gda_name` and `gda_desc` from every entity
+- Removes `gda_name`, `gda_desc` and `gda_curr_name` from every entity
 - Converts string values `"True"` / `"False"` / `""` to Python
   `True` / `False` / `None`
 

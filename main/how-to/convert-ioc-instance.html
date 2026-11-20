@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.6.1.dev10+g6d0c560fe documentation</title>
+    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.6.1.dev17+ga082f0594 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=3f1f9de1"></script>
+    <script src="../_static/documentation_options.js?v=164345b6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -732,10 +732,11 @@ If the original had alternative configurations in comments, choose the right
 one now.</p></li>
 <li><p><strong>Default values</strong>: some converters inject sensible defaults (e.g. autosave
 <code class="docutils literal notranslate"><span class="pre">debug:</span> <span class="pre">false</span></code>).  Verify these are appropriate.</p></li>
-<li><p><strong>Module coverage</strong>: if a module has no converter, its entities will just have
-identical parameters to the XML attributes in the original. For some entities this
-will be perfectly OK as we try to make the <code class="docutils literal notranslate"><span class="pre">xxx.ibek.support.yaml</span></code> as compatible
-with the original XML as possible.</p></li>
+<li><p><strong>Module coverage</strong>: if a module has no converter, its entities keep the XML
+attributes of the original, except that <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">gda_name</span></code>, <code class="docutils literal notranslate"><span class="pre">gda_desc</span></code> and
+<code class="docutils literal notranslate"><span class="pre">gda_curr_name</span></code> are removed and the values “True” and “False” become
+booleans. For many entities this is all that is needed, as we try to make the
+<code class="docutils literal notranslate"><span class="pre">xxx.ibek.support.yaml</span></code> as compatible with the original XML as possible.</p></li>
 <li><p><strong>Schema validation</strong>: open the YAML in VSCode with the Red Hat YAML extension;
 the <code class="docutils literal notranslate"><span class="pre">$schema</span></code> line at the top will highlight any type mismatches.</p></li>
 </ul>
@@ -834,8 +835,8 @@ regenerate the global schema that VSCode uses for validation.</p>
 </table>
 </div>
 <p>The converter modules in <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/</span></code> handle the non-trivial
-mappings. Each file corresponds to one support module. See <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/</span></code>
-for the full list.</p>
+mappings. There is one file per support module that needs more than the default.
+See <code class="docutils literal notranslate"><span class="pre">src/builder2ibek/converters/</span></code> for the full list.</p>
 </section>
 </section>
 

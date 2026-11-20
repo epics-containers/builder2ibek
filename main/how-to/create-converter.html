@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Create a builder2ibek converter for a support module &#8212; builder2ibek 2.6.1.dev10+g6d0c560fe documentation</title>
+    <title>Create a builder2ibek converter for a support module &#8212; builder2ibek 2.6.1.dev17+ga082f0594 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=3f1f9de1"></script>
+    <script src="../_static/documentation_options.js?v=164345b6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -495,8 +495,9 @@
 <h1>Create a builder2ibek converter for a support module<a class="headerlink" href="#create-a-builder2ibek-converter-for-a-support-module" title="Link to this heading">#</a></h1>
 <p>When <code class="docutils literal notranslate"><span class="pre">builder2ibek</span> <span class="pre">xml2yaml</span></code> converts a builder XML file it applies a
 <strong>converter</strong> — a small Python module — for each XML component prefix it
-encounters.  If no converter exists, the entity is passed through unchanged
-with whatever attributes the XML had.</p>
+encounters.  If no converter exists, the entity keeps the XML module name and
+the attributes the XML had, except that <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">gda_name</span></code>, <code class="docutils literal notranslate"><span class="pre">gda_desc</span></code> and
+<code class="docutils literal notranslate"><span class="pre">gda_curr_name</span></code> are removed and the values “True” and “False” become booleans.</p>
 <p>This how-to explains when and how to write a new converter.</p>
 <hr class="docutils" />
 <section id="why-fix-builder2ibek-rather-than-editing-ioc-yaml-by-hand">
@@ -524,7 +525,9 @@ converter instead.</p>
 <section id="when-a-converter-is-needed">
 <h2>When a converter is needed<a class="headerlink" href="#when-a-converter-is-needed" title="Link to this heading">#</a></h2>
 <p>A converter is needed when the ibek entity requires different field names,
-values, or structure from the raw XML attributes.  Common cases:</p>
+values, or structure from the raw XML attributes.  A module whose entities
+only need <code class="docutils literal notranslate"><span class="pre">name</span></code> removed needs no converter: that is what happens without
+one.  Common cases:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Situation</p></th>
@@ -538,25 +541,28 @@ values, or structure from the raw XML attributes.  Common cases:</p>
 <tr class="row-odd"><td><p>An XML attribute is GUI-only or builder-only and absent from ibek</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">entity.remove(&quot;attr&quot;)</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>An XML string <code class="docutils literal notranslate"><span class="pre">&quot;True&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code> should be a YAML boolean</p></td>
+<tr class="row-even"><td><p>The entity model takes <code class="docutils literal notranslate"><span class="pre">name</span></code> as <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">id</span></code></p></td>
+<td><p>An empty <code class="docutils literal notranslate"><span class="pre">handler</span></code> keeps <code class="docutils literal notranslate"><span class="pre">name</span></code>; remove it from the module’s other entity types with <code class="docutils literal notranslate"><span class="pre">entity.remove(&quot;name&quot;)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>An XML string <code class="docutils literal notranslate"><span class="pre">&quot;True&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code> should be a YAML boolean</p></td>
 <td><p>Already handled by <code class="docutils literal notranslate"><span class="pre">&#64;globalHandler</span></code>; check first</p></td>
 </tr>
-<tr class="row-odd"><td><p>A numeric value must be transformed (e.g. <code class="docutils literal notranslate"><span class="pre">valve</span> <span class="pre">×</span> <span class="pre">10</span> <span class="pre">=</span> <span class="pre">addr</span></code>)</p></td>
+<tr class="row-even"><td><p>A numeric value must be transformed (e.g. <code class="docutils literal notranslate"><span class="pre">valve</span> <span class="pre">×</span> <span class="pre">10</span> <span class="pre">=</span> <span class="pre">addr</span></code>)</p></td>
 <td><p>Arithmetic on <code class="docutils literal notranslate"><span class="pre">entity.addr</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>The entity type itself must change (module renamed in ibek)</p></td>
+<tr class="row-odd"><td><p>The entity type itself must change (module renamed in ibek)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">entity.type</span> <span class="pre">=</span> <span class="pre">&quot;newModule.NewClass&quot;</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>An XML element maps to a different ibek module entirely</p></td>
+<tr class="row-even"><td><p>An XML element maps to a different ibek module entirely</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">entity.type</span> <span class="pre">=</span> <span class="pre">&quot;dlsPLC.something&quot;</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>One XML element should be deleted (e.g. replaced by an ibek default)</p></td>
+<tr class="row-odd"><td><p>One XML element should be deleted (e.g. replaced by an ibek default)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">entity.delete_me()</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>The module is deprecated and must not be converted (e.g. procServControl, adPython)</p></td>
+<tr class="row-even"><td><p>The module is deprecated and must not be converted (e.g. procServControl, adPython)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ioc.wont_convert(entity,</span> <span class="pre">reason)</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>One XML element should expand to two ibek entities</p></td>
+<tr class="row-odd"><td><p>One XML element should expand to two ibek entities</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">entity.add_entity(Entity({...}))</span></code></p></td>
 </tr>
 </tbody>
@@ -639,7 +645,7 @@ registration step is needed.</p>
 <p><code class="docutils literal notranslate"><span class="pre">&#64;globalHandler</span></code> wraps your <code class="docutils literal notranslate"><span class="pre">handler</span></code> function so that the global
 pre-processing runs first.  The global handler:</p>
 <ul class="simple">
-<li><p>Removes <code class="docutils literal notranslate"><span class="pre">gda_name</span></code> and <code class="docutils literal notranslate"><span class="pre">gda_desc</span></code> from every entity</p></li>
+<li><p>Removes <code class="docutils literal notranslate"><span class="pre">gda_name</span></code>, <code class="docutils literal notranslate"><span class="pre">gda_desc</span></code> and <code class="docutils literal notranslate"><span class="pre">gda_curr_name</span></code> from every entity</p></li>
 <li><p>Converts string values <code class="docutils literal notranslate"><span class="pre">&quot;True&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> to Python
 <code class="docutils literal notranslate"><span class="pre">True</span></code> / <code class="docutils literal notranslate"><span class="pre">False</span></code> / <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
 </ul>
