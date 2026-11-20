@@ -150,10 +150,22 @@ Follow the `name` parameter rules in
 [support-yaml-rules.md](../skills/shared/support-yaml-rules.md) to determine whether
 `name` should be kept or dropped.
 
-If `name` must be dropped (confirmed leaf entity), create or update
-`src/builder2ibek/converters/<module>.py`. Follow the pattern in existing
-converters like `src/builder2ibek/converters/cmsIon.py`. Converters are
-auto-discovered — no registration needed.
+A module with no file in `src/builder2ibek/converters/` gets the default
+conversion: its entities keep the XML module name as their type prefix and
+lose `name`. That is all a module of leaf entities needs, so write no
+converter for it.
+
+Create or update `src/builder2ibek/converters/<module>.py` only when the module
+needs more than the default:
+
+- a model takes `name` as `type: id` (the converter then removes `name` only
+  from the module's other entity types, as
+  `src/builder2ibek/converters/cmsIon.py` does)
+- an attribute is renamed, removed or transformed
+- the ibek module name or an entity type differs from the XML's
+- an entity is deleted, expanded or given defaults
+
+Converters are auto-discovered — no registration needed.
 
 **Important**: pass plain `dict` to `entity.add_entity()`, never `Entity(...)`.
 
