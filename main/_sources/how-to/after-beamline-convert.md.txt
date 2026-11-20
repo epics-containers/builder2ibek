@@ -149,6 +149,9 @@ services repo for use across multiple IOCs on that beamline.
 See [Runtime Support](runtime-support.md) for full setup instructions,
 worked examples, and tips.
 
+xml2yaml adds the `detectorPlugins` pattern itself, with `ibek pattern add`,
+for an IOC whose XML has a `gdaPlugins` builder object.
+
 Raw `records.*` components in the builder XML have no entity model. builder2ibek
 writes them, as builder did, to `config/records.db` beside the `ioc.yaml` and
 lists it in the ioc.yaml's `post_db_files`, which ibek 4.12.0 and later loads

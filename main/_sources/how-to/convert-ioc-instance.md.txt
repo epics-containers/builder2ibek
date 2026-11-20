@@ -154,9 +154,13 @@ of the `ioc.yaml`, headed `DROPPED FOR MANUAL REVIEW`, lists each with its
 reason and its YAML as builder2ibek converted it, commented out, so that it can
 be found in the services repo, added to the pattern, and restored.
 
-Only the beamline modules of ibek-runtime-support are routed to it; its other
-patterns are not used. An IOC that uses one of them, such as `detectorPlugins`,
-keeps its entities with a warning. A builder repo such as `BL15I-BUILDER` is
+The beamline modules of ibek-runtime-support are routed to it, and so is
+`detectorPlugins`, whose `gdaPlugins` model takes the builder objects
+`adUtil.gdaPlugins` and `gdaPlugins.gdaPlugins`. Such an IOC needs a generic
+IOC image that builds every entity type the pattern's sub-entities create
+(ADCore and ffmpegServer) and takes every argument they pass; otherwise
+`detectorPlugins` is reported as an unresolved module. Its other patterns are
+not used: an IOC that uses one keeps its entities with a warning. A builder repo such as `BL15I-BUILDER` is
 never a pattern: its templates are to be migrated into the beamline module
 (`BL15I`), so every one of its entities is left out and listed for review in
 the same way, with one warning per entity type. A kept

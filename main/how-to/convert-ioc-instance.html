@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.5.1.dev97+g29d95e63d documentation</title>
+    <title>Convert a builder XML IOC instance to ibek YAML &#8212; builder2ibek 2.6.1.dev5+gab14767af documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=afd7e3dd"></script>
+    <script src="../_static/documentation_options.js?v=7dfeeb19"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -626,9 +626,13 @@ the entity type, its <code class="docutils literal notranslate"><span class="pre
 of the <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code>, headed <code class="docutils literal notranslate"><span class="pre">DROPPED</span> <span class="pre">FOR</span> <span class="pre">MANUAL</span> <span class="pre">REVIEW</span></code>, lists each with its
 reason and its YAML as builder2ibek converted it, commented out, so that it can
 be found in the services repo, added to the pattern, and restored.</p>
-<p>Only the beamline modules of ibek-runtime-support are routed to it; its other
-patterns are not used. An IOC that uses one of them, such as <code class="docutils literal notranslate"><span class="pre">detectorPlugins</span></code>,
-keeps its entities with a warning. A builder repo such as <code class="docutils literal notranslate"><span class="pre">BL15I-BUILDER</span></code> is
+<p>The beamline modules of ibek-runtime-support are routed to it, and so is
+<code class="docutils literal notranslate"><span class="pre">detectorPlugins</span></code>, whose <code class="docutils literal notranslate"><span class="pre">gdaPlugins</span></code> model takes the builder objects
+<code class="docutils literal notranslate"><span class="pre">adUtil.gdaPlugins</span></code> and <code class="docutils literal notranslate"><span class="pre">gdaPlugins.gdaPlugins</span></code>. Such an IOC needs a generic
+IOC image that builds every entity type the pattern’s sub-entities create
+(ADCore and ffmpegServer) and takes every argument they pass; otherwise
+<code class="docutils literal notranslate"><span class="pre">detectorPlugins</span></code> is reported as an unresolved module. Its other patterns are
+not used: an IOC that uses one keeps its entities with a warning. A builder repo such as <code class="docutils literal notranslate"><span class="pre">BL15I-BUILDER</span></code> is
 never a pattern: its templates are to be migrated into the beamline module
 (<code class="docutils literal notranslate"><span class="pre">BL15I</span></code>), so every one of its entities is left out and listed for review in
 the same way, with one warning per entity type. A kept

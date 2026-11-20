@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>After a Beamline Auto-Conversion &#8212; builder2ibek 2.5.1.dev97+g29d95e63d documentation</title>
+    <title>After a Beamline Auto-Conversion &#8212; builder2ibek 2.6.1.dev5+gab14767af documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=afd7e3dd"></script>
+    <script src="../_static/documentation_options.js?v=7dfeeb19"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -649,6 +649,8 @@ through the <code class="docutils literal notranslate"><span class="pre">ibek-ru
 services repo for use across multiple IOCs on that beamline.</p>
 <p>See <a class="reference internal" href="runtime-support.html"><span class="std std-doc">Runtime Support</span></a> for full setup instructions,
 worked examples, and tips.</p>
+<p>xml2yaml adds the <code class="docutils literal notranslate"><span class="pre">detectorPlugins</span></code> pattern itself, with <code class="docutils literal notranslate"><span class="pre">ibek</span> <span class="pre">pattern</span> <span class="pre">add</span></code>,
+for an IOC whose XML has a <code class="docutils literal notranslate"><span class="pre">gdaPlugins</span></code> builder object.</p>
 <p>Raw <code class="docutils literal notranslate"><span class="pre">records.*</span></code> components in the builder XML have no entity model. builder2ibek
 writes them, as builder did, to <code class="docutils literal notranslate"><span class="pre">config/records.db</span></code> beside the <code class="docutils literal notranslate"><span class="pre">ioc.yaml</span></code> and
 lists it in the ioc.yaml’s <code class="docutils literal notranslate"><span class="pre">post_db_files</span></code>, which ibek 4.12.0 and later loads
