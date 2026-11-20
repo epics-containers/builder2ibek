@@ -19,7 +19,7 @@
 #     | grep -o '"token":"[^"]*"' | cut -d'"' -f4 | xargs -I{} \
 #     curl -sL -H "Authorization: Bearer {}" \
 #     https://ghcr.io/v2/epics-containers/epics-base-developer/tags/list
-FROM ghcr.io/epics-containers/epics-base-developer:7.0.10ec5 AS developer
+FROM ghcr.io/epics-containers/epics-base-developer:7.0.10ec6 AS developer
 
 # Add any system dependencies for the developer/build environment here
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
