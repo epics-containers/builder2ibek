@@ -20,6 +20,19 @@ pattern
 	{ "100",      "",     "",     "",     "",     "",     "",     "",     "Default", "BL45P-MO-STEP-01", "4",       "8",     "BRICK1" }
 }
 
+file "pmacStatusAxis.template" {
+pattern 
+	{ "type",             "entity_enabled", "PMAC",             "PORT",   "AXIS" }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "1"    }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "2"    }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "3"    }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "4"    }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "5"    }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "6"    }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "7"    }
+	{ "pmac._axisStatus", "True",           "BL45P-MO-STEP-01", "BRICK1", "8"    }
+}
+
 file "dls_pmac_asyn_motor.template" {
 pattern 
 	{ "P",                 "M",          "PORT",   "SPORT",      "CS", "PMAC",             "VELO",  "ACCL", "SCALE", "BACC", "alh",  "DHLM",       "HOMEVIS", "EGU", "FEHSV",    "VBAS", "VMAX",   "HOME",              "BDST", "DIR", "DTYP",      "FEHIGH", "DLLM",        "INIT", "ALLOW_HOMED_SET", "RDBL", "SREV", "LLM", "ADEL", "RDBD", "URIP", "ADDR", "RTRY", "OFF", "ERES", "FEHIHI", "FEHHSV",   "JAR", "DESC",              "BVEL", "MRES",        "DLY", "HLSV",  "UEIP", "RRES", "PREC", "RLNK", "FOFF", "HLM", "NTM", "TWV", "HOMEVISSTR"               }
