@@ -27,7 +27,7 @@ Patterns seen across multiple beamline conversions:
 | Issue | Symptom | Fix |
 |---|---|---|
 | `when: last` not in ibek | `pingWait` entities fail generate2 | Known gap — ibek 3.3.3 hasn't implemented `When.last` |
-| gdaPlugins incomplete expansion | Only primary ROI+Stat chain generated; missing roi1-6, stat1-6, ffmpeg, PVA | Major gap in gdaPlugins converter — deliberate simplification |
+| Unresolved module detectorPlugins | "`<image>` ADCore.NDStats takes no ATTRIBUTES_FILE", "`<image>` does not build ffmpegServer.…", or "rejects detectorPlugins.gdaPlugins.ARRTYPE" | The image cannot run the gdaPlugins pattern: use an image release with those models, or fix the XML's `ARRTYPE` |
 | Raw `records.*` entities | Warning "N raw records written to config/records.db": every raw record but an EtherIP `ao` goes to `config/records.db`, loaded after ioc.db through the ioc.yaml's `post_db_files` | Check each is still wanted; a hardware-DTYP record needs its device support in the generic IOC. A set of records worth reusing can become a template in the IOC instance's config folder or a support module (see `docs/how-to/after-beamline-convert.md`, Custom templates) |
 | NDAttributes XML in a file | Warning "`<type>` has no ATTRIBUTES_FILE": the port's XML goes in `<port>.xml` next to the ioc.yaml, set by `ADCore.NDAttributesConfig` | Add `ATTRIBUTES_FILE` and `XMLSIZE` to that entity model, as ibek-support's ADCore drivers have; the converter then puts the XML inline |
 | vacValveGroup column misalignment | Rows have wrong number of values for multi-column pattern | dlsPLC support YAML — check column count matches template |

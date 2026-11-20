@@ -1,0 +1,9 @@
+version: 1
+patterns:
+  detectorPlugins:
+    version: 0.5.0
+    source: github.com/epics-containers/ibek-runtime-support
+    files:
+      config/detectorPlugins.ibek.support.yaml: sha256:532e090d18c1fe9fc640ccffd2368caf2e48dd2b9a22180d946c4b21a6e46c08
+      config/gdaPlugins.template: sha256:ae500d96bcd3b72a063948f517b837ae9d19169bb5f66fe2455084046c0f9539
+      config/gdaPluginsStats.xml: sha256:7b533498e836dcb3c4b51ed755587290705adb2a48e56aa6e2816b83cdb85e3a

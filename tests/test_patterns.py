@@ -24,6 +24,8 @@ from builder2ibek.patterns import (
     latest_tag,
     pattern_index,
 )
+from builder2ibek.support_defaults import routes_to_support_pattern
+from builder2ibek.vendor_patterns import is_pattern_only
 from tests.conftest import DLS_SUPPORT, REPO_ROOT
 from tests.pattern_pins import PINNED_LIBRARIES
 
@@ -85,34 +87,59 @@ def test_tests_index_the_pinned_tag(index: PatternIndex, submodule: Path):
 
 
 def test_every_pattern_folder_is_indexed(index: PatternIndex):
-    """Every folder, except ibek-runtime-support's of non-beamline modules."""
+    """Every folder, except ibek-runtime-support's of modules not routed to it."""
     for submodule in PINNED_LIBRARIES:
         folders = {p.parent.name for p in submodule.glob("*/*.ibek.support.yaml")}
         if submodule.name == SUPPORT_LIBRARY:
-            folders = set(filter(is_beamline_module, folders))
+            folders = set(filter(routes_to_support_pattern, folders))
         indexed = {m for m, p in index.patterns.items() if p.library == submodule.name}
         assert folders and indexed == folders
 
 
-def test_support_library_routes_only_beamline_modules(index: PatternIndex):
-    """BL15I-BUILDER and detectorPlugins get no pattern from ibek-runtime-support.
+def test_support_library_routes_beamline_and_areadetector_modules(
+    index: PatternIndex,
+):
+    """ibek-runtime-support serves beamline modules and detectorPlugins, whose
+    gdaPlugins model replaces the builder object gdaPlugins; BL15I-BUILDER gets
+    no pattern.
 
-    A detectorPlugins-only IOC is then never moved onto the streamdevice
-    runtime image, which has no areaDetector.
+    A detectorPlugins-only IOC is still never moved onto the streamdevice
+    runtime image, which has no AreaDetector: it needs an AreaDetector generic
+    IOC.
     """
     folders = {p.name for p in (REPO_ROOT / SUPPORT_LIBRARY).iterdir()}
     assert {"BL15I-BUILDER", "detectorPlugins"} <= folders
     assert "BL15I-BUILDER" not in index.patterns
-    assert "detectorPlugins" not in index.patterns
-    # skipped, but recorded so that an IOC using one gets a warning
-    assert {"BL15I-BUILDER", "detectorPlugins"} <= index.unindexed.keys()
-    plan = index.plan(
-        [
-            {"type": "detectorPlugins.detectorPlugins", "PREFIX": "X"},
-            {"type": "BL15I-BUILDER.auto_BL15I_SumTheDiode", "P": "X"},
-        ]
+    assert index.patterns["detectorPlugins"].library == SUPPORT_LIBRARY
+    # the sub-entities an image must run, as the index loads them
+    gda_subs = {
+        (t, args)
+        for model, t, args in index.patterns["detectorPlugins"].sub_entities
+        if model == "gdaPlugins"
+    }
+    assert any(
+        t == "ADCore.NDStats" and "ATTRIBUTES_FILE" in args for t, args in gda_subs
     )
-    assert plan.patterns == [] and plan.build_time == {}
+    assert {t for t, _ in gda_subs} >= {
+        "ffmpegServer.ffmpegFile",
+        "ffmpegServer.ffmpegStream",
+        "detectorPlugins._gdaPluginsRecords",
+    }
+    # skipped, but recorded so that an IOC using one gets a warning
+    assert "BL15I-BUILDER" in index.unindexed
+    assert "detectorPlugins" not in index.unindexed
+    gda = {
+        "type": "detectorPlugins.gdaPlugins",
+        "P": "X",
+        "CAM": "CAM",
+        "PORTPREFIX": "D",
+    }
+    plan = index.plan([gda, {"type": "BL15I-BUILDER.auto_BL15I_SumTheDiode"}])
+    assert plan.refs == [index.patterns["detectorPlugins"].ref]
+    assert plan.build_time == {}
+    # every type the runtime image could have, and still not pattern-only
+    runtime_types = frozenset({"detectorPlugins.gdaPlugins", "epics.dbpf"})
+    assert not is_pattern_only([gda], plan, runtime_types)
 
 
 def test_beamline_modules():
