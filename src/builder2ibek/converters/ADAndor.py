@@ -2,7 +2,7 @@ from builder2ibek.converters.globalHandler import globalHandler
 from builder2ibek.types import Entity, Generic_IOC
 
 xml_component = "ADAndor"
-yaml_component = "ADAndor_dls"
+yaml_component = "ADAndor"
 
 
 @globalHandler
