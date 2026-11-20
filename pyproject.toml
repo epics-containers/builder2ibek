@@ -63,6 +63,7 @@ filterwarnings = "error"
 testpaths = "docs src tests"
 
 [tool.coverage.run]
+core = "sysmon"
 patch = ["subprocess"]
 data_file = "/tmp/builder2ibek.coverage"
 
