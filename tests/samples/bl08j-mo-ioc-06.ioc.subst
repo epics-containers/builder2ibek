@@ -26,6 +26,19 @@ pattern
 	{ "100",      "",     "",     "",     "",     "",     "",     "Default", "",     "BL08J-MO-STEP-06", "4",       "8",     "STEP06" }
 }
 
+file "pmacStatusAxis.template" {
+pattern 
+	{ "type",             "entity_enabled", "PMAC",             "PORT",   "AXIS" }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "1"    }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "2"    }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "3"    }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "4"    }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "5"    }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "6"    }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "7"    }
+	{ "pmac._axisStatus", "True",           "BL08J-MO-STEP-06", "STEP06", "8"    }
+}
+
 file "dls_pmac_asyn_motor.template" {
 pattern 
 	{ "P",                 "M",      "PORT",   "SPORT",       "CS", "PMAC",             "VELO", "ACCL", "SCALE", "BACC", "alh",  "DHLM", "HOMEVIS", "EGU", "FEHSV",    "VBAS", "VMAX", "HOME",              "BDST", "DIR", "DTYP",      "FEHIGH", "DLLM",  "INIT", "ALLOW_HOMED_SET", "RDBL", "SREV", "LLM", "ADEL", "RDBD", "URIP", "ADDR", "RTRY", "OFF", "ERES", "FEHIHI", "FEHHSV",   "JAR", "DESC",                      "BVEL", "MRES",       "DLY", "HLSV",  "UEIP", "RRES", "PREC", "RLNK", "FOFF", "HLM", "NTM", "TWV", "HOMEVISSTR"        }
