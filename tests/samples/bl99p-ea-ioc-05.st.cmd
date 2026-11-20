@@ -9,8 +9,8 @@ epicsEnvSet EPICS_CA_MAX_ARRAY_BYTES 9000000
 dbLoadDatabase dbd/ioc.dbd
 ioc_registerRecordDeviceDriver pdbbase
 
-# andorCCDConfig(portName, installPath, shamrockID, maxBuffers, maxMemory, priority, stackSize)
-andorCCDConfig("DET3.cam", "/dls_sw/prod/R3.14.12.7/support/ANAndor/etc", 0, 2000, 0, 0, 100000)
+# andorCCDConfig(portName, installPath, cameraSerial, shamrockID, maxBuffers, maxMemory, priority, stackSize)
+andorCCDConfig("DET3.cam", "/dls_sw/prod/R3.14.12.7/support/ANAndor/etc", 0, 0, 2000, 0, 0, 100000)
 # NDPosPluginConfigure(portName, queueSize, blockingCallbacks, NDArrayPort, NDArrayAddr, maxBuffers, maxMemory, priority, stackSize)
 NDPosPluginConfigure("DET3.pos", 1000, 0, "DET3.cam", 0, 0, 0, 0, 0)
 ffmpegServerConfigure(8081)
