@@ -125,8 +125,8 @@ pattern
 
 file "$(FFMPEGSERVER)/db/ffmpegStream.template" {
 pattern 
-	{ "XMLSIZE", "PORT",         "P",                 "R",      "NDARRAY_PORT", "MAXW", "MAXH", "QUALITY", "SETW", "SETH" }
-	{ "256",     "PILATUS.mjpg", "BL18B-EA-PILAT-01", ":MJPG:", "PILATUS.over", "1600", "1200", "100",     "0",    "0"    }
+	{ "XMLSIZE", "PORT",         "P",                 "R",      "NDARRAY_PORT", "ENABLED", "MAXW", "MAXH", "QUALITY", "SETW", "SETH" }
+	{ "256",     "PILATUS.mjpg", "BL18B-EA-PILAT-01", ":MJPG:", "PILATUS.over", "1",       "1600", "1200", "100",     "0",    "0"    }
 }
 
 file "$(ADCORE)/db/NDPva.template" {
