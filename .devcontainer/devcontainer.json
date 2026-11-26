@@ -65,11 +65,11 @@
             "target": "/cache",
             "type": "volume"
         },
-        // /dls and /dls_sw as bindfs read-only views made by initializeCommand.sh,
+        // /dls_sw as a bindfs read-only view made by initializeCommand.sh,
         // so autofs submounts are read-only too (a plain readonly bind is not
-        // recursive on the RHEL8 kernel)
-        "type=bind,source=${localEnv:XDG_RUNTIME_DIR}/dls-ro/dls_sw,target=/dls_sw,readonly",
-        "type=bind,source=${localEnv:XDG_RUNTIME_DIR}/dls-ro/dls,target=/dls,readonly"
+        // recursive on the RHEL8 kernel). /dls is not mounted: it holds user
+        // data that Claude is not cleared to read.
+        "type=bind,source=${localEnv:XDG_RUNTIME_DIR}/dls-ro/dls_sw,target=/dls_sw,readonly"
     ],
     // Mount the parent as /workspaces so we can pip install peers as editable
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
