@@ -68,8 +68,8 @@
         // /dls and /dls_sw as bindfs read-only views made by initializeCommand.sh,
         // so autofs submounts are read-only too (a plain readonly bind is not
         // recursive on the RHEL8 kernel)
-        "type=bind,source=${localEnv:HOME}/.cache/dls-ro/dls_sw,target=/dls_sw,readonly",
-        "type=bind,source=${localEnv:HOME}/.cache/dls-ro/dls,target=/dls,readonly"
+        "type=bind,source=${localEnv:XDG_RUNTIME_DIR}/dls-ro/dls_sw,target=/dls_sw,readonly",
+        "type=bind,source=${localEnv:XDG_RUNTIME_DIR}/dls-ro/dls,target=/dls,readonly"
     ],
     // Mount the parent as /workspaces so we can pip install peers as editable
     "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",

@@ -22,7 +22,14 @@ if ! command -v bindfs >/dev/null; then
     exit 1
 fi
 
-ro_root="$HOME/.cache/dls-ro"
+# Under the per-user runtime dir (tmpfs, gone at logout or reboot) rather than
+# ~/.cache, which cleanup and disk-usage tools walk and delete from.
+if [[ -z ${XDG_RUNTIME_DIR:-} ]]; then
+    echo "ERROR: XDG_RUNTIME_DIR is not set; it holds the read-only views" >&2
+    echo "of /dls and /dls_sw for the container." >&2
+    exit 1
+fi
+ro_root="$XDG_RUNTIME_DIR/dls-ro"
 for src in /dls /dls_sw; do
     mnt="$ro_root/${src#/}"
     mkdir -p "$mnt"
