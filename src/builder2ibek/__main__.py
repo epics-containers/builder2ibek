@@ -8,6 +8,7 @@ from builder2ibek.convert import convert_file
 from builder2ibek.db2autosave import parse_templates
 from builder2ibek.dbcompare import compare_dbs
 from builder2ibek.devc7 import DLS_SW, devc7_cli
+from builder2ibek.hardware_status import hardware_status
 from builder2ibek.migrate_autosave import migrate_folder
 from builder2ibek.patterns import BeamlinePatternError
 from builder2ibek.reconvert import reconvert_cli
@@ -395,6 +396,29 @@ def dev_c7(
     )
     if code:
         raise typer.Exit(code)
+
+
+@cli.command("hardware-status")
+def hardware_status_cmd(
+    services_repo: Path = typer.Argument(
+        ..., help="Path to the beamline services repo"
+    ),
+):
+    """
+    Write a beamline's Phoebus hardware status screen,
+    synoptic/hardware-status/hardware-status.bob, from the IOC instances in
+    the services repo and the entities in their config/ioc.yaml.
+
+    It reads synoptic/hardware-status/hardware-status.yaml in the services
+    repo for the title, the service prefixes, row labels, external IOCs and
+    services to skip. Re-run it whenever an IOC is added, renamed or converted.
+    """
+    try:
+        out, iocs, devices = hardware_status(services_repo)
+    except (FileNotFoundError, ValueError) as e:
+        typer.echo(f"error: {e}", err=True)
+        raise typer.Exit(1) from e
+    typer.echo(f"{out}: {iocs} IOCs, {devices} devices")
 
 
 if __name__ == "__main__":

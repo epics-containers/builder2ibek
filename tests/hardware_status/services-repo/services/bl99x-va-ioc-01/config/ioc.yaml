@@ -1,0 +1,5 @@
+ioc_name: "{{ _global.get_env('IOC_NAME') }}"
+description: vacuum
+entities:
+  - type: FINS.FINSTemplate
+    device: BL99X-VA-PLC-01

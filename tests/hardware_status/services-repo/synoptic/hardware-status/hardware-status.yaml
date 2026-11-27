@@ -1,0 +1,11 @@
+title: B99 Hardware Status
+beamline_services: ["bl99x-"]
+skip:
+  - bl99x-synoptic
+labels:
+  BL99X-MO-IOC-01: Motion
+  BL99X-EA-IOC-01: Endstation
+external:
+  - name: BL99X-DI-IOC-01
+    kind: vxWorks VME crate
+  - name: BL99X-MO-IOC-01  # also in services: shown once
