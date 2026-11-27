@@ -426,6 +426,12 @@ def test_beamline_module_in_both_libraries_fails_the_conversion(
         convert_file(xml, tmp_path / "ioc.yaml", "/epics/ibek-defs/ioc.schema.json")
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="https://github.com/epics-containers/ibek-runtime-support/issues/15: "
+    "the SMPLValveSequence macros changed in BL21I 3-12 while BL21I-BUILDER is "
+    "still on 3-11",
+)
 def test_kept_entities_drop_the_pattern_model_defaults(tmp_path: Path):
     """Not the generic model's: GonioReady's dom defaults to 'undefined' only
     there, and the pattern requires it."""
