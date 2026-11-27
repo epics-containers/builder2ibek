@@ -8,12 +8,6 @@ xml_component = "BLfeedback"
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     XML to YAML specialist convertor function for the BLfeedback support module
-
-    feedback is the BLfeedback pattern of ibek-runtime-support. beamPositionCalc
-    calls beamPositionCalcConfigure, so it stays build-time, under the module
-    name BLfeedbackCalc in ibek-support-dls.
     """
-    if entity_type == "feedback":
+    if entity_type in ["feedback"]:
         entity.remove("name")
-    elif entity_type == "beamPositionCalc":
-        entity.type = "BLfeedbackCalc.beamPositionCalc"
