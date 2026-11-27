@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Migrating saved autosave values to an ibek IOC &#8212; builder2ibek 2.6.1.dev21+gc3fd4f4d8 documentation</title>
+    <title>Migrating saved autosave values to an ibek IOC &#8212; builder2ibek 2.6.1.dev24+g617c4a0e2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=a679c12c"></script>
+    <script src="../_static/documentation_options.js?v=1154ea22"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -664,6 +664,33 @@ directory the running ibek IOC mounts and restores from at boot (for an RTEMS
 hybrid IOC this is the NFS autosave mount; see the rtems-proxy autosave
 notes). Commit them alongside the IOC instance if you want the migrated values
 under version control.</p>
+<p>On a Kubernetes beamline, each domain has one shared autosave PVC,
+<code class="docutils literal notranslate"><span class="pre">&lt;domain&gt;-autosave-claim</span></code>. The <code class="docutils literal notranslate"><span class="pre">&lt;domain&gt;-epics-pvcs</span></code> pod mounts it at
+<code class="docutils literal notranslate"><span class="pre">/mounts/autosave</span></code>, with one folder per IOC, <code class="docutils literal notranslate"><span class="pre">/mounts/autosave/&lt;ioc-name&gt;/</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">&lt;ioc-name&gt;</span></code> is the IOC’s services folder name, e.g. <code class="docutils literal notranslate"><span class="pre">bl05i-ea-ioc-03</span></code>.
+Each IOC mounts its own folder as a subPath at <code class="docutils literal notranslate"><span class="pre">/autosave</span></code>. For domain <code class="docutils literal notranslate"><span class="pre">i05</span></code>,
+the pod is <code class="docutils literal notranslate"><span class="pre">i05-epics-pvcs-&lt;hash&gt;</span></code>.</p>
+<ol class="arabic">
+<li><p>Stop the legacy IOC, so its autosave files hold its final values.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">migrate-autosave</span></code> on its autosave folder.</p></li>
+<li><p>Copy the files into the pvcs pod while the ibek IOC is not running
+(stopped, or not yet started); otherwise its next save overwrites them:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kubectl<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>epics-pvcs
+kubectl<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;pod&gt;<span class="w"> </span>--<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/mounts/autosave/&lt;ioc-name&gt;
+kubectl<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span>cp<span class="w"> </span>&lt;out-folder&gt;/autosave_settings.sav<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>&lt;pod&gt;:/mounts/autosave/&lt;ioc-name&gt;/autosave_settings.sav
+kubectl<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span>cp<span class="w"> </span>&lt;out-folder&gt;/autosave_positions.sav<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>&lt;pod&gt;:/mounts/autosave/&lt;ioc-name&gt;/autosave_positions.sav
+kubectl<span class="w"> </span>-n<span class="w"> </span>&lt;namespace&gt;<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>&lt;pod&gt;<span class="w"> </span>--<span class="w"> </span>chmod<span class="w"> </span>-R<span class="w"> </span>a+rwX<span class="w"> </span>/mounts/autosave/&lt;ioc-name&gt;
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">mkdir</span></code> is needed because the IOC’s folder only appears when the IOC
+first mounts it. The <code class="docutils literal notranslate"><span class="pre">chmod</span></code> is needed because the pvcs pod writes as root,
+while autosave in a non-root IOC must rewrite the files and create its
+<code class="docutils literal notranslate"><span class="pre">.savB</span></code>/<code class="docutils literal notranslate"><span class="pre">.savN</span></code> backups in the folder.</p>
+</li>
+<li><p>Start the ibek IOC.</p></li>
+</ol>
 </section>
 </section>
 
