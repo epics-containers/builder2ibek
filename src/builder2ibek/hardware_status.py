@@ -67,13 +67,17 @@ class Device:
 
 
 def _load_yaml(path: Path) -> Any:
-    return YAML(typ="safe", pure=True).load(path.read_text())
+    return YAML(typ="safe", pure=True).load(path.read_text(encoding="utf-8"))
 
 
 def load_entities(ioc_yaml: Path) -> list[dict]:
     # ioc.yaml holds Jinja in string values only, so plain YAML reads it
     data = _load_yaml(ioc_yaml) or {}
-    return [e for e in data.get("entities", []) if isinstance(e, dict)]
+    return [
+        e
+        for e in data.get("entities", [])
+        if isinstance(e, dict) and str(e.get("entity_enabled", True)).lower() != "false"
+    ]
 
 
 def iocstats_name(entities: list[dict], service: str) -> str:
@@ -115,7 +119,9 @@ def read_services(services: Path, conf: dict) -> tuple[list[Ioc], list[Device]]:
         elif fastcs_yaml.exists():
             name = service.upper()
             iocs.append(Ioc(name, service, "fastcs", labels.get(name, "")))
-        elif values.exists() and re.search(r"^dev-c7:", values.read_text(), re.M):
+        elif values.exists() and re.search(
+            r"^dev-c7:", values.read_text(encoding="utf-8"), re.M
+        ):
             # a legacy IOC: DLS iocStats, prefixed by the IOC name; its builder
             # IOC loads no save_restoreStatus records, so no autosave LED
             name = service.upper()
@@ -362,5 +368,5 @@ def hardware_status(services_repo: Path) -> tuple[Path, int, int]:
             raise ValueError(f"{config}: missing '{key}'")
     iocs, devices = read_services(services_repo / "services", conf)
     out = screen_dir / OUTPUT_NAME
-    out.write_text(render_bob(conf, iocs, devices))
+    out.write_text(render_bob(conf, iocs, devices), encoding="utf-8")
     return out, len(iocs), len(devices)
