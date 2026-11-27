@@ -175,10 +175,14 @@ def _defined_before(name: str, entity_type: str, ioc: Generic_IOC) -> bool:
     return True
 
 
-def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:
+def render_records(
+    records: dict[str, tuple[str, dict[str, str]]],
+    infos: dict[str, dict[str, str]] | None = None,
+) -> str:
     """
     The records in builder's <IOC>.db layout: records sorted by name, each
-    record's fields sorted, and field names padded to four characters
+    record's fields sorted, and field names padded to four characters; then
+    each record's info tags, sorted
     """
     blocks = []
     for name in sorted(records):
@@ -187,6 +191,8 @@ def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:
         for key in sorted(fields):
             pad = " " * (4 - len(key))
             lines.append(f'    field({key}, {pad}"{fields[key]}")')
+        for key, value in sorted((infos or {}).get(name, {}).items()):
+            lines.append(f'    info({key}, "{value}")')
         lines.append("}")
         blocks.append("\n".join(lines) + "\n")
     return "\n".join(blocks)
@@ -195,7 +201,8 @@ def render_records(records: dict[str, tuple[str, dict[str, str]]]) -> str:
 def finalize(ioc: Generic_IOC):
     """
     Write the IOC's raw records to records.db next to the ioc.yaml and list
-    it in the ioc.yaml's post_db_files, which ibek loads after ioc.db.
+    it in the ioc.yaml's post_db_files, which ibek loads after ioc.db. They
+    include the records of userIO entities (see userIO.py).
     """
     if not ioc.raw_records:
         return
@@ -206,7 +213,9 @@ def finalize(ioc: Generic_IOC):
         f"# Do not edit: builder2ibek xml2yaml regenerates this file and\n"
         f"# overwrites any edit. Edit the XML instead.\n\n"
     )
-    ioc.side_files[RECORDS_DB] = header + render_records(ioc.raw_records)
+    ioc.side_files[RECORDS_DB] = header + render_records(
+        ioc.raw_records, ioc.raw_record_info
+    )
     # ibek loads each post_db_files entry after ioc.db, so a raw record that
     # shares a name with a template record sets that record's fields, as in
     # builder's IOCs

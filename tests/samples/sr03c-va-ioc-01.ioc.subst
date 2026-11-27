@@ -125,7 +125,7 @@ pattern
 	{ "dlsPLC.NX102_controller_status", "True",           "SR03C-VA-VLVCC-01", "VLVCC_01_EIP", "PLC_CS" }
 }
 
-file "$(MKS937A)/db/mks937a.template" {
+file "mks937a.template" {
 pattern 
 	{ "device",            "port"            }
 	{ "SR03S-VA-GCTLR-01", "GCTLR_S_01_PORT" }
@@ -149,7 +149,7 @@ pattern
 	{ "dlsPLC.NX102_readReal", "True",           "SR03I-VA-GCTLR-02:C2_RAW", "VLVCC_01_EIP", "GCTLR_I_02.Comb[2]", "",     "1 second", "",    "2",    ""            }
 }
 
-file "$(MKS937A)/db/mks937aGauge.template" {
+file "mks937aGauge.template" {
 pattern 
 	{ "dom",   "id", "c", "s", "aitype",       "aiinp"                          }
 	{ "SR03S", "01", "",  "",  "Soft Channel", "SR03S-VA-GAUGE-01:PLOG_CALC CP" }
@@ -164,7 +164,7 @@ pattern
 	{ "SR03I", "03", "",  "",  "Soft Channel", "SR03I-VA-GAUGE-03:PLOG_CALC CP" }
 }
 
-file "$(MKS937A)/db/mks937aPlogEGU.template" {
+file "mks937aPlogEGU.template" {
 pattern 
 	{ "device",                      "p_egu_pv"                 }
 	{ "SR03S-VA-GAUGE-01:PLOG_CALC", "SR03S-VA-GCTLR-01:C1_RAW" }
@@ -179,7 +179,7 @@ pattern
 	{ "SR03I-VA-GAUGE-03:PLOG_CALC", "SR03I-VA-GCTLR-02:C2_RAW" }
 }
 
-file "$(MKS937A)/db/mks937aImg.template" {
+file "mks937aImg.template" {
 pattern 
 	{ "device",          "port",            "channel", "ctlsp_level", "ctlsp_drvh", "ctlsp_drvl", "ctlsp_hopr", "ctlsp_lopr", "ctlsp_hihi", "ctlsp_lolo", "ctlsp_high", "ctlsp_low", "ctlsp_desc", "prosp_level", "prosp_drvh", "prosp_drvl", "prosp_hopr", "prosp_lopr", "prosp_hihi", "prosp_lolo", "prosp_high", "prosp_low", "prosp_desc",       "rlysp_level", "rlysp_drvh", "rlysp_drvl", "rlysp_hopr", "rlysp_lopr", "rlysp_hihi", "rlysp_lolo", "rlysp_high", "rlysp_low", "rlysp_desc",      "rlasp_drvh", "rlasp_drvl", "rlasp_hopr", "rlasp_lopr", "rlasp_hihi", "rlasp_lolo", "rlasp_high", "rlasp_low", "rlasp_desc",    "offwarn", "ilk_write_access_pv"                }
 	{ "SR03S-VA-IMG-01", "GCTLR_S_01_PORT", "1",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03S-VA-GAUGE-01:ILKSETSP:NOWRITE" }
@@ -192,7 +192,7 @@ pattern
 	{ "SR03A-VA-IMG-04", "GCTLR_A_03_PORT", "2",       "0.01",        "0.95",       "0.0027",     "0.95",       "0.0027",     "0.96",       "0.0026",     "0.011",      "0.009",     "IMG Enable", "0.0005",      "0.01",       "1.3e-05",    "0.01",       "1.3e-05",    "0.011",      "1.2e-05",    "0.00051",    "0.00049",   "IMG Overpressure", "1e-06",       "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-06",    "9e-07",     "Valve Interlock", "0.012",      "2.7e-10",    "0.012",      "2.7e-10",    "0.013",      "2.6e-10",    "1.1e-07",    "9e-08",     "MPS Interlock", "0",       "SR03A-VA-GAUGE-04:ILKSETSP:NOWRITE" }
 }
 
-file "$(MKS937A)/db/mks937aPirg.template" {
+file "mks937aPirg.template" {
 pattern 
 	{ "device",           "port",            "channel", "rlysp_level", "rlysp_drvh", "rlysp_drvl", "rlysp_hopr", "rlysp_lopr", "rlysp_hihi", "rlysp_lolo", "rlysp_high", "rlysp_low", "rlysp_desc",   "ilk_write_access_pv"     }
 	{ "SR03S-VA-PIRG-01", "GCTLR_S_01_PORT", "4",       "0.01",        "120.0",      "0.0027",     "120.0",      "0.0027",     "1000.0",     "0.0026",     "0.011",      "0.009",     "Ion Pump I/L", "$(device):CTL:CONSTZERO" }
@@ -280,7 +280,7 @@ pattern
 	{ "SR03C-VA-GIONP-01", "26",    "SR03A-VA-GIONP-01", "SR03A-VA-GIONP-01", "SR03A-VA-GIONP-01", "SR03A-VA-GIONP-01", "SR03A-VA-GIONP-01", "SR03A-VA-GIONP-01", "SR03S-VA-GIONP-01", "SR03I-VA-GIONP-01" }
 }
 
-file "$(MKS937A)/db/mks937aGaugeGroup.template" {
+file "mks937aGaugeGroup.template" {
 pattern 
 	{ "device",            "gauge1",            "gauge2",            "gauge3",            "gauge4",            "gauge5",            "gauge6",            "gauge7",            "gauge8",            "SELM", "SELN" }
 	{ "SR03S-VA-GGAUG-01", "SR03S-VA-GAUGE-01", "SR03S-VA-GAUGE-02", "SR03S-VA-GAUGE-01", "SR03S-VA-GAUGE-01", "SR03S-VA-GAUGE-01", "SR03S-VA-GAUGE-01", "SR03S-VA-GAUGE-01", "SR03S-VA-GAUGE-01", "1",    "0"    }
@@ -288,7 +288,7 @@ pattern
 	{ "SR03C-VA-GGAUG-01", "SR03S-VA-GGAUG-01", "SR03A-VA-GGAUG-01", "SR03I-VA-GGAUG-01", "SR03S-VA-GGAUG-01", "SR03S-VA-GGAUG-01", "SR03S-VA-GGAUG-01", "SR03S-VA-GGAUG-01", "SR03S-VA-GGAUG-01", "1",    "0"    }
 }
 
-file "$(MKS937A)/db/mks937aImgGroup.template" {
+file "mks937aImgGroup.template" {
 pattern 
 	{ "delay", "device",           "img8",             "img3",             "img2",             "img1",             "img7",             "img6",             "img5",             "img4"             }
 	{ "0.0",   "SR03S-VA-GIMG-01", "SR03S-VA-IMG-01",  "SR03S-VA-IMG-01",  "SR03S-VA-IMG-02",  "SR03S-VA-IMG-01",  "SR03S-VA-IMG-01",  "SR03S-VA-IMG-01",  "SR03S-VA-IMG-01",  "SR03S-VA-IMG-01"  }
@@ -296,7 +296,7 @@ pattern
 	{ "0.0",   "SR03C-VA-GIMG-01", "SR03S-VA-GIMG-01", "SR03I-VA-GIMG-01", "SR03A-VA-GIMG-01", "SR03S-VA-GIMG-01", "SR03S-VA-GIMG-01", "SR03S-VA-GIMG-01", "SR03S-VA-GIMG-01", "SR03S-VA-GIMG-01" }
 }
 
-file "$(MKS937A)/db/mks937aPirgGroup.template" {
+file "mks937aPirgGroup.template" {
 pattern 
 	{ "device",            "pirg1",             "pirg2",             "pirg3",             "pirg4",             "pirg5",             "pirg6",             "pirg7",             "pirg8"             }
 	{ "SR03S-VA-GPIRG-01", "SR03S-VA-PIRG-01",  "SR03S-VA-PIRG-02",  "SR03S-VA-PIRG-01",  "SR03S-VA-PIRG-01",  "SR03S-VA-PIRG-01",  "SR03S-VA-PIRG-01",  "SR03S-VA-PIRG-01",  "SR03S-VA-PIRG-01"  }
@@ -324,7 +324,7 @@ pattern
 	{ "SR03C-VA-GTSP-01", "SR03I-VA-TSP-01", "SR03I-VA-TSP-01", "SR03I-VA-TSP-01", "SR03I-VA-TSP-02", "SR03I-VA-TSP-02", "SR03I-VA-TSP-02", "SR03I-VA-TSP-02", "SR03I-VA-TSP-02" }
 }
 
-file "$(MKS937A)/db/mks937aImgMean.template" {
+file "mks937aImgMean.template" {
 pattern 
 	{ "device",           "current",              "nimgs", "img1",            "img2",            "img3",            "img4",            "img5",            "img6",            "img7",            "img8",            "img9",            "img10"           }
 	{ "SR03S-VA-MIMG-01", "SR-DI-DCCT-01:SIGNAL", "2",     "SR03S-VA-IMG-01", "SR03S-VA-IMG-02", "SR03S-VA-IMG-01", "SR03S-VA-IMG-01", "SR03S-VA-IMG-01", "SR03S-VA-IMG-01", "SR03S-VA-IMG-01", "SR03S-VA-IMG-01", "SR03S-VA-IMG-01", "SR03S-VA-IMG-01" }

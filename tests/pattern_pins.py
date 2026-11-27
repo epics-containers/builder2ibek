@@ -15,9 +15,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 # tag every conversion here uses, so that the samples do not move with upstream
 # releases. Each library's tag is its submodule's pin.
 PATTERN_LIBRARY = REPO_ROOT / "ibek-runtime-streamdevice"
-PATTERN_TAG = "0.8.3"
+PATTERN_TAG = "0.10.0"
 SUPPORT_PATTERN_LIBRARY = REPO_ROOT / "ibek-runtime-support"
-SUPPORT_PATTERN_TAG = "0.5.0"
+SUPPORT_PATTERN_TAG = "0.7.0"
 RUNTIME_TAG = "2.8.26ec8"
 
 # each library's submodule and the tag it is pinned at

@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<BLfeedback.feedback AUTOPV="BL05I-OP-SWTCH-01:FBCTRL:AUTOPV" AUTOPV2="BL05I-OP-SWTCH-01:FP:AUTOPV2" DRVH="1.5" DRVL="-1.5" HOPR="780" INP="BL05J-DI-PHDGN-01:STAT:CentroidX_RBV CP NMS" KD="0" KI="0.5" KP="0.001" LOPR="1" OUT="BL05I-OP-SWTCH-01:FPITCH:DMD PP NMS" P="BL05I-OP-SWTCH-01" PID=":FP:FB" PREC="3" SCAN=".1 second" TITLE="M3MJ6 Fine Pitch Feedback" name="M3MJ6.FinePitchFeedback"/>
+</components>

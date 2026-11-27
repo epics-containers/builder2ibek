@@ -1,7 +1,7 @@
 """
 Tests for the won't-convert mechanism.
 
-builder2ibek leaves procServControl and adPython entities out of the ioc.yaml,
+builder2ibek leaves procServControl, adPython and gda entities out of the ioc.yaml,
 with one warning per entity type per IOC naming the IOC, the entity type and
 the reason. For adPython the warning also names the entities that reference
 the dropped plugin's port.
@@ -131,3 +131,33 @@ def test_reconvert_summary_includes_warnings(
     summary = rc._render_human(result)
     assert "Warnings:      3" in summary
     assert "port CAM1.ROT is still referenced by" in summary
+
+
+# from BL05I-CS-IOC-01
+GDA_XML = """<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+  <gda.ID_gap gda_desc="Insertion Device 1" gda_name="ID1" prefix="SR05I-MO-"
+    suff1="0"/>
+  <gda.ID_phase axis="BLPL" desc="ID 1 row phase 1 (lower)"
+    gda_desc="Insertion Device 1 Lower Row Phase" gda_name="ID1.LOWER"
+    prefix="SR05I-MO-" suff1="0" tag_suffix="LOWERPHASE"/>
+  <gda.FE_motion M=":X" P="FE05I-AL-APTR-02" gda_desc="FE Aperture X Axis"
+    gda_name="FEAP.X"/>
+  <gda.FE_vacuum ABSB="02" BEAMLINE="05I" name="FEVA"/>
+</components>
+"""
+
+
+def test_gda_entities_left_out(tmp_path: Path):
+    xml = tmp_path / "BL05I-CS-IOC-01.xml"
+    xml.write_text(GDA_XML)
+    yaml = tmp_path / "ioc.yaml"
+    warnings = convert_file(xml, yaml, "/epics/ibek-defs/ioc.schema.json").warnings
+    types = [e["type"] for e in YAML(typ="safe").load(yaml.read_text())["entities"]]
+    assert not [t for t in types if t.startswith("gda.")]
+    assert sorted(w.split()[4] for w in warnings) == [
+        "gda.FE_motion",
+        "gda.FE_vacuum",
+        "gda.ID_gap",
+        "gda.ID_phase",
+    ]

@@ -1,0 +1,35 @@
+version: 1
+patterns:
+  mks937a:
+    version: 0.10.0
+    source: github.com/epics-containers/ibek-runtime-streamdevice
+    files:
+      config/auto_mks937aInterlock.pvi.device.yaml: sha256:a9ec22175ea716565c11172b2c454865653c577f3d2af9b9eeb38fc8123b4a1e
+      config/auto_mks937aPlogADC.pvi.device.yaml: sha256:37f0e4f53156d4fae964a6de7745e74359b70828e10bc3431e5a4edfe1239304
+      config/mks937a.ibek.support.yaml: sha256:908573f345d1384f4f46fc48aa51efe3217ab23bec4b72cd93a2f74e38c69eef
+      config/mks937a.protocol: sha256:cda8e31bfe7c8cec8534858cd3411f9009c7677ee2a6e4416a6cc5c81d662f62
+      config/mks937a.pvi.device.yaml: sha256:9bd8e6451b67b1afc998819cff9f6d09a1bdb9f6de075be1095ab63946614bdf
+      config/mks937a.template: sha256:185a4a520e9eef53f2b717dc74384b7f3e685003de4f1d2e5b2c00e94d88dff5
+      config/mks937aGauge.pvi.device.yaml: sha256:c0d478b999bcec36a264d1a4fa29a3f2294faf1be8fc9fed67fac7cf59ae653a
+      config/mks937aGauge.template: sha256:902ac1eb2a6eb14633bc3cb939c19fcff63d0f32db196c093180313751b98bf1
+      config/mks937aGaugeEGU.pvi.device.yaml: sha256:315db611781715b4d54af6ae199d9a15e6cc2f76aadb938c957f60e8b5481fbe
+      config/mks937aGaugeGroup.pvi.device.yaml: sha256:f35fb832eb94349341cb3572af8102c4755fef7b128b932a8d4ea7df84ab28f6
+      config/mks937aGaugeGroup.template: sha256:c041c89788bf73a5720d54b0c1c5dc9c36b43ed51d9bab5d2e9ceed840c7f635
+      config/mks937aGauge_positions.req: sha256:2af648c2c065b86fa3b1d5288b500fd743dc4a55d1d7b93a6508b8ba0b2b24d7
+      config/mks937aImg.pvi.device.yaml: sha256:c452ee7cdfd0836e88c30bcf2e269f0c4a7abcdc4efbc014f0b04c39ba8b7121
+      config/mks937aImg.template: sha256:10eb3fc0358ffc822d231e0d9e36dac89cf30f4b909c3044c9d8e38f96c4d856
+      config/mks937aImgDummy.pvi.device.yaml: sha256:53a3e4bd322adf5d9d3b0e464d7c6aafeea945f0c8bb6e377178a36baa77c94e
+      config/mks937aImgDummy.template: sha256:9e37ec577b2766ad4977e29dde9d7cbecf0ac70521a9e3cc2ed8e08407fd9cce
+      config/mks937aImgGroup.pvi.device.yaml: sha256:1626f84ca6e1e6aa2a054a7b9b1a241d6a87907fb1b6a152dc226a36709b2ee1
+      config/mks937aImgGroup.template: sha256:acfc1ae41dc9bc6d6efd3e88bdf74f4d3f6df9a0ecf35c1f306d48755cc6e6ec
+      config/mks937aImgMean.pvi.device.yaml: sha256:6ea05125e38d6cd3b7316925436391b6404ee76a25b00db03ab4ab62cce68b18
+      config/mks937aImgMean.template: sha256:4ef80c07b35e8dca5afb7229f97d762256deeb788bc8d4deb65057405f2bd3a0
+      config/mks937aInterlock.template: sha256:feaf94c0ed62e1692973f4bb3db6199413dc49996936975871bacc7bad6fa3f4
+      config/mks937aPirg.pvi.device.yaml: sha256:20a2bdd26bcd3701d4c6642489eb32217d90e387be2f94b5901e83ba101579ff
+      config/mks937aPirg.template: sha256:033ff52bab64e4fa29865efbdc66fc888efa777d144e6b2fd1fa72c929bc5d48
+      config/mks937aPirgDummy.pvi.device.yaml: sha256:c4a6c858ae8f616c2e01e5b3a2d0e03f5163ceade32dcb2eb1e2ca58b80855f8
+      config/mks937aPirgDummy.template: sha256:2b7f5740ff9be34faf88dff8c16864d21e03c2dfb1a6e49e2468c4774bfe906f
+      config/mks937aPirgGroup.pvi.device.yaml: sha256:ba91004dbead4ce3cff588f548604ba00d3b34fadf66bb4c9efcc912d6b607ab
+      config/mks937aPirgGroup.template: sha256:d75c8d35ba6d3c49e34adc71db30c3ec05bf4c0a63608b88c7a8ace041283589
+      config/mks937aPlogADC.template: sha256:83556df88278fe7fcf634bb1f545e26724572e1f6e9eb950a00831f4e06c3bbd
+      config/mks937aPlogEGU.template: sha256:0df81c52e1975535019ad8d371468d8bc8d0a36e2db1e3bce14e6b09e589646e

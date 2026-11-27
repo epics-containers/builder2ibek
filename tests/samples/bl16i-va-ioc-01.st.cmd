@@ -136,6 +136,7 @@ HostlinkInterposeInit("ty_41_7")
 finsDEVInit("TMPCC01", "ty_41_7")
 
 dbLoadRecords /ioc.db
+dbLoadRecords config/records.db
 iocInit
 
 # Autosave post iocInit

@@ -1,0 +1,43 @@
+# Raw records from the records.* elements of BL16I-VA-IOC-01.xml,
+# loaded after ioc.db through post_db_files in ioc.yaml.
+# Do not edit: builder2ibek xml2yaml regenerates this file and
+# overwrites any edit. Edit the XML instead.
+
+record(bi, "BL16I-VA-DCM-01:SERVICE")
+{
+    field(COSV, "")
+    field(DESC, "Binary Input")
+    field(DTYP, "Raw Soft Channel")
+    field(INP,  "BL16I-VA-VALVE-21:GILK.B1 MS")
+    field(ONAM, "ON")
+    field(OSV,  "")
+    field(SCAN, "1 second")
+    field(ZNAM, "OFF")
+    field(ZSV,  "")
+}
+
+record(bi, "BL16I-VA-DCM-01:TEST")
+{
+    field(COSV, "")
+    field(DESC, "Binary Input")
+    field(DTYP, "Raw Soft Channel")
+    field(INP,  "BL16I-VA-VALVE-21:GILK.B2 MS")
+    field(ONAM, "ON")
+    field(OSV,  "")
+    field(SCAN, "1 second")
+    field(ZNAM, "OFF")
+    field(ZSV,  "")
+}
+
+record(bi, "BL16I-VA-DCM-01:VENTENABLE")
+{
+    field(COSV, "")
+    field(DESC, "Binary Input")
+    field(DTYP, "Raw Soft Channel")
+    field(INP,  "BL16I-VA-VALVE-21:GILK.B0 MS")
+    field(ONAM, "ON")
+    field(OSV,  "")
+    field(SCAN, "1 second")
+    field(ZNAM, "OFF")
+    field(ZSV,  "")
+}

@@ -363,10 +363,24 @@ def _convert(xml: Path) -> list[dict]:
     return [dict(e) for e in dispatch(builder, xml).entities]
 
 
+BL21I_3_12 = pytest.mark.xfail(
+    strict=True,
+    reason="https://github.com/epics-containers/ibek-runtime-support/issues/15: "
+    "the BL21I pattern misnames the SGM air "
+    "control model, and the SMPLValveSequence macros changed in BL21I 3-12 while "
+    "BL21I-BUILDER is still on 3-11",
+)
+
+
 # One builder XML per module, named after the module builder2ibek emits, holding
 # components copied from real IOC XMLs.
 @pytest.mark.parametrize(
-    "fixture", sorted(FIXTURES.glob("*.xml")), ids=lambda p: p.stem
+    "fixture",
+    [
+        pytest.param(p, marks=BL21I_3_12) if p.stem == "BL21I" else p
+        for p in sorted(FIXTURES.glob("*.xml"))
+    ],
+    ids=lambda p: p.stem,
 )
 def test_converted_xml_maps_to_the_pattern(index: PatternIndex, fixture: Path):
     module = fixture.stem

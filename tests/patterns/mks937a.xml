@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<mks937a.mks937a device="BL16I-VA-GCTLR-02" name="GCTLR2" port="ty_40_5"/>
+	<mks937a.mks937aImg GCTLR="GCTLR2" channel="1" device="BL16I-VA-IMG-02" name="IMG02" offwarn="1"/>
+	<mks937a.mks937aImg GCTLR="GCTLR2" channel="2" device="BL16I-VA-IMG-05" name="IMG05"/>
+	<mks937a.auto_mks937aInterlock high="0.0001" interlock="BL16I-VA-IMG-21:RLY" level="1e-05" low="9e-07" name="X.OB1"/>
+	<mks937a.mks937aPirg GCTLR="GCTLR2" channel="4" device="BL16I-VA-PIRG-02" name="PIRG02"/>
+	<mks937a.mks937aPirg GCTLR="GCTLR2" channel="5" device="BL16I-VA-PIRG-05" name="PIRG05"/>
+</components>
