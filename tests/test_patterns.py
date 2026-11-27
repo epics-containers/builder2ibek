@@ -528,8 +528,13 @@ def test_converted_xml_fits_the_pattern(index: PatternIndex, fixture: Path):
     silent = _renders_nothing(index, pattern, ours)
     assert not silent, f"no records or commands from {silent}"
 
-    # where no generic model competes, builder2ibek uses the pattern
-    if module in ALIGNED or module not in patterns.generic_modules():
+    # where no generic model competes, builder2ibek uses the pattern; plan()
+    # routes beamline and ibek-runtime-support modules to theirs regardless
+    if (
+        module in ALIGNED
+        or routes_to_support_pattern(module)
+        or module not in patterns.generic_modules()
+    ):
         plan = index.plan(entities)
         assert plan.build_time == {}
         assert plan.patterns == [pattern]
