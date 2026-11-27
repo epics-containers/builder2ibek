@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!--From BL05J-EA-IOC-08, with a loopback address-->
+	<eurothermModbus.Eurotherm3KPIDselect device="BL05J-EA-TCTRL-03:EUTH" ipaddress="127.0.0.1" name="EAJ8.TCTRL3" port="TCTRL3"/>
+	<eurothermModbus.EurothermLoopPIDselect device="BL05J-EA-TCTRL-03:EUTH" loop_name="LOOP1" name="TCTRL3.LOOP1"/>
+	<eurothermModbus.EurothermLoopPIDselect device="BL05J-EA-TCTRL-03:EUTH" loop_name="LOOP2" name="TCTRL3.LOOP2"/>
+</components>

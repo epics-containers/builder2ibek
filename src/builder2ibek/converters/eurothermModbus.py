@@ -15,10 +15,12 @@ def reset():
 def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
     XML to YAML specialist convertor function for the eurothermModbus module.
-    Strips name (GUI label), generates modbus_prefix with a global counter.
+    Strips name (GUI label; no entity refers to another by it), and generates
+    modbus_prefix with a global counter.
     """
     global _modbus_prefix_index
 
+    entity.remove("name")
     if entity_type in [
         "Eurotherm2K",
         "Eurotherm3K",
@@ -26,6 +28,5 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         "Eurotherm3Krtu",
         "Eurotherm3KrtuPIDselect",
     ]:
-        entity.remove("name")
         entity.modbus_prefix = f"EURTHM_MB_{_modbus_prefix_index}"
         _modbus_prefix_index += 1
