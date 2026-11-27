@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL21B-BUILDER/etc/makeIocs/BL21B-EA-IOC-09.xml -->
+	<vici.viciUM P="BL21B-EA-GIR-01:" PORT="VICI1_s" POS1="Sep300" POS2="KW402.5" POS3="S200" POS4="Sup6" POS5="Guest1" POS6="Bypass1" Q="VALVE1" name="VICI1"/>
+	<vici.viciUM P="BL21B-EA-GIR-01:" PORT="VICI2_s" POS1="KW403" POS2="KW402.5" POS3="S200" POS4="Sep500" POS5="Guest2" POS6="Bypass2" Q="VALVE2" name="VICI2"/>
+</components>

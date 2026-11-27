@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL22I-BUILDER/etc/makeIocs/BL22I-EA-IOC-22.xml -->
+	<mks647c.mks647cChan CHAN="1" P="BL22I-EA-GIR-01" PORT="mks647c_port" Q=":MFC1" name="mks647c1"/>
+	<mks647c.mks647cChan CHAN="2" P="BL22I-EA-GIR-01" PORT="mks647c_port" Q=":MFC1" name="mks647c2"/>
+	<mks647c.mks647cChan CHAN="3" P="BL22I-EA-GIR-01" PORT="mks647c_port" Q=":MFC1" name="mks647c3"/>
+	<mks647c.mks647cChan CHAN="4" P="BL22I-EA-GIR-01" PORT="mks647c_port" Q=":MFC1" name="mks647c4"/>
+	<mks647c.mks647c4ChanCtrl P="BL22I-EA-GIR-01" PORT="mks647c_port" Q=":MFC1" name="ENV.MKS647C"/>
+</components>

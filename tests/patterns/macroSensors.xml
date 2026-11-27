@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL13J-BUILDER/etc/makeIocs/BL13J-MO-IOC-08.xml -->
+	<macroSensors.dmc_a2 ADDR="1" CHAN="1" EGU="mm" EGU2="mm" ENABLE2="0" GRAD="1" GRAD2="1" OFF="0" OFF2="0" P="BL13J-OP-MIRR-02" PORT="dmca2-2" PREC="3" PREC2="2" R=":VERT:BENDA" name="M2"/>
+	<macroSensors.dmc_a2 ADDR="1" CHAN="2" EGU="mm" EGU2="mm" ENABLE2="0" GRAD="1" GRAD2="1" OFF="0" OFF2="0" P="BL13J-OP-MIRR-02" PORT="dmca2-2" PREC="3" PREC2="2" R=":VERT:BENDB" name="M2.OB1"/>
+	<macroSensors.dmc_a2 ADDR="1" CHAN="1" EGU="mm" EGU2="mm" ENABLE2="0" GRAD="1" GRAD2="1" OFF="0" OFF2="0" P="BL13J-OP-MIRR-02" PORT="dmca2-1" PREC="3" PREC2="2" R=":HORZ:BENDA" name="M2.OB2"/>
+	<macroSensors.dmc_a2 ADDR="1" CHAN="2" EGU="mm" EGU2="mm" ENABLE2="0" GRAD="1" GRAD2="1" OFF="0" OFF2="0" P="BL13J-OP-MIRR-02" PORT="dmca2-1" PREC="3" PREC2="2" R=":HORZ:BENDB" name="M2.OB3"/>
+	<macroSensors.dmc_a2 ADDR="1" CHAN="1" EGU="mm" EGU2="mrad" ENABLE2="1" GRAD="1" GRAD2="1" OFF="0" OFF2="0" P="BL13J-OP-MIRR-02" PORT="dmca2-3" PREC="3" PREC2="2" R=":VERT:TILT" name="M2.OB4"/>
+	<macroSensors.dmc_a2 ADDR="1" CHAN="2" EGU="mm" EGU2="mrad" ENABLE2="1" GRAD="1" GRAD2="1" OFF="0" OFF2="0" P="BL13J-OP-MIRR-02" PORT="dmca2-3" PREC="3" PREC2="2" R=":HORZ:TILT" name="M2.OB5"/>
+</components>

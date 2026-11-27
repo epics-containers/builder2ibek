@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="vxWorks-ppc604_long">
+	<!-- from BL03I-BUILDER/etc/makeIocs/BL03I-VA-IOC-01.xml -->
+	<leyboldCenterOne.centerOne P="BL03I-VA-ESVG-01" STREAMS_PORT="LPORT" name="LB1"/>
+</components>

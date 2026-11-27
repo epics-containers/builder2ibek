@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL15I-BUILDER/etc/makeIocs/BL15J-EA-IOC-05.xml -->
+	<eurotherm903.Eurotherm903 GAD="0" LAD="1" P="BL15J-EA-ETHRM-01" PORT="etherm1" Q="" name="JSAM.Eurotherm1"/>
+</components>

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07I-BUILDER/etc/makeIocs/BL07I-EA-IOC-13.xml -->
+	<knauer.ConnectionManagement P="BL07I-EA-HPLC-01" R=":PUMP" name="Pump"/>
+	<knauer.ConnectionManagement P="BL07I-EA-HPLC-01" R=":VALVE" name="Valve"/>
+	<knauer.BlueShadow40P P="BL07I-EA-HPLC-01" PORT="pumpTS" R=":PUMP" name="pump40P"/>
+	<knauer.Azura21S P="BL07I-EA-HPLC-01" PORT="valveIP" R=":VALVE" name="valve21S"/>
+	<knauer.PumpAndValve PUMP="BL07I-EA-HPLC-01:PUMP" VALVE="BL07I-EA-HPLC-01:VALVE" name="topscreen"/>
+</components>

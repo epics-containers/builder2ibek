@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL11I-BUILDER/etc/makeIocs/BL11I-CS-IOC-05.xml -->
+	<motomanNX100.nx100 EIST="TABLEOUT" ELST="" FFST="" FRST="PLACED" FTST="" FVST="GRIPO" NIST="UNLOAD" ONST="PICKC" P="BL11I-EA-ROBOT-01" PORT="nx100p" Q="" SVST="TABLEIN" SXST="GRIPC" TEST="" THST="PICKD" TTST="" TVST="" TWST="PLACEC" ZRST="RECOVER" gda_desc="Robot Controller" gda_name="ROBOT.ROBOT"/>
+	<motomanNX100.nx100pvar P="BL11I-EA-ROBOT-01" PORT="nx100p" Q="" SCAN="1 second" VAR="010"/>
+	<motomanNX100.nx100dvar P="BL11I-EA-ROBOT-01" PORT="nx100p" Q="" SCAN=".5 second" VAR="010"/>
+	<motomanNX100.auto_nx100io DESC0="Gripper" DESC1="VA Spare" DESC2="Table X- allowed" DESC3="Spinner Braked" DESC4="Table Out Req" DESC5="Carousel Advance Req" DESC6="Carousel Reset Req" DESC7="" P="BL11I-EA-ROBOT-01" PORT="nx100p" Q="" SCAN=".5 second" VAR="10020"/>
+	<motomanNX100.auto_BL11I_barcode ROBOT="BL11I-EA-ROBOT-01"/>
+	<motomanNX100.auto_BL11I_robot_interlocks DIFF="BL11I-MO-DIFF-01" ROBOT="BL11I-EA-ROBOT-01"/>
+</components>

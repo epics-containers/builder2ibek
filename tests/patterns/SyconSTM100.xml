@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07I-BUILDER/etc/makeIocs/BL07I-EA-IOC-21.xml -->
+	<SyconSTM100.SyconSTM100 P="BL07I-EA-STM-01" PORT="SyconSTM100Port" name="SyconSTM100"/>
+</components>

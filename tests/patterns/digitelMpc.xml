@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<components arch="vxWorks-ppc604_long">
+	<!-- from VALAB-BUILDER/etc/makeIocs/LA02R-VA-IOC-06.xml -->
+	<digitelMpc.digitelMpc device="LA02R-VA-MPC-01" name="MPC1" port="ts1_17"/>
+	<digitelMpc.digitelMpc device="LA02R-VA-MPC-02" name="MPC2" port="ts1_1" unit="01"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC1" device="LA02R-VA-IONP-01" disptext="R-IONP-01" name="IONP-01" proto="digitelMpc.proto" pump="1" size="300" sp1off="2.0E-8" sp1on="1.0E-8" sp2off="5.0E-7" sp2on="1.0E-7"/>
+	<digitelMpc.digitelMpcIonp MPC="MPC2" device="LA02R-VA-IONP-02" disptext="R-IONP-02" name="IONP-02" proto="digitelMpc.proto" pump="1" size="300" sp1off="2.0E-8" sp1on="1.0E-8" sp2off="5.0E-7" sp2on="1.0E-7"/>
+	<digitelMpc.digitelMpcIonpGroup delay="5" device="LA02R-VA-IONP-91" ionp1="LA02R-VA-IONP-01" ionp2="LA02R-VA-IONP-02" ionp3="LA02R-VA-IONP-01" ionp4="LA02R-VA-IONP-01" ionp5="LA02R-VA-IONP-01" ionp6="LA02R-VA-IONP-01" ionp7="LA02R-VA-IONP-01" ionp8="LA02R-VA-IONP-01" name="IONPG_91"/>
+	<digitelMpc.digitelMpcqTsp ctlsrc="1" device="LA02R-VA-TSP-01" name="QTSP_01" port="ts1_17" unit="01"/>
+	<digitelMpc.digitelMpcTsp ctlsrc="1" device="LA02R-VA-TSP-02" name="TSP_02" port="ts1_1" unit="01"/>
+</components>

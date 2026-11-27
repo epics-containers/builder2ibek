@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16B-BUILDER/etc/makeIocs/BL16B-MO-IOC-09.xml -->
+	<newstep.NSC200 CH="1" M=":CAM1" P="BL16B-EA-DET-02" PORT="asynNSC200_A" gda_desc="PCO stage 1 motor 1" gda_name="pcom1" name="PCOSTAGE1.CAM1"/>
+	<newstep.NSC200 CH="2" M=":CAM2" P="BL16B-EA-DET-02" PORT="asynNSC200_A" gda_desc="PCO stage 1 motor 2" gda_name="pcom2" name="PCOSTAGE1.CAM2"/>
+	<newstep.NSC200 CH="3" M=":CAM3" P="BL16B-EA-DET-02" PORT="asynNSC200_A" gda_desc="PCO grating rotary 1" gda_name="pcom3" name="PCOSTAGE1.CAM3"/>
+</components>

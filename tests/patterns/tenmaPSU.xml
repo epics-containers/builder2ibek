@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL05I-BUILDER/etc/makeIocs/BL05I-EA-IOC-02.xml -->
+	<tenmaPSU.tenma ADDR="0" KD="0.01000" KI="0.00300" KP="0.08000" MAXI="10" MAXV="30" P="BL05I-EA-PSU-01" PORT="vts_PSU1" SCAN="1" SETPOINT="30" TGET="BL05I-EA-TCTRL-01:LOOP1:PV:RBV" name="EA2.PSU1"/>
+</components>

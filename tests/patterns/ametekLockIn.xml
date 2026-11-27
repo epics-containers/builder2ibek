@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16I-BUILDER/etc/makeIocs/LA84R-EA-IOC-06.xml -->
+	<ametekLockIn.ametekLockIn P="LA84R-EA-LOCK-01" PORT="AM_s" Q=":AMP" name="AM1"/>
+</components>

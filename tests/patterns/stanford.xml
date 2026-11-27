@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL08I-BUILDER/etc/makeIocs/BL08I-EA-IOC-06.xml -->
+	<stanford.sr570 P="BL08I-EA-STANF-01" PORT="STANF01port" Q="" name="STANF01"/>
+</components>

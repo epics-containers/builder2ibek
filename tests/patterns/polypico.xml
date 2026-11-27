@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from ME18X-BUILDER/etc/makeIocs/ME18X-EA-IOC-03.xml -->
+	<polypico.polypico P="ME18X-EA-POLY-01" PORT="ty_polypico"/>
+</components>

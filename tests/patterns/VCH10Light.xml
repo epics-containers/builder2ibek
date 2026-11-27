@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07B-BUILDER/etc/makeIocs/BL07B-EA-IOC-53.xml -->
+	<VCH10Light.VCH10Light P="BL07B-EA-VCH-51" description="Controls lights on all HiTES1 chambers" name="VCH51B" port="BL07B-EA-VCH-51" shortdesc="HiTES1 Lights"/>
+</components>

@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL09K-BUILDER/etc/makeIocs/BL09K-EA-IOC-02.xml -->
+	<tdklambda.Gen3300w CMDSET="S" P="BL09K-EA-PSU-03" PORT="tdkport" name="tdkPSU"/>
+</components>

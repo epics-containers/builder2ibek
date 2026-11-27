@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07I-BUILDER/etc/makeIocs/BL07I-EA-IOC-18.xml -->
+	<kellerPyrometer.kellerPyrometer P="BL07I-EA-PYRO-01" PORT="KellerPyrometerPort" name="pyrometer"/>
+</components>

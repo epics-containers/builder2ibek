@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL13I-BUILDER/etc/makeIocs/BL13I-MO-IOC-32.xml -->
+	<yaskawaBARTRobot.BARTRobot COORDSYS="1" CUR_PIN_VAR_NUM="082" CUR_PUCK_VAR_NUM="081" DISV="64" DISWRITE="STA2" JOB1="NOP" JOB2="RECOVER_TO_HOME" JOB3="HTL_TO_SMP" JOB4="SMP_EXCHANGE" JOB5="SMP_TO_HTL" JOB6="DISPOSE" JOB7="CHECK_SAMPLE_POS" NEXT_PIN_VAR_NUM="084" NEXT_PUCK_VAR_NUM="083" P="BL13I-MO-ROBOT-01" PORT="robotPLC" STREAMS_PORT="YRC1000Micro" TYPE="YR" name="yaskawaBART"/>
+	<yaskawaBARTRobot.yaskawaByte DESC="Acceleration gain in percent" DRVH="100" DRVL="20" P="BL13I-MO-ROBOT-01" SCAN="1 second" STREAMS_PORT="YRC1000Micro" VAR="010" name="accel_gain_percent"/>
+	<yaskawaBARTRobot.yaskawaByte DESC="Deceleration gain in percent" DRVH="100" DRVL="20" P="BL13I-MO-ROBOT-01" SCAN="1 second" STREAMS_PORT="YRC1000Micro" VAR="011" name="decel_gain_percent"/>
+	<yaskawaBARTRobot.yaskawaOutput DESC="NetworkOutput1" DESC0="Running" DESC1="Servo" DESC2="Alarm/Error?" DESC3="Battery?" DESC4="Hold" DESC5="Command Remote" DESC6="Play Mode" DESC7="Gripper Open" P="BL13I-MO-ROBOT-01" SCAN="1 second" STREAMS_PORT="YRC1000Micro" VAR="30010" name="NetworkOutput1"/>
+	<yaskawaBARTRobot.yaskawaInput DESC="NetworkInput1" DESC0="External Start" DESC1="External Hold" DESC2="Call master Job" DESC3="Alarm/Error Reset" DESC4="External Servo On" DESC5="Select Play Mode" DESC6="Select Teach Mode" DESC7="Sample exchange ready" P="BL13I-MO-ROBOT-01" SCAN="1 second" STREAMS_PORT="YRC1000Micro" VAR="20030" name="NetworkInput1"/>
+</components>

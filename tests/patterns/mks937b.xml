@@ -1,5 +1,17 @@
 <?xml version="1.0" ?>
 <components arch="linux-x86_64">
+	<!-- one of each class from BL02I-BUILDER/etc/makeIocs/BL02I-VA-IOC-01.xml -->
+	<mks937b.mks937b address="001" device="BL02I-VA-GCTLR-01" name="GCTLR01" port="ty_40_5"/>
+	<mks937b.mks937bHy8401 c="50" device="BL02I-VA-ADC-01:CH0" name="GAUGE1.OB1" s="1"/>
+	<mks937b.mks937bGauge dom="BL02I" id="01" name="GAUGE1" plog_adc_pv="BL02I-VA-ADC-01:CH0"/>
+	<mks937b.mks937bGaugeGroup device="BL02I-VA-GGAUG-01" gauge1="BL02I-VA-GAUGE-01" gauge2="BL02I-VA-GAUGE-02" gauge3="BL02I-VA-GAUGE-02" gauge4="BL02I-VA-GAUGE-02" gauge5="BL02I-VA-GAUGE-02" gauge6="BL02I-VA-GAUGE-02" gauge7="BL02I-VA-GAUGE-02" gauge8="BL02I-VA-GAUGE-02" name="GGAUG1"/>
+	<mks937b.mks937bImg GCTLR="GCTLR01" channel="1" ctl_channel="0" device="BL02I-VA-IMG-01" ilk_write_access_pv="BL02I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="IMG01" offwarn="1"/>
+	<mks937b.mks937bImgGroup delay="0" device="BL02I-VA-GIMG-01" img1="BL02I-VA-IMG-01" img2="BL02I-VA-IMG-02" img3="BL02I-VA-IMG-02" img4="BL02I-VA-IMG-02" img5="BL02I-VA-IMG-02" img6="BL02I-VA-IMG-02" img7="BL02I-VA-IMG-02" img8="BL02I-VA-IMG-02" name="GIMG1"/>
+	<mks937b.mks937bPirg GCTLR="GCTLR01" channel="5" device="BL02I-VA-PIRG-01" name="PIRG01"/>
+	<mks937b.mks937bPirgGroup device="BL02I-VA-GPIRG-01" name="GPIRG1" pirg1="BL02I-VA-PIRG-01" pirg2="BL02I-VA-PIRG-02" pirg3="BL02I-VA-PIRG-02" pirg4="BL02I-VA-PIRG-02" pirg5="BL02I-VA-PIRG-02" pirg6="BL02I-VA-PIRG-02" pirg7="BL02I-VA-PIRG-02" pirg8="BL02I-VA-PIRG-02"/>
+	<mks937b.mks937bRelays GAUGE="IMG01" ilk_write_access_pv="BL02I-VA-GAUGE-01:ILKSETSP:NOWRITE" relay_desc="Valve I/L On" relay_drvh="1.20E-002" relay_drvl="2.70E-010" relay_high="1.10E-006" relay_hihi="1.30E-002" relay_hopr="1.20E-002" relay_level="1.00E-008" relay_lolo="2.60E-010" relay_lopr="2.70E-010" relay_low="9.00E-007" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.10E-006"/>
+	<mks937b.mks937bFastRelay GAUGE="IMG01" frcsp_desc="Fast Valve I/L" frcsp_level="1e-05" ilk_write_access_pv="BL02I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="IMG1.OB4"/>
+	<!-- auto_mks937bHcg, which gauges refer to, from BL05I-BUILDER/etc/makeIocs/BL05I-VA-IOC-03.xml -->
 	<mks937b.mks937b address="001" device="BL05I-VA-GCTLR-10" name="VA3.GCTLR10" port="vts_GCTLR10"/>
 	<mks937b.mks937bGauge GCTLR="VA3.GCTLR10" dom="BL05I" id="20" name="VA3.GAUGE20" plog_adc_pv="0"/>
 	<mks937b.mks937bImg GCTLR="VA3.GCTLR10" channel="1" ctlsp_level="2.0e-1" device="BL05I-VA-IMG-20" ilk_write_access_pv="BL05I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="VA3.IMG20"/>

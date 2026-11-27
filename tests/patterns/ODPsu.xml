@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="vxWorks-ppc604_long">
+	<!-- from BL02I-BUILDER/etc/makeIocs/BL02I-MO-IOC-01.xml -->
+	<ODPsu.ODPsu P="BL02I-MO-PSU-01" PORT="ty_41_4" Q=":BM" name="PSU"/>
+	<ODPsu.ODPsuBank BANK="0" P="BL02I-MO-PSU-01" PORT="ty_41_4" Q=":BM" name="HPSU"/>
+	<ODPsu.ODPsuFormat22 P="BL02I-MO-PSU-01" PORT="ty_41_4" Q=":BM" name="PSU.OB1"/>
+	<ODPsu.ODPsu22DUpdate P="BL02I-MO-PSU-01" Q=":BM" name="PSU.OB2"/>
+	<ODPsu.ODPsuChannel BANK="0" CHAN="0" P="BL02I-MO-PSU-01" PORT="ty_41_4" Q=":BM" name="PSU.OB3"/>
+</components>

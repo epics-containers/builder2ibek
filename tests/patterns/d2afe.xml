@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from EBPM-BUILDER/etc/makeIocs/SR98C-DI-IOC-01.xml -->
+	<d2afe.d2ptg CELL="98" D2AFE_MASK="1" ID="1" STREAMS_PORT="d2ptg1_ip" name="d2ptg1"/>
+	<d2afe.d2afe ADDR="1" CELL="98" ID="1" PTG="d2ptg1" name="d2afe1"/>
+</components>

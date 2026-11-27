@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL15I-BUILDER/etc/makeIocs/BL15I-EA-IOC-07.xml -->
+	<ttiCPX.ttiCPX P="BL15I-EA-TTI-07" PORT="tti_Port" name="TTI07.controller"/>
+	<ttiCPX.ttiCPXChannel CHAN="1" P="BL15I-EA-TTI-07" PORT="tti_Port" name="TTI07.C1"/>
+	<ttiCPX.ttiCPXChannel CHAN="2" P="BL15I-EA-TTI-07" PORT="tti_Port" name="TTI07.C2"/>
+</components>

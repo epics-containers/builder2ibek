@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from ME15I-BUILDER/etc/makeIocs/ME15I-EA-IOC-01.xml -->
+	<kriIonBeam.Autocontroller P="ME15I-EA-IBM-01" PORT="kriib" name="autocontroller"/>
+	<kriIonBeam.ProgramParameters P="ME15I-EA-IBM-01" PORT="kriib" PROG="0" name="p0"/>
+	<kriIonBeam.ProgramParameters P="ME15I-EA-IBM-01" PORT="kriib" PROG="1" name="p1"/>
+	<kriIonBeam.ProgramParameters P="ME15I-EA-IBM-01" PORT="kriib" PROG="2" name="p2"/>
+	<kriIonBeam.ProgramParameters P="ME15I-EA-IBM-01" PORT="kriib" PROG="3" name="p3"/>
+	<kriIonBeam.ProgramParameters P="ME15I-EA-IBM-01" PORT="kriib" PROG="4" name="p4"/>
+</components>

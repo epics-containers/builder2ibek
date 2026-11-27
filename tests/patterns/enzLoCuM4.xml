@@ -1,4 +1,8 @@
 <?xml version="1.0" ?>
 <components arch="linux-x86_64">
 	<enzLoCuM4.enzLoCuM4 adr="01" device="BL05I-DI-IAMP-01" gda_desc="Current Amplifier 1 (S2)" gda_name="CA1.CTRL" name="DI3.LOCUM1" port="enz.LOCUM1"/>
+	<!-- from BL02I-BUILDER/etc/makeIocs/BL02I-EA-IOC-01.xml -->
+	<enzLoCuM4.enzLoCuM4Readback_generic_vertical desc_prefix="BLADE" device="BL02I-EA-DIST-01" dtyp="asynInt32" dtyp_wf="Soft Channel" egu="um" name="ENZL.AI" neg_x="@asyn(ERIO.12_ADC2)VALUE" neg_x_wf="BL02I-EA-ENZL-01:MOD2:ADC2_WAVEFORM CP" neg_y="@asyn(ERIO.11_ADC2)VALUE" neg_y_wf="BL02I-EA-ENZL-01:MOD1:ADC2_WAVEFORM CP" nelm="100" pos_x="@asyn(ERIO.12_ADC1)VALUE" pos_x_wf="BL02I-EA-ENZL-01:MOD2:ADC1_WAVEFORM CP" pos_y="@asyn(ERIO.11_ADC1)VALUE" pos_y_wf="BL02I-EA-ENZL-01:MOD1:ADC1_WAVEFORM CP"/>
+	<!-- from BL04J-BUILDER/etc/makeIocs/BL04J-EA-IOC-02.xml -->
+	<enzLoCuM4.auto_enzLoCuM4Readback blade_a_card="51" blade_a_chan="0" blade_b_card="51" blade_b_chan="1" blade_c_card="51" blade_c_chan="2" blade_d_card="51" blade_d_chan="3" desc_prefix="Diode" device="BL04J-EA-QBPM-03" egu="um" gda_desc="I0 Monitor 1 BPM" gda_name="D7.BPM" name="D7.OB1"/>
 </components>

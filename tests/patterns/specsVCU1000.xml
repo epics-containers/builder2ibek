@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL05I-BUILDER/etc/makeIocs/BL05I-EA-IOC-02.xml -->
+	<specsVCU1000.specsVCU1000 P="BL05I-EA-VCU-01" PORT="vts_VCU1" Q="" name="EA2.VCU1"/>
+</components>

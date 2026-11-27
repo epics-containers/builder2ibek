@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16I-BUILDER/etc/makeIocs/BL16I-EA-IOC-07.xml -->
+	<keithley6517B.keithley6517B A="10" P="BL16I-EA-K65-01" PORT="p15" R="" name="k6517B"/>
+</components>

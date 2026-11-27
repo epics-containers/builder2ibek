@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL23I-BUILDER/etc/makeIocs/BL23I-EA-IOC-09.xml -->
+	<lakeshore218.lakeshore218 ADDR="0" CH1_label="Shield Connect to TS1" CH2_label="Upper Shield TS2" CH3_label="Inboard Shield TS3" CH4_label="Bottom Shield TS5" CH5_label="Mirror Holder TS6" CH6_label="Gripper Jaw" CH7_label="Plastic Support TS7" P="BL23I-EA-TCTRL-03" PORT="vts_TCTRL3" SCAN="1" TEMPSCAN="1" name="TCTRL3"/>
+</components>

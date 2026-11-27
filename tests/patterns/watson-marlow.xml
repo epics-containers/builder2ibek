@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL22I-BUILDER/etc/makeIocs/BL22I-CS-IOC-08.xml -->
+	<watson-marlow.Pump323Du P="BL22I-EA-PUMP-01" PORT="watsonmarlow" Q="" name="ENV.PPUMP"/>
+</components>

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL15I-BUILDER/etc/makeIocs/BL15I-MO-IOC-16.xml -->
+	<attocube.ANC150 AXIS="1" M=":PIEZO1" P="BL15I-EA-ATTO-05" PORT="ATTOS" name="ATTO1"/>
+	<attocube.ANC150 AXIS="2" M=":PIEZO2" P="BL15I-EA-ATTO-05" PORT="ATTOS" name="ATTO2"/>
+	<attocube.ANC150 AXIS="3" M=":PIEZO3" P="BL15I-EA-ATTO-05" PORT="ATTOS" name="ATTO3"/>
+</components>

@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL18B-BUILDER/etc/makeIocs/BL18B-EA-IOC-03.xml -->
+	<norhofLN2.norhofLN2 P="BL18B-EA-PUMP-01" PORT="norhof" name="PUMP1"/>
+</components>

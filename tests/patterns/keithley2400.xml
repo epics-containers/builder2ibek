@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16B-BUILDER/etc/makeIocs/BL16B-EA-IOC-46.xml -->
+	<keithley2400.Keithley2400 ADDR="0" P="BL16B-EA-K2400-01" PORT="KE2410VBIAS" SCAN=".1"/>
+</components>

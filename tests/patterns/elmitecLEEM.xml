@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL06K-BUILDER/etc/makeIocs/BL06K-CS-IOC-01.xml -->
+	<elmitecLEEM.leem P="BL06K-EA-LEEM-01" PHI_MTR_RBV="BL06K-MO-PEEM-01:PHI:OS.RBV MS" PORT="LEEMport" Q="" name="Leem"/>
+	<elmitecLEEM.leemPSValue IDX="11" P="BL06K-EA-LEEM-01" PORT="LEEMport" Q=":OBJECTIVE" name="OBJECTIVE"/>
+</components>

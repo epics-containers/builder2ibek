@@ -1,12 +1,19 @@
 """The runtime pattern index, and which modules builder2ibek maps to a pattern."""
 
 import subprocess
+import warnings
+from collections.abc import Mapping
 from functools import cache
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import pytest
+from ibek.ioc import clear_entity_model_ids
 from ibek.pattern_cmds.sources import DEFAULT_LIBRARIES
+from ibek.render import Render
+from ibek.render_db import RenderDb
+from pydantic.warnings import PydanticDeprecatedSince211
 from ruamel.yaml import YAML
 
 from builder2ibek import patterns
@@ -18,6 +25,7 @@ from builder2ibek.patterns import (
     LIBRARIES,
     STREAMDEVICE_LIBRARY,
     SUPPORT_LIBRARY,
+    Pattern,
     PatternIndex,
     PatternIndexError,
     is_beamline_module,
@@ -363,36 +371,181 @@ def _convert(xml: Path) -> list[dict]:
     return [dict(e) for e in dispatch(builder, xml).entities]
 
 
-BL21I_3_12 = pytest.mark.xfail(
-    strict=True,
-    reason="https://github.com/epics-containers/ibek-runtime-support/issues/15: "
-    "the BL21I pattern misnames the SGM air "
-    "control model, and the SMPLValveSequence macros changed in BL21I 3-12 while "
-    "BL21I-BUILDER is still on 3-11",
-)
+# One builder XML per pattern module that real builder XMLs use, named after the
+# module builder2ibek emits, holding components copied from real IOC XMLs (a
+# comment in each names its source). Each checks that the pattern's models follow
+# the module's etc/builder.py: what builder2ibek converts from builder XML must
+# validate against the pattern and load records.
+
+# Fixtures that fail against the pinned library release: the exact failure, and
+# the change that fixes it. Each is strict, so it fails once the pin moves to a
+# release with the fix; then drop it from here.
+_SD = "https://github.com/epics-containers/ibek-runtime-streamdevice/pull/"
+_RS = "https://github.com/epics-containers/ibek-runtime-support/issues/"
+XFAIL: dict[str, tuple[str, str]] = {
+    "BL21I": (
+        "no model BL21I.SGMTravellerAirControl: the pattern misnames it, and the "
+        "SMPLValveSequence macros changed in BL21I 3-12 while BL21I-BUILDER is "
+        "still on 3-11",
+        f"{_RS}15",
+    ),
+    "caenN1470": (
+        "no model caenN1470.caenN1470, only the private _caenN1470 helpers",
+        f"{_SD}60, released in 0.12.0",
+    ),
+    "chillax": (
+        "chillax.chillaxController loads no records",
+        f"{_SD}58, released in 0.12.0",
+    ),
+    "d2afe": (
+        "no model d2afe.d2afe; d2afe needs compiled code",
+        f"{_SD}58, released in 0.12.0, which removes the pattern: drop this "
+        "fixture when the pin moves",
+    ),
+    "digitelMpc": (
+        "digitelMpc.digitelMpc rejects name (extra input)",
+        f"{_SD}56, released in 0.12.0; its port then refers to an asyn port, "
+        "which this fixture does not define",
+    ),
+    "keithley2400": (
+        'Keithley2400.SCAN is an int; builder XMLs pass SCAN=".1"',
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "Keithley6487": (
+        'Keithley6487.A is required; builder XMLs set A="", which is dropped',
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "keysightLCR": (
+        'keysightLCR.SCAN is an int; builder XMLs pass SCAN=".1"',
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "knauer": (
+        "no model knauer.PumpAndValve",
+        f"{_SD}57, released in 0.12.0, which adds it with no records: list it "
+        "in RENDERS_NOTHING when the pin moves",
+    ),
+    "lakeshore331": (
+        "lakeshore331.ONOFFDEFAULT is an int; builder XMLs pass 'OFF'",
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "lakeshore340": (
+        "lakeshore340.lakeshore340 rejects name (extra input)",
+        f"{_SD}56, released in 0.12.0; TEMPSCAN then still converts as an int, "
+        "because ibek-support's generic model has it as an int, and nothing "
+        "tracks changing that",
+    ),
+    "leybold": (
+        "leybold.read_write_floatE_floatE requires DRVH, which centerOne.xml "
+        "leaves empty (the converter reads centerOne.xml from /dls_sw, absent "
+        "in CI, where it fails as well)",
+        f"{_SD}56, released in 0.12.0; leybold.center_one_gui then loads no "
+        "records and belongs in RENDERS_NOTHING",
+    ),
+    "motomanNX100": (
+        "no models motomanNX100.auto_BL11I_barcode, auto_BL11I_robot_interlocks",
+        "moving those templates to the BL11I pattern of ibek-runtime-support; "
+        "nothing tracks it",
+    ),
+    "PIpiezo": (
+        "no model PIpiezo.auto_actuatorcallback (imported from PIpiezo 1-23)",
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "yaskawaBARTRobot": (
+        "yaskawaBARTRobot.BARTRobot requires CUR_COLUMN_VAR_NUM (I22-only "
+        "release); yaskawaBARTRobot needs compiled code",
+        f"{_SD}58, released in 0.12.0, which removes the pattern: drop this "
+        "fixture when the pin moves",
+    ),
+}
+
+# Models that load no records by design: they only give a screen
+RENDERS_NOTHING: frozenset[str] = frozenset()
 
 
-# One builder XML per module, named after the module builder2ibek emits, holding
-# components copied from real IOC XMLs.
-@pytest.mark.parametrize(
-    "fixture",
-    [
-        pytest.param(p, marks=BL21I_3_12) if p.stem == "BL21I" else p
-        for p in sorted(FIXTURES.glob("*.xml"))
-    ],
-    ids=lambda p: p.stem,
-)
-def test_converted_xml_maps_to_the_pattern(index: PatternIndex, fixture: Path):
+def _fixture_params() -> list:
+    return [
+        pytest.param(
+            fixture,
+            id=fixture.stem,
+            marks=[
+                pytest.mark.xfail(
+                    strict=True, reason="; fixed by ".join(XFAIL[fixture.stem])
+                )
+            ]
+            if fixture.stem in XFAIL
+            else [],
+        )
+        for fixture in sorted(FIXTURES.glob("*.xml"))
+    ]
+
+
+def _renders_nothing(
+    index: PatternIndex, pattern: Pattern, entities: list[Mapping[str, Any]]
+) -> list[str]:
+    """The types of the entities that load no records and run no commands."""
+    clear_entity_model_ids()
+    try:
+        with warnings.catch_warnings():
+            # raised from inside ibek's Entity, as in PatternIndex.rejects
+            warnings.simplefilter("ignore", PydanticDeprecatedSince211)
+            ioc = index._ioc_model(pattern)(
+                ioc_name="validate",
+                description="validate",
+                entities=[dict(e) for e in entities],
+            )
+        render = Render()
+        silent = []
+        for entity in ioc.entities:
+            model = entity._model
+            if model.sub_entities or f"{pattern.module}.{model.name}" in (
+                RENDERS_NOTHING
+            ):
+                continue
+            outputs = [
+                RenderDb([entity]).render_database(),
+                render.render_pre_ioc_init(entity),
+                render.render_post_ioc_init(entity),
+            ]
+            if not any(outputs):
+                silent.append(str(entity.type))
+        return silent
+    finally:
+        clear_entity_model_ids()
+
+
+@pytest.mark.parametrize("fixture", _fixture_params())
+def test_converted_xml_fits_the_pattern(index: PatternIndex, fixture: Path):
     module = fixture.stem
+    pattern = index.patterns[module]
     entities = _convert(fixture)
-    assert any(str(e["type"]).startswith(f"{module}.") for e in entities)
-    plan = index.plan(entities)
-    assert plan.build_time == {}
-    assert plan.patterns == [index.patterns[module]]
+    ours: list[Mapping[str, Any]] = [
+        e for e in entities if patterns.module_of(e) == module
+    ]
+    assert ours, f"{fixture.name} converts to no {module} entity"
+
+    reason = index.rejects(pattern, ours, index.foreign_ids(ours))
+    assert not reason, reason
+    silent = _renders_nothing(index, pattern, ours)
+    assert not silent, f"no records or commands from {silent}"
+
+    # where no generic model competes, builder2ibek uses the pattern; plan()
+    # routes beamline and ibek-runtime-support modules to theirs regardless
+    if (
+        module in ALIGNED
+        or routes_to_support_pattern(module)
+        or module not in patterns.generic_modules()
+    ):
+        plan = index.plan(entities)
+        assert plan.build_time == {}
+        assert plan.patterns == [pattern]
 
 
 def test_every_aligned_module_has_a_fixture():
     assert {p.stem for p in FIXTURES.glob("*.xml")} >= ALIGNED
+
+
+def test_xfails_name_fixtures():
+    assert set(XFAIL) <= {p.stem for p in FIXTURES.glob("*.xml")}
 
 
 # -- the plan for one IOC -------------------------------------------------------
@@ -439,11 +592,11 @@ def test_plan_rejected_entity_keeps_the_module_build_time(index: PatternIndex):
 
 def test_plan_model_missing_from_pattern(index: PatternIndex):
     entities = _convert(FIXTURES / "enzLoCuM4.xml") + [
-        {"type": "enzLoCuM4.auto_enzLoCuM4Readback", "device": "X"}
+        {"type": "enzLoCuM4.noSuchModel", "device": "X"}
     ]
     plan = index.plan(entities)
     assert plan.patterns == []
-    assert "no model enzLoCuM4.auto_enzLoCuM4Readback" in plan.build_time["enzLoCuM4"]
+    assert "no model enzLoCuM4.noSuchModel" in plan.build_time["enzLoCuM4"]
 
 
 def test_plan_leaves_no_ids_registered(index: PatternIndex):

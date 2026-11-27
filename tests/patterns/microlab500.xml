@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07I-BUILDER/etc/makeIocs/BL07I-EA-IOC-08.xml -->
+	<microlab500.microlab500 LEFTSYRINGEVOL="10000" P="BL07I-EA-SYRG-01" PORT="MLAB500IP" R=":P1" RIGHTSYRINGEVOL="10000" STROKESIZE="1000" name="MLAB500"/>
+</components>

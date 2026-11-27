@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL99P-BUILDER/etc/makeIocs/BL99P-EA-IOC-02.xml -->
+	<thorlabsMcls1.thorlabsMcls1 BLUE="Diffraction" IRED="Unused (near-infrared)" P="BL99P-EA-LASER-01" PORT="usb0" Q="" RED="Imaging" VRED="Unused (red)" name="P99.LASER.01"/>
+</components>

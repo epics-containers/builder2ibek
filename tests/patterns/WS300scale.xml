@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL19I-BUILDER/etc/makeIocs/BL19I-EA-IOC-07-2.xml -->
+	<WS300scale.WS300 P="BL19I-EA-SCL-01" PORT="HESCALES" S="" name="SCALE"/>
+</components>
