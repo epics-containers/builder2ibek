@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<components arch="vxWorks-ppc604_long">
+<components arch="linux-x86_64">
 	<!-- one of each class from BL02I-BUILDER/etc/makeIocs/BL02I-VA-IOC-01.xml -->
 	<mks937b.mks937b address="001" device="BL02I-VA-GCTLR-01" name="GCTLR01" port="ty_40_5"/>
 	<mks937b.mks937bHy8401 c="50" device="BL02I-VA-ADC-01:CH0" name="GAUGE1.OB1" s="1"/>
@@ -11,4 +11,12 @@
 	<mks937b.mks937bPirgGroup device="BL02I-VA-GPIRG-01" name="GPIRG1" pirg1="BL02I-VA-PIRG-01" pirg2="BL02I-VA-PIRG-02" pirg3="BL02I-VA-PIRG-02" pirg4="BL02I-VA-PIRG-02" pirg5="BL02I-VA-PIRG-02" pirg6="BL02I-VA-PIRG-02" pirg7="BL02I-VA-PIRG-02" pirg8="BL02I-VA-PIRG-02"/>
 	<mks937b.mks937bRelays GAUGE="IMG01" ilk_write_access_pv="BL02I-VA-GAUGE-01:ILKSETSP:NOWRITE" relay_desc="Valve I/L On" relay_drvh="1.20E-002" relay_drvl="2.70E-010" relay_high="1.10E-006" relay_hihi="1.30E-002" relay_hopr="1.20E-002" relay_level="1.00E-008" relay_lolo="2.60E-010" relay_lopr="2.70E-010" relay_low="9.00E-007" relay_number="1" relay_off_desc="Valve I/L Off" relay_off_level="1.10E-006"/>
 	<mks937b.mks937bFastRelay GAUGE="IMG01" frcsp_desc="Fast Valve I/L" frcsp_level="1e-05" ilk_write_access_pv="BL02I-VA-GAUGE-01:ILKSETSP:NOWRITE" name="IMG1.OB4"/>
+	<!-- auto_mks937bHcg, which gauges refer to, from BL05I-BUILDER/etc/makeIocs/BL05I-VA-IOC-03.xml -->
+	<mks937b.mks937b address="001" device="BL05I-VA-GCTLR-10" name="VA3.GCTLR10" port="vts_GCTLR10"/>
+	<mks937b.mks937bGauge GCTLR="VA3.GCTLR10" dom="BL05I" id="20" name="VA3.GAUGE20" plog_adc_pv="0"/>
+	<mks937b.mks937bImg GCTLR="VA3.GCTLR10" channel="1" ctlsp_level="2.0e-1" device="BL05I-VA-IMG-20" ilk_write_access_pv="BL05I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="VA3.IMG20"/>
+	<mks937b.auto_mks937bHcg address="001" channel="3" ctl_channel="1" ctlsp_level="4.0e-3" device="BL05I-VA-HCG-03" ilk_write_access_pv="BL05I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="VA3.HCG3" port="vts_GCTLR10"/>
+	<mks937b.mks937bPirg GCTLR="VA3.GCTLR10" channel="5" device="BL05I-VA-PIRG-20" name="VA3.PIRG20"/>
+	<mks937b.mks937bRelays GAUGE="VA3.HCG3" ilk_write_access_pv="BL05I-VA-GAUGE-21:ILKSETSP:NOWRITE" name="VA3.HCGRLY1" relay_desc="Valve I/L On" relay_number="5" relay_off_desc="Valve I/L Off" relay_off_level="1.5e-6"/>
+	<mks937b.mks937bFastRelay GAUGE="VA3.IMG20" frcsp_desc="FastValve I/L" ilk_write_access_pv="BL05I-VA-GAUGE-20:ILKSETSP:NOWRITE" name="VA3.FRLY1"/>
 </components>

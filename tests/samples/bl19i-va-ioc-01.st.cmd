@@ -165,6 +165,7 @@ Hy8401ipConfigure(52, $(BL19I-VA-IOC-01.Slot5), 2, $(Vec7), 0, 0, 0, 15, 0, 1, 1
 ErConfigurePMC 1 0
 
 dbLoadRecords /ioc.db
+dbLoadRecords config/records.db
 iocInit
 
 # Autosave post iocInit

@@ -1,0 +1,17 @@
+# Raw records from the records.* elements of BL19I-VA-IOC-01.xml,
+# loaded after ioc.db through post_db_files in ioc.yaml.
+# Do not edit: builder2ibek xml2yaml regenerates this file and
+# overwrites any edit. Edit the XML instead.
+
+record(ai, "BL19I-VA-LPC-01:VOLTAGE")
+{
+    field(DESC, "Analogue Input")
+    field(DTYP, "Hy8401ip")
+    field(EGU,  "V")
+    field(EGUF, "1")
+    field(EGUL, "-1")
+    field(INP,  "#C50 S4 @MEAN=500")
+    field(LINR, "LINEAR")
+    field(PREC, "3")
+    field(SCAN, "1 second")
+}

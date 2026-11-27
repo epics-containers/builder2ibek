@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<adamCPW.adamCPWplus BALANCEDESC="Nano-ES Liquid Helium Balance" GROSSDESC="Current Dewar Weight" OFFENTRYDESC="Enter Empty Dewar Weight" OFFSETDESC="Empty Dewar Weight" P="BL05J-CG-BALNC-01" R="" TMOT="5" disable="1" name="BLNCJ" port="BLNCJ.ASYN"/>
+</components>

@@ -30,7 +30,7 @@ BL21I = f"{SUPPORT_LIBRARY}:BL21I@{SUPPORT_PATTERN_TAG}"
 
 # Every record type the ioc-streamdevice-runtime image provides: EPICS base,
 # calc (with sseq and transform, from calcSupport_LOCAL.dbd), busy, std and
-# asyn. stream adds device support, not record types.
+# asyn, and sscan. stream adds device support, not record types.
 BASE_RECORDS = {
     "aai", "aao", "ai", "ao", "aSub", "bi", "bo", "calc", "calcout", "compress",
     "dfanout", "event", "fanout", "histogram", "int64in", "int64out", "longin",
@@ -40,7 +40,9 @@ BASE_RECORDS = {
 }  # fmt: skip
 CALC_RECORDS = {"scalcout", "acalcout", "sseq", "transform", "swait"}
 STD_RECORDS = {"epid", "throttle", "timestamp"}
-RUNTIME_IMAGE_RECORDS = BASE_RECORDS | CALC_RECORDS | STD_RECORDS | {"busy", "asyn"}
+RUNTIME_IMAGE_RECORDS = (
+    BASE_RECORDS | CALC_RECORDS | STD_RECORDS | {"busy", "asyn", "sscan"}
+)
 BEAMLINE_PATTERNS = ["BL04I", "BL11I", "BL19I", "BL21I"]
 
 
@@ -424,6 +426,12 @@ def test_beamline_module_in_both_libraries_fails_the_conversion(
         convert_file(xml, tmp_path / "ioc.yaml", "/epics/ibek-defs/ioc.schema.json")
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="https://github.com/epics-containers/ibek-runtime-support/issues/15: "
+    "the SMPLValveSequence macros changed in BL21I 3-12 while BL21I-BUILDER is "
+    "still on 3-11",
+)
 def test_kept_entities_drop_the_pattern_model_defaults(tmp_path: Path):
     """Not the generic model's: GonioReady's dom defaults to 'undefined' only
     there, and the pattern requires it."""

@@ -136,6 +136,26 @@ def _modules_used_by_samples() -> set[str]:
     return used
 
 
+def _needed_modules(
+    dls: dict[str, list[Path]], community: dict[str, list[Path]]
+) -> set[str]:
+    """The dls modules the samples need that ibek-support cannot supply.
+
+    That includes the modules whose models a needed module's sub_entities use,
+    e.g. SR-VA's userIO.ai: generate2 expands them, so they must be vendored too.
+    """
+    needed: set[str] = set()
+    todo = {m for m in _modules_used_by_samples() if m in dls and m not in community}
+    while todo:
+        module = todo.pop()
+        needed.add(module)
+        for support_yaml in dls[module]:
+            for used in _ENTITY_TYPE_RE.findall(support_yaml.read_text()):
+                if used in dls and used not in community and used not in needed:
+                    todo.add(used)
+    return needed
+
+
 def _git(*args: str) -> str:
     return subprocess.run(
         ["git", *args], cwd=REPO_ROOT, capture_output=True, text=True, check=True
@@ -175,7 +195,7 @@ def update() -> int:
     # Only what the samples actually need, and only what ibek-support cannot
     # already supply -- a module that moves to the community repo should drop
     # out of the vendored set on the next --update.
-    needed = sorted(m for m in used if m in dls and m not in community)
+    needed = sorted(_needed_modules(dls, community))
     unresolved = sorted(m for m in used if m not in dls and m not in community)
 
     if VENDORED.exists():
@@ -273,8 +293,7 @@ def check() -> int:
 
     community = _module_index(COMMUNITY)
     dls = _module_index(DLS)
-    needed = {m for m in _modules_used_by_samples() if m in dls and m not in community}
-    missing = sorted(needed - set(_module_index(VENDORED)))
+    missing = sorted(_needed_modules(dls, community) - set(_module_index(VENDORED)))
     differs = [
         f"{f.parent.name}/{f.name}"
         for f in sorted(VENDORED.glob(SUPPORT_GLOB))

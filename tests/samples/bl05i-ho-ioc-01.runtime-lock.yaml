@@ -1,0 +1,42 @@
+version: 1
+patterns:
+  BL05I:
+    version: 0.7.0
+    source: github.com/epics-containers/ibek-runtime-support
+    files:
+      config/BL05I.ibek.support.yaml: sha256:bc378b5c38a21458190606d47101e0dc2153e3371101c5290339f7b6a96ac5f5
+      config/BL05I_Feedback_AutoPV.template: sha256:2484e6a7baab32b0300d284b334ab1ac3e2fec5d00f6af9746bc5da011711de1
+      config/BL05I_HR_beamStatus.template: sha256:185892952df752a72b9d6e154808edac901f40587bf8f33e84b9f3990a442100
+      config/BL05I_HR_manipulator.template: sha256:21611fd290700e1094816be779ab1ac0775ed1bfdfacbb5b1e0a7ca086f8aa44
+      config/BL05I_HR_manipulatorLimit.template: sha256:894d6c3dc33d07219a900a2e569dd766d98f60a1954e0fcac93aa1bdd4e9cb86
+      config/BL05I_HR_manipulatorSlit.template: sha256:521aab68fc5a680eec4c3d1e7c90e39de9d550107e44ca29d5485fa4858f99e3
+      config/BL05I_HR_manipulatorXZone.template: sha256:c9dc2989b6169a3cb78d0b88a6a1acbdfcff224e68316baa44ce0f9586a28f75
+      config/BL05I_HR_manipulatorXZoneSet.template: sha256:a15c9bba566de26bce21a0eea57e4cc67145227365876ba7d111568a564eaad0
+      config/BL05I_HR_vacuumOpenSequence.template: sha256:adaa86bed0fb77f03b32fa11a40ff304084101c2e853de113efddc55026cb546
+      config/BL05I_Helium_recovery.template: sha256:13541065220d7190e401eeeaab709c7a295237f63065566e78add5b229dde772
+      config/BL05I_PGM_homingPLC_steps.template: sha256:4b828d3306e8c398938d7cb5f5c7056a4f7e460d246ca76dfc0831b8692bcde3
+      config/BL05I_changeHexapodMirror.pvi.device.yaml: sha256:cc4a600b3be0d34de9ce9e9eb09a95822d4a72cad40ab75b9464f71bf3b779d0
+      config/BL05I_changeHexapodMirror.template: sha256:9b9266c42fd4c1649af3e35450cf49f14260f3066f6470d651cf44e2815861a0
+      config/BL05I_changeHexapodMirror_withRef.pvi.device.yaml: sha256:f240d1fdba23e6952fa14ae32cb15cdfba4112f8cdd828707a5b5fe4d27eb6d5
+      config/BL05I_changeHexapodMirror_withReference.template: sha256:89e23c6be0f1bbe80a2ab8dd9f975d7e064d25f93a2443eb0f7773f203c9f6bd
+      config/BL05I_mks937bGauge_pressureOverride.template: sha256:b6034aaf0d2bc2e8707ac2a81ba587c760595bffcbfba79a1a6184dcec5b3d97
+      config/BL05I_shared_beamStatus.template: sha256:8502ff614fbf28bbed1147cdd1004eed883528e3d744d9addf8648ac7a2100f7
+      config/BL05I_slit_BPM_dummies.template: sha256:195cdf5c474590f2ade8d9cc9fea90d3b3ded646ce80a9ee65a968faefde9ab5
+      config/BL05I_waterChiller.template: sha256:b6295d6b13a7af87badc8ac72707bde822849cca7b31f13011f9ae0d6beb29c1
+      config/BL05I_waterChiller_interlock.template: sha256:707170d386449b65bfeb3047357b1e17e64ebae1902c1c7bb887b5bb61ee5f62
+      config/BL05I_waterChiller_settings.req: sha256:52005530f5e8334f6c9c284911c847b45cae3e4602b93e8ade1eb38bfa66b8d5
+      config/BL05I_waterchiller.pvi.device.yaml: sha256:55e4428efb13004d0851e68dd4258bc71e08b76cf7c09d088c0b0bf1ec8e8811
+      config/BL05J_Nano_beamStatus.template: sha256:cf4aa5a5f7569f5a2810f6e9b4517877d4b5f5caba12d55e112f90795f06a0e4
+      config/BL05J_adamCPW_patch.template: sha256:ea361dcfa120f44382799a1f97979578e38959d0ed6ae66d43b21c3379036887
+      config/BL05JmanipulatorSlit.template: sha256:1d6b19f803ab2f404d55fd55f619d8d5ac5997a936b12afcabfc08af0c503864
+      config/BL05JpvRamp.template: sha256:bb5a51bdcbbe3b1d16e1fcc0c6c25ebcc7e0462ea5893aa2bbb8d4fdd38e72df
+      config/motionProtectionMeaning.template: sha256:96f6b185d57b806a68c8531550cec0182721dd117ec6acf66c945a619cec1ee1
+  HostLink:
+    version: 0.10.0
+    source: github.com/epics-containers/ibek-runtime-streamdevice
+    files:
+      config/HostLink.ibek.support.yaml: sha256:e77700e70f8586ad9f3b5266793be684fb89f8085d65932ffacc5ac6b3e1b0ed
+      config/HostLink.template: sha256:f44244eaf5b370dc86bf42cbcb73082ddda77cdd5bce9bbae4bac380c6390dfd
+      config/HostLinkTemplate.pvi.device.yaml: sha256:de55da95f8e5b16636c952b6f5744d41ae643d9d6a4ca7f4ef87e041b09f2989
+      config/Hostlink.proto: sha256:d06721c98afcd5e0a6d26a71afbc3bfec2d52d921cd118a3e37b8a94f6510524
+      config/HostlinkFINS.proto: sha256:10da969e35a255c1947afd6d94847245c30df1579ed6949c04333fff4b99c8ed

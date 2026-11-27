@@ -133,6 +133,11 @@ class Generic_IOC(BaseModel):
     # entity's type; the records converter checks names against these and
     # raw_records to warn about a record defined more than once
     converted_records: dict[str, str] = Field(default_factory=dict, exclude=True)
+    # the info tags of raw records by record name, each tag's value by its
+    # name; the records converter's finalize writes them with the records
+    raw_record_info: dict[str, dict[str, str]] = Field(
+        default_factory=dict, exclude=True
+    )
     # warnings that are not about a dropped entity type
     extra_warnings: list[str] = Field(default_factory=list, exclude=True)
     # the PandAs split out for fastcs-pandablocks (a fastcs_panda.PandaSplit)

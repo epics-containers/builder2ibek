@@ -12,7 +12,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     """
 
     # remove GUI only parameters (except entities whose name is cross-referenced:
-    # mks937b via GCTLR, mks937bGauge/mks937bImg/mks937bPirg/mks937bCap via GAUGE)
+    # mks937b via GCTLR, mks937bGauge/mks937bImg/mks937bPirg/mks937bCap/
+    # auto_mks937bHcg via GAUGE; and auto_mks937bInterlock, whose records take
+    # it as DESC)
     if entity_type not in (
         "mks937b",
         "mks937bGauge",
@@ -20,6 +22,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         "mks937bImg",
         "mks937bPirg",
         "mks937bCap",
+        "auto_mks937bHcg",
+        "auto_mks937bInterlock",
     ):
         entity.remove("name")
 

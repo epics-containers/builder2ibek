@@ -378,11 +378,18 @@ def _convert(xml: Path) -> list[dict]:
 # validate against the pattern and load records.
 
 # Fixtures that fail against the pinned library release, with the reason the
-# pattern audit gave and the change that fixes it. Each turns into a pass once
-# the fix is released and the pin moves; then drop it from here.
+# pattern audit gave and the change that fixes it. Each is strict, so it fails
+# once the fix is released and the pin moves; then drop it from here.
 _SD = "https://github.com/epics-containers/ibek-runtime-streamdevice/pull/"
+_RS = "https://github.com/epics-containers/ibek-runtime-support/issues/"
 _PENDING = "a fix in ibek-runtime-streamdevice, not yet in a PR"
 XFAIL: dict[str, tuple[str, str]] = {
+    "BL21I": (
+        "no model BL21I.SGMTravellerAirControl: the pattern misnames it; and the "
+        "SMPLValveSequence macros changed in BL21I 3-12 while BL21I-BUILDER is "
+        "still on 3-11",
+        f"{_RS}15",
+    ),
     "caenN1470": (
         "only the private _caenN1470/_chan helpers are modelled, not caenN1470",
         _PENDING,
@@ -397,11 +404,6 @@ XFAIL: dict[str, tuple[str, str]] = {
         "raw template import: the controller has no name id, Ionp a flat MPC",
         _PENDING,
     ),
-    "granvillePhillips": (
-        "gauges take a flat port, not GCTLR",
-        f"{_SD}53, released in 0.9.0, with "
-        "https://github.com/epics-containers/builder2ibek/pull/216",
-    ),
     "keithley2400": ('SCAN is an int; builder XMLs pass SCAN=".1"', _PENDING),
     "Keithley6487": ('A is a required int; builder XMLs set A=""', _PENDING),
     "keysightLCR": ('SCAN is an int; builder XMLs pass SCAN=".1"', _PENDING),
@@ -415,15 +417,6 @@ XFAIL: dict[str, tuple[str, str]] = {
         "DRVH and DRVL are required; centerOne.xml leaves them out (and the "
         "leybold converter reads centerOne.xml from /dls_sw, absent in CI)",
         _PENDING,
-    ),
-    "mks937a": (
-        "raw template import: a flat port, not GCTLR; template names, not the "
-        "auto_ classes",
-        f"{_SD}54",
-    ),
-    "mks937b": (
-        "raw template import: a flat port, not GCTLR; no name id on the controller",
-        f"{_SD}54",
     ),
     "motomanNX100": (
         "no model for the BL11I templates auto_BL11I_barcode and "
@@ -449,7 +442,11 @@ def _fixture_params() -> list:
         pytest.param(
             fixture,
             id=fixture.stem,
-            marks=[pytest.mark.xfail(reason="; fixed by ".join(XFAIL[fixture.stem]))]
+            marks=[
+                pytest.mark.xfail(
+                    strict=True, reason="; fixed by ".join(XFAIL[fixture.stem])
+                )
+            ]
             if fixture.stem in XFAIL
             else [],
         )

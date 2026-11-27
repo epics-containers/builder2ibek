@@ -1,0 +1,33 @@
+version: 1
+patterns:
+  granvillePhillips:
+    version: 0.10.0
+    source: github.com/epics-containers/ibek-runtime-streamdevice
+    files:
+      config/gp307.proto: sha256:ea3e15c667a6085420d17c3b0f87e7f7ae0242cd28bec1ea24687d75a74e1ba5
+      config/gp307.pvi.device.yaml: sha256:b2d4041cbb808ed5dc5955e4512bb21b9aac5290be61d2bb813915ec74b23cdd
+      config/gp307.template: sha256:701f1e7bc6a816f6060b6663a43376318cc1a565bae70743a45ccbf8f1cfbcfb
+      config/gp307Gauge.pvi.device.yaml: sha256:78fc87f544212804f1ec898dbdfde19b40123c4a1359d9e20d26d4fd054af8d6
+      config/gp307Gauge.template: sha256:67e7570e3c2b669fd8f08512069a560aad0583e3b910c4dcb7fd217333a2ba79
+      config/gp307Hcg.pvi.device.yaml: sha256:c61902b93e26452d72c660397de39abdb01983bf0a90eb578da33fb2167f1fc3
+      config/gp307Hcg.template: sha256:14d49248bf1c2ef2a8be6c8b9080f242300986b101a8e0d17190ce3c3a0b34bc
+      config/gp307HcgDummy.pvi.device.yaml: sha256:3690643bfd4c570bc9ff919320a675f0de27e3326a8d6ed27c2c677f8598466a
+      config/gp307HcgDummy.template: sha256:78dd4081789a67b203eeced203a1b032eca28393d191915764f3d03870434508
+      config/gp307Pirg.pvi.device.yaml: sha256:0eeacf81386d0f4e9a5774e23c85aa4145348d2fcdd50e7673a40d4f1980e451
+      config/gp307Pirg.template: sha256:3cdbc73f8745d6f093e146bb43bfe3e4421e73efdb6df6b5c268a1b2b753bd0d
+      config/gp307PirgDummy.pvi.device.yaml: sha256:0f8eaf304745f56dc19f73e101230fb74736dfc0181790692810662c60fad3e1
+      config/gp307PirgDummy.template: sha256:fec32f20e962ef9bc1cfa90a4e0a020b7450a408e56234ebeb80ce0e1c62f338
+      config/gp350.proto: sha256:f6af494a5324b1d58a4a4b08280324535a833e6562055f2eddfea72b95acf46c
+      config/gp350.pvi.device.yaml: sha256:41034b1caddffe12ce50d44af152a4d0f5a08ff28aac07b15c2d45fc5628f8e0
+      config/gp350.template: sha256:43ad6b96a949b65ed00758b332786c7e1c98a30055c9937f91ffd66316531b0a
+      config/gp350Gauge.pvi.device.yaml: sha256:f50ce4ccb22f5cc8d0afe9cfa817c0c0127046350955c316f1a637ba19ffadd0
+      config/gp350Gauge.template: sha256:5b8fa7c31612cd8875cffcd64fe462e1d301bd6237ca7b3393f7ac995a2bf288
+      config/gp350Hcg.pvi.device.yaml: sha256:0a586b5bfde280c8d97e954468b97b22f6099a9646710add903fd5076253d58c
+      config/gp350Hcg.template: sha256:609b2a30e9c1dd0d93c4d2eb0780dd82bf36308a4099b54318e7a162e6e03033
+      config/gp350HcgDummy.pvi.device.yaml: sha256:985cd54a8ece2ae95c1478534133bba59122dc949816be484698f616b672f948
+      config/gp350HcgDummy.template: sha256:8120acd2b65dde40046904e4a1216d02fbc81a3bd5d5945723f8cdd3c4f7872d
+      config/gp350Pirg.pvi.device.yaml: sha256:b8d9245f8da2c386ee184552020165895bf94de72190bae632edb7cd7934c2a0
+      config/gp350Pirg.template: sha256:261df930c0545d1008132e5888fd3f4c3459e2cf5bac8392b2193ef69bcec399
+      config/gp350PirgDummy.pvi.device.yaml: sha256:4cd7fff661c710ec89277946bffa620e19f562f510d8a875c52d7222a6cba9aa
+      config/gp350PirgDummy.template: sha256:06b4d6a4708026b9937e2697de754d1fcc8a2064ecf60af4fcdb39d1a741c274
+      config/granvillePhillips.ibek.support.yaml: sha256:b0989740ae594fba53d7336a0e30bb30a5677b54f0ac6c8382c2f551bba7f33b
