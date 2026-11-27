@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json
+# yaml-language-server: $schema=../ioc.schema.json
 
 ioc_name: "{{  _global.get_env('IOC_NAME') }}"
 

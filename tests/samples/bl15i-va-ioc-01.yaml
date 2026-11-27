@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json
+# yaml-language-server: $schema=../ioc.schema.json
 
 # DROPPED FOR MANUAL REVIEW by builder2ibek. A beamline module comes only
 # from its runtime pattern (ibek-runtime-support), which does not take the

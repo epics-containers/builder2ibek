@@ -365,10 +365,17 @@ grep "^# % macro" /dls_sw/prod/R3.14.12.7/support/<module>/<version>/db/<file>.d
 
 ### 5c. Refresh the global schema
 
+An `ioc.yaml` inside a services-repo instance (`services/<ioc>/config/ioc.yaml`)
+names `../ioc.schema.json` on line 1: the instance's own schema, which the
+services repo's `ibek-ioc-schema` pre-commit hook (`ibek pattern schema`)
+generates. The global schema at `/epics/ibek-defs/ioc.schema.json` applies only
+to an `ioc.yaml` outside an instance, such as one written with `--yaml`
+to any other path.
+
 The isolated `EPICS_ROOT` from Phase 0 keeps this run's schema separate, but it
-also means the **global** schema at `/epics/ibek-defs/ioc.schema.json` (which
-the editor's yaml-language-server reads — see line 1 of every `ioc.yaml`) is
-unaware of any new support YAMLs created during this run. The result is
+also means that global schema (which the editor's yaml-language-server reads
+for an `ioc.yaml` outside an instance) is unaware of any new support YAMLs
+created during this run. The result is
 spurious "unknown type" warnings in the IDE on freshly-converted ioc.yaml
 files, even though `ibek runtime generate2` succeeded.
 

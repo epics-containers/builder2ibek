@@ -11,6 +11,7 @@ from dataclasses import field as dc_field
 from pathlib import Path
 from typing import Any
 
+from ibek.globals import IOC_SCHEMA_NAME
 from ruamel.yaml import YAML, CommentedMap
 
 from builder2ibek.builder import Builder, Element
@@ -34,7 +35,7 @@ from builder2ibek.support_defaults import (
     strip_defaults,
 )
 from builder2ibek.types import Entity, Generic_IOC
-from builder2ibek.vendor_patterns import ModuleStatus, add_patterns
+from builder2ibek.vendor_patterns import ModuleStatus, add_patterns, instance_folder
 
 log = logging.getLogger(__name__)
 
@@ -103,6 +104,12 @@ def convert_file(
     ``image_types`` its entity types when its published schema cannot be
     fetched (a GitLab image matched on its Dockerfile).
 
+    The ioc.yaml's ``$schema`` header names ``schema``, except in a
+    services-repo instance: there it names the instance's own
+    ``../ioc.schema.json``: the header the services repo's
+    ``ibek-ioc-schema`` pre-commit hook (``ibek pattern schema``) writes
+    whenever it generates the schema, and leaves alone when it cannot.
+
     Returns what was written and the IOC's warnings, one per dropped entity
     type plus any others; the caller reports them to the user.
     """
@@ -136,6 +143,8 @@ def convert_file(
     yaml_map = CommentedMap(ioc.model_dump())
 
     # add support yaml schema
+    if instance_folder(yaml) is not None:
+        schema = f"../{IOC_SCHEMA_NAME}"
     yaml_map.yaml_add_eol_comment(f"yaml-language-server: $schema={schema}", column=0)
 
     ruamel.indent(mapping=2, sequence=4, offset=2)
