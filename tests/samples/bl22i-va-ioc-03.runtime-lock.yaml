@@ -1,7 +1,7 @@
 version: 1
 patterns:
   EdwardsRangeGauge:
-    version: 0.8.3
+    version: 0.9.0
     source: github.com/epics-containers/ibek-runtime-streamdevice
     files:
       config/EdGauge.proto: sha256:c69e85f877fa45357498329e2d0c6be998342e72a387db154185847696c1fe8e

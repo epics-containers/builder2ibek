@@ -1,7 +1,7 @@
 version: 1
 patterns:
   granvillePhillips:
-    version: i05-patterns
+    version: 0.9.0
     source: github.com/epics-containers/ibek-runtime-streamdevice
     files:
       config/gp307.proto: sha256:ea3e15c667a6085420d17c3b0f87e7f7ae0242cd28bec1ea24687d75a74e1ba5

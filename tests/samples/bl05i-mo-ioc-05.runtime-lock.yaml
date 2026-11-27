@@ -1,10 +1,10 @@
 version: 1
 patterns:
   BL05I:
-    version: i05-patterns
+    version: 0.6.0
     source: github.com/epics-containers/ibek-runtime-support
     files:
-      config/BL05I.ibek.support.yaml: sha256:3387362b893f8fcdf2a4479f1afdbf03adc81a550617825113f13b43852a6885
+      config/BL05I.ibek.support.yaml: sha256:bc378b5c38a21458190606d47101e0dc2153e3371101c5290339f7b6a96ac5f5
       config/BL05I_Feedback_AutoPV.template: sha256:2484e6a7baab32b0300d284b334ab1ac3e2fec5d00f6af9746bc5da011711de1
       config/BL05I_HR_beamStatus.template: sha256:185892952df752a72b9d6e154808edac901f40587bf8f33e84b9f3990a442100
       config/BL05I_HR_manipulator.template: sha256:21611fd290700e1094816be779ab1ac0775ed1bfdfacbb5b1e0a7ca086f8aa44
@@ -15,9 +15,9 @@ patterns:
       config/BL05I_HR_vacuumOpenSequence.template: sha256:adaa86bed0fb77f03b32fa11a40ff304084101c2e853de113efddc55026cb546
       config/BL05I_Helium_recovery.template: sha256:13541065220d7190e401eeeaab709c7a295237f63065566e78add5b229dde772
       config/BL05I_PGM_homingPLC_steps.template: sha256:4b828d3306e8c398938d7cb5f5c7056a4f7e460d246ca76dfc0831b8692bcde3
-      config/BL05I_changeHexapodMirror.pvi.device.yaml: sha256:9dea989a28a3bd85e376ff1b831d957e2a6adbb5be2a1dc93a41a17291898270
+      config/BL05I_changeHexapodMirror.pvi.device.yaml: sha256:cc4a600b3be0d34de9ce9e9eb09a95822d4a72cad40ab75b9464f71bf3b779d0
       config/BL05I_changeHexapodMirror.template: sha256:9b9266c42fd4c1649af3e35450cf49f14260f3066f6470d651cf44e2815861a0
-      config/BL05I_changeHexapodMirror_withRef.pvi.device.yaml: sha256:e799be573b2e1bdc3d2d053cbcb238e8334006c11c6676eeae023915db487d69
+      config/BL05I_changeHexapodMirror_withRef.pvi.device.yaml: sha256:f240d1fdba23e6952fa14ae32cb15cdfba4112f8cdd828707a5b5fe4d27eb6d5
       config/BL05I_changeHexapodMirror_withReference.template: sha256:89e23c6be0f1bbe80a2ab8dd9f975d7e064d25f93a2443eb0f7773f203c9f6bd
       config/BL05I_mks937bGauge_pressureOverride.template: sha256:b6034aaf0d2bc2e8707ac2a81ba587c760595bffcbfba79a1a6184dcec5b3d97
       config/BL05I_shared_beamStatus.template: sha256:8502ff614fbf28bbed1147cdd1004eed883528e3d744d9addf8648ac7a2100f7
@@ -25,7 +25,7 @@ patterns:
       config/BL05I_waterChiller.template: sha256:b6295d6b13a7af87badc8ac72707bde822849cca7b31f13011f9ae0d6beb29c1
       config/BL05I_waterChiller_interlock.template: sha256:707170d386449b65bfeb3047357b1e17e64ebae1902c1c7bb887b5bb61ee5f62
       config/BL05I_waterChiller_settings.req: sha256:52005530f5e8334f6c9c284911c847b45cae3e4602b93e8ade1eb38bfa66b8d5
-      config/BL05I_waterchiller.pvi.device.yaml: sha256:665b9990abde17165d52ce8ee8da57875646f5c83a0e6a544898489d79884aa6
+      config/BL05I_waterchiller.pvi.device.yaml: sha256:55e4428efb13004d0851e68dd4258bc71e08b76cf7c09d088c0b0bf1ec8e8811
       config/BL05J_Nano_beamStatus.template: sha256:cf4aa5a5f7569f5a2810f6e9b4517877d4b5f5caba12d55e112f90795f06a0e4
       config/BL05J_adamCPW_patch.template: sha256:ea361dcfa120f44382799a1f97979578e38959d0ed6ae66d43b21c3379036887
       config/BL05JmanipulatorSlit.template: sha256:1d6b19f803ab2f404d55fd55f619d8d5ac5997a936b12afcabfc08af0c503864
