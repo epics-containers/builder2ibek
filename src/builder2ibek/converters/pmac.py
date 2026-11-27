@@ -189,22 +189,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         if ":" not in entity.IP:
             entity.IP = entity.IP + ":1025"
 
-    elif entity_type == "RunCommand":
-        # XML uses BRICK but support YAML expects PORT
-        entity.rename("BRICK", "PORT")
-
-    elif entity_type == "RunPlc":
-        # XML uses BRICK but support YAML expects PORT
-        entity.rename("BRICK", "PORT")
-        # the model takes the template's P, which the builder took from the
-        # brick
-        if not has_value(entity.P):
-            for raw in ioc.raw_entities:
-                if raw.get("type") in CONTROLLER_TYPES and raw.get("name") == (
-                    entity.PORT
-                ):
-                    entity.P = raw.get("P")
-                    break
+    elif entity_type in ["RunCommand", "RunPlc"]:
+        # leaf entities: nothing refers to them by name
+        entity.remove("name")
 
     elif entity_type == "moveAxesToSafeMaster":
         # name is type: id (slaves reference it via MASTER)

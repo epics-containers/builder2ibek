@@ -129,6 +129,8 @@ PMAC_XML = """\
   <pmac.auto_pmacVariableRead P="BL05I-MO-STEP-01" Q=":M100" PORT="BRICK1"
     VAR="M100" name="VAR1"/>
   <pmac.RunPlc BRICK="BRICK1" DESC="Clear amp faults" PLC="6" name="PLC6"/>
+  <pmac.RunCommand BRICK="BRICK1" COMMAND="P100=1" P="BL05I-MO-STEP-01" R=":CMD"
+    name="CMD1"/>
 </components>
 """
 
@@ -136,7 +138,7 @@ PMAC_XML = """\
 def test_pmac_leaf_models_drop_name():
     entities = _entities(PMAC_XML)
 
-    for leaf in ("GeoBricketteMStop", "CS_symetrie_hexapod"):
+    for leaf in ("GeoBricketteMStop", "CS_symetrie_hexapod", "RunPlc", "RunCommand"):
         assert "name" not in _of_type(entities, f"pmac.{leaf}")[0]
 
 
@@ -153,11 +155,11 @@ def test_auto_pmac_variable_read_maps_to_its_model():
     assert "name" not in read
 
 
-def test_run_plc_takes_p_from_its_brick():
+def test_run_plc_keeps_the_brick_it_runs_on():
     run = _of_type(_entities(PMAC_XML), "pmac.RunPlc")[0]
 
-    assert run["PORT"] == "BRICK1"
-    assert run["P"] == "BL05I-MO-STEP-01"
+    assert run["BRICK"] == "BRICK1"
+    assert "P" not in run and "PORT" not in run
 
 
 def test_beam_position_calc_moves_to_the_build_time_module():
