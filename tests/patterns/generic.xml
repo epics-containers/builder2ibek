@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<generic.generic_BPM_vert A="BL05I-AL-SLITS-02:Y:PLUS:I" B="BL05I-AL-SLITS-02:X:MINUS:I" C="BL05I-AL-SLITS-02:Y:MINUS:I" D="BL05I-AL-SLITS-02:X:PLUS:I" KX="1" KY="1" P="BL05I-AL-SLITS-02" SCAN="1 second" gda_desc="S2 Beam Position Monitor (X and Y)" gda_name="S2.BPM" name="S2.BPM"/>
+	<generic.generic_scan P="BL05I-CS-SCAN-01" S=":SCAN1D" name="SCAN1D"/>
+	<generic.generic_2d_scan P="BL05I-CS-SCAN-02" S=":SCAN2D" name="SCAN2D"/>
+</components>

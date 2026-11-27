@@ -43,7 +43,9 @@ BEAMLINE_MODULE = re.compile(r"BL\d\d[A-Z]")
 # builder2ibek routes to their pattern. One that also has a generic model is
 # decided by patterns.ALIGNED or patterns.GENERIC_DIFFERS, as for
 # ibek-runtime-streamdevice.
-SUPPORT_PATTERN_MODULES = frozenset({"adamCPW", "BLfeedback", "detectorPlugins"})
+SUPPORT_PATTERN_MODULES = frozenset(
+    {"adamCPW", "BLfeedback", "detectorPlugins", "generic"}
+)
 
 
 # A beamline's builder repo, e.g. BL15I-BUILDER. It is never a runtime

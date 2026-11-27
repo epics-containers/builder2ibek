@@ -1,7 +1,7 @@
 version: 1
 patterns:
   BL05I:
-    version: 0.6.0
+    version: 0.7.0
     source: github.com/epics-containers/ibek-runtime-support
     files:
       config/BL05I.ibek.support.yaml: sha256:bc378b5c38a21458190606d47101e0dc2153e3371101c5290339f7b6a96ac5f5
