@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16I-BUILDER/etc/makeIocs/BL16I-EA-IOC-22.xml -->
+	<keysightLCR.keysightLCR ADDR="0" P="BL16I-EA-LCR-01" PORT="LCRPort" Q="" SCAN=".1" name="LCR"/>
+</components>

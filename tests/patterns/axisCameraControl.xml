@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL22I-BUILDER/etc/makeIocs/BL22I-DI-IOC-05.xml -->
+	<axisCameraControl.axisCamera IPADDR="172.23.122.182" P="BL22I-DI-WEB-07" name="WEB7.cam"/>
+	<axisCameraControl.axisCamera IPADDR="172.23.122.183" P="BL22I-DI-WEB-08" name="WEB8.cam"/>
+	<axisCameraControl.axisCamera IPADDR="172.23.122.184" P="BL22I-DI-WEB-09" name="WEB9.cam"/>
+	<axisCameraControl.axisCameraControl P="BL22I-DI-WEB-07:CONTROL" PORT="WEB7.cam" name="WEB7.ctrl"/>
+	<axisCameraControl.axisCameraControl P="BL22I-DI-WEB-08:CONTROL" PORT="WEB8.cam" name="WEB8.ctrl"/>
+	<axisCameraControl.axisCameraControl P="BL22I-DI-WEB-09:CONTROL" PORT="WEB9.cam" name="WEB9.ctrl"/>
+</components>

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL05I-BUILDER/etc/makeIocs/BL05I-VA-IOC-03.xml -->
+	<granvillePhillips.gp307 gctrl="BL05I-VA-GCTLR-11" name="VA3.GCTRL11" port="vts_GCTLR11"/>
+	<granvillePhillips.gp307Hcg GCTLR="VA3.GCTRL11" channel="1" device="BL05I-VA-HCG-01" gctrl="BL05I-VA-GCTLR-11" name="VA3.HCG1"/>
+	<granvillePhillips.gp307HcgDummy device="BL05I-VA-HCG-99" name="VA3.HCG99"/>
+	<granvillePhillips.gp307Pirg GCTLR="VA3.GCTRL11" channel="1" device="BL05I-VA-GPIRG-04" gctrl="BL05I-VA-GCTLR-11" name="VA3.GPIRG4"/>
+</components>

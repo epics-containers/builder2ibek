@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL02I-BUILDER/etc/makeIocs/BL02I-EA-IOC-09.xml -->
+	<keysight33500B.keysight33500B P="BL02I-EA-SGEN-01" PORT="SGEN1port" Q="" name="SGERN1"/>
+	<keysight33500B.keysight33500Bchan CHAN="1" P="BL02I-EA-SGEN-01" PORT="SGEN1port" Q="" name="SGERN1_CH1"/>
+	<keysight33500B.keysight33500Bchan CHAN="2" P="BL02I-EA-SGEN-01" PORT="SGEN1port" Q="" name="SGERN1_CH2"/>
+</components>

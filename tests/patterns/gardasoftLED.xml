@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL02I-BUILDER/etc/makeIocs/BL02I-EA-IOC-03.xml -->
+	<gardasoftLED.gardasoftLED420 P="BL02I-EA-BL-01" STREAMS_PORT="led" name="backlight"/>
+	<gardasoftLED.gardasoftLED400Channel CHANNEL="1" CONTINUOUS_MAX_CURR="0.1" P="BL02I-EA-BL-01" PULSED_MAX_CURR="0.1" STREAMS_PORT="led" name="backlight_ch1"/>
+	<gardasoftLED.gardasoftLED420Profile LINKPOS="ZR" P="BL02I-EA-BL-01" PROFILE="1" name="backlight_profile1"/>
+	<gardasoftLED.gardasoftLED420ProfileChannel CHANNEL="1" P="BL02I-EA-BL-01" PROFILE="1" name="backlight_profile1_ch1"/>
+</components>

@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07I-BUILDER/etc/makeIocs/BL07I-EA-IOC-08.xml -->
+	<lakeshore340.lakeshore340 ADDR="12" P="BL07I-EA-LS-01" PORT="LAKESHORE" SCAN="5" TEMPSCAN="1" gda_desc="Lakeshore 340 Temperature Controller" gda_name="LS340" name="LS1"/>
+</components>

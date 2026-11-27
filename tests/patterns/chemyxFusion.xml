@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL18B-BUILDER/etc/makeIocs/BL18B-EA-IOC-27.xml -->
+	<chemyxFusion.Fusion4000 P="BL18B-EA-SPUMP-33" PORT="FUSION4000" R=""/>
+</components>

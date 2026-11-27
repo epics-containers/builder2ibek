@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07C-BUILDER/etc/makeIocs/BL07C-EA-IOC-04.xml -->
+	<ip.stanfordSR830 N="A" P="BL07C-EA-LKAMP-99:" PORT="SR830" name="Lockin Amp"/>
+</components>

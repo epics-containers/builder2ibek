@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07I-BUILDER/etc/makeIocs/ClaspTemplate.xml -->
+	<SQC-310.SQC310 P="$(domain)-EA-SQC-41" PORT="SQCPort" name="SQC"/>
+</components>

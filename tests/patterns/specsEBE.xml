@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07I-BUILDER/etc/makeIocs/BL07I-EA-IOC-15.xml -->
+	<specsEBE.EBE4 P="BL07I-EA-EBE-01" PORT="EBEPort" SCAN="1" name="EBE"/>
+</components>

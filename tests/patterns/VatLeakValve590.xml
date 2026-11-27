@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL06I-BUILDER/etc/makeIocs/BL06I-VA-IOC-02.xml -->
+	<VatLeakValve590.VatLeakValve590series device="BL06I-VA-VALVE-20" name="VATLV20" port="p_VATL20" proto="V590.proto"/>
+	<VatLeakValve590.VatLeakValve590series device="BL06I-VA-VALVE-21" name="VATLV21" port="p_VATL21" proto="V590.proto"/>
+</components>

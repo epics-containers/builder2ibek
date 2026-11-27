@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16I-BUILDER/etc/makeIocs/BL16I-EA-IOC-31.xml -->
+	<KeithleyDMM6500.dmm6500 P="BL16I-EA-DMM-01" PORT="port01" R=":" name="Keithley DMM 1"/>
+	<KeithleyDMM6500.dmm6500 P="BL16I-EA-DMM-02" PORT="port02" R=":" name="Keithley DMM 2"/>
+</components>

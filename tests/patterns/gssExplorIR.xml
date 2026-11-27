@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL11J-BUILDER/etc/makeIocs/BL11J-EA-IOC-09.xml -->
+	<gssExplorIR.explorir P="BL11J-EA-CELL-01" PORT="explorir0" name="CELL1"/>
+	<gssExplorIR.explorir P="BL11J-EA-CELL-02" PORT="explorir1" name="CELL2"/>
+	<gssExplorIR.explorir P="BL11J-EA-CELL-03" PORT="explorir2" name="CELL3"/>
+</components>

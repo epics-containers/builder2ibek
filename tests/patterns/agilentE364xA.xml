@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16B-BUILDER/etc/makeIocs/BL16B-EA-IOC-06.xml -->
+	<agilentE364xA.E364xA P="BL16B-EA-PSU-01" PORT="psu1" PREC="4" R="" name="PSU"/>
+	<agilentE364xA.caputcallback CPCB_RBV="BL16B-EA-PSU-01:VOLT:MEAS" CPCB_SET="BL16B-EA-PSU-01:VOLT:SET" M="" P="BL16B-EA-PSU-01" PREC="4" name="PSUvoltscan"/>
+</components>

@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL05I-BUILDER/etc/makeIocs/BL05I-VA-IOC-03.xml -->
+	<agilentTurboPump.twisTorr305FS COOLING_FAN="1" DISABLED="0" GAUGE="0" P="BL05I-VA-TURBO-03" PORT="vts_TURBO3" R=":FS" VENT_VALVE="0" name="VA3.AGLTP1"/>
+</components>

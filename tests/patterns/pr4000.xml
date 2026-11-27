@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL09I-BUILDER/etc/makeIocs/BL09I-VA-IOC-03.xml -->
+	<pr4000.pr4000 ch1pv="BL09I-VA-CAPG-91" ch2pv="BL09I-VA-CAPG-92" device="BL09I-VA-GCTRL-92" name="GCTLR92" port="pr4000_1"/>
+	<pr4000.pr4000 ch1pv="BL09I-VA-CAPG-93" ch2pv="BL09I-VA-CAPG-94" device="BL09I-VA-GCTRL-93" name="GCTLR93" port="pr4000_2"/>
+	<pr4000.pr4000chan channel="1" device="BL09I-VA-CAPG-91" name="CG1" port="pr4000_1"/>
+	<pr4000.pr4000chan channel="2" device="BL09I-VA-CAPG-92" name="CG2" port="pr4000_1"/>
+	<pr4000.pr4000chan channel="1" device="BL09I-VA-CAPG-93" name="CG3" port="pr4000_2"/>
+	<pr4000.pr4000chan channel="2" device="BL09I-VA-CAPG-94" name="CG4" port="pr4000_2"/>
+</components>

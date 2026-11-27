@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL07B-BUILDER/etc/makeIocs/BL07B-EA-IOC-53.xml -->
+	<Keithley6487.Keithley6487 A="" DESCLONG="Current Amplifier 53B Keithley 6487" DESCSHORT="CurrAmp 53B HiTES1 I0" MODEL="0" P="BL07B-DI-IAMP-53" PORT="BL07B-DI-IAMP-53" R=":" name="CA53B"/>
+</components>

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from TS15I-BUILDER/etc/makeIocs/TSLAB-CS-IOC-03.xml -->
+	<lakeshore224.lakeshore224 ADDR="0" P="TSLAB-CS-TMON-01" PORT="LS_TMON1" name="TMON1"/>
+	<lakeshore224.lakeshore224_input_dls ADDR="0" INDEX="A" P="TSLAB-CS-TMON-01" PORT="LS_TMON1" TADEL="0.1" TEMPSCAN="1" TNAME="TS15I-CS-SCMPW-01:T1" name="T1"/>
+</components>

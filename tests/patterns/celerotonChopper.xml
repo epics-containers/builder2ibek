@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL22B-BUILDER/etc/makeIocs/BL22B-EA-IOC-07.xml -->
+	<celerotonChopper.celerotonChopper P="BL22B-EA-CHOP-02" PORT="CHOP_s" Q=":CHOP" name="CHOP.FAST"/>
+</components>

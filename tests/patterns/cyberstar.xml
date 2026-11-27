@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="vxWorks-ppc604_long">
+	<!-- from BL07I-BUILDER/etc/makeIocs/BL07I-EA-IOC-01.xml -->
+	<cyberstar.CBY_2206 ADDR="0" P="BL07I-EA-CYBER-01" PORT="ty_50_6" name="CYB1"/>
+</components>

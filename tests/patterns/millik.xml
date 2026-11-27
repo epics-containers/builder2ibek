@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16B-BUILDER/etc/makeIocs/BL16B-EA-IOC-07.xml -->
+	<millik.millik EGU="C" P="BL16B-DI-TEMP-02" PORT="millik_ip" R=":" name="millik"/>
+</components>

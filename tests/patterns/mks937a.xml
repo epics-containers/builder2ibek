@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- one of each class from SR-BUILDER/etc/makeIocs/SR02C-VA-IOC-01.xml -->
+	<mks937a.auto_mks937aPlogADC device="SR02C-VA-ADCP-01" plog_adc_pv="SR02C-VA-ADC-01:ADC1_VALUE"/>
+	<mks937a.mks937a device="SR02S-VA-GCTLR-01" name="GCTLR_S_01" port="ts1_1"/>
+	<mks937a.mks937aGauge aiinp="SR02C-VA-ADCP-01 PP MS" aitype="Soft Channel" c="0" dom="SR02S" id="01" name="GAUGE_S_01" s="0"/>
+	<mks937a.mks937aImg GCTLR="GCTLR_S_01" channel="1" device="SR02S-VA-IMG-01" ilk_write_access_pv="SR02S-VA-GAUGE-01:ILKSETSP:NOWRITE"/>
+	<mks937a.mks937aPirg GCTLR="GCTLR_S_01" channel="4" device="SR02S-VA-PIRG-01" ilk_write_access_pv="SR02S-VA-GAUGE-01:ILKSETSP:NOWRITE"/>
+	<mks937a.mks937aGaugeGroup device="SR02S-VA-GGAUG-01" gauge1="SR02S-VA-GAUGE-01" gauge2="SR02S-VA-GAUGE-02" gauge3="SR02S-VA-GAUGE-01" gauge4="SR02S-VA-GAUGE-01" gauge5="SR02S-VA-GAUGE-01" gauge6="SR02S-VA-GAUGE-01" gauge7="SR02S-VA-GAUGE-01" gauge8="SR02S-VA-GAUGE-01"/>
+	<mks937a.mks937aImgGroup delay="0" device="SR02S-VA-GIMG-01" img1="SR02S-VA-IMG-01" img2="SR02S-VA-IMG-02" img3="SR02S-VA-IMG-01" img4="SR02S-VA-IMG-01" img5="SR02S-VA-IMG-01" img6="SR02S-VA-IMG-01" img7="SR02S-VA-IMG-01" img8="SR02S-VA-IMG-01"/>
+	<mks937a.mks937aPirgGroup device="SR02S-VA-GPIRG-01" pirg1="SR02S-VA-PIRG-01" pirg2="SR02S-VA-PIRG-02" pirg3="SR02S-VA-PIRG-01" pirg4="SR02S-VA-PIRG-01" pirg5="SR02S-VA-PIRG-01" pirg6="SR02S-VA-PIRG-01" pirg7="SR02S-VA-PIRG-01" pirg8="SR02S-VA-PIRG-01"/>
+	<mks937a.mks937aImgMean current="SR-DI-DCCT-01:SIGNAL" device="SR02S-VA-MIMG-01" img1="SR02S-VA-IMG-01" img10="SR02S-VA-IMG-01" img2="SR02S-VA-IMG-02" img3="SR02S-VA-IMG-01" img4="SR02S-VA-IMG-01" img5="SR02S-VA-IMG-01" img6="SR02S-VA-IMG-01" img7="SR02S-VA-IMG-01" img8="SR02S-VA-IMG-01" img9="SR02S-VA-IMG-01" nimgs="2"/>
+</components>

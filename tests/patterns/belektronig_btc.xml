@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL11K-BUILDER/etc/makeIocs/BL11K-MO-IOC-06.xml -->
+	<belektronig_btc.belektronig_btc DESC="M10 Heater 1" P="BL11K-OP-DCM-01" PORT="k11-dcm1-h1" R="HEATER1" name="DCM1.H1"/>
+	<belektronig_btc.belektronig_btc DESC="M10 Heater 2" P="BL11K-OP-DCM-01" PORT="k11-dcm1-h2" R="HEATER2" name="DCM1.H2"/>
+	<belektronig_btc.belektronig_btc DESC="M10 Heater 3" P="BL11K-OP-DCM-01" PORT="k11-dcm1-h3" R="HEATER3" name="DCM1.H3"/>
+	<belektronig_btc.belektronig_btc DESC="M10 Heater 4" P="BL11K-OP-DCM-01" PORT="k11-dcm1-h4" R="HEATER4" name="DCM1.H4"/>
+</components>

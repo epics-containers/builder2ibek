@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL18B-BUILDER/etc/makeIocs/BL18B-EA-IOC-08.xml -->
+	<zaber_T-LSR.Zaber_T_LSR DEVICE="1" DISABLE="0" P="BL18B-EA-IOC-08" PORT="ty_zaber" Q=":Y" name="zaber Y"/>
+	<zaber_T-LSR.Zaber_T_LSR DEVICE="2" DISABLE="0" P="BL18B-EA-IOC-08" PORT="ty_zaber" Q=":X" name="zaber X"/>
+</components>

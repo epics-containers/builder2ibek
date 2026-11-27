@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL16B-BUILDER/etc/makeIocs/BL16B-MO-IOC-04.xml -->
+	<PIpiezo.auto_actuatorcallback ACT_RBV="BL16B-EA-PIEZO-02:E625:POS:RD" ACT_SET="BL16B-EA-PIEZO-02:E625:MOV:WR" DEADBAND="0.01" EGU="um" M=":E625" P="BL16B-EA-PIEZO-02" name="PIEZO2CB"/>
+	<PIpiezo.auto_actuatorcallback ACT_RBV="BL16B-EA-PIEZO-03:E625B:POS:RD" ACT_SET="BL16B-EA-PIEZO-03:E625B:MOV:WR" DEADBAND="0.01" EGU="um" M=":E625B" P="BL16B-EA-PIEZO-03" name="PIEZO3CB"/>
+	<PIpiezo.E816 AXIS="A" EGU="um" P="BL16B-EA-PIEZO-02" PORT="E625" Q=":E625" name="PIEZO2"/>
+	<PIpiezo.E816 AXIS="A" EGU="um" P="BL16B-EA-PIEZO-03" PORT="E625B" Q=":E625B" name="PIEZO3"/>
+	<PIpiezo.E725 AXIS="1" C=":X" DEADBAND="0.01" EGU="um" P="BL16B-EA-PIEZO-04" PORT="E725" Q=":E725" name="PIEZO4"/>
+	<PIpiezo.E725 AXIS="2" C=":Y" DEADBAND="0.01" EGU="um" P="BL16B-EA-PIEZO-04" PORT="E725" Q=":E725" name="PIEZO4.OB1"/>
+</components>

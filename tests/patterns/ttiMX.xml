@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL09K-BUILDER/etc/makeIocs/BL09K-EA-IOC-02.xml -->
+	<ttiMX.ttiMX P="BL09K-EA-PSU-02" PORT="ttiMXport" name="TTIMX"/>
+	<ttiMX.ttiMXChannel CHAN="1" P="BL09K-EA-PSU-02" PORT="ttiMXport" name="TTIMX.CHAN1"/>
+	<ttiMX.ttiMXChannel CHAN="2" P="BL09K-EA-PSU-02" PORT="ttiMXport" name="TTIMX.CHAN2"/>
+	<ttiMX.ttiMXChannel CHAN="3" P="BL09K-EA-PSU-02" PORT="ttiMXport" name="TTIMX.CHAN3"/>
+	<ttiMX.ttiMXChannel CHAN="4" P="BL09K-EA-PSU-02" PORT="ttiMXport" RANGE2="N/A" RANGE3="N/A" name="TTIMX.CHAN4"/>
+</components>

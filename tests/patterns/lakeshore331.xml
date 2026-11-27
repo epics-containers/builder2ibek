@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL11J-BUILDER/etc/makeIocs/BL11J-EA-IOC-11.xml -->
+	<lakeshore331.lakeshore331 ADDR="0" ONOFFDEFAULT="OFF" P="BL11J-EA-LS331-01" PORT="p13" SCAN="5" TEMPSCAN="1" gda_desc='"Lakeshore 331 Temperature Controller"' gda_name='"LS331"' name="ENV.LS331"/>
+</components>

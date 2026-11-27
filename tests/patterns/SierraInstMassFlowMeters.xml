@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL18I-BUILDER/etc/makeIocs/BL18I-EA-IOC-31.xml -->
+	<SierraInstMassFlowMeters.SierraInstMassFlowMeters P="BL18I-EA-MFC-01" PORT="MFC_IOC" Q="" name="mfc_ioc"/>
+</components>

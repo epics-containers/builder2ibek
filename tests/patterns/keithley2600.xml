@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<!-- from BL13J-BUILDER/etc/makeIocs/BL13J-EA-IOC-19.xml -->
+	<keithley2600.keithley2600 P="BL13J-EA-K2600-01" PORT="KEITH" Q=":01" name="keith01"/>
+	<keithley2600.keithley2600chan CHAN="0" P="BL13J-EA-K2600-01" PORT="KEITH" Q=":01" SMU="smua" TAG="1" name="keith_chan00"/>
+</components>
