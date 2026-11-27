@@ -140,18 +140,30 @@ hybrid IOC this is the NFS autosave mount; see the rtems-proxy autosave
 notes). Commit them alongside the IOC instance if you want the migrated values
 under version control.
 
-On a Kubernetes beamline, each namespace has a `<domain>-epics-pvcs` pod that
-mounts every IOC's autosave PVC under `/mounts/autosave/<ioc-name>/`, where
-`<ioc-name>` is the IOC's services folder name, e.g. `bl05i-ea-ioc-03`. Find
-the pod, then copy both files into it:
+On a Kubernetes beamline, each domain has one shared autosave PVC,
+`<domain>-autosave-claim`. The `<domain>-epics-pvcs` pod mounts it at
+`/mounts/autosave`, with one folder per IOC, `/mounts/autosave/<ioc-name>/`,
+where `<ioc-name>` is the IOC's services folder name, e.g. `bl05i-ea-ioc-03`.
+Each IOC mounts its own folder as a subPath at `/autosave`. For domain `i05`,
+the pod is `i05-epics-pvcs-<hash>`.
 
-```bash
-kubectl get pods | grep epics-pvcs
-kubectl cp <out-folder>/autosave_settings.sav \
-    <domain>-epics-pvcs-<hash>:/mounts/autosave/<ioc-name>/autosave_settings.sav
-kubectl cp <out-folder>/autosave_positions.sav \
-    <domain>-epics-pvcs-<hash>:/mounts/autosave/<ioc-name>/autosave_positions.sav
-```
+1. Stop the legacy IOC, so its autosave files hold its final values.
+2. Run `migrate-autosave` on its autosave folder.
+3. Copy the files into the pvcs pod while the ibek IOC is not running
+   (stopped, or not yet started); otherwise its next save overwrites them:
 
-Copy them before the IOC's first real start, and with the legacy IOC already
-stopped, so the files hold its final values.
+   ```bash
+   kubectl -n <namespace> get pods | grep epics-pvcs
+   kubectl -n <namespace> exec <pod> -- mkdir -p /mounts/autosave/<ioc-name>
+   kubectl -n <namespace> cp <out-folder>/autosave_settings.sav \
+       <pod>:/mounts/autosave/<ioc-name>/autosave_settings.sav
+   kubectl -n <namespace> cp <out-folder>/autosave_positions.sav \
+       <pod>:/mounts/autosave/<ioc-name>/autosave_positions.sav
+   kubectl -n <namespace> exec <pod> -- chmod -R a+rwX /mounts/autosave/<ioc-name>
+   ```
+
+   The `mkdir` is needed because the IOC's folder only appears when the IOC
+   first mounts it. The `chmod` is needed because the pvcs pod writes as root,
+   while autosave in a non-root IOC must rewrite the files and create its
+   `.savB`/`.savN` backups in the folder.
+4. Start the ibek IOC.
