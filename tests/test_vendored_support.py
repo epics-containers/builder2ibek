@@ -16,7 +16,7 @@ from tests.vendor_support_dls import (
     SUPPORT_GLOB,
     VENDORED,
     _module_index,
-    _modules_used_by_samples,
+    _needed_modules,
 )
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -67,8 +67,7 @@ def test_vendored_copy_covers_every_module_the_samples_need():
     dls = _module_index(DLS_SUPPORT)
     vendored = _module_index(VENDORED)
 
-    needed = {m for m in _modules_used_by_samples() if m in dls and m not in community}
-    missing = sorted(needed - set(vendored))
+    missing = sorted(_needed_modules(dls, community) - set(vendored))
 
     assert not missing, (
         f"samples need dls modules that are not vendored: {' '.join(missing)}\n"
