@@ -104,3 +104,46 @@ def test_water_chillers_pull_in_hostlink_once():
     assert types.index("HostLink.HostLink") < types.index("BL05I.BL05I_waterchiller")
     for chiller in _of_type(entities, "BL05I.BL05I_waterchiller"):
         assert "name" not in chiller
+
+
+PMAC_XML = """\
+<components arch="linux-x86_64">
+  <pmac.pmacAsynIPPort IP="10.0.0.1:1025" name="BRICK1port"/>
+  <pmac.GeoBrick P="BL05I-MO-STEP-01" Port="BRICK1port" name="BRICK1"/>
+  <pmac.GeoBricketteMStop P="BL05I-MO-STEP-01" PORT="BRICK1port"
+    name="BRICK1.STOP"/>
+  <pmac.CS_symetrie_hexapod COORD="2" P="BL05I-MO-HEX-01" PORT="BRICK1"
+    name="HEX.SETUP"/>
+  <pmac.auto_slit4_gui P="BL05I-AL-SLITS-02" name="S2.GUI"/>
+  <pmac.auto_pmacVariableRead P="BL05I-MO-STEP-01" Q=":M100" PORT="BRICK1"
+    VAR="M100" name="VAR1"/>
+  <pmac.RunPlc BRICK="BRICK1" DESC="Clear amp faults" PLC="6" name="PLC6"/>
+</components>
+"""
+
+
+def test_pmac_leaf_models_drop_name():
+    entities = _entities(PMAC_XML)
+
+    for leaf in ("GeoBricketteMStop", "CS_symetrie_hexapod"):
+        assert "name" not in _of_type(entities, f"pmac.{leaf}")[0]
+
+
+def test_pmac_gui_only_slit_template_is_dropped():
+    assert not _of_type(_entities(PMAC_XML), "pmac.auto_slit4_gui")
+
+
+def test_auto_pmac_variable_read_maps_to_its_model():
+    entities = _entities(PMAC_XML)
+
+    assert not _of_type(entities, "pmac.auto_pmacVariableRead")
+    read = _of_type(entities, "pmac.pmacVariableRead")[0]
+    assert read["VAR"] == "M100"
+    assert "name" not in read
+
+
+def test_run_plc_takes_p_from_its_brick():
+    run = _of_type(_entities(PMAC_XML), "pmac.RunPlc")[0]
+
+    assert run["PORT"] == "BRICK1"
+    assert run["P"] == "BL05I-MO-STEP-01"

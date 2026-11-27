@@ -20,6 +20,29 @@ schema = (
 # entity types that create a pmac controller port and take CSG0..CSG7
 CONTROLLER_TYPES = ["pmac.PMAC", "pmac.GeoBrick", "pmac.PowerPMAC"]
 
+# leaf entity types whose models do not take name; CS_accel_dcm is not one,
+# as its name is an id
+LEAF_TYPES = (
+    "GeoBricketteMStop",
+    "CS_blade_slits",
+    "CS_2jack",
+    "CS_3jack",
+    "CS_3jack_mirror",
+    "CS_1jack_compensated",
+    "CS_aperture_slits",
+    "CS_gap_and_centre_slits",
+    "CS_flexure_slits",
+    "CS_bender",
+    "CS_IDT_sagittal_dcm",
+    "CS_IDT_sagittal_bender",
+    "CS_qcm",
+    "CS_B22_Optics_Box",
+    "CS_multi_beamstop_on_platform",
+    "CS_zform",
+    "CS_symetrie_hexapod",
+    "auto_motion_stop",
+)
+
 # pmacController.template only has state strings for groups 0 to 7
 MAX_CS_GROUP = 7
 
@@ -35,6 +58,20 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
 
     if entity_type == "pmacDisableLimitsCheck":
         # remove GUI only parameters
+        entity.remove("name")
+
+    elif entity_type in LEAF_TYPES:
+        # name is only the builder object's GUI name: nothing refers to it
+        entity.remove("name")
+
+    elif entity_type == "auto_slit4_gui":
+        # this template has no records: it exists only for the builder GUI
+        entity.delete_me()
+
+    elif entity_type == "auto_pmacVariableRead":
+        # the builder's automatic class for pmacVariableRead.template, which
+        # the pmacVariableRead model loads with the same parameters
+        entity.type = "pmac.pmacVariableRead"
         entity.remove("name")
 
     elif entity_type in [
@@ -159,6 +196,15 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     elif entity_type == "RunPlc":
         # XML uses BRICK but support YAML expects PORT
         entity.rename("BRICK", "PORT")
+        # the model takes the template's P, which the builder took from the
+        # brick
+        if not has_value(entity.P):
+            for raw in ioc.raw_entities:
+                if raw.get("type") in CONTROLLER_TYPES and raw.get("name") == (
+                    entity.PORT
+                ):
+                    entity.P = raw.get("P")
+                    break
 
     elif entity_type == "moveAxesToSafeMaster":
         # name is type: id (slaves reference it via MASTER)
