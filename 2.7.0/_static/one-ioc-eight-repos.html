@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One IOC, eight repos — builder2ibek</title>
+<!--
+  Standalone briefing page, copied verbatim into _static/ by Sphinx.
+  Deliberately NOT styled by pydata-sphinx-theme: it is a self-contained
+  handout, linked from docs/explanations/one-ioc-eight-repos.md, which
+  carries the analysis and the recommendations.
+-->
+<style>
+  :root {
+    --paper:      #F4F5F8;
+    --surface:    #FFFFFF;
+    --surface-2:  #ECEEF3;
+    --ink:        #14171F;
+    --ink-2:      #454B5A;
+    --ink-3:      #6E7588;
+    --rule:       #D6DAE3;
+    --rule-soft:  #E4E7EE;
+    --accent:     #A96718;
+    --accent-bg:  #F7EEDF;
+    --alert:      #9C3E33;
+    --alert-bg:   #F8E9E6;
+    --done:       #3F6B57;
+    --done-bg:    #E6EFEA;
+
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+    --max: 60rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:     #12141A;
+      --surface:   #191C24;
+      --surface-2: #21252F;
+      --ink:       #E7E9EF;
+      --ink-2:     #AFB5C4;
+      --ink-3:     #7C8396;
+      --rule:      #2C313D;
+      --rule-soft: #232833;
+      --accent:    #D8A052;
+      --accent-bg: #2A2318;
+      --alert:     #D98177;
+      --alert-bg:  #2B1D1B;
+      --done:      #79AC92;
+      --done-bg:   #17251E;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:     #12141A;
+    --surface:   #191C24;
+    --surface-2: #21252F;
+    --ink:       #E7E9EF;
+    --ink-2:     #AFB5C4;
+    --ink-3:     #7C8396;
+    --rule:      #2C313D;
+    --rule-soft: #232833;
+    --accent:    #D8A052;
+    --accent-bg: #2A2318;
+    --alert:     #D98177;
+    --alert-bg:  #2B1D1B;
+    --done:      #79AC92;
+    --done-bg:   #17251E;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(2rem, 5.5vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst { font-size: 1.09rem; color: var(--ink-2); max-width: 42rem; text-wrap: pretty; margin: 0; }
+
+  /* ---------- stat strip ---------- */
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .stat { background: var(--surface); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.2rem; }
+  .stat b {
+    font-family: var(--mono);
+    font-size: 1.65rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .stat span { font-size: 0.78rem; color: var(--ink-3); line-height: 1.35; }
+  .stat.flag b { color: var(--accent); }
+  .stat.good b { color: var(--done); }
+
+  /* ---------- section furniture ---------- */
+
+  section { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  h2 {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0;
+    padding-bottom: 0.7rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .lede { color: var(--ink-2); max-width: 42rem; margin: 0; }
+
+  /* ---------- topology ---------- */
+
+  .topo { display: flex; flex-direction: column; gap: 0; }
+
+  .tier { display: flex; flex-direction: column; gap: 0.7rem; padding: 1.15rem 0; }
+  .tier + .tier { border-top: 1px dashed var(--rule); }
+
+  .tier-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .nodes { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+  .node {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.6rem 0.85rem;
+    min-width: 11rem;
+    flex: 1 1 11rem;
+  }
+  .node .name { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; letter-spacing: -0.01em; }
+  .node .meta { font-size: 0.73rem; color: var(--ink-3); }
+  .node.gl { border-left-color: var(--accent); }
+  .node.gh { border-left-color: var(--ink-3); }
+  .node.src { border-left-color: var(--rule); border-style: dashed; }
+
+  .forge-key { display: flex; flex-wrap: wrap; gap: 1.2rem; font-size: 0.76rem; color: var(--ink-3); }
+  .forge-key i { font-style: normal; display: inline-flex; align-items: center; gap: 0.45rem; }
+  .swatch { width: 0.7rem; height: 0.7rem; border-radius: 1px; display: inline-block; }
+
+  /* ---------- stages ---------- */
+
+  .stages { display: flex; flex-direction: column; gap: 0; }
+
+  .stage {
+    display: grid;
+    grid-template-columns: 3.25rem 1fr;
+    gap: 0 1.2rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .stage:first-child { border-top: none; padding-top: 0; }
+
+  .num {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+    padding-top: 0.15rem;
+  }
+  .stage.hand .num { color: var(--accent); }
+
+  .body { display: flex; flex-direction: column; gap: 0.55rem; min-width: 0; }
+
+  .stage h3 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  .stage p { margin: 0; color: var(--ink-2); max-width: 44rem; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    padding: 0.16rem 0.45rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--ink-3);
+    background: var(--surface);
+    white-space: nowrap;
+  }
+  .tag.hand { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); font-weight: 600; }
+  .tag.done { color: var(--done); border-color: var(--done); }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-bg);
+    padding: 0.7rem 0.9rem;
+    border-radius: 0 2px 2px 0;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    max-width: 44rem;
+  }
+  .note.stop { border-left-color: var(--alert); background: var(--alert-bg); }
+  .note.good { border-left-color: var(--done); background: var(--done-bg); }
+  .note b { color: var(--ink); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    padding: 0.08em 0.32em;
+    border-radius: 2px;
+    word-break: break-word;
+  }
+
+  /* ---------- tables ---------- */
+
+  .scroller { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); }
+
+  table { border-collapse: collapse; width: 100%; min-width: 40rem; }
+  th, td { text-align: left; padding: 0.75rem 0.95rem; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.what { font-weight: 600; }
+  td.cost { color: var(--ink-2); }
+  td.mono { font-family: var(--mono); font-size: 0.82rem; }
+  td.num-cell { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .sev {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .sev.hi { color: var(--alert); background: var(--alert-bg); }
+  .sev.md { color: var(--accent); background: var(--accent-bg); }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.4rem;
+    font-size: 0.8rem;
+    color: var(--ink-3);
+    max-width: 44rem;
+  }
+  footer a { color: var(--accent); }
+
+  @media (max-width: 34rem) {
+    .stage { grid-template-columns: 1fr; gap: 0.5rem; }
+    .num { padding-top: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Workflow post-mortem · BL15I-VA-IOC-02 · the complete chain · 12 Aug 2026</div>
+    <h1>One IOC, eight repos</h1>
+    <p class="standfirst">
+      The ask was small: add a vacuum IOC instance for I15. Getting there meant changing
+      support metadata in three repositories, patching three upstream module sources at
+      build time, cutting two releases, stopping three times for a human to merge, and
+      running the whole thing twice — because the first version generated cleanly and
+      would have been dead on arrival. This is the chain as it actually ran.
+    </p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b>15</b><span>steps, none of them optional</span></div>
+    <div class="stat"><b>8</b><span>repositories touched</span></div>
+    <div class="stat"><b>15</b><span>defects fixed across 7 modules</span></div>
+    <div class="stat flag"><b>3</b><span>protected-branch hand-offs</span></div>
+    <div class="stat good"><b>12,025</b><span>records, 0 missing, 0 extra</span></div>
+    <div class="stat"><b>0</b><span>lines of the IOC written by hand</span></div>
+  </div>
+
+  <section>
+    <h2>The dependency graph</h2>
+    <p class="lede">
+      Nothing here is unusual on its own. The cost comes from the depth: a fix in a
+      support model has to climb three tiers before an IOC can use it, and the tier
+      below that isn't ours to change at all.
+    </p>
+
+    <div class="topo">
+      <div class="tier">
+        <div class="tier-label">Tier 0 — upstream module sources (patched at build time, never forked)</div>
+        <div class="nodes">
+          <div class="node src"><span class="name">digitelSpc</span><span class="meta">DLS support · ion pump controller</span></div>
+          <div class="node src"><span class="name">mks937b</span><span class="meta">DLS support · gauge controller</span></div>
+          <div class="node src"><span class="name">vacuumSpace</span><span class="meta">DLS support · space aggregation</span></div>
+        </div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-label">Tier 1 — support metadata</div>
+        <div class="nodes">
+          <div class="node gh"><span class="name">ibek-support</span><span class="meta">GitHub · public entity models</span></div>
+          <div class="node gl"><span class="name">ibek-support-dls</span><span class="meta">GitLab · DLS entity models</span></div>
+          <div class="node gh"><span class="name">ibek-runtime-support</span><span class="meta">GitHub · vendored patterns</span></div>
+        </div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-label">Tier 2 — consumers (submodule pins)</div>
+        <div class="nodes">
+          <div class="node gh"><span class="name">builder2ibek</span><span class="meta">GitHub · converter + CI samples</span></div>
+          <div class="node gl"><span class="name">ioc-dlslinuxvac</span><span class="meta">GitLab · the container image</span></div>
+          <div class="node gh"><span class="name">ioc-template</span><span class="meta">GitHub · copier source</span></div>
+        </div>
+      </div>
+
+      <div class="tier">
+        <div class="tier-label">Tier 3 — instances</div>
+        <div class="nodes">
+          <div class="node gl"><span class="name">i15-services</span><span class="meta">GitLab · the IOC we wanted</span></div>
+          <div class="node gl"><span class="name">i21-services</span><span class="meta">GitLab · collateral, re-fixed</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="forge-key">
+      <i><span class="swatch" style="background: var(--ink-3)"></span> GitHub — agent can push, PR, merge</i>
+      <i><span class="swatch" style="background: var(--accent)"></span> GitLab — protected branches, human merges</i>
+      <i><span class="swatch" style="background: var(--rule)"></span> Upstream source — patched declaratively during the image build</i>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it actually ran</h2>
+    <p class="lede">
+      Numbered because the order was forced, not chosen. Each step either uncovered
+      the next problem or was blocked until the previous one landed.
+    </p>
+
+    <div class="stages">
+
+      <div class="stage">
+        <div class="num">01</div>
+        <div class="body">
+          <h3>Convert the XML</h3>
+          <p>
+            <code>builder2ibek xml2yaml</code> turned 338 XMLbuilder elements into 335
+            ibek entities. Every entity type round-tripped. This part worked exactly as
+            intended and took seconds.
+          </p>
+          <div class="tags"><span class="tag done">automated</span><span class="tag">builder2ibek</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">02</div>
+        <div class="body">
+          <h3>Generation failed — and that was the only discovery mechanism</h3>
+          <p>
+            <code>ibek runtime generate2</code> — the command that turns <code>ioc.yaml</code> plus
+            the support metadata into the IOC's database and startup script — returned 144
+            validation errors. <code>NX102_femto</code> had no entity model at all;
+            <code>NX102_readBool</code> was missing three macros; <code>NX102_temperature</code>
+            demanded a <code>desc</code> that 122 of 123 entities don't set;
+            <code>ether_ip</code> only had <code>EtherIPInit</code>; <code>mks937bGaugeEGU</code>
+            demanded four inputs it should have derived.
+          </p>
+          <div class="note">
+            <b>Nothing knew these gaps existed until an IOC happened to need them.</b>
+            A later sweep found 15 dlsPLC templates with no entity model — the same
+            failure is queued up for the next IOC that touches one.
+          </div>
+          <div class="tags"><span class="tag done">automated</span><span class="tag">dlsPLC</span><span class="tag">ether_ip</span><span class="tag">mks937b</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">03</div>
+        <div class="body">
+          <h3>Fix the same class of bug in two repos on two forges</h3>
+          <p>
+            All 144 errors were one shape: the entity model in a support YAML did not match the
+            database template it wraps. In three variants — a template with no model at all
+            (<code>NX102_femto</code>, <code>NX102_readInt</code>, <code>NX102_PID</code>, and all
+            but one of <code>ether_ip</code>'s); a model missing macros the template accepts
+            (<code>NX102_readBool</code> had no <code>bit</code>, <code>zsv</code> or
+            <code>osv</code>); and a model demanding parameters XMLbuilder derives or leaves blank.
+          </p>
+          <p>
+            The fix is the same in all three: hand-edit the <code>*.ibek.support.yaml</code> to add
+            the missing model, add the missing parameter, or give the over-strict one a
+            <code>default:</code> so it becomes optional. Small, mechanical edits — but
+            <code>ether_ip</code> and <code>mks937b</code> live in the public GitHub repo while
+            <code>dlsPLC</code> and <code>vacuumSpace</code> live in the DLS GitLab one, so identical
+            work was split by ownership across two review and merge processes.
+          </p>
+          <div class="tags"><span class="tag">ibek-support</span><span class="tag">ibek-support-dls</span><span class="tag">entity models</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">04</div>
+        <div class="body">
+          <h3>A cross-cutting defect surfaced, invalidating earlier work</h3>
+          <p>
+            <code>vacuumSpace</code> was passing XMLbuilder short-names (<code>GAUGE1</code>,
+            <code>PIRG13</code>) straight into database macros instead of device PV names.
+            Every gauge, img and pirg link in every vacuum space group pointed at a PV that
+            could never connect.
+          </p>
+          <div class="note">
+            <b>It also broke the I21 IOC converted an hour earlier and reported clean.</b>
+            Five committed CI samples changed. Nothing flagged it — the only reason it was
+            caught is that I15 exercised the same code path with a different module.
+          </div>
+          <div class="tags"><span class="tag">vacuumSpace</span><span class="tag">i21-services</span><span class="tag">5 samples</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">05</div>
+        <div class="body">
+          <h3>A build-or-vendor decision, and a third support repo</h3>
+          <p>
+            <code>BL15I-BUILDER</code> is a beamline repo whose entities the converter
+            silently dropped. It turned out to have no compiled code, so it became a
+            vendored runtime pattern rather than a built module — which meant a new pattern
+            folder, a PR, and a <code>v0.2.0</code> tag in a third support repository before
+            the IOC could reference it.
+          </p>
+          <div class="tags"><span class="tag done">automated</span><span class="tag">ibek-runtime-support</span><span class="tag">tag v0.2.0</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">06</div>
+        <div class="body">
+          <h3>The pin choreography</h3>
+          <p>
+            Bump two submodule pins, commit. Refresh the vendored copy that CI uses because
+            GitHub Actions can't reach DLS GitLab. Regenerate every sample. Commit again.
+            The order is forced: the refresh tool refuses unless the pin is already committed,
+            and two guards read <code>git ls-tree HEAD</code>, so staging isn't enough.
+          </p>
+          <p>
+            And it happens twice over, because the same two support repos are pinned by two
+            consumers: <code>builder2ibek</code>, which converts the XML, and
+            <code>ioc-dlslinuxvac</code>, which builds the container that runs the result. Both have
+            to land on the same metadata. If they drift, the IOC is converted against one version of
+            the entity models and executed against another — and the symptom is a generate failure
+            in the cluster, not a diff anyone reviewed.
+          </p>
+          <div class="tags"><span class="tag">builder2ibek</span><span class="tag">ioc-dlslinuxvac</span><span class="tag">2 consumers, one pin set</span></div>
+        </div>
+      </div>
+
+      <div class="stage hand">
+        <div class="num">07</div>
+        <div class="body">
+          <h3>Hand-off — GitLab main is protected</h3>
+          <p>
+            <code>git push origin main</code> rejected by the pre-receive hook. Push a branch,
+            open a merge request, switch to a browser, merge, come back. The automated chain
+            stops dead here and waits for a person.
+          </p>
+          <div class="tags"><span class="tag hand">human required</span><span class="tag">ibek-support-dls</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">08</div>
+        <div class="body">
+          <h3>Bake it into the container</h3>
+          <p>
+            Point <code>ioc-dlslinuxvac</code> at the two new submodule commits.
+            Straightforward — and, on its own, not enough.
+          </p>
+          <div class="note">
+            <b>What keeps the whole chain tractable: none of it has to be published to be tried.</b>
+            The Generic IOC's devcontainer builds the developer image locally with every support
+            module compiled, and the <code>ibek-support</code> repos are submodules inside it. So
+            entity-model edits, module build fixes, conversion and <code>generate2</code> can all be
+            exercised in a single shell against the real EPICS build. Publishing an image and driving
+            CI in two repositories is the last step, not a step per iteration — otherwise every one
+            of these fifteen steps would have cost a release cycle.
+          </div>
+          <div class="tags"><span class="tag">ioc-dlslinuxvac</span><span class="tag">devcontainer</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">09</div>
+        <div class="body">
+          <h3>The template update turned out to be load-bearing</h3>
+          <p>
+            The image was two template versions behind, and 4.6.3 carries the only two things
+            that make a vendored pattern work at all: <code>ibek runtime place-files</code> in
+            <code>start.sh</code>, and the config folder on msi's include path.
+          </p>
+          <div class="note">
+            <b>Without both, the IOC builds green and dies at container start.</b>
+            This was found by asking a side question about a version pin, not by any check.
+            The update also exposed two template gaps, filed as <code>ioc-template#83</code>.
+          </div>
+          <div class="tags"><span class="tag">copier 4.5.2 → 4.6.3</span><span class="tag">3 conflicts</span><span class="tag">ioc-template#83</span></div>
+        </div>
+      </div>
+
+      <div class="stage hand">
+        <div class="num">10</div>
+        <div class="body">
+          <h3>Hand-off — merge request, then tag the release</h3>
+          <p>
+            The same protected-branch stop as step 07. Merge the MR, then push tag
+            <code>2026.8.1</code> to trigger the image build and the schema publish.
+            Building that image is what started everything below.
+          </p>
+          <div class="tags"><span class="tag hand">human required</span><span class="tag">ioc-dlslinuxvac</span><span class="tag">tag 2026.8.1</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">11</div>
+        <div class="body">
+          <h3>Two support modules were missing from the image entirely</h3>
+          <p>
+            The generated IOC references <code>mks937b</code> and <code>digitelSpc</code>.
+            Neither was in the Dockerfile — six lines to add, one <code>COPY</code> and one
+            <code>ansible.sh</code> per module.
+          </p>
+          <div class="note">
+            <b>The support module list is per-image and hand-maintained.</b> Nothing compares
+            it against what the IOCs using that image actually reference, so a missing module
+            looks exactly like a working image right up until generate time.
+          </div>
+          <div class="tags"><span class="tag">ioc-dlslinuxvac</span><span class="tag">mks937b</span><span class="tag">digitelSpc</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">12</div>
+        <div class="body">
+          <h3>Adding them exposed four build defects</h3>
+          <p>
+            None were bugs in our code. All four are properties of the DLS module sources
+            that only bite outside the DLS build environment — and each was fixed
+            declaratively in that module's <code>*.install.yml</code> rather than by forking
+            the module, which is the pattern worth keeping.
+          </p>
+          <div class="scroller">
+            <table>
+              <thead>
+                <tr><th>Module</th><th>Symptom</th><th>Cause and fix</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono">digitelSpc</td>
+                  <td class="cost"><code>Device 'stream' refers to unknown record type 'scalcout'</code></td>
+                  <td class="cost">The Makefile lists <code>stream.dbd</code> before <code>calcSupport.dbd</code>.
+                    Our StreamDevice is built <em>with</em> calc, so its <code>stream.dbd</code> declares a
+                    <code>scalcout</code> device and dbdExpand needs the record type defined first. The DLS
+                    production build never hit it. Fixed by reordering the two.</td>
+                </tr>
+                <tr>
+                  <td class="mono">digitelSpc</td>
+                  <td class="cost"><code>No rule to make target … stExample-gui</code></td>
+                  <td class="cost">The repo ships only <code>stExample-gui.eds</code>; the script itself is generated
+                    by the <code>etc/makeIocs</code> build, which containers disable. The <code>SCRIPTS=</code>
+                    line is commented out.</td>
+                </tr>
+                <tr>
+                  <td class="mono">digitelSpc<br>mks937b</td>
+                  <td class="cost"><code>ccppc: No such file or directory</code></td>
+                  <td class="cost">Both leave <code>CROSS_COMPILER_TARGET_ARCHS = vxWorks-ppc604_long</code>
+                    uncommented, so make goes on to cross-build for a toolchain the container has never had.
+                    Every sibling vacuum module leaves that line commented; these two are the outliers.</td>
+                </tr>
+                <tr>
+                  <td class="mono">digitelSpc</td>
+                  <td class="cost">example IOCs and EDM screens built</td>
+                  <td class="cost">The <code>etc</code> and <code>opi</code> directories are commented out of the
+                    directory lists, matching what mks937a/b already do.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="tags"><span class="tag">ibek-support-dls</span><span class="tag">ibek-support</span><span class="tag">mks937b 3-0-1 → 3-1-0</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">13</div>
+        <div class="body">
+          <h3>Verifying the IOC needs a toolchain no single container has</h3>
+          <p>
+            The real check on a converted IOC is <code>builder2ibek db-compare</code> against the
+            original expanded database from <code>/dls_sw/prod</code>. That needs <code>msi</code>
+            and the compiled support modules, which exist only in the Generic IOC's image — and,
+            while the converter itself was being rewritten, a working checkout of
+            <code>builder2ibek</code> and its test suite, which sits in a container with no EPICS
+            build.
+          </p>
+          <div class="note">
+            <b>So the work was split across two containers, one per half.</b> One generated the
+            <code>.subst</code>; the other expanded it with <code>msi</code> and compared. Four
+            unrelated build defects had to be fixed before the verification that mattered could
+            run at all.
+          </div>
+          <div class="tags"><span class="tag">2 containers</span><span class="tag">msi</span><span class="tag">db-compare</span></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="num">14</div>
+        <div class="body">
+          <h3>The comparison found 1360 records that should not exist</h3>
+          <p>
+            1360 extra records, none missing, and every vacuum space linking at a
+            <code>:GAUGEG</code> / <code>:IMGG</code> / <code>:IONPG</code> / <code>:PIRGG</code> /
+            <code>:VALVEG</code> prefix instead of a real device. The <code>space</code> and
+            <code>space_b</code> entity models instantiated all five group templates
+            unconditionally. XMLbuilder does not — it counts the devices of each type and picks
+            one of three shapes.
+          </p>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Devices of a type</th><th>What XMLbuilder creates</th></tr></thead>
+              <tbody>
+                <tr><td class="num-cell">0</td><td class="cost">a dummy at <code>&lt;device&gt;:XXXG</code>; the space links to it</td></tr>
+                <tr><td class="num-cell">1</td><td class="cost"><strong>nothing</strong> — the space links straight at the device</td></tr>
+                <tr><td class="num-cell">&gt;1</td><td class="cost">a group at <code>&lt;device&gt;:XXXG</code>; the space links to it</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note stop">
+            <b>An IOC in this state generates cleanly and is dead at runtime.</b> Every space PV
+            points at something that was never created. Nothing in the chain catches it short of
+            comparing against XMLbuilder's own output.
+          </div>
+          <p>
+            The fix went into the converter, not the instance: it now expands <code>space</code> /
+            <code>space_b</code> into the entities builder would have created — per-component
+            delays, the 8-slot padding, the gap-closing that 37 real spaces across
+            <code>/dls_sw</code> depend on — and emits a plain template. The support YAML lost 570
+            lines and gained 16. Groups went from 50 to 7, matching the original exactly, and all
+            50 space→device links match. Because the fix was in the converter, the instance was
+            reconverted rather than patched.
+          </p>
+          <div class="tags"><span class="tag">vacuumSpace</span><span class="tag">13 samples</span><span class="tag">ibek-support#200</span></div>
+        </div>
+      </div>
+
+      <div class="stage hand">
+        <div class="num">15</div>
+        <div class="body">
+          <h3>Hand-off — re-cut the release, then deploy</h3>
+          <p>
+            The third protected-branch stop: merge the module fixes, cut an image that contains
+            them, then set that tag in the instance's <code>values.yaml</code> and deploy.
+            Fifteen steps and eight repositories after the request.
+          </p>
+          <div class="tags"><span class="tag hand">human required</span><span class="tag">ioc-dlslinuxvac</span><span class="tag">i15-services</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Where the time actually went</h2>
+    <p class="lede">
+      Ranked by how much of the chain each one lengthens. The conversion itself isn't
+      on the list — that part is fine.
+    </p>
+
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th>Friction</th><th>What it costs</th><th>Weight</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="what">A converted IOC can be wrong in a way nothing checks</td>
+            <td class="cost">Generation, validation and CI all passed on an IOC whose every vacuum space pointed at PVs that were never created. Only a comparison against XMLbuilder's own output found it, and that comparison is manual.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">Entity-model gaps only surface at generate time</td>
+            <td class="cost">Every new IOC is a fresh discovery exercise. 15 dlsPLC templates still have no model, waiting for whoever needs them first.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">Protected branches mid-chain</td>
+            <td class="cost">Three full stops that no amount of automation can cross. All are small merges of changes already reviewed in-session.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">Failures that are silent until runtime</td>
+            <td class="cost">Missing <code>place-files</code>, ibek below its floor, <code>IOC_VERSION</code> unset, spaces linked at group prefixes — all build green and fail in the cluster.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">No single container can verify an IOC</td>
+            <td class="cost">The converter and the EPICS build live in different images, so the verification loop spans two containers and has to be driven across them by hand.</td>
+            <td><span class="sev hi">High</span></td>
+          </tr>
+          <tr>
+            <td class="what">Support metadata lives in three places</td>
+            <td class="cost">Public repo, DLS repo, plus a vendored copy so CI can run without DLS network. Each needs its own commit, and a guard exists to catch them drifting.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">The image's module list is hand-maintained</td>
+            <td class="cost">Nothing reconciles it against what the IOCs using that image reference, so a missing module is indistinguishable from a working image until an IOC needs it.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Module sources encode their original build environment</td>
+            <td class="cost">vxWorks cross-targets, EDM screen builds, dbd orderings that only work against one particular StreamDevice build. Each is a two-line patch, and each is found by a failed build, one at a time.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Template drift is invisible until you look</td>
+            <td class="cost">Nothing told us the image was two versions behind, or that the gap mattered. It surfaced from a passing remark about a pin.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Sample regeneration couples unrelated modules</td>
+            <td class="cost">A vacuum fix reruns every sample IOC, minutes at a time, and an unrelated upstream change can turn the suite red.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Upstream lands changes unvalidated against converted IOCs</td>
+            <td class="cost">A four-line addition to <code>positioner</code> made a required parameter no XMLbuilder IOC could supply, breaking six samples before it was fixed upstream.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+          <tr>
+            <td class="what">Release tags outlive their contents</td>
+            <td class="cost">An instance pinned to a tag cut before the modules it needs looks perfectly correct in review and fails in the cluster.</td>
+            <td><span class="sev md">Medium</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>What came out of it</h2>
+    <p class="lede">
+      The database the IOC loads was compared record by record against the one XMLbuilder
+      produces for the same beamline.
+    </p>
+
+    <div class="note good">
+      <b>12,025 records in the original, 12,025 in the generated IOC. None missing, none extra.</b>
+      29 records differ by a field, in three classes: 18 carry a <code>DESC</code> the original left
+      blank and 9 carry a fuller one, both on mks937a/b relay setpoints and neither related to spaces;
+      the remaining 2 are the space interlock enable records, which differ by a handful of states and
+      labels because the module is pinned at <code>4-9ec1</code> where the original was built at
+      <code>4-10</code>.
+    </div>
+
+    <p class="lede">
+      The IOC starts. It has not yet been run against the real hardware at I15 — but with
+      parity at this level, connecting it to the beamline is expected to be uneventful.
+    </p>
+  </section>
+
+  <footer>
+    A worked example, not a rule: <code>BL15I-VA-IOC-02</code> converted from
+    <code>/dls_sw/prod/R3.14.12.7/support/BL15I-BUILDER/26-3</code> in August 2026,
+    across two Claude Code sessions in separate containers &mdash; one holding the
+    converter, one holding the EPICS build. Counts are of work actually performed,
+    not estimates. The specifics will date; the shape of the chain is the point.
+    <br><br>
+    <a href="../explanations/one-ioc-eight-repos.html">&larr; Why one IOC instance touches eight repositories</a>
+    &mdash; the same material in prose, with what it suggests we change.
+  </footer>
+
+</div>
+
+</body>
+</html>
