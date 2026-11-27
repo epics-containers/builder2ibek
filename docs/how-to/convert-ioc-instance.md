@@ -140,7 +140,11 @@ them xml2yaml warns once and uses every pattern. When the `--yaml` path is
 `services/<ioc>/config/ioc.yaml` in a services repo, xml2yaml adds each pattern
 with `ibek pattern add <library>:<module>@<tag> services/<ioc>`,
 which writes the pattern files under `config/`, `runtime-lock.yaml`,
-`ioc.schema.json` and the `ioc.yaml` schema header.
+`ioc.schema.json` and the `ioc.yaml` schema header. In a services repo the
+`ioc.yaml` schema header always names the instance's own `../ioc.schema.json`,
+whether or not a pattern is added. That is the header the services repo's
+`ibek-ioc-schema` pre-commit hook writes whenever it can generate the schema;
+when it cannot (no published schema for the image), it leaves the header alone.
 
 A beamline module, one named `BL<nn><x>` such as `BL21I` (not `BL15I-BUILDER`
 or `I19Server`), is never compiled into a generic IOC, so it comes only from
@@ -224,8 +228,7 @@ and `ibek pattern add` can fetch the image's published schema only when that
 GitLab server is listed in `IBEK_GITLAB_HOSTS`, a comma-separated list of
 `host[:port]` entries (a bare host means HTTPS on port 443; in a GitLab CI job
 ibek also adds `CI_SERVER_HOST` itself), with a token in
-`GITLAB_TOKEN` for a private project. Without it every pattern is added and the
-`ioc.yaml` keeps the default schema header.
+`GITLAB_TOKEN` for a private project. Without it every pattern is added.
 
 A pattern already in `runtime-lock.yaml` is left at its locked version; move it
 with `ibek pattern update`. Any other `--yaml` path only lists the patterns and

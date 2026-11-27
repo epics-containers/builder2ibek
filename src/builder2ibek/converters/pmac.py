@@ -41,6 +41,7 @@ LEAF_TYPES = (
     "CS_zform",
     "CS_symetrie_hexapod",
     "auto_motion_stop",
+    "pmacVariableRead",
 )
 
 # pmacController.template only has state strings for groups 0 to 7
@@ -179,10 +180,20 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity.rename("Axis", "AXIS")
         entity.rename("Controller", "CONTROLLER")
         entity.rename("Encoder_axis", "ENCODER_AXIS")
+        # GUI only: the model does not take name
+        entity.remove("name")
+
+    elif entity_type == "pmacMonitorVariables":
+        entity.rename("Controller", "CONTROLLER")
+        entity.rename("Variables", "VARIABLES")
+        # GUI only: the model does not take name
+        entity.remove("name")
 
     elif entity_type == "pmacSetCoordStepsPerUnit":
         entity.rename("Axis", "AXIS")
         entity.rename("Scale", "SCALE")
+        # GUI only: the model does not take name
+        entity.remove("name")
 
     elif entity_type == "pmacAsynIPPort":
         entity.remove("simulation")
