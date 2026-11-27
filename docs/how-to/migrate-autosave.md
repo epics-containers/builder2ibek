@@ -139,3 +139,19 @@ directory the running ibek IOC mounts and restores from at boot (for an RTEMS
 hybrid IOC this is the NFS autosave mount; see the rtems-proxy autosave
 notes). Commit them alongside the IOC instance if you want the migrated values
 under version control.
+
+On a Kubernetes beamline, each namespace has a `<domain>-epics-pvcs` pod that
+mounts every IOC's autosave PVC under `/mounts/autosave/<ioc-name>/`, where
+`<ioc-name>` is the IOC's services folder name, e.g. `bl05i-ea-ioc-03`. Find
+the pod, then copy both files into it:
+
+```bash
+kubectl get pods | grep epics-pvcs
+kubectl cp <out-folder>/autosave_settings.sav \
+    <domain>-epics-pvcs-<hash>:/mounts/autosave/<ioc-name>/autosave_settings.sav
+kubectl cp <out-folder>/autosave_positions.sav \
+    <domain>-epics-pvcs-<hash>:/mounts/autosave/<ioc-name>/autosave_positions.sav
+```
+
+Copy them before the IOC's first real start, and with the legacy IOC already
+stopped, so the files hold its final values.
