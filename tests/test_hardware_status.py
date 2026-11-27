@@ -94,7 +94,9 @@ def test_device_panels(repo: Path):
 
 def test_opis_root(repo: Path):
     config = repo / SCREEN / "hardware-status.yaml"
-    config.write_text(config.read_text() + "opis_root: ../../..\n")
+    config.write_text(
+        config.read_text(encoding="utf-8") + "opis_root: ../../..\n", encoding="utf-8"
+    )
     root = run(repo)
     files = {f.text for f in root.iter("file")}
     assert "../../../bl99x-mo-ioc-01/index.bob" in files
@@ -104,3 +106,10 @@ def test_missing_config(tmp_path: Path):
     result = CliRunner().invoke(cli, ["hardware-status", str(tmp_path)])
     assert result.exit_code == 1
     assert "hardware-status.yaml not found" in result.output
+
+
+def test_disabled_entity_left_out(repo: Path):
+    root = run(repo)
+    pvs = {w.findtext("pv_name") for w in root.iter("widget")}
+    assert "BL99X-VA-PLC-01:MODE" in pvs
+    assert not any("BL99X-VA-PLC-02" in (pv or "") for pv in pvs)

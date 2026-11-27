@@ -47,7 +47,7 @@ opis_root: ../..
 ## Writing the screen
 
 ```bash
-builder2ibek hardware-status <path/to/services-repo>
+uv run builder2ibek hardware-status <path/to/services-repo>
 ```
 
 writes `synoptic/hardware-status/hardware-status.bob` next to the input file.

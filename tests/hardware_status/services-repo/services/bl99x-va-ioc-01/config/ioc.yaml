@@ -3,3 +3,6 @@ description: vacuum
 entities:
   - type: FINS.FINSTemplate
     device: BL99X-VA-PLC-01
+  - type: FINS.FINSTemplate
+    device: BL99X-VA-PLC-02
+    entity_enabled: false
