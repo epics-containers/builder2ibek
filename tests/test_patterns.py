@@ -377,59 +377,84 @@ def _convert(xml: Path) -> list[dict]:
 # the module's etc/builder.py: what builder2ibek converts from builder XML must
 # validate against the pattern and load records.
 
-# Fixtures that fail against the pinned library release, with the reason the
-# pattern audit gave and the change that fixes it. Each is strict, so it fails
-# once the fix is released and the pin moves; then drop it from here.
+# Fixtures that fail against the pinned library release: the exact failure, and
+# the change that fixes it. Each is strict, so it fails once the pin moves to a
+# release with the fix; then drop it from here.
 _SD = "https://github.com/epics-containers/ibek-runtime-streamdevice/pull/"
 _RS = "https://github.com/epics-containers/ibek-runtime-support/issues/"
-_PENDING = "a fix in ibek-runtime-streamdevice, not yet in a PR"
 XFAIL: dict[str, tuple[str, str]] = {
     "BL21I": (
-        "no model BL21I.SGMTravellerAirControl: the pattern misnames it; and the "
+        "no model BL21I.SGMTravellerAirControl: the pattern misnames it, and the "
         "SMPLValveSequence macros changed in BL21I 3-12 while BL21I-BUILDER is "
         "still on 3-11",
         f"{_RS}15",
     ),
     "caenN1470": (
-        "only the private _caenN1470/_chan helpers are modelled, not caenN1470",
-        _PENDING,
+        "no model caenN1470.caenN1470, only the private _caenN1470 helpers",
+        f"{_SD}60, released in 0.12.0",
     ),
-    "chillax": ("chillaxController loads no databases", _PENDING),
+    "chillax": (
+        "chillax.chillaxController loads no records",
+        f"{_SD}58, released in 0.12.0",
+    ),
     "d2afe": (
-        "no d2afe model, only the raw d2ptg template; d2afe needs compiled code, "
-        "so it moves to ibek-support-dls",
-        _PENDING,
+        "no model d2afe.d2afe; d2afe needs compiled code",
+        f"{_SD}58, released in 0.12.0, which removes the pattern: drop this "
+        "fixture when the pin moves",
     ),
     "digitelMpc": (
-        "raw template import: the controller has no name id, Ionp a flat MPC",
-        _PENDING,
+        "digitelMpc.digitelMpc rejects name (extra input)",
+        f"{_SD}56, released in 0.12.0; its port then refers to an asyn port, "
+        "which this fixture does not define",
     ),
-    "keithley2400": ('SCAN is an int; builder XMLs pass SCAN=".1"', _PENDING),
-    "Keithley6487": ('A is a required int; builder XMLs set A=""', _PENDING),
-    "keysightLCR": ('SCAN is an int; builder XMLs pass SCAN=".1"', _PENDING),
-    "knauer": ("no model for the GUI-only PumpAndValve class", _PENDING),
-    "lakeshore331": ("ONOFFDEFAULT is an int; builder XMLs pass 'OFF'", _PENDING),
+    "keithley2400": (
+        'Keithley2400.SCAN is an int; builder XMLs pass SCAN=".1"',
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "Keithley6487": (
+        'Keithley6487.A is required; builder XMLs set A="", which is dropped',
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "keysightLCR": (
+        'keysightLCR.SCAN is an int; builder XMLs pass SCAN=".1"',
+        f"{_SD}57, released in 0.12.0",
+    ),
+    "knauer": (
+        "no model knauer.PumpAndValve",
+        f"{_SD}57, released in 0.12.0, which adds it with no records: list it "
+        "in RENDERS_NOTHING when the pin moves",
+    ),
+    "lakeshore331": (
+        "lakeshore331.ONOFFDEFAULT is an int; builder XMLs pass 'OFF'",
+        f"{_SD}57, released in 0.12.0",
+    ),
     "lakeshore340": (
-        "no name id; SCAN and TEMPSCAN are ints, builder XMLs pass .5",
-        _PENDING,
+        "lakeshore340.lakeshore340 rejects name (extra input)",
+        f"{_SD}56, released in 0.12.0; TEMPSCAN then still converts as an int, "
+        "because ibek-support's generic model has it as an int, and nothing "
+        "tracks changing that",
     ),
     "leybold": (
-        "DRVH and DRVL are required; centerOne.xml leaves them out (and the "
-        "leybold converter reads centerOne.xml from /dls_sw, absent in CI)",
-        _PENDING,
+        "leybold.read_write_floatE_floatE requires DRVH, which centerOne.xml "
+        "leaves empty (the converter reads centerOne.xml from /dls_sw, absent "
+        "in CI, where it fails as well)",
+        f"{_SD}56, released in 0.12.0; leybold.center_one_gui then loads no "
+        "records and belongs in RENDERS_NOTHING",
     ),
     "motomanNX100": (
-        "no model for the BL11I templates auto_BL11I_barcode and "
-        "auto_BL11I_robot_interlocks, which belong in the BL11I runtime pattern",
-        _PENDING,
+        "no models motomanNX100.auto_BL11I_barcode, auto_BL11I_robot_interlocks",
+        "moving those templates to the BL11I pattern of ibek-runtime-support; "
+        "nothing tracks it",
     ),
     "PIpiezo": (
-        "imported from PIpiezo 1-23, so no auto_actuatorcallback (1-28's name)",
-        _PENDING,
+        "no model PIpiezo.auto_actuatorcallback (imported from PIpiezo 1-23)",
+        f"{_SD}57, released in 0.12.0",
     ),
     "yaskawaBARTRobot": (
-        "models the I22-only release; 0-1 builder XMLs leave out CUR_COLUMN_VAR_NUM",
-        _PENDING,
+        "yaskawaBARTRobot.BARTRobot requires CUR_COLUMN_VAR_NUM (I22-only "
+        "release); yaskawaBARTRobot needs compiled code",
+        f"{_SD}58, released in 0.12.0, which removes the pattern: drop this "
+        "fixture when the pin moves",
     ),
 }
 
