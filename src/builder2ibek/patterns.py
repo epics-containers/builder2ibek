@@ -110,7 +110,6 @@ ALIGNED: frozenset[str] = frozenset(
 # is aligned with the generic model, and aligning one means moving it to ALIGNED.
 GENERIC_DIFFERS: frozenset[str] = frozenset(
     {
-        "BLfeedback",
         "digitelMpc",
         "lakeshore340",
         "leybold",

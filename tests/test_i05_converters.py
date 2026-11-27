@@ -1,7 +1,8 @@
 """
-The granvillePhillips and BL05I converters, checked on the converted entities
-alone, before any runtime pattern is consulted: both patterns' models are newer
-than the releases the tests pin.
+The granvillePhillips, BL05I and BLfeedback converters, checked on the converted
+entities alone, before any runtime pattern is consulted: the granvillePhillips
+and BL05I patterns' models are newer than the releases the tests pin, and
+BLfeedbackCalc is not in the pinned ibek-support-dls yet.
 """
 
 from typing import Any
@@ -40,6 +41,16 @@ BL05I_XML = """\
     name="HO1.M1_Chiller" port="vts_H2OPLC1"/>
   <BL05I.BL05I_waterchiller P="BL05I-HO-CHILL-02" PLCNAME="BL05I-HO-PLC-02"
     name="HO1.PGM_Chiller" port="vts_H2OPLC1"/>
+</components>
+"""
+
+# from BL11I-MO-IOC-02
+BEAM_POSITION_XML = """\
+<components arch="linux-x86_64">
+  <BLfeedback.beamPositionCalc ADCPORT="ADC53" C1="3" C2="1" C3="0" C4="2"
+    name="S4BPC"/>
+  <BLfeedback.beamPositionCalc ADCPORT="ADC53" C1="4" C2="5" C3="6" C4="7"
+    geometry="1" name="QBPM3BPC"/>
 </components>
 """
 
@@ -147,3 +158,21 @@ def test_run_plc_takes_p_from_its_brick():
 
     assert run["PORT"] == "BRICK1"
     assert run["P"] == "BL05I-MO-STEP-01"
+
+
+def test_beam_position_calc_moves_to_the_build_time_module():
+    entities = [
+        e for e in _entities(BEAM_POSITION_XML) if "beamPositionCalc" in e["type"]
+    ]
+
+    assert len(entities) == 2
+    assert entities[1] == {
+        "type": "BLfeedbackCalc.beamPositionCalc",
+        "ADCPORT": "ADC53",
+        "C1": 4,
+        "C2": 5,
+        "C3": 6,
+        "C4": 7,
+        "geometry": 1,
+        "name": "QBPM3BPC",
+    }
