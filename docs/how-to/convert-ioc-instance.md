@@ -277,7 +277,16 @@ Auto-conversion is a best-effort translation; review the output for:
 You will need to update the schema when you have made changes — see [](#schema-update).
 :::
 
-For schema validation to work your `ioc.yaml` should have the following header:
+For schema validation to work your `ioc.yaml` needs a schema header. Inside a
+services-repo instance (`services/<ioc>/config/ioc.yaml`) it names the
+instance's own schema, which the services repo's `ibek-ioc-schema` pre-commit
+hook generates; xml2yaml writes this header there:
+
+```yaml
+# yaml-language-server: $schema=../ioc.schema.json
+```
+
+Outside an instance it names the global schema, which `./update-schema` builds:
 
 ```yaml
 # yaml-language-server: $schema=/epics/ibek-defs/ioc.schema.json
