@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<pmac.pmacAsynIPPort IP="10.105.2.6:1025" name="BRICK06_Port"/>
+	<pmac.GeoBrick ControlIP="bl05i-nt-tserv-01" ControlMode="ts" ControlPort="7022" Description="M4M5 hexapod motion" MovingPoll="50" P="BL05I-MO-STEP-06" Port="BRICK06_Port" name="BRICK06"/>
+	<BL05I.BL05I_changeHexapodMirror_withRef M1HLM="4" M1LLM="-68" M1NAME="M4" M2HLM="68" M2LLM="-4" M2NAME="M5" MREFHLM="36" MREFLLM="-36" P="BL05I-OP-RFM-01" PLC="12" PORT="BRICK06_Port" R=":MIRCTRL" YMTR="BL05I-OP-RFM-01:Y" name="M4M5.CHANGE"/>
+</components>

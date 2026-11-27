@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<components arch="linux-x86_64">
+	<asyn.AsynIP name="pGCTLR03" port="10.172.4.1:7001"/>
+	<granvillePhillips.gp350 gctrl="BL06K-VA-GCTLR-03" name="GCTLR03" port="pGCTLR03"/>
+	<granvillePhillips.gp350Gauge dom="BL06K" gctrl="BL06K-VA-GCTLR-03" id="03" name="GCTLR-03"/>
+	<granvillePhillips.gp350Hcg GCTLR="GCTLR03" device="BL06K-VA-HCG-02" gctrl="BL06K-VA-GCTLR-03" name="HCG-02"/>
+</components>

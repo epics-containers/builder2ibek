@@ -47,7 +47,7 @@ def _skip_without_runtime_schema(stem: str) -> None:
 
 # Samples with runtime patterns that also need compiled support, so their
 # values.yaml keeps the services template's image placeholder
-MIXED_PATTERN_SAMPLES = {"bl04i-mo-ioc-03", "bl18b-ea-ioc-24"}
+MIXED_PATTERN_SAMPLES = {"bl04i-mo-ioc-03", "bl05i-mo-ioc-05", "bl18b-ea-ioc-24"}
 
 
 def _check_patterns(config: Path, stem: str) -> None:
