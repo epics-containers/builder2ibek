@@ -59,3 +59,25 @@ def test_autosave_tags_become_info_tags():
     assert "BL05I-EA-USER-01:AI1" not in ioc.raw_record_info
     rendered = render_records(ioc.raw_records, ioc.raw_record_info)
     assert '    info(autosaveFields, "VAL")\n}' in rendered
+
+
+MOVING_AVERAGE_XML = """\
+<components arch="linux-x86_64">
+  <userIO.movingAverage ADEL="0.1" INP="BL24I-MO-STEP-01:X.RBV" P="BL24I-MO-AVG-01"
+    TYPE="DOUBLE" name="AVG1"/>
+</components>
+"""
+
+
+def test_moving_average_stays_a_userio_entity():
+    """Its aSub calls calcAverage from userIO's library, so the IOC needs it."""
+    builder = Builder()
+    builder.load_string(MOVING_AVERAGE_XML)
+    ioc = dispatch(builder, "BL24I-MO-IOC-99.xml")
+
+    (average,) = [e for e in ioc.entities if e["type"] == "userIO.movingAverage"]
+    assert average["INP"] == "BL24I-MO-STEP-01:X.RBV"
+    assert "name" not in average
+    assert not ioc.raw_records
+    # so the module plan keeps userIO as build-time
+    assert "userIO" in {str(e["type"]).split(".")[0] for e in ioc.entities}

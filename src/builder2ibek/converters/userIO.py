@@ -5,8 +5,11 @@ builder's userIO classes are AutoSubstitutions: each loads one template of the
 module with its XML attributes as the macros. This converter expands that
 template itself, from the copies of userIO 2-32's templates in userIO_db/, and
 writes the records to records.db with the raw records (see records.py), so the
-IOC needs no userIO in its image. A record with a ``#% autosave <pass>
-<fields>`` tag gets an autosave info tag naming those fields.
+IOC needs no userIO in its image. The exception is movingAverage, whose aSub
+record calls calcAverage and initAverage from userIO's compiled library: it
+stays a userIO entity, so userIO stays build-time for an IOC that uses it. A
+record with a ``#% autosave <pass> <fields>`` tag gets an autosave info tag
+naming those fields.
 """
 
 import re
@@ -22,6 +25,10 @@ TEMPLATES = Path(__file__).parent / "userIO_db"
 # builder's simulation classes load their parent's template, with the I/O link
 # emptied and soft device support
 SIMULATIONS = {"ai_sim": "INP", "ao_sim": "OUT", "bi_sim": "INP", "bo_sim": "OUT"}
+
+# templates whose records need userIO's compiled library (userIOSupport.dbd):
+# they stay userIO entities, for their ibek model
+COMPILED = {"movingAverage"}
 
 # templates loaded by a class of another name
 TEMPLATE_FILES = {"caLab_interface": "caLab_interface.db"}
@@ -99,8 +106,8 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
     base = entity_type.removeprefix("auto_")
     base = base.removesuffix("_sim") if entity_type in SIMULATIONS else base
     template = TEMPLATES / TEMPLATE_FILES.get(base, f"{base}.template")
-    if not template.is_file():
-        # no template to expand: the entity stays for its ibek model
+    if base in COMPILED or not template.is_file():
+        # nothing to expand: the entity stays for its ibek model
         entity.remove("name")
         return
 
