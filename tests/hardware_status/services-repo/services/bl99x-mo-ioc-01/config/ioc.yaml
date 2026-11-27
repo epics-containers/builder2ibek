@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://example.invalid/ibek.ioc.schema.json
+ioc_name: "{{ _global.get_env('IOC_NAME') }}"
+description: motion
+entities:
+  - type: devIocStats.iocAdminSoft
+    IOC: "{{ ioc_name | upper }}"
+  - type: devIocStats.iocAdminSoft
+    IOC: BL99X-MO-IOC-01
+  - type: autosave.Autosave
+    P: "BL99X-MO-IOC-01:"
+  - type: pmac.GeoBrick
+    name: BRICK1
+    P: BL99X-MO-BRICK-01
+  - type: pmac.GeoBricketteMStop
+    P: BL99X-MO-BRICK-01
+  - type: pmac.GeoBrick
+    name: BRICK2
+    P: BL99X-MO-BRICK-02

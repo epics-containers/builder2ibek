@@ -10,6 +10,7 @@ how-to/after-beamline-convert.md
 how-to/create-generic-ioc-repo.md
 how-to/convert-ioc-instance.md
 how-to/runtime-support.md
+how-to/hardware-status.md
 how-to/autosave.md
 how-to/migrate-autosave.md
 how-to/verify-with-devcontainer.md

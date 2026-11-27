@@ -88,6 +88,11 @@ uv run builder2ibek beamline2yaml <BL08J> --services-repo <path/to/services-repo
 # Services-repo files only: never deploy one while its IOC runs on its server.
 uv run builder2ibek dev-c7 <BL08J> --services-repo <path/to/services-repo>
 
+# Write synoptic/hardware-status/hardware-status.bob, the Phoebus hardware status
+# screen, from the services/ IOCs and synoptic/hardware-status/hardware-status.yaml
+# (see docs/how-to/hardware-status.md).
+uv run builder2ibek hardware-status <path/to/services-repo>
+
 # Testing:
 uv run pytest
 env -u EPICS_ROOT uv run pytest      # as CI runs it -- local /epics hides failures
