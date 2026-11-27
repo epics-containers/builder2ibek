@@ -45,7 +45,11 @@ its submodule, so samples such as `bl08j-mo-ioc-13` and `bl04i-mo-ioc-03`
 (`*.runtime-lock.yaml`) are reproducible and offline. The runtime image's
 schema is still fetched, by ibek, which caches it. Each submodule is pinned at
 a **release tag** equal to its tag in `PINNED_LIBRARIES`. Their paths do not
-match `ibek-support*`, so `update-schema` never sees the pattern models.
+match `ibek-support*`, so `update-schema` never sees the pattern models, and
+neither does `support_defaults.py`: the parameter types it gives a pattern
+entity (an empty attribute, or a number kept as text for a `str`) come from the
+indexed release, the one the conversion validates against, never from the
+submodule.
 
 `tests/test_beamline_patterns.py` checks that the beamline patterns of the
 pinned `ibek-runtime-support` load only record types the

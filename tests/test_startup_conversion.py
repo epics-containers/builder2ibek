@@ -11,7 +11,7 @@ import pytest
 
 from builder2ibek.builder import Builder
 from builder2ibek.convert import convert_file, dispatch
-from tests.conftest import requires_support
+from tests.conftest import REPO_ROOT, requires_support
 
 
 def convert(body: str) -> list[dict[str, Any]]:
@@ -184,6 +184,37 @@ def test_text_kept_only_for_str_params_holding_the_xml_number(monkeypatch):
     entity.set_xml_attributes({"A": "1.50", "B": "3", "C": "3", "D": "4"})
     support_defaults.keep_text_attributes(entity)
     assert entity == {"type": "m.e", "A": "1.50", "B": 7, "C": 3, "D": 4}
+
+
+def test_pattern_types_come_from_the_indexed_release(monkeypatch, tmp_path):
+    """A pattern parameter's type is the one in the library release the
+    conversion validates against, not the pinned submodule's: here a release
+    in which lakeshore218 takes SCAN as str, where the submodule has int."""
+    from builder2ibek import patterns
+    from builder2ibek.support_defaults import empty_attribute
+
+    pinned = REPO_ROOT / "ibek-runtime-streamdevice" / "lakeshore218"
+    pinned_yaml = (pinned / "lakeshore218.ibek.support.yaml").read_text()
+    assert "      SCAN:\n        type: int\n" in pinned_yaml
+    release = tmp_path / "lakeshore218"
+    release.mkdir()
+    (release / "lakeshore218.ibek.support.yaml").write_text(
+        pinned_yaml.replace(
+            "      SCAN:\n        type: int\n", "      SCAN:\n        type: str\n"
+        )
+    )
+    index = patterns.PatternIndex(tmp_path, "99.0.0")
+    monkeypatch.setattr(patterns, "pattern_index", lambda: index)
+
+    entities = convert(
+        '<lakeshore218.lakeshore218 ADDR="0" P="BL01C-EA-TCTRL-01" PORT="ls" '
+        'SCAN="5" TEMPSCAN="5"/>'
+    )
+    (lakeshore,) = of_type(entities, "lakeshore218.lakeshore218")
+    assert lakeshore["SCAN"] == "5"
+    assert lakeshore["TEMPSCAN"] == 5
+    assert empty_attribute("lakeshore218.lakeshore218", "SCAN") == ""
+    assert empty_attribute("lakeshore218.lakeshore218", "TEMPSCAN") is None
 
 
 def test_empty_attribute_is_filled_under_its_new_name():

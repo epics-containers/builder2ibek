@@ -3,13 +3,14 @@ Load defaults from ibek support YAML files so we can omit parameters
 whose values match the defaults during conversion, and the parameter types
 that decide what an empty XML attribute becomes (see empty_attribute).
 
-The models are read from the submodules of a source checkout: ibek-support*
-for the generic models, and the pinned runtime pattern libraries
-(ibek-runtime-streamdevice, and the modules of ibek-runtime-support that
-routes_to_support_pattern names)
-for the parameter types of pattern entities. An installed builder2ibek has
-none of them, so it finds no models and drops every empty attribute, leaving
-each to its model default.
+The generic models are read from the ibek-support* submodules of a source
+checkout. The parameter types of pattern entities come from the runtime pattern
+library releases the conversion validates against: the index that
+builder2ibek.patterns.pattern_index clones (the latest releases, or those
+BUILDER2IBEK_PATTERN_TAG and BUILDER2IBEK_SUPPORT_PATTERN_TAG name), never the
+pinned pattern submodules. An installed builder2ibek has no ibek-support*, and
+with no index there are no pattern types either: an empty attribute with no
+model to say is dropped, leaving it to its model default.
 """
 
 import re
@@ -26,15 +27,8 @@ _project_root = Path(__file__).parent.parent.parent
 _defaults: dict[str, dict[str, Any]] = {}
 # {entity_type: {param_name, ...}}
 _params: dict[str, set[str]] = {}
-# {entity_type: {param_name: param_spec}}
+# {entity_type: {param_name: param_spec}}, of the generic models
 _param_specs: dict[str, dict[str, dict[str, Any]]] = {}
-
-# The runtime pattern libraries, as patterns.py chooses between a pattern and
-# the generic model: an ibek-runtime-streamdevice pattern only stands in for a
-# module with no generic model (or one that matches it), while a beamline
-# module comes only from its ibek-runtime-support pattern.
-_STREAMDEVICE_PATTERNS = "ibek-runtime-streamdevice"
-_SUPPORT_PATTERNS = "ibek-runtime-support"
 
 # A beamline module holds the templates of one beamline, e.g. BL21I
 BEAMLINE_MODULE = re.compile(r"BL\d\d[A-Z]")
@@ -90,19 +84,31 @@ def _specs(params: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {k: v for k, v in params.items() if isinstance(v, dict)}
 
 
-def _load_pattern_specs():
+def param_specs(entity_type: str) -> dict[str, dict[str, Any]]:
     """
-    The parameter types of the runtime pattern models, from the pinned
-    submodules. They only feed empty_attribute: defaults stay the generic ones.
+    The parameters of the model builder2ibek converts an entity type with, by
+    name; {} if there is none.
+
+    That is the generic model in ibek-support*, except where patterns.py takes
+    the pattern model instead: for a module routes_to_support_pattern names,
+    and for an entity type with no generic model. A pattern model comes from the
+    release in patterns.pattern_index, the one the conversion validates
+    against; with no index, or no pattern for the type, the generic model (if
+    any) is used.
     """
-    for entity_type, params in _models(_project_root / _STREAMDEVICE_PATTERNS):
-        _param_specs.setdefault(entity_type, _specs(params))
-    # a beamline module never uses a generic model, so its pattern model
-    # replaces any; ibek-runtime-support's other modules are used only when
-    # routes_to_support_pattern says so
-    for entity_type, params in _models(_project_root / _SUPPORT_PATTERNS):
-        if routes_to_support_pattern(entity_type.partition(".")[0]):
-            _param_specs[entity_type] = _specs(params)
+    generic = _param_specs.get(entity_type)
+    if generic is not None and not routes_to_support_pattern(
+        entity_type.partition(".")[0]
+    ):
+        return generic
+    # patterns.py imports this module
+    from builder2ibek import patterns
+
+    try:
+        pattern = patterns.pattern_index().param_specs(entity_type)
+    except Exception:  # noqa: BLE001 -- no index: plan_patterns reports why
+        pattern = None
+    return pattern if pattern is not None else generic or {}
 
 
 def _load_all_support_yamls():
@@ -155,7 +161,7 @@ def empty_attribute(entity_type: str, param: str) -> Any:
     default) for a parameter the model does not take as "", or does not have,
     or when there is no model to say.
     """
-    spec = _param_specs.get(entity_type, {}).get(param)
+    spec = param_specs(entity_type).get(param)
     if spec is None:
         return None
     typ = spec.get("type")
@@ -218,7 +224,7 @@ def keep_text_attributes(entity: dict[str, Any]):
     """
     if not isinstance(entity, Entity):
         return
-    specs = _param_specs.get(str(entity.get("type", "")), {})
+    specs = param_specs(str(entity.get("type", "")))
     for key, text in entity.xml_attributes().items():
         value = entity.get(key)
         if (
@@ -252,7 +258,5 @@ def strip_defaults(entity: dict[str, Any]):
             del entity[param_name]
 
 
-# Load at import time: generic models first, so that a streamdevice pattern
-# only adds the types of modules they lack
+# Load at import time
 _load_all_support_yamls()
-_load_pattern_specs()
