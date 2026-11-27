@@ -32,7 +32,7 @@ patterns:
       config/BL05JpvRamp.template: sha256:bb5a51bdcbbe3b1d16e1fcc0c6c25ebcc7e0462ea5893aa2bbb8d4fdd38e72df
       config/motionProtectionMeaning.template: sha256:96f6b185d57b806a68c8531550cec0182721dd117ec6acf66c945a619cec1ee1
   HostLink:
-    version: 0.9.0
+    version: 0.10.0
     source: github.com/epics-containers/ibek-runtime-streamdevice
     files:
       config/HostLink.ibek.support.yaml: sha256:e77700e70f8586ad9f3b5266793be684fb89f8085d65932ffacc5ac6b3e1b0ed

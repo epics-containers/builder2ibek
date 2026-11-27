@@ -25,8 +25,9 @@ def handler(entity: Entity, entity_type: str, ioc: Generic_IOC):
         entity_type = entity_type[5:]
         entity.type = f"{xml_component}.{entity_type}"
 
-    # remove GUI only parameters (except on mks937aGauge which uses it for object ref)
-    if entity_type not in ["mks937aGauge", "mks937a"]:
+    # remove GUI only parameters, except on mks937aGauge, which uses it for
+    # object ref, and auto_mks937aInterlock, whose records take it as DESC
+    if entity_type not in ["mks937aGauge", "mks937a", "auto_mks937aInterlock"]:
         entity.remove("name")
 
     # mks937aGauge(EGU).id is type: int in the support YAML, but XML encodes
