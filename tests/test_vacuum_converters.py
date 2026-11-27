@@ -90,14 +90,15 @@ def test_dlsplc_numeric_labels_become_str(tmp_path: Path):
     assert valve["addr"] == 70
 
 
-def test_userio_calcout12input_fields_are_str(tmp_path: Path):
+def test_userio_calcout12input_goes_to_records_db(tmp_path: Path):
     entities, _ = _convert(tmp_path, XML)
-    (calc,) = _by_type(entities, "userIO.auto_calcout12input")
-    assert calc["OCAL"] == "1"
-    assert calc["INPA"] == "1"
-    assert calc["PREC"] == "3"
-    assert calc["R"] == "1"
-    assert "name" not in calc
+    assert not _by_type(entities, "userIO.auto_calcout12input")
+    text = (tmp_path / "records.db").read_text()
+    record = text.split('record(calcout, "BL01C-VA-SPACE-12:1")')[1].split("}")[0]
+    assert 'field(OCAL, "1")' in record
+    assert 'field(INPA, "1")' in record
+    assert 'field(PREC, "3")' in record
+    assert 'info(autosaveFields, "CALC OUT PREC' in record
 
 
 def test_alarm_monitor(tmp_path: Path):
@@ -142,10 +143,11 @@ def test_raw_records_go_to_records_db(tmp_path: Path):
     ioc_yaml = YAML(typ="safe").load((tmp_path / "ioc.yaml").read_text())
     assert ioc_yaml["post_db_files"] == ["records.db"]
     text = (tmp_path / "records.db").read_text()
-    assert text.count("record(") == 3
+    # the three records.* elements and the userIO calcout
+    assert text.count("record(") == 4
     assert 'record(ai, "BL01C-EA-TABLE-01:AI")' in text
     assert not [w for w in warnings if "won't convert" in w and "records." in w]
-    assert any(w.startswith(f"{IOC}: 3 raw records written") for w in warnings)
+    assert any(w.startswith(f"{IOC}: 4 raw records written") for w in warnings)
 
 
 def test_dls8516channel_fullduplex_optional(tmp_path: Path):

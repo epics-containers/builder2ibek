@@ -239,14 +239,6 @@ pattern
 	{ "dlsPLC.vacValveDebounce", "True",           "MAJOR",      "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "NO_ALARM",   "Failed",        "Run Ilks Ok",   "OK",            "Disarmed",      "",              "",              "Remote",      "Local",   "MAJOR",   "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "NO_ALARM", "Fault",      "Open",       "Opening",    "Closed",     "Closing",    "",           "",           "Open",       "Close",      "Reset",      "",           "",           "",           "",           "unused",    "unused",    "unused",    "unused",    "unused",    "unused",    "unused", "unused", "unused", "unused", "unused", "unused", "unused", "unused", "unused", "unused", "unused",       "Valve 1 Closed",           "Valve 2 Closed",           "TurboOff&NotAtSpeed",      "Vent Permit",      "Valve 22 Not Open", "Stop Button",      "unused",          "unused",          "unused",          "unused",          "unused",          "unused",       "unused",       "unused",      "unused",        "0",       "Open command not allowed", "",        "BL16I-VA-VLVCC-02", "120",  "BL16I-VA-VALVE-23", "VLVCC02", "valve",     "$(device)" }
 }
 
-file "$(USERIO)/db/bi.template" {
-pattern 
-	{ "P",               "R",           "DTYP",             "INP",                          "SCAN",     "ZNAM", "ONAM", "ZSV", "OSV", "COSV", "DESC",         "archiver_rate" }
-	{ "BL16I-VA-DCM-01", ":VENTENABLE", "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B0 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10"            }
-	{ "BL16I-VA-DCM-01", ":SERVICE",    "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B1 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10"            }
-	{ "BL16I-VA-DCM-01", ":TEST",       "Raw Soft Channel", "BL16I-VA-VALVE-21:GILK.B2 MS", "1 second", "OFF",  "ON",   "",    "",    "",     "Binary Input", "10"            }
-}
-
 file "$(DLSPLC)/db/dlsPLC_temperature.template" {
 pattern 
 	{ "type",               "entity_enabled", "timeout", "lolo", "low", "high", "hihi", "hopr",  "lopr", "llsv",     "lsv",      "hyst", "device",            "temp",           "desc",                "tmpcc",             "port",    "offset", "adel", "scalefac", "tempcal", "prec", "disable_pv",            "disable_calc", "incentury", "outcentury", "egu" }

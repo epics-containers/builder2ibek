@@ -362,12 +362,6 @@ pattern
 	{ "dlsPLC.temperature", "True",           "0",       "0.0",  "0.0", "60.0", "70.0", "100.0", "0.0",  "NO_ALARM", "NO_ALARM", "0.0",  "BL19I-DI-TEMP-01",  ":T6",      "EH2 Temp 2",             "BL19I-VA-TMPCC-02", "ty_40_5.Hostlink", "28",     "0.0",  "100",      "0.0",     "3",    "$(device)$(temp):ZERO", "A=1",          "2",         "1",          "C"   }
 }
 
-file "$(USERIO)/db/ai.template" {
-pattern 
-	{ "EGUF", "SCAN",     "DTYP",     "INP",               "LINR",   "PREC", "EGUL", "P",               "R",        "EGU", "DESC",           "archiver_rate" }
-	{ "1.0",  "1 second", "Hy8401ip", "#C50 S4 @MEAN=500", "LINEAR", "3",    "-1.0", "BL19I-VA-LPC-01", ":VOLTAGE", "V",   "Analogue Input", "10"            }
-}
-
 file "mks937bImgGroup.template" {
 pattern 
 	{ "rgaIlRelay", "img6",            "delay", "img3",            "img8",            "device",                 "img5",            "valveIlRelay", "img2",            "img1",            "img7",            "mpsIlRelay2", "mpsIlRelay1", "img4"            }
